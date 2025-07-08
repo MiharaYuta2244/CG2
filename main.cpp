@@ -5,6 +5,7 @@
 #include "ImGuiManager.h"
 #include "MathUtility.h"
 #include "Model.h"
+#include "ModelCommon.h"
 #include "Object3d.h"
 #include "Object3dCommon.h"
 #include "SphereMeshGenerator.h"
@@ -34,7 +35,6 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int) {
 	auto dxCommon = std::make_unique<DirectXCommon>();
 	dxCommon->Initialize(winApp);
 
-
 	// ImGuiManager
 	std::unique_ptr<ImGuiManager> imGuiManager_ = std::make_unique<ImGuiManager>();
 	imGuiManager_->Initialize(dxCommon->GetWinApp()->GetHWND(), dxCommon->GetDevice(), dxCommon->GetSwapChainDescBufferCount(), dxCommon->GetRtvFormat(), dxCommon->GetSrvDescriptorHeap().Get());
@@ -45,17 +45,30 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int) {
 
 	SphereMeshGenerator sphereMesh(16);
 
-	// Model共通部
+	// Object3dCommon
 	auto object3dCommon = std::make_unique<Object3dCommon>();
 	object3dCommon->Initialize(dxCommon.get());
 
-	// Model個別
-	auto object3d = std::make_unique<Object3d>();
-	object3d->Initialize(object3dCommon.get(), textureManager_.get());
+	// Object3d
+	std::vector<std::unique_ptr<Object3d>> object3ds;
+	for (uint32_t i = 0; i < 5; ++i) {
+		auto object3d = std::make_unique<Object3d>();
+		object3d->Initialize(object3dCommon.get(), textureManager_.get());
+		object3ds.push_back(std::move(object3d));
+	}
+
+	// ModelCommon
+	auto modelCommon = std::make_unique<ModelCommon>();
+	modelCommon->Initialize(dxCommon.get());
 
 	// Model
-	//auto model = std::make_shared<Model>();
-	//model->Initialize(dxCommon->GetDevice(), sphereMesh);
+	auto model = std::make_unique<Model>();
+	model->Initialize(modelCommon.get(), textureManager_.get());
+
+	// modelのポインタを受け取る
+	for (uint32_t i = 0; i < 5; ++i) {
+		object3ds[i]->SetModel(model.get());
+	}
 
 	// Sprite共通部
 	auto spriteCommon = std::make_unique<SpriteCommon>();
@@ -82,10 +95,11 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int) {
 	std::unique_ptr<DebugCamera> debugCamera = std::make_unique<DebugCamera>();
 	debugCamera->Initialize();
 
+	// model座標
+	Vector3 translate[5];
+
 	// 音声再生
 	// audio->SoundPlayWave(audio->GetXAudio2().Get(), audio->GetSound());
-
-	// int count = 0;
 
 	// ウィンドウのxボタンが押されるまでループ
 	while (dxCommon->GetWinApp()->ProcessMessage()) {
@@ -95,30 +109,31 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int) {
 		imGuiManager_->BeginFrame();
 
 		debugCamera->Update(*input);
-		//model->SetViewMatrix(debugCamera->GetViewMatrix());
-
-		// ゲームの処理
-		// 三角形
-		//model->Update();
-		object3d->Update();
 
 		for (uint32_t i = 0; i < 5; ++i) {
-			sprites[i]->Update();
+			translate[i] = object3ds[i]->GetTranslate();
 		}
 
 		// ImGui
-		//ImGui::ColorEdit4("Color", &model->GetColor().color.x);
-		//ImGui::SliderFloat3("Scale", &model->GetTransform().scale.x, 0.0f, 5.0f);
-		//ImGui::SliderFloat3("Rotate", &model->GetTransform().rotate.x, 0.0f, 5.0f);
-		//ImGui::SliderFloat3("Translate", &model->GetTransform().translate.x, -5.0f, 5.0f);
-		//ImGui::Checkbox("useMonsterBall", &model->GetUseMonsterBallRef());
-		//ImGui::Text("useMonsterBall_: %s", model->GetUseMonsterBallRef() ? "true" : "false"); // 変更確認用
-		//ImGui::DragFloat("intensity", &model->GetIntensity(), 0.01f);
-		//ImGui::DragFloat3("lightDirection", &model->GetLightDirection().x, 0.01f);
-		//ImGui::DragFloat3("fogCenter", &model->GetFogParam().fogCenter.x, 0.01f);
-		//ImGui::DragFloat3("fogColor", &model->GetFogParam().fogColor.x, 0.01f);
-		//ImGui::SliderFloat("radius", &model->GetFogParam().radius, 0.0f, 50.0f);
-		//ImGui::SliderFloat("fogIntensity", &model->GetFogParam().fogIntensity, 0.0f, 1.0f);
+		ImGui::DragFloat3("translate0", &translate[0].x, 0.01f);
+		ImGui::DragFloat3("translate1", &translate[1].x, 0.01f);
+		ImGui::DragFloat3("translate2", &translate[2].x, 0.01f);
+		ImGui::DragFloat3("translate3", &translate[3].x, 0.01f);
+		ImGui::DragFloat3("translate4", &translate[4].x, 0.01f);
+
+		for (uint32_t i = 0; i < 5; ++i) {
+			object3ds[i]->SetTranslate(translate[i]);
+		}
+
+		// object3dUpdate
+		for (uint32_t i = 0; i < 5; ++i) {
+			object3ds[i]->Update();
+		}
+
+		// spriteUpdate
+		for (uint32_t i = 0; i < 5; ++i) {
+			sprites[i]->Update();
+		}
 
 		// Sprite ImGui
 		Vector2 position = sprites[0]->GetPosition();
@@ -138,15 +153,10 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int) {
 		// 3Dオブジェクト描画準備。3Dオブジェクトの描画に共通のグラフィックスコマンドを積む
 		object3dCommon->DrawSettingCommon();
 
-		//model->SetPipelineState(dxCommon->GetGraphicsPipelineState());
-		//model->SetRootSignature(dxCommon->GetRootSignature());
-		/*model->SetTextureHandle(textureManager_->GetTextureSrvHandleGPU());
-		model->SetTextureHandle2(textureManager_->GetTextureSrvHandleGPU2());
-		model->SetTextureHandle3(textureManager_->GetTextureSrvHandleGPU3());*/
-
 		// 3Dモデル描画
-		//model->Draw(dxCommon->GetCommandList());
-		object3d->Draw();
+		for (uint32_t i = 0; i < 5; ++i) {
+			object3ds[i]->Draw();
+		}
 
 		// Sprite描画
 		for (uint32_t i = 0; i < 5; ++i) {

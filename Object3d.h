@@ -16,14 +16,28 @@
 
 class Object3dCommon;
 class TextureManager;
+class Model;
 
 class Object3d {
 public:
-	void Initialize(Object3dCommon* objct3dCommon, TextureManager* textureManager);
+	void Initialize(Object3dCommon* modelCommon, TextureManager* textureManager);
 
 	void Update();
 
 	void Draw();
+
+	// setter
+	void SetModel(Model* model) { model_ = model; }
+
+	// setter
+	void SetScale(const Vector3& scale) { transform_.scale = scale; }
+	void SetRotate(const Vector3& rotate) { transform_.rotate = rotate; }
+	void SetTranslate(const Vector3& translate) { transform_.translate = translate; }
+
+	// getter
+	const Vector3& GetScale() const { return transform_.scale; }
+	const Vector3& GetRotate() const { return transform_.rotate; }
+	const Vector3& GetTranslate() const { return transform_.translate; }
 
 private:
 	// .mtlファイルの読み取り
@@ -33,16 +47,6 @@ private:
 	MaterialData LoadMaterialTemplateFile(const std::string& directoryPath, const std::string& filename);
 
 	Microsoft::WRL::ComPtr<ID3D12Resource> CreateBufferResource(Microsoft::WRL::ComPtr<ID3D12Device> device, size_t sizeBytes);
-
-	/// <summary>
-	/// 頂点データ作成
-	/// </summary>
-	void CreateVertexData();
-
-	/// <summary>
-	/// マテリアルデータ作成
-	/// </summary>
-	void CreateMaterialData();
 
 	/// <summary>
 	/// 座標変換行列データ作成
@@ -72,14 +76,10 @@ private:
 private:
 	Object3dCommon* object3dCommon_ = nullptr;
 	TextureManager* textureManager_ = nullptr;
-
-	// objファイルのデータ
-	ModelData modelData_;
+	Model* model_ = nullptr;
 
 	// バッファリソース
-	Microsoft::WRL::ComPtr<ID3D12Resource> vertexResource_;
 	Microsoft::WRL::ComPtr<ID3D12Resource> indexResource_;
-	Microsoft::WRL::ComPtr<ID3D12Resource> materialResource_;
 	Microsoft::WRL::ComPtr<ID3D12Resource> wvpResource_;
 	Microsoft::WRL::ComPtr<ID3D12Resource> directionalLightResource_;
 	Microsoft::WRL::ComPtr<ID3D12Resource> cameraForGPUResource_;
@@ -87,9 +87,7 @@ private:
 	Microsoft::WRL::ComPtr<ID3D12Resource> timeParamResource_;
 
 	// バッファリソース内のデータを指すポインタ
-	VertexData* vertexData_ = nullptr;
 	uint32_t* indexData_ = nullptr;
-	Material* materialData_ = nullptr;
 	TransformationMatrix* transformMatrixData_ = nullptr;
 	DirectionalLight* directionalLightData_ = nullptr;
 	CameraForGPU* cameraForGPUData_ = nullptr;
@@ -97,7 +95,6 @@ private:
 	TimeParam* timeParamData_ = nullptr;
 
 	// バッファリソースの使い道を補足するバッファビュー
-	D3D12_VERTEX_BUFFER_VIEW vertexBufferView_;
 	D3D12_INDEX_BUFFER_VIEW indexBufferView_;
 
 	// データ変更用の変数

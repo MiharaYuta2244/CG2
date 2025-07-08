@@ -1,99 +1,53 @@
 #pragma once
 #include "Material.h"
-#include "Matrix4x4.h"
-#include "SphereMeshGenerator.h"
-#include "Transform.h"
-#include "Vector4.h"
-#include "TransformationMatrix.h"
-#include "DirectionalLight.h"
-#include "MeshData.h"
-#include "ModelData.h"
 #include "MaterialData.h"
-#include "CameraForGPU.h"
-#include "FogParam.h"
-#include "TimeParam.h"
+#include "ModelData.h"
+#include "ModelCommon.h"
 #include <d3d12.h>
-#include <memory>
-#include <wrl.h>
 #include <string>
+#include <wrl.h>
+
+class TextureManager;
+
 class Model {
 public:
-	~Model();
-	void Initialize(Microsoft::WRL::ComPtr<ID3D12Device> device, const IMeshGenerator& meshGen);
-	void Update();
-	void Draw(Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList> commandList);
-	Material& GetColor() { return material_; }
-	Transform& GetTransform() { return transform_; }
+	void Initialize(ModelCommon* modelCommon, TextureManager* textureManager);
 
-	Microsoft::WRL::ComPtr<ID3D12Resource> GetMaterialResource() { return materialResource_; }
-	Microsoft::WRL::ComPtr<ID3D12Resource> GetWvpResource() { return wvpResource_; }
-	D3D12_VERTEX_BUFFER_VIEW GetVertexBufferView() { return vertexBufferView_; }
-	bool& GetUseMonsterBallRef() { return useMonsterBall_; }
-	D3D12_GPU_DESCRIPTOR_HANDLE GetSrvHandle() { return srvHandle_; }
-	ModelData& GetModelData() { return modelData_; }
-	Matrix4x4 GetCameraMatrix() { return cameraMatrix_; }
-	float& GetIntensity() { return directionalLight_.intensity; }
-	Vector3& GetLightDirection() { return directionalLight_.direction; }
-	FogParam& GetFogParam() { return fogParam_; }
-
-	void SetRootSignature(Microsoft::WRL::ComPtr<ID3D12RootSignature> rs);
-	void SetPipelineState(Microsoft::WRL::ComPtr<ID3D12PipelineState> pso);
-	void SetTextureHandle(D3D12_GPU_DESCRIPTOR_HANDLE handle);
-	void SetTextureHandle2(D3D12_GPU_DESCRIPTOR_HANDLE handle);
-	void SetTextureHandle3(D3D12_GPU_DESCRIPTOR_HANDLE handle);
-	void SetViewMatrix(Matrix4x4 viewMatrix) { viewMatrix_ = viewMatrix; }
+	void Draw();
 
 private:
-	Microsoft::WRL::ComPtr<ID3D12Resource> CreateBufferResource(Microsoft::WRL::ComPtr<ID3D12Device> device, size_t sizeBytes);
-	void UpdateColor(Material& material);
 	ModelData LoadObjFile(const std::string& directoryPath, const std::string& filename);
 	MaterialData LoadMaterialTemplateFile(const std::string& directoryPath, const std::string& filename);
+	Microsoft::WRL::ComPtr<ID3D12Resource> CreateBufferResource(Microsoft::WRL::ComPtr<ID3D12Device> device, size_t sizeBytes);
 
-private:
-	Microsoft::WRL::ComPtr<ID3D12Resource> vertexResource_;
-	Microsoft::WRL::ComPtr<ID3D12Resource> indexResource_;
-	D3D12_VERTEX_BUFFER_VIEW vertexBufferView_;
-	D3D12_INDEX_BUFFER_VIEW indexBufferView_;
-	Microsoft::WRL::ComPtr<ID3D12Resource> materialResource_;
-	Microsoft::WRL::ComPtr<ID3D12Resource> wvpResource_;
-	Microsoft::WRL::ComPtr<ID3D12Resource> directionalLightResource_;
-	Microsoft::WRL::ComPtr<ID3D12Resource> cameraForGPUResource_;
-	Microsoft::WRL::ComPtr<ID3D12Resource> fogParamResource_;
-	Microsoft::WRL::ComPtr<ID3D12Resource> timeParamResource_;
-	Transform transform_;
-	Transform cameraTransform_;
-	Matrix4x4 cameraMatrix_;
-	Matrix4x4 viewMatrix_;
-	Transform uvTransform_;
-	Matrix4x4 worldMatrix_;
-	TransformationMatrix* transformMatrixData_;
-	Material material_ = {};
-	Material* materialData_;
-	CameraForGPU cameraForGPU_;
-	CameraForGPU* cameraForGPUData_;
-	FogParam fogParam_;
-	FogParam* fogParamData_;
-	TimeParam timeParam_;
-	TimeParam* timeParamData_;
+	/// <summary>
+	/// 頂点データ作成
+	/// </summary>
+	void CreateVertexData();
 
-	DirectionalLight* directionalLightData_;
-	DirectionalLight directionalLight_;
+	/// <summary>
+	/// マテリアルデータ作成
+	/// </summary>
+	void CreateMaterialData();
 
-	Microsoft::WRL::ComPtr<ID3D12RootSignature> rootSignature_;
-	Microsoft::WRL::ComPtr<ID3D12PipelineState> pipelineState_;
-	D3D12_GPU_DESCRIPTOR_HANDLE srvHandle_;
-	D3D12_GPU_DESCRIPTOR_HANDLE srvHandle2_;
-	D3D12_GPU_DESCRIPTOR_HANDLE srvHandle3_;
+private: 
+	ModelCommon* modelCommon_ = nullptr;
+	TextureManager* textureManager_ = nullptr;
 
-	// 画像切り替え用の変数
-	bool useMonsterBall_;
-
-	// 描画用に頂点数を取得
-	uint32_t vertexCount_;
-	uint32_t indexCount_;
-
-	// 色の増減量
-	Vector4 stepColor_;
-
+	// objファイルのデータ
 	ModelData modelData_;
+
+	// VertexBufferView
+	D3D12_VERTEX_BUFFER_VIEW vertexBufferView_;
+
+	// Rsource
+	Microsoft::WRL::ComPtr<ID3D12Resource> vertexResource_;
+	Microsoft::WRL::ComPtr<ID3D12Resource> materialResource_;
+
+	// Resourceにデータを書き込むためのポインタ
+	VertexData* vertexData_ = nullptr;
+	Material* materialData_ = nullptr;
+
+	// データ変更用の変数
+	Material material_;
 };

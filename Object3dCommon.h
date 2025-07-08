@@ -2,8 +2,6 @@
 #include "DirectXCommon.h"
 class Object3dCommon {
 public:
-	DirectXCommon* GetDirectXCommon() const { return dxCommon_; }
-
 	/// <summary>
 	/// 共通描画設定
 	/// </summary>
@@ -11,8 +9,10 @@ public:
 
 	void Initialize(DirectXCommon* dxCommon);
 
-private:
+	// getter
+	DirectXCommon* GetDxCommon() const { return dxCommon_; }
 
+private:
 	/// <summary>
 	/// ルートシグネチャの作成
 	/// </summary>
@@ -35,7 +35,6 @@ private:
 	    IDxcUtils* dxcUtils, IDxcCompiler3* dxcCompiler, IDxcIncludeHandler* includeHandler);
 
 private:
-
 	DirectXCommon* dxCommon_;
 
 	// Root Signature / Pipeline
