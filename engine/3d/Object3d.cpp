@@ -43,6 +43,7 @@ void Object3d::Initialize(Object3dCommon* modelCommon, TextureManager* textureMa
         {0.3f, 0.0f, 0.0f  },
         {0.0f, 4.0f, -10.0f}
     };
+	worldMatrix_ = MathUtility::MakeAffineMatrix(transform_.scale, transform_.rotate, transform_.translate);
 }
 
 void Object3d::Update() {
@@ -53,7 +54,6 @@ void Object3d::Update() {
 
 	timeParam_.time = totalTime;
 
-	worldMatrix_ = MathUtility::MakeAffineMatrix(transform_.scale, transform_.rotate, transform_.translate);
 	//Matrix4x4 cameraMatrix = MathUtility::MakeAffineMatrix(cameraTransform_.scale, cameraTransform_.rotate, cameraTransform_.translate);
 	//Matrix4x4 viewMatrix = MathUtility::Inverse(cameraMatrix);
 	projectionMatrix_ = MathUtility::MakePerspectiveFovMatrix(0.45f, static_cast<float>(WinApp::kClientWidth) / static_cast<float>(WinApp::kClientHeight), 0.1f, 100.0f);

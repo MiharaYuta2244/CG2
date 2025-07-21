@@ -48,7 +48,8 @@ public:
 	const Vector3& GetRotate() const { return transform_.rotate; }
 	const Vector3& GetTranslate() const { return transform_.translate; }
 	const Vector4& GetColor() const { return material_.color; }
-	const Matrix4x4& GetWorldMatrix() const { return worldMatrix_; }
+
+	Matrix4x4& GetWorldMatrix()  { return worldMatrix_; }
 	const Matrix4x4& GetViewMatrix() const { return viewMatrix_; }
 	const Matrix4x4& GetProjectionMatrix() const { return projectionMatrix_; }
 

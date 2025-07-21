@@ -118,26 +118,38 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int) {
 	// 音声再生
 	// audio->SoundPlayWave(audio->GetXAudio2().Get(), audio->GetSound());
 
+	// ギズモで動かせるオブジェクトを選ぶ用の変数
+	int objIndex = 0;
+
 	// ウィンドウのxボタンが押されるまでループ
 	while (dxCommon->GetWinApp()->ProcessMessage()) {
 
+		// 入力処理更新
 		input->Update();
 
 		imGuiManager_->BeginFrame();
 
-		ImGuizmo::BeginFrame();
+		// ImGuiウィンドウ位置、サイズ固定
+		ImGui::SetNextWindowPos(ImVec2(0, 0), ImGuiCond_Always);
+		ImGui::SetNextWindowSize(ImVec2(1280, 720), ImGuiCond_Always);
 
-		//ImGui::Begin("transform");
+		ImGui::PushStyleColor(ImGuiCol_WindowBg, ImVec4(0, 0, 0, 0)); // 完全に透明
+		ImGui::Begin("Gizmo", nullptr, ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoInputs);
+		ImGuizmo::BeginFrame();
 
 		// ImGuizmoの設定
 		ImGuizmo::SetOrthographic(false);
-		ImGuizmo::SetDrawlist();
+		ImGuizmo::Enable(true);
+		ImGuizmo::SetDrawlist(ImGui::GetWindowDrawList());
+
+		ImGuiIO& io = ImGui::GetIO();
+		float windowWidth = (float)ImGui::GetWindowWidth();
+		float windowHeight = (float)ImGui::GetWindowHeight();
 
 		// ウィンドウサイズを取得してImGuizmoに渡す
-		float windowWidth = ImGui::GetWindowWidth();
-		float windowHeight = ImGui::GetWindowHeight();
 		ImGuizmo::SetRect(ImGui::GetWindowPos().x, ImGui::GetWindowPos().y, windowWidth, windowHeight);
 
+		// デバッグカメラ更新
 		debugCamera->Update(*input);
 		for (uint32_t i = 0; i < 5; ++i) {
 			object3ds[i]->SetViewMatrix(debugCamera->GetViewMatrix());
@@ -149,68 +161,20 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int) {
 			transform[i].scale = object3ds[i]->GetScale();
 		}
 
-		// 転置して列メジャー化
-		float outW[16];
-		float outV[16];
-		float outP[16];
-		for (uint32_t row = 0; row < 4; ++row) {
-			for (uint32_t col = 0; col < 4; ++col) {
-				outW[col * 4 + row] = object3ds[0]->GetWorldMatrix().m[row][col];
-				outV[col * 4 + row] = debugCamera->GetViewMatrix().m[row][col];
-				outP[col * 4 + row] = object3ds[0]->GetProjectionMatrix().m[row][col];
-			}
-		}
-		// 編集対象の行列を渡す
-		float* objectMatrix = outW;
-		float* viewMatrix = outV;
-		float* projectionMatrix = outP;
-
-		//float identityMatrix[16] = {1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1};
-
 		ImGuizmo::Manipulate(
-		    viewMatrix, projectionMatrix,
-		    ImGuizmo::OPERATION::TRANSLATE, // 操作タイプ(TRANSLATE/ROTATE/SCALE)
-		    ImGuizmo::LOCAL,                // ローカル or ワールド
-		    objectMatrix                  // 編集されるオブジェクトの行列
-		);
+		    *(debugCamera->GetViewMatrix()).m, *(object3ds[objIndex]->GetProjectionMatrix()).m, ImGuizmo::OPERATION::TRANSLATE, ImGuizmo::LOCAL, *(object3ds[objIndex]->GetWorldMatrix()).m);
 
-		//ImGui::End();
-
-		Matrix4x4 temp;
-		for (uint32_t row = 0; row < 4; ++row) {
-			for (uint32_t col = 0; col < 4; ++col) {
-				temp.m[row][col] = outW[col * 4 + row];
-				object3ds[0]->SetWorldMatrix(temp);
-			}
-		}
+		ImGui::End();
+		ImGui::PopStyleColor();
 
 		// ImGui
+		ImGui::SetNextWindowPos(ImVec2(0, 0), ImGuiCond_Always);
 		ImGui::Begin("Editor");
-		ImGui::DragFloat3("translate0", &transform[0].translate.x, 0.01f);
-		ImGui::DragFloat3("translate1", &transform[1].translate.x, 0.01f);
-		ImGui::DragFloat3("translate2", &transform[2].translate.x, 0.01f);
-		ImGui::DragFloat3("translate3", &transform[3].translate.x, 0.01f);
-		ImGui::DragFloat3("translate4", &transform[4].translate.x, 0.01f);
-		ImGui::DragFloat3("rotate0", &transform[0].rotate.x, 0.01f);
-		ImGui::DragFloat3("rotate1", &transform[1].rotate.x, 0.01f);
-		ImGui::DragFloat3("rotate2", &transform[2].rotate.x, 0.01f);
-		ImGui::DragFloat3("rotate3", &transform[3].rotate.x, 0.01f);
-		ImGui::DragFloat3("rotate4", &transform[4].rotate.x, 0.01f);
-		ImGui::DragFloat3("scale0", &transform[0].scale.x, 0.01f);
-		ImGui::DragFloat3("scale1", &transform[1].scale.x, 0.01f);
-		ImGui::DragFloat3("scale2", &transform[2].scale.x, 0.01f);
-		ImGui::DragFloat3("scale3", &transform[3].scale.x, 0.01f);
-		ImGui::DragFloat3("scale4", &transform[4].scale.x, 0.01f);
-		ImGui::Text("ImGuizmo::IsUsing: %s", ImGuizmo::IsUsing() ? "true" : "false");
+
+		ImGui::SliderInt("objIndex", &objIndex, 0, 4);
 		
 		ImGui::SliderFloat4("color", &color.x, 0.0f, 1.0f);
 		object3ds[3]->SetColor(color);
-
-		for (uint32_t i = 0; i < 5; ++i) {
-			object3ds[i]->SetTranslate(transform[i].translate);
-			object3ds[i]->SetRotate(transform[i].rotate);
-			object3ds[i]->SetScale(transform[i].scale);
-		}
 
 		// object3dUpdate
 		for (uint32_t i = 0; i < 5; ++i) {
