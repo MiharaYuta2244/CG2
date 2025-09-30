@@ -1,0 +1,1 @@
+﻿C:\Program Files\Microsoft Visual Studio\2022\Community\MSBuild\Microsoft\VC\v170\Microsoft.CppBuild.targets(463,5): error MSB8020: Visual Studio 2010 (プラットフォーム ツールセット = 'v100') のビルド ツールが見つかりません。v100 ビルド ツールを使用してビルドするには、Visual Studio 2010 ビルド ツールをインストールしてください。または、[プロジェクト] メニューを選択するかソリューションを右クリックし [ソリューションの再ターゲット] を選択して、現在の Visual Studio Tools にアップグレードすることもできます。
