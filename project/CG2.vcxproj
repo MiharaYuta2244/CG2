@@ -160,6 +160,7 @@ copy "$(windowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="engine\base\ImGuiManager.cpp" />
     <ClCompile Include="externals\imguizmo\ImGuizmo.cpp" />
     <ClCompile Include="engine\base\Logger.cpp" />
+    <ClCompile Include="Game.cpp" />
     <ClCompile Include="main.cpp">
       <Optimization Condition="'$(Configuration)|$(Platform)'=='Development|x64'">MaxSpeed</Optimization>
       <WholeProgramOptimization Condition="'$(Configuration)|$(Platform)'=='Development|x64'">true</WholeProgramOptimization>
@@ -246,6 +247,7 @@ copy "$(windowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="engine\base\VertexData.h" />
     <ClInclude Include="engine\base\WinApp.h" />
     <ClInclude Include="engine\audio\XAudio.h" />
+    <ClInclude Include="Game.h" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="externals\imgui\LICENSE.txt" />
