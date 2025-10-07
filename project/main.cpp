@@ -2,8 +2,6 @@
 #include "WinApp.h"
 #include <memory>
 
-//
-
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int) {
 	// ゲームクラス生成
 	std::unique_ptr<Game> game = std::make_unique<Game>();
