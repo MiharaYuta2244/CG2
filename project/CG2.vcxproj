@@ -81,6 +81,7 @@
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
       <TreatWarningAsError>true</TreatWarningAsError>
       <AdditionalIncludeDirectories>$(ProjectDir)externals\imguizmo;$(ProjectDir)externals\imgui;$(ProjectDir)externals\DirectXTex;$(ProjectDir)resources\shaders;$(ProjectDir)engine\math;$(ProjectDir)engine\input;$(ProjectDir)engine\base;$(ProjectDir)engine\audio;$(ProjectDir)engine\3d;$(ProjectDir)engine\2d;$(ProjectDir)engine;$(WindowsSdkDir)Include\10.0.26100.0\um</AdditionalIncludeDirectories>
+      <PrecompiledHeader>Use</PrecompiledHeader>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -105,6 +106,7 @@ copy "$(windowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <AdditionalIncludeDirectories>$(ProjectDir)externals\imguizmo;$(ProjectDir)externals\imgui;$(ProjectDir)externals\DirectXTex;$(ProjectDir)resources\shaders;$(ProjectDir)engine\math;$(ProjectDir)engine\input;$(ProjectDir)engine\base;$(ProjectDir)engine\audio;$(ProjectDir)engine\3d;$(ProjectDir)engine\2d;$(ProjectDir)engine;$(WindowsSdkDir)Include\10.0.26100.0\um</AdditionalIncludeDirectories>
+      <PrecompiledHeader>Use</PrecompiledHeader>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -132,6 +134,7 @@ copy "$(windowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
       <AdditionalIncludeDirectories>$(ProjectDir)externals\imguizmo;$(ProjectDir)externals\imgui;$(ProjectDir)externals\DirectXTex;$(ProjectDir)resources\shaders;$(ProjectDir)engine\math;$(ProjectDir)engine\input;$(ProjectDir)engine\base;$(ProjectDir)engine\audio;$(ProjectDir)engine\3d;$(ProjectDir)engine\2d;$(ProjectDir)engine;$(WindowsSdkDir)Include\10.0.26100.0\um</AdditionalIncludeDirectories>
       <Optimization>Disabled</Optimization>
       <WholeProgramOptimization>false</WholeProgramOptimization>
+      <PrecompiledHeader>Use</PrecompiledHeader>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
