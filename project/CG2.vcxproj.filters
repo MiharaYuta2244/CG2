@@ -117,7 +117,7 @@
     <ClCompile Include="engine\input\DirectInput.cpp">
       <Filter>ソース ファイル\engine\input</Filter>
     </ClCompile>
-    <ClCompile Include="engine\base\ImGuiManager.cpp">
+    <ClCompile Include="engine\base\imGuiManager\ImGuiManager.cpp">
       <Filter>ソース ファイル\engine\imgui</Filter>
     </ClCompile>
     <ClCompile Include="externals\imguizmo\ImGuizmo.cpp">
@@ -168,6 +168,9 @@
     <ClCompile Include="application\player\Player.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
+    <ClCompile Include="engine\input\GamePad.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="resources\shaders\Object3d.PS.hlsl">
@@ -216,19 +219,19 @@
     <ClInclude Include="engine\base\WinApp.h">
       <Filter>ヘッダー ファイル\engine\base</Filter>
     </ClInclude>
-    <ClInclude Include="engine\base\Matrix3x3.h">
+    <ClInclude Include="engine\math\mathLib\Matrix3x3.h">
       <Filter>ヘッダー ファイル\engine\base</Filter>
     </ClInclude>
-    <ClInclude Include="engine\base\Matrix4x4.h">
+    <ClInclude Include="engine\math\mathLib\Matrix4x4.h">
       <Filter>ヘッダー ファイル\engine\base</Filter>
     </ClInclude>
-    <ClInclude Include="engine\base\Vector2.h">
+    <ClInclude Include="engine\math\mathLib\Vector2.h">
       <Filter>ヘッダー ファイル\engine\base</Filter>
     </ClInclude>
-    <ClInclude Include="engine\base\Vector3.h">
+    <ClInclude Include="engine\math\mathLib\Vector3.h">
       <Filter>ヘッダー ファイル\engine\base</Filter>
     </ClInclude>
-    <ClInclude Include="engine\base\Vector4.h">
+    <ClInclude Include="engine\math\mathLib\Vector4.h">
       <Filter>ヘッダー ファイル\engine\base</Filter>
     </ClInclude>
     <ClInclude Include="engine\base\VertexData.h">
@@ -258,7 +261,7 @@
     <ClInclude Include="engine\base\IMeshGenerator.h">
       <Filter>ヘッダー ファイル\engine\base</Filter>
     </ClInclude>
-    <ClInclude Include="engine\base\ImGuiManager.h">
+    <ClInclude Include="engine\base\imGuiManager\ImGuiManager.h">
       <Filter>ヘッダー ファイル\engine\imgui</Filter>
     </ClInclude>
     <ClInclude Include="externals\imguizmo\ImGuizmo.h">
@@ -331,6 +334,9 @@
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
     <ClInclude Include="application\Actor.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="engine\input\GamePad.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
   </ItemGroup>

@@ -2,12 +2,13 @@
 #include "Vector3.h"
 #include "Matrix4x4.h"
 #include "DirectInput.h"
+#include "GamePad.h"
 
 class DebugCamera {
 public:
 	void Initialize();
 	void SetPivot(const Vector3& p);
-	void Update(const DirectInput& input);
+	void Update(const DirectInput& input, const GamePad& gamePad);
 	void UpdateViewMatrix();
 	Matrix4x4 GetViewMatrix() { return viewMatrix_; }
 

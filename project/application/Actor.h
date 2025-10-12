@@ -1,6 +1,6 @@
 #pragma once
 #include "Transform.h"
-#include "Model.h"
+#include "Object3d.h"
 #include <memory>
 
 class Actor {
@@ -17,5 +17,5 @@ protected:
 	Vector3 collisionSize = {0.0f, 0.0f, 0.0f};
 	bool isActive_ = true;
 
-	std::unique_ptr<Model> model_ = nullptr;
+	std::unique_ptr<Object3d> object3d_ = nullptr;
 };

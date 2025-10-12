@@ -15,9 +15,9 @@ void DebugCamera::SetPivot(const Vector3& p) {
 	translation_ = MathUtility::Add(pivot_, offset);
 }
 
-void DebugCamera::Update(const DirectInput& input) {
+void DebugCamera::Update(const DirectInput& input, const GamePad& gamePad) {
 	// フリー回転
-	if (input.IsMouseButtonDown(1)) {
+	if (input.MouseButtonDown(1)) {
 		float dx = input.GetMouseDeltaX() * 0.001f; 
 		float dy = input.GetMouseDeltaY() * 0.001f;
 
@@ -29,7 +29,7 @@ void DebugCamera::Update(const DirectInput& input) {
 	}
 
 	// ピボット回転
-	if (input.IsMouseButtonDown(2)) {
+	if (input.MouseButtonDown(2)) {
 		float dx = input.GetMouseDeltaX() * 0.001f;
 		float dy = input.GetMouseDeltaY() * 0.001f;
 
@@ -53,36 +53,36 @@ void DebugCamera::Update(const DirectInput& input) {
 
 	const float speed = 0.1f;
 
-	if (!input.IsKeyDown(DIK_LSHIFT)) {
+	if (!input.KeyDown(DIK_LSHIFT)) {
 		// 前移動
-		if (input.IsKeyDown(DIK_W)) {
+		if (input.KeyDown(DIK_W) || gamePad.GetState().axes.ry < -0.3f) {
 			MoveLocal({0.0f, 0.0f, speed});
 		}
 
 		// 後ろ移動
-		if (input.IsKeyDown(DIK_S)) {
+		if (input.KeyDown(DIK_S) || gamePad.GetState().axes.ry > 0.3f) {
 			MoveLocal({0.0f, 0.0f, -speed});
 		}
 	}
 
-	if (input.IsKeyDown(DIK_LSHIFT)) {
+	if (input.KeyDown(DIK_LSHIFT)) {
 		// 右移動
-		if (input.IsKeyDown(DIK_D)) {
+		if (input.KeyDown(DIK_D)) {
 			MoveLocal({speed, 0.0f, 0.0f});
 		}
 
 		// 左移動
-		if (input.IsKeyDown(DIK_A)) {
+		if (input.KeyDown(DIK_A)) {
 			MoveLocal({-speed, 0.0f, 0.0f});
 		}
 
 		// 上移動
-		if (input.IsKeyDown(DIK_W)) {
+		if (input.KeyDown(DIK_W)) {
 			MoveLocal({0.0f, speed, 0.0f});
 		}
 
 		// 下移動
-		if (input.IsKeyDown(DIK_S)) {
+		if (input.KeyDown(DIK_S)) {
 			MoveLocal({0.0f, -speed, 0.0f});
 		}
 	}

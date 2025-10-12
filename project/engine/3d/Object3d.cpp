@@ -57,6 +57,7 @@ void Object3d::Update() {
 
 	//Matrix4x4 cameraMatrix = MathUtility::MakeAffineMatrix(cameraTransform_.scale, cameraTransform_.rotate, cameraTransform_.translate);
 	//Matrix4x4 viewMatrix = MathUtility::Inverse(cameraMatrix);
+	worldMatrix_ = MathUtility::MakeAffineMatrix(transform_.scale, transform_.rotate, transform_.translate);
 	projectionMatrix_ = MathUtility::MakePerspectiveFovMatrix(0.45f, static_cast<float>(WinApp::kClientWidth) / static_cast<float>(WinApp::kClientHeight), 0.1f, 100.0f);
 	transformMatrixData_->WVP = worldMatrix_ * viewMatrix_ * projectionMatrix_;
 	transformMatrixData_->World = worldMatrix_;
@@ -73,17 +74,19 @@ void Object3d::Update() {
 }
 
 void Object3d::Draw() {
+	auto commadList = object3dCommon_->GetDxCommon()->GetCommandList();
+
 	// commandList->IASetIndexBuffer(&indexBufferView_); // IBVを設定
 	// wvp用のBufferの場所を設定
-	object3dCommon_->GetDxCommon()->GetCommandList()->SetGraphicsRootConstantBufferView(1, wvpResource_->GetGPUVirtualAddress());
+	commadList->SetGraphicsRootConstantBufferView(1, wvpResource_->GetGPUVirtualAddress());
 	// ライティングCBufferの場所を指定
-	object3dCommon_->GetDxCommon()->GetCommandList()->SetGraphicsRootConstantBufferView(3, directionalLightResource_->GetGPUVirtualAddress());
+	commadList->SetGraphicsRootConstantBufferView(3, directionalLightResource_->GetGPUVirtualAddress());
 	// CameraForGPUCBufferの場所を指定
-	object3dCommon_->GetDxCommon()->GetCommandList()->SetGraphicsRootConstantBufferView(4, cameraForGPUResource_->GetGPUVirtualAddress());
+	commadList->SetGraphicsRootConstantBufferView(4, cameraForGPUResource_->GetGPUVirtualAddress());
 	// FogParamCBufferの場所を指定
-	object3dCommon_->GetDxCommon()->GetCommandList()->SetGraphicsRootConstantBufferView(5, fogParamResource_->GetGPUVirtualAddress());
+	commadList->SetGraphicsRootConstantBufferView(5, fogParamResource_->GetGPUVirtualAddress());
 	// TimeParamCBufferの場所を指定
-	object3dCommon_->GetDxCommon()->GetCommandList()->SetGraphicsRootConstantBufferView(6, timeParamResource_->GetGPUVirtualAddress());
+	commadList->SetGraphicsRootConstantBufferView(6, timeParamResource_->GetGPUVirtualAddress());
 
 	// 3Dモデルが割り当てられれいれば描画する
 	if (model_) {

@@ -16,6 +16,8 @@
 #include "TextureManager.h"
 #include "WinApp.h"
 #include "XAudio.h"
+#include "Player.h"
+#include "GamePad.h"
 #include <memory>
 #pragma comment(lib, "d3d12.lib")
 #pragma comment(lib, "dxgi.lib")
@@ -73,6 +75,9 @@ private:
 	// DirectInput
 	std::unique_ptr<DirectInput> input_ = std::make_unique<DirectInput>();
 
+	// GamePad
+	std::unique_ptr<GamePad> gamePad_ = std::make_unique<GamePad>();
+
 	// DebugCamera
 	std::unique_ptr<DebugCamera> debugCamera_ = std::make_unique<DebugCamera>();
 
@@ -84,4 +89,7 @@ private:
 
 	// ギズモで動かせるオブジェクトを選ぶ用の変数
 	int objIndex_ = 0;
+
+	// プレイヤー
+	std::unique_ptr<Player> player_ = std::make_unique<Player>();
 };

@@ -5,32 +5,37 @@
 #include <functional>
 #include <memory>
 #include <wrl.h>
+#include <WinApp.h>
 
 #pragma comment(lib, "dinput8.lib")
 #pragma comment(lib, "dxguid.lib")
 
 class DirectInput {
 public:
+	// namespace省略
+	template<class T> using ComPtr = Microsoft::WRL::ComPtr<T>;
+
+public:
 	~DirectInput();
-	void Initialize(HINSTANCE hInstance, HWND hwnd);
+	void Initialize(WinApp* winApp);
 	void Update();
 
 	// キーボード
-	bool IsKeyDown(uint8_t keyCode) const;
-	bool IsKeyTriggered(uint8_t keyCode) const;
-	bool IsKeyReleased(uint8_t keyCode) const;
+	bool KeyDown(uint8_t keyCode) const;
+	bool KeyTriggered(uint8_t keyCode) const;
+	bool KeyReleased(uint8_t keyCode) const;
 
 	// マウス
-	bool IsMouseButtonDown(uint8_t button) const;
-	bool IsMouseButtonTriggered(uint8_t button) const;
-	bool IsMouseButtonReleased(uint8_t button) const;
+	bool MouseButtonDown(uint8_t button) const;
+	bool MouseButtonTriggered(uint8_t button) const;
+	bool MouseButtonReleased(uint8_t button) const;
 	float GetMouseDeltaX() const { return static_cast<float>(mouseState_.lX); }
 	float GetMouseDeltaY() const { return static_cast<float>(mouseState_.lY); }
 	float GetMouseWheel() const { return static_cast<float>(mouseState_.lZ); }
 
 private:
-	Microsoft::WRL::ComPtr<IDirectInput8> directInput_;
-	Microsoft::WRL::ComPtr<IDirectInputDevice8> keyboard_;
+	ComPtr<IDirectInput8> directInput_;
+	ComPtr<IDirectInputDevice8> keyboard_;
 
 	// キーボード
 	uint8_t key_[256];
@@ -38,10 +43,13 @@ private:
 	HINSTANCE hInstance_;
 
 	// マウス
-	Microsoft::WRL::ComPtr<IDirectInputDevice8> mouse_;
+	ComPtr<IDirectInputDevice8> mouse_;
 	DIMOUSESTATE2 mouseState_{};    // 今フレームのマウス入力
 	DIMOUSESTATE2 preMouseState_{}; // 前フレーム
 
 	float accumX_ = 0;
 	float accumY_ = 0;
+
+	// WindowsAPI
+	WinApp* winApp_ = nullptr;
 };

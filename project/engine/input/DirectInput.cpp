@@ -3,11 +3,13 @@
 
 DirectInput::~DirectInput() {}
 
-void DirectInput::Initialize(HINSTANCE hInstance, HWND hwnd) {
+void DirectInput::Initialize(WinApp* winApp) {
 	HRESULT result;
 
+	winApp_ = winApp;
+
 	// DirectInputの初期化
-	result = DirectInput8Create(hInstance, DIRECTINPUT_VERSION, IID_IDirectInput8, (void**)&directInput_, nullptr);
+	result = DirectInput8Create(winApp_->GetHInstance(), DIRECTINPUT_VERSION, IID_IDirectInput8, (void**)&directInput_, nullptr);
 	assert(SUCCEEDED(result));
 
 	// キーボードデバイスの生成
@@ -17,7 +19,7 @@ void DirectInput::Initialize(HINSTANCE hInstance, HWND hwnd) {
 	result = keyboard_->SetDataFormat(&c_dfDIKeyboard); // 標準形式
 	assert(SUCCEEDED(result));
 	// 排他制御レベルのセット
-	result = keyboard_->SetCooperativeLevel(hwnd, DISCL_FOREGROUND | DISCL_NONEXCLUSIVE | DISCL_NOWINKEY);
+	result = keyboard_->SetCooperativeLevel(winApp_->GetHWND(), DISCL_FOREGROUND | DISCL_NONEXCLUSIVE | DISCL_NOWINKEY);
 	assert(SUCCEEDED(result));
 
 	// マウス
@@ -27,7 +29,7 @@ void DirectInput::Initialize(HINSTANCE hInstance, HWND hwnd) {
 	result = mouse_->SetDataFormat(&c_dfDIMouse2);
 	assert(SUCCEEDED(result));
 	// フルスクリーン時は EXCLUSIVE 推奨
-	result = mouse_->SetCooperativeLevel(hwnd, DISCL_FOREGROUND | DISCL_NONEXCLUSIVE);
+	result = mouse_->SetCooperativeLevel(winApp_->GetHWND(), DISCL_FOREGROUND | DISCL_NONEXCLUSIVE);
 	assert(SUCCEEDED(result));
 }
 
@@ -50,7 +52,7 @@ void DirectInput::Update() {
 	accumY_ += mouseState_.lY;
 }
 
-bool DirectInput::IsKeyDown(uint8_t keyCode) const {
+bool DirectInput::KeyDown(uint8_t keyCode) const {
 	// 0でなければ押している
 	if (key_[keyCode]) {
 		return true;
@@ -59,7 +61,7 @@ bool DirectInput::IsKeyDown(uint8_t keyCode) const {
 	return false;
 }
 
-bool DirectInput::IsKeyTriggered(uint8_t keyCode) const {
+bool DirectInput::KeyTriggered(uint8_t keyCode) const {
 	// 前回が0で、今回が0でなければトリガー
 	if (!preKey_[keyCode] && key_[keyCode]) {
 		return true;
@@ -68,7 +70,7 @@ bool DirectInput::IsKeyTriggered(uint8_t keyCode) const {
 	return false;
 }
 
-bool DirectInput::IsKeyReleased(uint8_t keyCode) const {
+bool DirectInput::KeyReleased(uint8_t keyCode) const {
 	// 前回が0でなく、今回が0であればトリガー
 	if (preKey_[keyCode] && !key_[keyCode]) {
 		return true;
@@ -77,12 +79,12 @@ bool DirectInput::IsKeyReleased(uint8_t keyCode) const {
 	return false;
 }
 
-bool DirectInput::IsMouseButtonDown(uint8_t button) const { 
+bool DirectInput::MouseButtonDown(uint8_t button) const { 
 	return mouseState_.rgbButtons[button] & 0x80;
 }
-bool DirectInput::IsMouseButtonTriggered(uint8_t button) const { 
+bool DirectInput::MouseButtonTriggered(uint8_t button) const { 
 	return !(preMouseState_.rgbButtons[button] & 0x80) && (mouseState_.rgbButtons[button] & 0x80);
 }
-bool DirectInput::IsMouseButtonReleased(uint8_t button) const { 
+bool DirectInput::MouseButtonReleased(uint8_t button) const { 
 	return (preMouseState_.rgbButtons[button] & 0x80) && !(mouseState_.rgbButtons[button] & 0x80);
 }

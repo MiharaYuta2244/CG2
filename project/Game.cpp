@@ -70,10 +70,14 @@ void Game::Initialize(HINSTANCE hInstance) {
 	audio_->SoundsAllLoad();
 
 	// DirectInput
-	input_->Initialize(hInstance, dxCommon_->GetWinApp()->GetHWND());
+	input_->Initialize(winApp_.get());
 
 	// DebugCamera
 	debugCamera_->Initialize();
+
+	// プレイヤー
+	player_->Initialize(object3dCommon_.get(), textureManager_.get(), modelManger_.get(), input_.get(), gamePad_.get());
+	player_->SetModel("fence.obj");
 }
 
 void Game::Update() {
@@ -103,9 +107,10 @@ void Game::Update() {
 	//ImGuizmo::SetRect(ImGui::GetWindowPos().x, ImGui::GetWindowPos().y, windowWidth, windowHeight);
 
 	// デバッグカメラ更新
-	debugCamera_->Update(*input_);
+	debugCamera_->Update(*input_, *gamePad_);
 	for (uint32_t i = 0; i < 10; ++i) {
 		object3ds_[i]->SetViewMatrix(debugCamera_->GetViewMatrix());
+		player_->GetObject3d()->SetViewMatrix(debugCamera_->GetViewMatrix());
 	}
 
 	/*for (uint32_t i = 0; i < 10; ++i) {
@@ -119,6 +124,9 @@ void Game::Update() {
 
 	//ImGui::End();
 	//ImGui::PopStyleColor();
+
+	// プレイヤー更新
+	player_->Update();
 
 	// ImGui
 	ImGui::SetNextWindowPos(ImVec2(0, 0), ImGuiCond_Always);
@@ -170,6 +178,9 @@ void Game::Draw() {
 	for (uint32_t i = 0; i < 10; ++i) {
 		object3ds_[i]->Draw();
 	}
+
+	// プレイヤー描画
+	player_->Draw();
 
 	// ImGuiの内部コマンドを生成する
 	imGuiManager_->Render(dxCommon_->GetCommandList());

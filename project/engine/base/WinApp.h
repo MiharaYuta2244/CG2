@@ -13,6 +13,9 @@ class WinApp {
 public:
 	WinApp();
 	~WinApp();
+
+	// getter
+	HINSTANCE GetHInstance() const { return wc_.hInstance; }
 	HWND GetHWND() const { return hwnd_; }
 	bool ProcessMessage();
 
