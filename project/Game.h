@@ -18,6 +18,8 @@
 #include "XAudio.h"
 #include "Player.h"
 #include "GamePad.h"
+#include "ParticleCommon.h"
+#include "Particle.h"
 #include <memory>
 #pragma comment(lib, "d3d12.lib")
 #pragma comment(lib, "dxgi.lib")
@@ -66,9 +68,6 @@ private:
 	// Sprite共通部
 	std::unique_ptr<SpriteCommon> spriteCommon_ = std::make_unique<SpriteCommon>();
 
-	// Sprite
-	std::vector<std::unique_ptr<Sprite>> sprites_;
-
 	// XAudio
 	std::unique_ptr<XAudio> audio_ = std::make_unique<XAudio>();
 
@@ -92,4 +91,11 @@ private:
 
 	// プレイヤー
 	std::unique_ptr<Player> player_ = std::make_unique<Player>();
+
+	// スプライト
+	std::array<std::unique_ptr<Sprite>, 2> sprite_;
+
+	// パーティクル
+	std::unique_ptr<ParticleCommon> particleCommon_ = std::make_unique<ParticleCommon>();
+	std::unique_ptr<Particle> particle_ = std::make_unique<Particle>();
 };

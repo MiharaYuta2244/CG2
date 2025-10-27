@@ -32,6 +32,9 @@ void Object3d::Initialize(Object3dCommon* modelCommon, TextureManager* textureMa
 	// タイムパラメータデータ作成
 	CreateTimeParamData();
 
+	// インスタンシングデータ作成
+	CreateInstancingData();
+
 	// Transform変数を作る
 	transform_ = {
 	    {1.0f, 1.0f, 1.0f},
@@ -215,4 +218,30 @@ void Object3d::CreateTimeParamData() {
 	timeParam_.time = 1.0f / 60.0f;
 	// timeParamDataへの書き込み
 	*timeParamData_ = timeParam_;
+}
+
+void Object3d::CreateInstancingData() {
+	Transform transforms[kNumInstance];
+
+	for (uint32_t index = 0; index < kNumInstance; ++index) {
+		transforms[index].scale = {1.0f, 1.0f, 1.0f};
+		transforms[index].rotate = {0.0f, 0.0f, 0.0f};
+		transforms[index].translate = {index * 0.1f, index * 0.1f, index * 0.1f};
+	}
+
+	// Instancing用のTransformationMatrixリソースを作る
+	instancingResource_ = CreateBufferResource(object3dCommon_->GetDxCommon()->GetDevice(), sizeof(TransformationMatrix) * kNumInstance);
+
+	// 書き込むためのアドレスを取得
+	TransformationMatrix* instancingData = nullptr;
+	instancingResource_->Map(0, nullptr, reinterpret_cast<void**>(&instancingData));
+	instancingResource_->Unmap(0, nullptr);
+
+	for (uint32_t index = 0; index < kNumInstance; ++index) {
+		Matrix4x4 worldMatrix = MathUtility::MakeAffineMatrix(transforms[index].scale, transforms[index].rotate, transforms[index].translate);
+		Matrix4x4 viewProjectionMatrix = viewMatrix_ * projectionMatrix_;
+		Matrix4x4 worldViewProjectionMatrix = MathUtility::Multiply(worldMatrix, viewProjectionMatrix);
+		instancingData[index].WVP = worldViewProjectionMatrix;
+		instancingData[index].World = worldMatrix;
+	}
 }

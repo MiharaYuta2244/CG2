@@ -29,6 +29,11 @@ public:
 	Microsoft::WRL::ComPtr<ID3D12PipelineState> GetGraphicsPipelineState() { return graphicsPipelineState_; }
 	Microsoft::WRL::ComPtr<ID3D12RootSignature> GetRootSignature() { return rootSignature_; }
 
+	// Getter
+	uint32_t GetDescriptorSizeSRV() const { return descriptorSizeSRV_; }
+	uint32_t GetDescriptorSizeRTV() const { return descriptorSizeRTV_; }
+	uint32_t GetDescriptorSizeDSV() const { return descriptorSizeDSV_; }
+
 	/// <summary>
 	/// SRVの指定番号のCPUディスクリプタハンドルを取得する
 	/// </summary>
@@ -43,6 +48,9 @@ public:
 	/// <returns>GPUディスクリプタハンドル</returns>
 	D3D12_GPU_DESCRIPTOR_HANDLE GetSRVGPUDescriptorHandle(uint32_t index);
 
+	D3D12_CPU_DESCRIPTOR_HANDLE GetCPUDescriptorHandle(Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> descriptorHeap, uint32_t descriptorSize, uint32_t index);
+	D3D12_GPU_DESCRIPTOR_HANDLE GetGPUDescriptorHandle(Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> descriptorHeap, uint32_t descriptorSize, uint32_t index);
+
 public:
 	// 最大SRV数(最大テクスチャ枚数)
 	static const uint32_t kMaxSRVCount;
@@ -54,8 +62,11 @@ private:
 	void CreateDescriptorHeaps();
 	void CreateRTV();
 	void InitializeShaderCompiler();
-	void CreateRootSignature();
-	void CreateGraphicsPipeline();
+	void CreateDSV();
+	void CreateRootSignatureObject3d();
+	void CreateRootSignatureParticle();
+	void CreateGraphicsPipelineObject3d();
+	void CreateGraphicsPipelineParticle();
 	void CreateViewport();
 	void CreateScissor();
 	void CreateFence();
@@ -71,9 +82,6 @@ private:
 	    IDxcUtils* dxcUtils, IDxcCompiler3* dxcCompiler, IDxcIncludeHandler* includeHandler);
 
 	Microsoft::WRL::ComPtr<ID3D12Resource> CreateDepthStencilTextureResource(Microsoft::WRL::ComPtr<ID3D12Device> device, int32_t width, int32_t height);
-
-	D3D12_CPU_DESCRIPTOR_HANDLE GetCPUDescriptorHandle(Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> descriptorHeap, uint32_t descriptorSize, uint32_t index);
-	D3D12_GPU_DESCRIPTOR_HANDLE GetGPUDescriptorHandle(Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> descriptorHeap, uint32_t descriptorSize, uint32_t index);
 
 	// FPS固定初期化
 	void InitializeFixFPS();
@@ -110,6 +118,7 @@ private:
 
 	// Depth Buffer
 	Microsoft::WRL::ComPtr<ID3D12Resource> depthStencilResource_;
+	Microsoft::WRL::ComPtr<ID3D12Resource> instancingResource_;
 
 	// Shader Compiler
 	Microsoft::WRL::ComPtr<IDxcUtils> dxcUtils_;

@@ -1,11 +1,11 @@
+#include <cassert>
 #include "Sprite.h"
 #include "MathUtility.h"
 #include "Matrix4x4.h"
 #include "SpriteCommon.h"
+#include "TextureManager.h"
 #include "VertexData.h"
 #include "WinApp.h"
-#include "TextureManager.h"
-#include <cassert>
 
 using namespace Microsoft::WRL;
 
@@ -38,22 +38,33 @@ void Sprite::Initialize(SpriteCommon* spriteCommon, TextureManager* textureManag
     };
 
 	textureIndex_ = textureManager_->GetTextureIndexByFilePath(textureFilePath);
+
+	// テクスチャサイズをイメージに合わせる
+	AdjustTextureSize();
 }
 
 void Sprite::Update() {
-	// 頂点データ4つで四角形の描画
-	vertexData_[0].position = {0.0f, 1.0f, 0.0f, 1.0f}; // 左下
-	vertexData_[0].texcoord = {0.0f, 1.0f};
-	vertexData_[1].position = {0.0f, 0.0f, 0.0f, 1.0f}; // 左上
-	vertexData_[1].texcoord = {0.0f, 0.0f};
-	vertexData_[2].position = {1.0f, 1.0f, 0.0f, 1.0f}; // 右下
-	vertexData_[2].texcoord = {1.0f, 1.0f};
-	vertexData_[3].position = {1.0f, 0.0f, 0.0f, 1.0f}; // 右上
-	vertexData_[3].texcoord = {1.0f, 0.0f};
+	left_ = 0.0f - anchorPoint_.x;
+	right_ = 1.0f - anchorPoint_.x;
+	top_ = 0.0f - anchorPoint_.y;
+	bottom_ = 1.0f - anchorPoint_.y;
 
-	for (uint32_t i = 0; i < 4; ++i) {
-		vertexData_[i].normal = {0.0f, 0.0f, -1.0f};
-	}
+	// フリップ反映
+	ApplyFlip();
+
+	// テクスチャ範囲指定
+	TextureRangeSelection();
+
+	// 頂点データ4つで四角形の描画
+	vertexData_[0].position = {left_, bottom_, 0.0f, 1.0f};  // 左下
+	vertexData_[1].position = {left_, top_, 0.0f, 1.0f};     // 左上
+	vertexData_[2].position = {right_, bottom_, 0.0f, 1.0f}; // 右下
+	vertexData_[3].position = {right_, top_, 0.0f, 1.0f};    // 右上
+
+	vertexData_[0].texcoord = {tex_left_, tex_bottom_};
+	vertexData_[1].texcoord = {tex_left_, tex_top_};
+	vertexData_[2].texcoord = {tex_right_, tex_bottom_};
+	vertexData_[3].texcoord = {tex_right_, tex_top_};
 
 	// 書き込むためのアドレスを取得
 	indexResource_->Map(0, nullptr, reinterpret_cast<void**>(&indexData_));
@@ -152,6 +163,8 @@ void Sprite::CreateTransformationData() {
 
 void Sprite::SetSrvHandle(D3D12_GPU_DESCRIPTOR_HANDLE srvHandle) { srvHandle_ = srvHandle; }
 
+void Sprite::SetTexture(const std::string texturePath) { textureIndex_ = textureManager_->GetTextureIndexByFilePath(texturePath); }
+
 ComPtr<ID3D12Resource> Sprite::CreateBufferResource(size_t sizeBytes) {
 	// 頂点リソース用のヒープの設定
 	D3D12_HEAP_PROPERTIES heapProperties{};
@@ -177,4 +190,37 @@ ComPtr<ID3D12Resource> Sprite::CreateBufferResource(size_t sizeBytes) {
 	assert(SUCCEEDED(hr));
 
 	return resource;
+}
+
+void Sprite::ApplyFlip() {
+	// 左右反転
+	if (isFlipX_) {
+		left_ = -left_;
+		right_ = -right_;
+	}
+
+	// 上下反転
+	if (isFlipY_) {
+		top_ = -top_;
+		bottom_ = -bottom_;
+	}
+}
+
+void Sprite::TextureRangeSelection() {
+	const DirectX::TexMetadata& metadata = textureManager_->GetMetaData(textureIndex_);
+	tex_left_ = textureLeftTop_.x / metadata.width;
+	tex_right_ = (textureLeftTop_.x + textureSize_.x) / metadata.width;
+	tex_top_ = textureLeftTop_.y / metadata.height;
+	tex_bottom_ = (textureLeftTop_.y + textureSize_.y) / metadata.height;
+}
+
+void Sprite::AdjustTextureSize() {
+	// テクスチャデータを取得
+	const DirectX::TexMetadata& metadata = textureManager_->GetMetaData(textureIndex_);
+
+	textureSize_.x = static_cast<float>(metadata.width);
+	textureSize_.y = static_cast<float>(metadata.height);
+
+	// 画像サイズをテクスチャサイズに合わせる
+	size_ = textureSize_;
 }

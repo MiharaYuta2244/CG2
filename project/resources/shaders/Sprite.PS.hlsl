@@ -1,12 +1,9 @@
-#include "Particle.hlsli"
+#include "Sprite.hlsli"
 
 struct Material
 {
     float32_t4 color;
-    int32_t enableLighting;
     float32_t4x4 uvTransform;
-    float32_t shininess;
-    int32_t enableFoging;
 };
 
 struct PixelShaderOutput
@@ -15,7 +12,7 @@ struct PixelShaderOutput
 };
 
 ConstantBuffer<Material> gMaterial : register(b0);
-Texture2D<float32_t4> gTexture : register(t1);
+Texture2D<float32_t4> gTexture : register(t0);
 SamplerState gSampler : register(s0);
 
 PixelShaderOutput main(VertexShaderOutput input)

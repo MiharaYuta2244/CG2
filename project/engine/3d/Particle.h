@@ -1,28 +1,27 @@
 #pragma once
+#include <d3d12.h>
+#include <string>
+#include <vector>
+#include <wrl.h>
 #include "CameraForGPU.h"
 #include "DirectionalLight.h"
 #include "FogParam.h"
 #include "Material.h"
 #include "MaterialData.h"
 #include "ModelData.h"
+#include "ModelManager.h"
 #include "TimeParam.h"
+#include "Transform.h"
 #include "TransformationMatrix.h"
 #include "VertexData.h"
-#include "Transform.h"
-#include "ModelManager.h"
-#include <wrl.h>
-#include <d3d12.h>
-#include <string>
-#include <vector>
 
-
-class Object3dCommon;
+class ParticleCommon;
 class TextureManager;
 class Model;
 
-class Object3d {
+class Particle {
 public:
-	void Initialize(Object3dCommon* modelCommon, TextureManager* textureManager, ModelManager* modelManager);
+	void Initialize(ParticleCommon* particleCommon, TextureManager* textureManager, ModelManager* modelManager);
 
 	void Update();
 
@@ -50,7 +49,7 @@ public:
 	const Vector3& GetTranslate() const { return transform_.translate; }
 	const Vector4& GetColor() const { return material_.color; }
 
-	Matrix4x4& GetWorldMatrix()  { return worldMatrix_; }
+	Matrix4x4& GetWorldMatrix() { return worldMatrix_; }
 	const Matrix4x4& GetViewMatrix() const { return viewMatrix_; }
 	const Matrix4x4& GetProjectionMatrix() const { return projectionMatrix_; }
 
@@ -69,32 +68,12 @@ private:
 	void CreateTransformationMatrixData();
 
 	/// <summary>
-	/// 平行光源データ作成
-	/// </summary>
-	void CreateDirectionalLightData();
-
-	/// <summary>
-	/// CameraForGPUデータの作成
-	/// </summary>
-	void CreateCameraForGPUData();
-
-	/// <summary>
-	/// フォグパラメータデータの作成
-	/// </summary>
-	void CreateFogParamData();
-
-	/// <summary>
-	/// タイムパラメータデータの作成
-	/// </summary>
-	void CreateTimeParamData();
-
-	/// <summary>
 	/// インスタンシングデータの作成
 	/// </summary>
 	void CreateInstancingData();
 
 private:
-	Object3dCommon* object3dCommon_ = nullptr;
+	ParticleCommon* particleCommon_ = nullptr;
 	TextureManager* textureManager_ = nullptr;
 	ModelManager* modelManager_ = nullptr;
 	Model* model_ = nullptr;

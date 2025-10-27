@@ -1,11 +1,11 @@
 #pragma once
 #include "DirectXTex.h"
 #include "MaterialData.h"
-#include "TextureData.h"
+#include <wrl.h>
 #include <d3d12.h>
 #include <string>
 #include <vector>
-#include <wrl.h>
+#include "TextureData.h"
 
 class DirectXCommon;
 
@@ -20,6 +20,9 @@ public:
 
 	// テクスチャ番号からGPUハンドルを取得
 	D3D12_GPU_DESCRIPTOR_HANDLE GetSrvHandleGPU(uint32_t textureIndex);
+
+	// メタデータを取得
+	const DirectX::TexMetadata& GetMetaData(uint32_t textureIndex);
 
 	/*D3D12_GPU_DESCRIPTOR_HANDLE GetTextureSrvHandleGPU() { return textureSrvHandleGPU_; }
 	D3D12_GPU_DESCRIPTOR_HANDLE GetTextureSrvHandleGPU2() { return textureSrvHandleGPU2_; }

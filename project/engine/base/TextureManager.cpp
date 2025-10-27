@@ -98,6 +98,14 @@ D3D12_GPU_DESCRIPTOR_HANDLE TextureManager::GetSrvHandleGPU(uint32_t textureInde
 	return textureData.srvHandleGPU;
 }
 
+const DirectX::TexMetadata& TextureManager::GetMetaData(uint32_t textureIndex) {
+	// 範囲外指定違反チェック
+	assert(textureIndex < textureDatas_.size() + 1);
+
+	TextureData& textureData = textureDatas_[textureIndex];
+	return textureData.metaData;
+}
+
 ComPtr<ID3D12Resource> TextureManager::CreateTextureResource(const DirectX::TexMetadata& metadata) {
 	// metadataを基にResourceの設定
 	D3D12_RESOURCE_DESC resourceDesc{};

@@ -3,9 +3,11 @@
 #include "MathUtility.h"
 #include "TextureManager.h"
 #include "SphereMeshGenerator.h"
+#include "TransformationMatrix.h"
 #include <assert.h>
 #include <fstream>
 #include <sstream>
+#include <Transform.h>
 
 using namespace Microsoft::WRL;
 
@@ -14,8 +16,8 @@ void Model::Initialize(ModelCommon* modelCommon, TextureManager* textureManager,
 	textureManager_ = textureManager;
 
 	// モデル読み込み
-	modelData_ = LoadObjFile(directorypath, filename);
-	//modelData_ = CreatePrimitiveObj();
+	//modelData_ = LoadObjFile(directorypath, filename);
+	modelData_ = CreatePrimitiveObj();
 
 	// 頂点データの初期化
 	CreateVertexData();
@@ -44,12 +46,16 @@ void Model::Draw()
 	commandList->IASetVertexBuffers(0, 1, &vertexBufferView_); // VBVを設定
 	// IndexBufferViewを設定
 	//commandList->IASetIndexBuffer(&indexBufferView_); // IBVを設定
+	
+	// 描画する数
+	const uint32_t instanceCount = 10;
+
 	// マテリアルCBufferの場所を設定
 	commandList->SetGraphicsRootConstantBufferView(0, materialResource_->GetGPUVirtualAddress());
 	// SRVのDescriptorTableの先頭を設定。2はrootParameter[2]である。
 	commandList->SetGraphicsRootDescriptorTable(2, textureManager_->GetSrvHandleGPU(modelData_.material.textureIndex));
 	// 描画!(DrawCall/ドローコール)。
-	commandList->DrawInstanced(UINT(modelData_.vertices.size()), 1, 0, 0);
+	commandList->DrawInstanced(UINT(modelData_.vertices.size()), instanceCount, 0, 0);
 	//modelCommon_->GetDxCommon()->GetCommandList()->DrawIndexedInstanced(indexCount_, 1, 0, 0, 0);
 }
 
@@ -124,18 +130,15 @@ ModelData Model::LoadObjFile(const std::string& directoryPath, const std::string
 
 ModelData Model::CreatePrimitiveObj() { 
 	ModelData modelData;
-	Vector4 positions; // 位置
-	Vector3 normals;   // 法線
-	Vector2 texcoords; // テクスチャ座標
 
-	modelData.vertices.push_back({positions = {1.0f,1.0f, 0.0f, 1.0f}, texcoords = {0.0f, 0.0f}, normals = {0.0f,0.0f,1.0f}}); // 左上
-	modelData.vertices.push_back({positions = {-1.0f,1.0f, 0.0f, 1.0f}, texcoords = {1.0f, 0.0f}, normals = {0.0f,0.0f,1.0f}}); // 右上
-	modelData.vertices.push_back({positions = {1.0f,-1.0f, 0.0f, 1.0f}, texcoords = {0.0f, 1.0f}, normals = {0.0f,0.0f,1.0f}}); // 左下
-	modelData.vertices.push_back({positions = {1.0f,-1.0f, 0.0f, 1.0f}, texcoords = {0.0f, 1.0f}, normals = {0.0f,0.0f,1.0f}}); // 左下
-	modelData.vertices.push_back({positions = {-1.0f,1.0f, 0.0f, 1.0f}, texcoords = {1.0f, 0.0f}, normals = {0.0f,0.0f,1.0f}}); // 右上
-	modelData.vertices.push_back({positions = {-1.0f,-1.0f, 0.0f, 1.0f}, texcoords = {1.0f, 1.0f}, normals = {0.0f,0.0f,1.0f}}); // 右下
+	modelData.vertices.push_back({.position = {-1.0f, 1.0f, 0.0f, 1.0f}, .texcoord = {0.0f, 0.0f}, .normal = {0.0f,0.0f,1.0f}}); // 左上
+    modelData.vertices.push_back({.position = {1.0f, 1.0f, 0.0f, 1.0f}, .texcoord = {1.0f, 0.0f}, .normal = {0.0f,0.0f,1.0f}}); // 右上
+    modelData.vertices.push_back({.position = {-1.0f,-1.0f, 0.0f, 1.0f}, .texcoord = {0.0f, 1.0f}, .normal = {0.0f,0.0f,1.0f}}); // 左下
+    modelData.vertices.push_back({.position = {-1.0f,-1.0f, 0.0f, 1.0f}, .texcoord = {0.0f, 1.0f}, .normal = {0.0f,0.0f,1.0f}}); // 左下
+    modelData.vertices.push_back({.position = {1.0f, 1.0f, 0.0f, 1.0f}, .texcoord = {1.0f, 0.0f}, .normal = {0.0f,0.0f,1.0f}}); // 右上
+    modelData.vertices.push_back({.position = {1.0f,-1.0f, 0.0f, 1.0f}, .texcoord = {1.0f, 1.0f}, .normal = {0.0f,0.0f,1.0f}}); // 右下
 
-	modelData.material.textureFilePath = "./resources/uvChecker.png";
+	modelData.material.textureFilePath = "resources/uvChecker.png";
 
 	return modelData;
 }

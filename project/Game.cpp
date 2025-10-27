@@ -18,6 +18,12 @@ void Game::Initialize(HINSTANCE hInstance) {
 	// ModelManager
 	modelManger_->Initialize(dxCommon_.get(), textureManager_.get());
 
+	// ParticleCommon
+	//particleCommon_->Initialize(dxCommon_.get());
+
+	// Particle
+	//particle_->Initialize(particleCommon_.get(), textureManager_.get(), modelManger_.get());
+
 	// Object3d
 	//for (uint32_t i = 0; i < 5; ++i) {
 	//	auto object3d = std::make_unique<Object3d>();
@@ -59,11 +65,12 @@ void Game::Initialize(HINSTANCE hInstance) {
 	spriteCommon_->Initialize(dxCommon_.get());
 
 	// Sprite
-	/*for (uint32_t i = 0; i < 5; ++i) {
-		auto sprite = std::make_unique<Sprite>();
-		sprite->Initialize(spriteCommon_.get(), textureManager_.get(), "resources/uvChecker.png");
-		sprites_.push_back(std::move(sprite));
-	}*/
+	for (uint32_t i = 0; i < sprite_.size(); ++i) {
+		sprite_[i] = std::make_unique<Sprite>();
+		sprite_[i]->Initialize(spriteCommon_.get(), textureManager_.get(), "resources/uvChecker.png");
+	}
+
+	sprite_[0]->SetTexture("resources/white.png");
 
 	// XAudio
 	audio_->Initialize();
@@ -85,6 +92,57 @@ void Game::Update() {
 	input_->Update();
 
 	imGuiManager_->BeginFrame();
+
+	ImGui::Begin("Sprite");
+
+	for (size_t i = 0; i < sprite_.size(); ++i) {
+		if (!sprite_[i])
+			continue;
+
+		std::string labelPrefix = "Sprite " + std::to_string(i) + " / ";
+
+		ImGui::Text("Sprite %zu", i);
+		ImGui::DragFloat2((labelPrefix + "Position").c_str(), &sprite_[i]->GetPosition().x, 1.0f);
+		ImGui::DragFloat2((labelPrefix + "Size").c_str(), &sprite_[i]->GetSize().x, 1.0f);
+		ImGui::DragFloat((labelPrefix + "Rotate").c_str(), &sprite_[i]->GetRotation(), 0.01f);
+		ImGui::DragFloat2((labelPrefix + "AnchorPoint").c_str(), &sprite_[i]->GetAnchorPoint().x, 0.01f);
+		ImGui::DragFloat2((labelPrefix + "TextureLeftTop").c_str(), &sprite_[i]->GetTextureLeftTop().x, 1.0f);
+		ImGui::DragFloat2((labelPrefix + "TextureSize").c_str(), &sprite_[i]->GetTextureSize().x, 1.0f);
+		ImGui::Checkbox((labelPrefix + "isFlipX").c_str(), &sprite_[i]->GetIsFlipX());
+		ImGui::Checkbox((labelPrefix + "isFlipY").c_str(), &sprite_[i]->GetIsFlipY());
+
+		static const char* textureList[] = {"uvChecker.png", "white.png"};
+
+		// 各スプライトごとに選択状態を保持
+		static std::vector<int> currentItemList;
+		if (currentItemList.size() < sprite_.size()) {
+			currentItemList.resize(sprite_.size(), 0);
+		}
+
+		int& currentItem = currentItemList[i];
+
+		if (ImGui::BeginCombo((labelPrefix + "Texture").c_str(), textureList[currentItem])) {
+			for (int t = 0; t < IM_ARRAYSIZE(textureList); ++t) {
+				bool isSelected = (currentItem == t);
+				if (ImGui::Selectable(textureList[t], isSelected)) {
+					currentItem = t;
+
+					// テクスチャ変更
+					std::string texturePath = std::string("resources/") + textureList[t];
+					sprite_[i]->SetTexture(texturePath);
+				}
+				if (isSelected)
+					ImGui::SetItemDefaultFocus();
+			}
+			ImGui::EndCombo();
+		}
+
+		ImGui::Separator();
+	}
+
+	ImGui::End();
+
+
 
 	// ImGuiウィンドウ位置、サイズ固定
 	//ImGui::SetNextWindowPos(ImVec2(0, 0), ImGuiCond_Always);
@@ -125,12 +183,15 @@ void Game::Update() {
 	//ImGui::End();
 	//ImGui::PopStyleColor();
 
+	// Particle更新
+	//particle_->Update();
+
 	// プレイヤー更新
 	player_->Update();
 
 	// ImGui
-	ImGui::SetNextWindowPos(ImVec2(0, 0), ImGuiCond_Always);
-	ImGui::Begin("Editor");
+	//ImGui::SetNextWindowPos(ImVec2(0, 0), ImGuiCond_Always);
+	//ImGui::Begin("Editor");
 
 	//ImGui::SliderInt("objIndex", &objIndex_, 0, 4);
 
@@ -142,21 +203,10 @@ void Game::Update() {
 		object3ds_[i]->Update();
 	}
 
-	// spriteUpdate
-	/*for (uint32_t i = 0; i < 5; ++i) {
-		sprites_[i]->Update();
-	}*/
-
-	// Sprite ImGui
-	/*Vector2 position = sprites_[0]->GetPosition();
-	ImGui::DragFloat2("position", &position.x, 0.1f);
-	sprites_[0]->SetPosition(position);
-
-	Vector2 size = sprites_[0]->GetSize();
-	ImGui::DragFloat2("size", &size.x, 0.1f);
-	sprites_[0]->SetSize(size);*/
-
-	ImGui::End();
+	// スプライト更新
+	for (auto& sprite : sprite_) {
+		sprite->Update();
+	}
 }
 
 void Game::Draw() {
@@ -169,15 +219,21 @@ void Game::Draw() {
 	// 3Dオブジェクト描画準備。3Dオブジェクトの描画に共通のグラフィックスコマンドを積む
 	object3dCommon_->DrawSettingCommon();
 
-	// スプライト描画
-	/*for (uint32_t i = 0; i < 5; ++i) {
-		sprites_[i]->Draw();
-	}*/
+	// Particle描画準備。3Dオブジェクトの描画に共通のグラフィックスコマンドを積む
+	//particleCommon_->DrawSettingCommon();
 
 	// 3Dモデル描画
 	for (uint32_t i = 0; i < 10; ++i) {
 		object3ds_[i]->Draw();
 	}
+
+	// スプライト描画
+	for (auto& sprite : sprite_) {
+		sprite->Draw();
+	}
+
+	// Particle描画
+	//particle_->Draw();
 
 	// プレイヤー描画
 	player_->Draw();

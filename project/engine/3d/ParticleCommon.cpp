@@ -1,7 +1,21 @@
-#include "SpriteCommon.h"
-#include "StringUtility.h"
 #include <format>
-void SpriteCommon::Initialize(DirectXCommon* dxCommon) { 
+#include "ParticleCommon.h"
+#include "DirectXCommon.h"
+#include "StringUtility.h"
+#include <TransformationMatrix.h>
+#include <algorithm>
+
+using namespace Microsoft::WRL;
+
+void ParticleCommon::DrawSettingCommon() {
+	// RootSignatureを設定。PSOに設定しているけど別途設定が必要
+	dxCommon_->GetCommandList()->SetGraphicsRootSignature(rootSignature_.Get());
+	dxCommon_->GetCommandList()->SetPipelineState(graphicsPipelineState_.Get()); // PSOを設定
+	// 形状を設定。PSOに設定しているものとはまた別。同じものを設定すると考えておけば良い
+	dxCommon_->GetCommandList()->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+}
+
+void ParticleCommon::Initialize(DirectXCommon* dxCommon) {
 	dxCommon_ = dxCommon;
 
 	InitializeShaderCompiler();
@@ -10,17 +24,7 @@ void SpriteCommon::Initialize(DirectXCommon* dxCommon) {
 	CreateGraphicsPipeline();
 }
 
-void SpriteCommon::DrawSettingCommon()
-{
-	// RootSignatureを設定。PSOに設定しているけど別途設定が必要
-	dxCommon_->GetCommandList()->SetGraphicsRootSignature(rootSignature_.Get());
-	dxCommon_->GetCommandList()->SetPipelineState(graphicsPipelineState_.Get()); // PSOを設定
-	// 形状を設定。PSOに設定しているものとはまた別。同じものを設定すると考えておけば良い
-	dxCommon_->GetCommandList()->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-}
-
-void SpriteCommon::CreateRootSignature()
-{
+void ParticleCommon::CreateRootSignature() {
 	HRESULT hr;
 
 	D3D12_DESCRIPTOR_RANGE descriptorRange[1] = {};
@@ -60,6 +64,21 @@ void SpriteCommon::CreateRootSignature()
 	descriptionRootSignature.pStaticSamplers = staticSamplers;
 	descriptionRootSignature.NumStaticSamplers = _countof(staticSamplers);
 
+	// SRVの作成
+	const uint32_t kNumInstance = 10;
+	D3D12_SHADER_RESOURCE_VIEW_DESC instancingSrvDesc{};
+	instancingSrvDesc.Format = DXGI_FORMAT_UNKNOWN;
+	instancingSrvDesc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
+	instancingSrvDesc.ViewDimension = D3D12_SRV_DIMENSION_BUFFER;
+	instancingSrvDesc.Buffer.FirstElement = 0;
+	instancingSrvDesc.Buffer.Flags = D3D12_BUFFER_SRV_FLAG_NONE;
+	instancingSrvDesc.Buffer.NumElements = kNumInstance;
+	instancingSrvDesc.Buffer.StructureByteStride = sizeof(TransformationMatrix);
+
+	D3D12_CPU_DESCRIPTOR_HANDLE instancingSrvHandleCPU = dxCommon_->GetCPUDescriptorHandle(dxCommon_->GetSrvDescriptorHeap(), dxCommon_->GetDescriptorSizeSRV(), 3);
+	D3D12_GPU_DESCRIPTOR_HANDLE instancingSrvHandleGPU = dxCommon_->GetGPUDescriptorHandle(dxCommon_->GetSrvDescriptorHeap(), dxCommon_->GetDescriptorSizeSRV(), 3);
+	dxCommon_->GetDevice()->CreateShaderResourceView(instancingResource_.Get(), &instancingSrvDesc, instancingSrvHandleCPU);
+
 	// シリアライズしてバイナリにする
 	ID3DBlob* signatureBlob = nullptr;
 	ID3DBlob* errorBlob = nullptr;
@@ -74,8 +93,7 @@ void SpriteCommon::CreateRootSignature()
 	assert(SUCCEEDED(hr));
 }
 
-void SpriteCommon::CreateGraphicsPipeline()
-{
+void ParticleCommon::CreateGraphicsPipeline() {
 	CreateRootSignature();
 	HRESULT hr;
 
@@ -113,26 +131,16 @@ void SpriteCommon::CreateGraphicsPipeline()
 	// RasterizerStateの設定
 	D3D12_RASTERIZER_DESC rasterizerDesc{};
 	// 裏面(時計回り)を表示しない
-	rasterizerDesc.CullMode = D3D12_CULL_MODE_NONE;
+	rasterizerDesc.CullMode = D3D12_CULL_MODE_BACK;
 	// 三角形の中を塗りつぶす
 	rasterizerDesc.FillMode = D3D12_FILL_MODE_SOLID;
 
 	// Shaderをコンパイルする
-	IDxcBlob* vertexShaderBlob = CompileShader(L"resources/shaders/Sprite.VS.hlsl", L"vs_6_0", dxcUtils_.Get(), dxcCompiler_.Get(), includeHandler_.Get());
+	IDxcBlob* vertexShaderBlob = CompileShader(L"resources/shaders/Particle.VS.hlsl", L"vs_6_0", dxcUtils_.Get(), dxcCompiler_.Get(), includeHandler_.Get());
 	assert(vertexShaderBlob != nullptr);
 
-	IDxcBlob* pixelShaderBlob = CompileShader(L"resources/shaders/Sprite.PS.hlsl", L"ps_6_0", dxcUtils_.Get(), dxcCompiler_.Get(), includeHandler_.Get());
+	IDxcBlob* pixelShaderBlob = CompileShader(L"resources/shaders/Particle.PS.hlsl", L"ps_6_0", dxcUtils_.Get(), dxcCompiler_.Get(), includeHandler_.Get());
 	assert(pixelShaderBlob != nullptr);
-
-	//// DepthStencilTextureをウィンドウのサイズで作成
-	// depthStencilResource_ = CreateDepthStencilTextureResource(dxCommon_->GetDevice()/*.Get()*/, WinApp::kClientWidth, WinApp::kClientHeight);
-
-	//// DSVの設定
-	// D3D12_DEPTH_STENCIL_VIEW_DESC dsvDesc{};
-	// dsvDesc.Format = DXGI_FORMAT_D24_UNORM_S8_UINT;        // Format。基本的にはResourceに合わせる
-	// dsvDesc.ViewDimension = D3D12_DSV_DIMENSION_TEXTURE2D; // 2dTexture
-	//// DSVHeapの先頭にDSVをつくる
-	// dxCommon_->GetDevice()->CreateDepthStencilView(depthStencilResource_.Get(), &dsvDesc, dsvDescriptorHeap_->GetCPUDescriptorHandleForHeapStart());
 
 	// DepthStencilStateの設定
 	D3D12_DEPTH_STENCIL_DESC depthStencilDesc{};
@@ -167,7 +175,21 @@ void SpriteCommon::CreateGraphicsPipeline()
 	assert(SUCCEEDED(hr));
 }
 
-IDxcBlob* SpriteCommon::CompileShader(
+void ParticleCommon::InitializeShaderCompiler() {
+
+	HRESULT hr;
+
+	// dxcCompilerを初期化
+	hr = DxcCreateInstance(CLSID_DxcUtils, IID_PPV_ARGS(&dxcUtils_));
+	assert(SUCCEEDED(hr));
+	hr = DxcCreateInstance(CLSID_DxcCompiler, IID_PPV_ARGS(&dxcCompiler_));
+	assert(SUCCEEDED(hr));
+	// 現時点でincludeはしないが、includeに対応するための設定を行っていく
+	hr = dxcUtils_->CreateDefaultIncludeHandler(&includeHandler_);
+	assert(SUCCEEDED(hr));
+}
+
+IDxcBlob* ParticleCommon::CompileShader(
     // CompilerするShaderファイルへのパス
     const std::wstring& filePath,
     // Compilerに使用するProfile
@@ -223,18 +245,4 @@ IDxcBlob* SpriteCommon::CompileShader(
 	shaderError->Release();
 	// 実行用のバイナリを返却
 	return shaderBlob;
-}
-
-void SpriteCommon::InitializeShaderCompiler() {
-
-	HRESULT hr;
-
-	// dxcCompilerを初期化
-	hr = DxcCreateInstance(CLSID_DxcUtils, IID_PPV_ARGS(&dxcUtils_));
-	assert(SUCCEEDED(hr));
-	hr = DxcCreateInstance(CLSID_DxcCompiler, IID_PPV_ARGS(&dxcCompiler_));
-	assert(SUCCEEDED(hr));
-	// 現時点でincludeはしないが、includeに対応するための設定を行っていく
-	hr = dxcUtils_->CreateDefaultIncludeHandler(&includeHandler_);
-	assert(SUCCEEDED(hr));
 }
