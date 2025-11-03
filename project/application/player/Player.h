@@ -11,10 +11,14 @@ class Player : public Actor {
 public:
 	void Initialize(Object3dCommon* obj3dCommon, TextureManager* texMane, ModelManager* ModelMane, DirectInput* input, GamePad* gamePad);
 
-	void Update();
+	void Update(float deltaTime);
 
 	void Draw();
 
+	// ImGui
+	void UpdateImGui();
+
+	// Setter
 	void SetModel(const std::string model) { object3d_->SetModel(model); }
 
 	// Getter
@@ -35,13 +39,16 @@ private:
 	bool isJump_ = false;
 
 	// ジャンプ力
-	float jumpPower_ = 0.2f;
+	float jumpPower_ = 10.0f;
 
 	// 速度関連
-	Vector3 acceleration_ = {0.0f, -0.098f, 0.0f};
-	Vector3 velocity_ = {0.0f, 0.0f, 0.0f};
+	Vector2 acceleration_ = {0.0f, -9.81f};
+	Vector2 velocity_ = {5.0f, 0.0f};
 	float gravity_ = 0.01f;
 
 	// ゲームパッド
 	GamePad* gamePad_ = nullptr;
+
+	// 経過時間
+	float deltaTime_;
 };

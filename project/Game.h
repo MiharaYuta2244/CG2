@@ -20,6 +20,7 @@
 #include "GamePad.h"
 #include "ParticleCommon.h"
 #include "Particle.h"
+#include "DeltaTime.h"
 #include <memory>
 #pragma comment(lib, "d3d12.lib")
 #pragma comment(lib, "dxgi.lib")
@@ -98,4 +99,7 @@ private:
 	// パーティクル
 	std::unique_ptr<ParticleCommon> particleCommon_ = std::make_unique<ParticleCommon>();
 	std::unique_ptr<Particle> particle_ = std::make_unique<Particle>();
+
+	// 経過時間
+	std::unique_ptr<DeltaTime> deltaTime_ = std::make_unique<DeltaTime>();
 };

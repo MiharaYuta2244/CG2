@@ -24,19 +24,6 @@ void Game::Initialize(HINSTANCE hInstance) {
 	// Particle
 	//particle_->Initialize(particleCommon_.get(), textureManager_.get(), modelManger_.get());
 
-	// Object3d
-	//for (uint32_t i = 0; i < 5; ++i) {
-	//	auto object3d = std::make_unique<Object3d>();
-	//	object3d->Initialize(object3dCommon_.get(), textureManager_.get(), modelManger_.get());
-	//	object3ds_.push_back(std::move(object3d));
-	//}
-
-	for (uint16_t i = 0; i < 10; ++i) {
-		auto object3d = std::make_unique<Object3d>();
-		object3d->Initialize(object3dCommon_.get(), textureManager_.get(), modelManger_.get());
-		object3ds_.push_back(std::move(object3d));
-	}
-
 	// .objファイルからモデルを読み込む
 	modelManger_->LoadModel("fence.obj");
 	modelManger_->LoadModel("plane.obj");
@@ -53,24 +40,8 @@ void Game::Initialize(HINSTANCE hInstance) {
 	//object3ds_[3]->SetModel("sphere.obj");
 	//object3ds_[4]->SetModel("Field.obj");
 
-	//object3ds_[1]->SetEnableFoging(false);
-	//object3ds_[2]->SetEnableFoging(false);
-	//object3ds_[3]->SetEnableFoging(false);
-	//object3ds_[4]->SetEnableFoging(false);
-
-	//object3ds_[1]->SetColor({1.0f, 1.0f, 1.0f, 0.5f});
-	//object3ds_[3]->SetColor({1.0f, 1.0f, 1.0f, 0.5f});
-
 	// Sprite共通部
 	spriteCommon_->Initialize(dxCommon_.get());
-
-	// Sprite
-	for (uint32_t i = 0; i < sprite_.size(); ++i) {
-		sprite_[i] = std::make_unique<Sprite>();
-		sprite_[i]->Initialize(spriteCommon_.get(), textureManager_.get(), "resources/uvChecker.png");
-	}
-
-	sprite_[0]->SetTexture("resources/white.png");
 
 	// XAudio
 	audio_->Initialize();
@@ -88,61 +59,17 @@ void Game::Initialize(HINSTANCE hInstance) {
 }
 
 void Game::Update() {
+	// 経過時間
+	deltaTime_->Update();
+
 	// 入力処理更新
 	input_->Update();
 
+	// ImGui前処理
 	imGuiManager_->BeginFrame();
 
-	ImGui::Begin("Sprite");
-
-	for (size_t i = 0; i < sprite_.size(); ++i) {
-		if (!sprite_[i])
-			continue;
-
-		std::string labelPrefix = "Sprite " + std::to_string(i) + " / ";
-
-		ImGui::Text("Sprite %zu", i);
-		ImGui::DragFloat2((labelPrefix + "Position").c_str(), &sprite_[i]->GetPosition().x, 1.0f);
-		ImGui::DragFloat2((labelPrefix + "Size").c_str(), &sprite_[i]->GetSize().x, 1.0f);
-		ImGui::DragFloat((labelPrefix + "Rotate").c_str(), &sprite_[i]->GetRotation(), 0.01f);
-		ImGui::DragFloat2((labelPrefix + "AnchorPoint").c_str(), &sprite_[i]->GetAnchorPoint().x, 0.01f);
-		ImGui::DragFloat2((labelPrefix + "TextureLeftTop").c_str(), &sprite_[i]->GetTextureLeftTop().x, 1.0f);
-		ImGui::DragFloat2((labelPrefix + "TextureSize").c_str(), &sprite_[i]->GetTextureSize().x, 1.0f);
-		ImGui::Checkbox((labelPrefix + "isFlipX").c_str(), &sprite_[i]->GetIsFlipX());
-		ImGui::Checkbox((labelPrefix + "isFlipY").c_str(), &sprite_[i]->GetIsFlipY());
-
-		static const char* textureList[] = {"uvChecker.png", "white.png"};
-
-		// 各スプライトごとに選択状態を保持
-		static std::vector<int> currentItemList;
-		if (currentItemList.size() < sprite_.size()) {
-			currentItemList.resize(sprite_.size(), 0);
-		}
-
-		int& currentItem = currentItemList[i];
-
-		if (ImGui::BeginCombo((labelPrefix + "Texture").c_str(), textureList[currentItem])) {
-			for (int t = 0; t < IM_ARRAYSIZE(textureList); ++t) {
-				bool isSelected = (currentItem == t);
-				if (ImGui::Selectable(textureList[t], isSelected)) {
-					currentItem = t;
-
-					// テクスチャ変更
-					std::string texturePath = std::string("resources/") + textureList[t];
-					sprite_[i]->SetTexture(texturePath);
-				}
-				if (isSelected)
-					ImGui::SetItemDefaultFocus();
-			}
-			ImGui::EndCombo();
-		}
-
-		ImGui::Separator();
-	}
-
-	ImGui::End();
-
-
+	// プレイヤーのimGui
+	player_->UpdateImGui();
 
 	// ImGuiウィンドウ位置、サイズ固定
 	//ImGui::SetNextWindowPos(ImVec2(0, 0), ImGuiCond_Always);
@@ -166,16 +93,7 @@ void Game::Update() {
 
 	// デバッグカメラ更新
 	debugCamera_->Update(*input_, *gamePad_);
-	for (uint32_t i = 0; i < 10; ++i) {
-		object3ds_[i]->SetViewMatrix(debugCamera_->GetViewMatrix());
-		player_->GetObject3d()->SetViewMatrix(debugCamera_->GetViewMatrix());
-	}
-
-	/*for (uint32_t i = 0; i < 10; ++i) {
-		transform_[i].translate = object3ds_[i]->GetTranslate();
-		transform_[i].rotate = object3ds_[i]->GetRotate();
-		transform_[i].scale = object3ds_[i]->GetScale();
-	}*/
+	player_->GetObject3d()->SetViewMatrix(debugCamera_->GetViewMatrix());
 
 	//ImGuizmo::Manipulate(
 	//    *(debugCamera_->GetViewMatrix()).m, *(object3ds_[objIndex_]->GetProjectionMatrix()).m, ImGuizmo::OPERATION::TRANSLATE, ImGuizmo::LOCAL, *(object3ds_[objIndex_]->GetWorldMatrix()).m);
@@ -187,26 +105,7 @@ void Game::Update() {
 	//particle_->Update();
 
 	// プレイヤー更新
-	player_->Update();
-
-	// ImGui
-	//ImGui::SetNextWindowPos(ImVec2(0, 0), ImGuiCond_Always);
-	//ImGui::Begin("Editor");
-
-	//ImGui::SliderInt("objIndex", &objIndex_, 0, 4);
-
-	//ImGui::SliderFloat4("color", &color_.x, 0.0f, 1.0f);
-	//object3ds_[3]->SetColor(color_);
-
-	// object3dUpdate
-	for (uint32_t i = 0; i < 10; ++i) {
-		object3ds_[i]->Update();
-	}
-
-	// スプライト更新
-	for (auto& sprite : sprite_) {
-		sprite->Update();
-	}
+	player_->Update(deltaTime_->GetDeltaTime());
 }
 
 void Game::Draw() {
@@ -221,16 +120,6 @@ void Game::Draw() {
 
 	// Particle描画準備。3Dオブジェクトの描画に共通のグラフィックスコマンドを積む
 	//particleCommon_->DrawSettingCommon();
-
-	// 3Dモデル描画
-	for (uint32_t i = 0; i < 10; ++i) {
-		object3ds_[i]->Draw();
-	}
-
-	// スプライト描画
-	for (auto& sprite : sprite_) {
-		sprite->Draw();
-	}
 
 	// Particle描画
 	//particle_->Draw();

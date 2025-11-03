@@ -20,18 +20,23 @@ void Player::Initialize(Object3dCommon* obj3dCommon, TextureManager* texMane, Mo
 	gamePad_ = gamePad;
 }
 
-void Player::Update() {
+void Player::Update(float deltaTime) {
 	gamePad_->Update();
 
+	// 経過時間
+	deltaTime_ = deltaTime;
+
 	// 重力
-	velocity_.y += acceleration_.y;
-	transform_.translate.y += velocity_.y;
+	velocity_.y += acceleration_.y * deltaTime_;
 
 	// 横移動
 	HorizontalMove();
 
 	// ジャンプ
 	Jump();
+
+	// Y座標更新
+	transform_.translate.y += velocity_.y * deltaTime_;
 
 	// プレイヤーの高さが0以下にならないようにする
 	if (transform_.translate.y <= 0.0f) {
@@ -48,18 +53,27 @@ void Player::Update() {
 
 void Player::Draw() { object3d_->Draw(); }
 
+void Player::UpdateImGui() { 
+	ImGui::Begin("Player");
+
+	ImGui::DragFloat3("Position", &transform_.translate.x, 0.01f);
+	ImGui::DragFloat2("Velocity", &velocity_.x, 0.01f);
+
+	ImGui::End();
+}
+
 void Player::HorizontalMove() { 
 	bool isRightInput = input_->KeyDown(DIK_D) || gamePad_->GetState().axes.lx > 0.3f;
 	bool isLeftInput = input_->KeyDown(DIK_A) || gamePad_->GetState().axes.lx < -0.3f;
 
 	// 右移動
 	if (isRightInput) {
-		transform_.translate.x += 0.1f;
+		transform_.translate.x += velocity_.x * deltaTime_;
 	}
 
 	// 左移動
 	if (isLeftInput) {
-		transform_.translate.x -= 0.1f;
+		transform_.translate.x -= velocity_.x * deltaTime_;
 	}
 }
 
@@ -68,7 +82,7 @@ void Player::Jump() {
 
 	// ジャンプ
 	if (isJumpInput && !isJump_) {
-		velocity_.y = 1.0f;
+		velocity_.y = jumpPower_;
 		isJump_ = true;
 	}
 }
