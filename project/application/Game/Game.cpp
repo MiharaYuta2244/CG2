@@ -9,6 +9,11 @@ void Game::Initialize(HINSTANCE hInstance) {
 	// ImGuiManager
 	imGuiManager_->Initialize(dxCommon_->GetWinApp()->GetHWND(), dxCommon_->GetDevice(), dxCommon_->GetSwapChainDescBufferCount(), dxCommon_->GetRtvFormat(), dxCommon_->GetSrvDescriptorHeap().Get());
 
+	// ImGuiの色変更
+	ImGuiStyle& style = ImGui::GetStyle();
+	style.Colors[ImGuiCol_WindowBg] = ImVec4(0.1f, 0.1f, 0.1f, 1.0f); // ダークグレー
+	style.Colors[ImGuiCol_Text] = ImVec4(0.9f, 0.9f, 0.9f, 1.0f);     // 明るいグレー
+
 	// テクスチャマネージャー
 	textureManager_->Initialize(dxCommon_.get());
 
@@ -69,6 +74,9 @@ void Game::Update() {
 	// 経過時間
 	deltaTime_->Update();
 
+	// フレームレート
+	fps_ = 1.0f / deltaTime_->GetDeltaTime();
+
 	// 入力処理更新
 	input_->Update();
 
@@ -77,6 +85,9 @@ void Game::Update() {
 
 	// プレイヤーのimGui
 	player_->UpdateImGui();
+
+	// フレームレート表示(ImGui)
+	ImGuiFPS();
 
 	// ImGuiウィンドウ位置、サイズ固定
 	// ImGui::SetNextWindowPos(ImVec2(0, 0), ImGuiCond_Always);
@@ -179,4 +190,11 @@ void Game::SpawnObjectsByMapChip(float mapHeight) {
 			}
 		}
 	}
+}
+
+void Game::ImGuiFPS() {
+	ImGui::Begin("Performance", nullptr, ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoTitleBar);
+	ImGui::Text("FPS: %.1f", fps_);
+	ImGui::Text("Frame Time: %.3f ms", deltaTime_->GetDeltaTime() * 1000.0f);
+	ImGui::End();
 }

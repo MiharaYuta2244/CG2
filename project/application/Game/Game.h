@@ -47,6 +47,9 @@ private:
 	// マップチップに応じてオブジェクトの配置
 	void SpawnObjectsByMapChip(float mapHeight);
 
+	// フレームレートの表示(ImGui)
+	void ImGuiFPS();
+
 private:
 	// リリースリークチェック
 	D3DResourceLeakChecker leakCheck_;
@@ -114,4 +117,7 @@ private:
 
 	// ブロック
 	std::vector<std::unique_ptr<Block>> blocks_;
+
+	// フレームレート
+	float fps_ = 0.0f;
 };
