@@ -11,13 +11,13 @@
 
 using namespace Microsoft::WRL;
 
-void Model::Initialize(ModelCommon* modelCommon, TextureManager* textureManager, const std::string& directorypath, const std::string& filename) { 
+void Model::Initialize(ModelCommon* modelCommon, TextureManager* textureManager, const std::string& filename) { 
 	modelCommon_ = modelCommon; 
 	textureManager_ = textureManager;
 
 	// モデル読み込み
-	//modelData_ = LoadObjFile(directorypath, filename);
-	modelData_ = CreatePrimitiveObj();
+	modelData_ = LoadObjFile(filename);
+	//modelData_ = CreatePrimitiveObj();
 
 	// 頂点データの初期化
 	CreateVertexData();
@@ -59,14 +59,14 @@ void Model::Draw()
 	//modelCommon_->GetDxCommon()->GetCommandList()->DrawIndexedInstanced(indexCount_, 1, 0, 0, 0);
 }
 
-ModelData Model::LoadObjFile(const std::string& directoryPath, const std::string& filename) {
+ModelData Model::LoadObjFile(const std::string& filename) {
 	ModelData modelData;            // 構築するModelData
 	std::vector<Vector4> positions; // 位置
 	std::vector<Vector3> normals;   // 法線
 	std::vector<Vector2> texcoords; // テクスチャ座標
 	std::string line;               // ファイルから読んだ1行を格納するもの
 
-	std::ifstream file(directoryPath + "/" + filename); // ファイルを開く
+	std::ifstream file("resources/model/" + filename); // ファイルを開く
 	assert(file.is_open());                             // とりあえず開けなかったら止める
 
 	while (std::getline(file, line)) {
@@ -122,7 +122,7 @@ ModelData Model::LoadObjFile(const std::string& directoryPath, const std::string
 			std::string materialFilename;
 			s >> materialFilename;
 			// 基本的にobjファイルと同一階層にmtlは存在させるので、ディレクトリ名とファイル名を渡す
-			modelData.material = LoadMaterialTemplateFile(directoryPath, materialFilename);
+			modelData.material = LoadMaterialTemplateFile(materialFilename);
 		}
 	}
 	return modelData;
@@ -143,10 +143,10 @@ ModelData Model::CreatePrimitiveObj() {
 	return modelData;
 }
 
-MaterialData Model::LoadMaterialTemplateFile(const std::string& directoryPath, const std::string& filename) {
+MaterialData Model::LoadMaterialTemplateFile(const std::string& filename) {
 	MaterialData materialData;                          // 構築するMaterialData
 	std::string line;                                   // ファイルから読んだ1行を格納するもの
-	std::ifstream file(directoryPath + "/" + filename); // ファイルを開く
+	std::ifstream file("resources/model/" + filename); // ファイルを開く
 	assert(file.is_open());                             // とりあえず開けなかったら止める
 
 	while (std::getline(file, line)) {
@@ -159,7 +159,7 @@ MaterialData Model::LoadMaterialTemplateFile(const std::string& directoryPath, c
 			std::string textureFilename;
 			s >> textureFilename;
 			// 連結してファイルパスにする
-			materialData.textureFilePath = directoryPath + "/" + textureFilename;
+			materialData.textureFilePath = "resources/model/" + textureFilename;
 		}
 	}
 	return materialData;

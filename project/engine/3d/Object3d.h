@@ -40,6 +40,7 @@ public:
 	void SetScale(const Vector3& scale) { transform_.scale = scale; }
 	void SetRotate(const Vector3& rotate) { transform_.rotate = rotate; }
 	void SetTranslate(const Vector3& translate) { transform_.translate = translate; }
+	void SetTransform(const Transform& transform) { transform_ = transform; }
 	void SetWorldMatrix(Matrix4x4 worldMatrix) { worldMatrix_ = worldMatrix; }
 	void SetViewMatrix(Matrix4x4 viewMatrix) { viewMatrix_ = viewMatrix; }
 	void SetProjectionmatrix(Matrix4x4 projectionMatrix) { projectionMatrix_ = projectionMatrix; }

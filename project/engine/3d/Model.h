@@ -14,7 +14,7 @@ class TextureManager;
 
 class Model {
 public:
-	void Initialize(ModelCommon* modelCommon, TextureManager* textureManager, const std::string& directorypath, const std::string& filename);
+	void Initialize(ModelCommon* modelCommon, TextureManager* textureManager, const std::string& filename);
 
 	void Draw();
 
@@ -28,11 +28,11 @@ public:
 
 
 private:
-	ModelData LoadObjFile(const std::string& directoryPath, const std::string& filename);
+	ModelData LoadObjFile(const std::string& filename);
 
 	ModelData CreatePrimitiveObj();
 
-	MaterialData LoadMaterialTemplateFile(const std::string& directoryPath, const std::string& filename);
+	MaterialData LoadMaterialTemplateFile(const std::string& filename);
 	Microsoft::WRL::ComPtr<ID3D12Resource> CreateBufferResource(Microsoft::WRL::ComPtr<ID3D12Device> device, size_t sizeBytes);
 
 	/// <summary>

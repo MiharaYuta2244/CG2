@@ -21,6 +21,8 @@
 #include "ParticleCommon.h"
 #include "Particle.h"
 #include "DeltaTime.h"
+#include "Map.h"
+#include "Block.h"
 #include <memory>
 #pragma comment(lib, "d3d12.lib")
 #pragma comment(lib, "dxgi.lib")
@@ -40,6 +42,10 @@ public:
 	void Finalize();
 
 	DirectXCommon* GetDxCommon() const { return dxCommon_.get(); }
+
+private:
+	// マップチップに応じてオブジェクトの配置
+	void SpawnObjectsByMapChip(float mapHeight);
 
 private:
 	// リリースリークチェック
@@ -102,4 +108,10 @@ private:
 
 	// 経過時間
 	std::unique_ptr<DeltaTime> deltaTime_ = std::make_unique<DeltaTime>();
+
+	// マップ
+	std::unique_ptr<Map> map_ = std::make_unique<Map>();
+
+	// ブロック
+	std::vector<std::unique_ptr<Block>> blocks_;
 };

@@ -19,10 +19,10 @@ void Game::Initialize(HINSTANCE hInstance) {
 	modelManger_->Initialize(dxCommon_.get(), textureManager_.get());
 
 	// ParticleCommon
-	//particleCommon_->Initialize(dxCommon_.get());
+	// particleCommon_->Initialize(dxCommon_.get());
 
 	// Particle
-	//particle_->Initialize(particleCommon_.get(), textureManager_.get(), modelManger_.get());
+	// particle_->Initialize(particleCommon_.get(), textureManager_.get(), modelManger_.get());
 
 	// .objファイルからモデルを読み込む
 	modelManger_->LoadModel("fence.obj");
@@ -32,13 +32,14 @@ void Game::Initialize(HINSTANCE hInstance) {
 	modelManger_->LoadModel("skydome.obj");
 	modelManger_->LoadModel("Field.obj");
 	modelManger_->LoadModel("sphere.obj");
+	modelManger_->LoadModel("Box.obj");
 
 	// modelのポインタを受け取る
-	//object3ds_[0]->SetModel("fence.obj");
-	//object3ds_[1]->SetModel("skydome.obj");
-	//object3ds_[2]->SetModel("SkySphere.obj");
-	//object3ds_[3]->SetModel("sphere.obj");
-	//object3ds_[4]->SetModel("Field.obj");
+	// object3ds_[0]->SetModel("fence.obj");
+	// object3ds_[1]->SetModel("skydome.obj");
+	// object3ds_[2]->SetModel("SkySphere.obj");
+	// object3ds_[3]->SetModel("sphere.obj");
+	// object3ds_[4]->SetModel("Field.obj");
 
 	// Sprite共通部
 	spriteCommon_->Initialize(dxCommon_.get());
@@ -55,7 +56,13 @@ void Game::Initialize(HINSTANCE hInstance) {
 
 	// プレイヤー
 	player_->Initialize(object3dCommon_.get(), textureManager_.get(), modelManger_.get(), input_.get(), gamePad_.get());
-	player_->SetModel("fence.obj");
+	player_->SetModel("Box.obj");
+
+	// マップ
+	map_->Initialize();
+
+	// オブジェクトの配置
+	SpawnObjectsByMapChip(0.0f);
 }
 
 void Game::Update() {
@@ -72,40 +79,49 @@ void Game::Update() {
 	player_->UpdateImGui();
 
 	// ImGuiウィンドウ位置、サイズ固定
-	//ImGui::SetNextWindowPos(ImVec2(0, 0), ImGuiCond_Always);
-	//ImGui::SetNextWindowSize(ImVec2(1280, 720), ImGuiCond_Always);
+	// ImGui::SetNextWindowPos(ImVec2(0, 0), ImGuiCond_Always);
+	// ImGui::SetNextWindowSize(ImVec2(1280, 720), ImGuiCond_Always);
 
-	//ImGui::PushStyleColor(ImGuiCol_WindowBg, ImVec4(0, 0, 0, 0)); // 完全に透明
-	//ImGui::Begin("Gizmo", nullptr, ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoInputs);
-	//ImGuizmo::BeginFrame();
+	// ImGui::PushStyleColor(ImGuiCol_WindowBg, ImVec4(0, 0, 0, 0)); // 完全に透明
+	// ImGui::Begin("Gizmo", nullptr, ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoInputs);
+	// ImGuizmo::BeginFrame();
 
 	// ImGuizmoの設定
-	//ImGuizmo::SetOrthographic(false);
-	//ImGuizmo::Enable(true);
-	//ImGuizmo::SetDrawlist(ImGui::GetWindowDrawList());
+	// ImGuizmo::SetOrthographic(false);
+	// ImGuizmo::Enable(true);
+	// ImGuizmo::SetDrawlist(ImGui::GetWindowDrawList());
 
-	//ImGuiIO& io = ImGui::GetIO();
-	//float windowWidth = (float)ImGui::GetWindowWidth();
-	//float windowHeight = (float)ImGui::GetWindowHeight();
+	// ImGuiIO& io = ImGui::GetIO();
+	// float windowWidth = (float)ImGui::GetWindowWidth();
+	// float windowHeight = (float)ImGui::GetWindowHeight();
 
 	// ウィンドウサイズを取得してImGuizmoに渡す
-	//ImGuizmo::SetRect(ImGui::GetWindowPos().x, ImGui::GetWindowPos().y, windowWidth, windowHeight);
+	// ImGuizmo::SetRect(ImGui::GetWindowPos().x, ImGui::GetWindowPos().y, windowWidth, windowHeight);
 
 	// デバッグカメラ更新
 	debugCamera_->Update(*input_, *gamePad_);
 	player_->GetObject3d()->SetViewMatrix(debugCamera_->GetViewMatrix());
 
-	//ImGuizmo::Manipulate(
-	//    *(debugCamera_->GetViewMatrix()).m, *(object3ds_[objIndex_]->GetProjectionMatrix()).m, ImGuizmo::OPERATION::TRANSLATE, ImGuizmo::LOCAL, *(object3ds_[objIndex_]->GetWorldMatrix()).m);
+	for (auto& block : blocks_) {
+		block->GetObject3d()->SetViewMatrix(debugCamera_->GetViewMatrix());
+	}
 
-	//ImGui::End();
-	//ImGui::PopStyleColor();
+	// ImGuizmo::Manipulate(
+	//     *(debugCamera_->GetViewMatrix()).m, *(object3ds_[objIndex_]->GetProjectionMatrix()).m, ImGuizmo::OPERATION::TRANSLATE, ImGuizmo::LOCAL, *(object3ds_[objIndex_]->GetWorldMatrix()).m);
+
+	// ImGui::End();
+	// ImGui::PopStyleColor();
 
 	// Particle更新
-	//particle_->Update();
+	// particle_->Update();
 
 	// プレイヤー更新
 	player_->Update(deltaTime_->GetDeltaTime());
+
+	// ブロック更新
+	for (auto& block : blocks_) {
+		block->Update();
+	}
 }
 
 void Game::Draw() {
@@ -119,13 +135,18 @@ void Game::Draw() {
 	object3dCommon_->DrawSettingCommon();
 
 	// Particle描画準備。3Dオブジェクトの描画に共通のグラフィックスコマンドを積む
-	//particleCommon_->DrawSettingCommon();
+	// particleCommon_->DrawSettingCommon();
 
 	// Particle描画
-	//particle_->Draw();
+	// particle_->Draw();
 
 	// プレイヤー描画
 	player_->Draw();
+
+	// ブロック描画
+	for (auto& block : blocks_) {
+		block->Draw();
+	}
 
 	// ImGuiの内部コマンドを生成する
 	imGuiManager_->Render(dxCommon_->GetCommandList());
@@ -140,4 +161,22 @@ void Game::Finalize() {
 	CloseHandle(dxCommon_->GetFenceEvent());
 
 	CoUninitialize();
+}
+
+void Game::SpawnObjectsByMapChip(float mapHeight) {
+	for (int y = 0; y < map_->GetRowCount(); ++y) {
+		for (int x = 0; x < map_->GetColumnCount(); ++x) {
+			int tile = map_->GetMapData(y, x);
+
+			// タイルごとの描画処理
+			if (static_cast<TileType>(tile) == TileType::BLOCK) {
+				// ブロックの初期化
+				auto block = std::make_unique<Block>();
+				block->Initialize(object3dCommon_.get(), textureManager_.get(), modelManger_.get());
+				block->Spawn({static_cast<float>(x), static_cast<float>(y) + mapHeight, 0.0f});
+				block->SetModel("Box.obj");
+				blocks_.push_back(std::move(block));
+			}
+		}
+	}
 }
