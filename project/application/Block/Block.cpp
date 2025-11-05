@@ -1,7 +1,7 @@
 #include "Block.h"
+#include "ModelManager.h"
 #include "Object3dCommon.h"
 #include "TextureManager.h"
-#include "ModelManager.h"
 
 void Block::Initialize(Object3dCommon* obj3dCommon, TextureManager* texMane, ModelManager* ModelMane) {
 	// 3Dオブジェクトの生成
@@ -15,8 +15,8 @@ void Block::Initialize(Object3dCommon* obj3dCommon, TextureManager* texMane, Mod
 	transform_.scale = {1.0f, 1.0f, 1.0f};
 }
 
-void Block::Update() { 
-	object3d_->SetTransform(transform_); 
+void Block::Update() {
+	object3d_->SetTransform(transform_);
 	object3d_->Update();
 }
 

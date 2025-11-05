@@ -45,10 +45,13 @@ public:
 
 private:
 	// マップチップに応じてオブジェクトの配置
-	void SpawnObjectsByMapChip(float mapHeight);
+	void SpawnObjectsByMapChip(Vector2 leftTop);
 
 	// フレームレートの表示(ImGui)
 	void ImGuiFPS();
+
+	// デバッグカメラ(ImGui)
+	void ImGuiDebugCamera();
 
 private:
 	// リリースリークチェック
@@ -120,4 +123,7 @@ private:
 
 	// フレームレート
 	float fps_ = 0.0f;
+
+	// マップの左上座標
+	Vector2 mapLeftTop_ = {0.0f, 0.0f};
 };

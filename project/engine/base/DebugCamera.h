@@ -10,7 +10,13 @@ public:
 	void SetPivot(const Vector3& p);
 	void Update(const DirectInput& input, const GamePad& gamePad);
 	void UpdateViewMatrix();
+
+	// Getter
 	Matrix4x4 GetViewMatrix() { return viewMatrix_; }
+	Vector3& GetTranslation() { return translation_; }
+	
+	// Setter
+	void SetTranslation(Vector3 translation) { translation_ = translation; }
 
 private:
 	// 累積回転行列

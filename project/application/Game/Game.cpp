@@ -58,6 +58,7 @@ void Game::Initialize(HINSTANCE hInstance) {
 
 	// DebugCamera
 	debugCamera_->Initialize();
+	debugCamera_->SetTranslation({19.45f, 10.5f, -50.0f});
 
 	// プレイヤー
 	player_->Initialize(object3dCommon_.get(), textureManager_.get(), modelManger_.get(), input_.get(), gamePad_.get());
@@ -67,7 +68,7 @@ void Game::Initialize(HINSTANCE hInstance) {
 	map_->Initialize();
 
 	// オブジェクトの配置
-	SpawnObjectsByMapChip(0.0f);
+	SpawnObjectsByMapChip(mapLeftTop_);
 }
 
 void Game::Update() {
@@ -88,6 +89,9 @@ void Game::Update() {
 
 	// フレームレート表示(ImGui)
 	ImGuiFPS();
+
+	// デバッグカメラ(ImGui)
+	ImGuiDebugCamera();
 
 	// ImGuiウィンドウ位置、サイズ固定
 	// ImGui::SetNextWindowPos(ImVec2(0, 0), ImGuiCond_Always);
@@ -158,6 +162,10 @@ void Game::Draw() {
 	for (auto& block : blocks_) {
 		block->Draw();
 	}
+	
+	// 当たり判定用の線描画
+	ImDrawList* drawList = ImGui::GetBackgroundDrawList();
+	drawList->AddRect(ImVec2(player_->GetTranslate().x, player_->GetTranslate().y), ImVec2(40.0f, 40.0f), IM_COL32(0, 255, 0, 255));
 
 	// ImGuiの内部コマンドを生成する
 	imGuiManager_->Render(dxCommon_->GetCommandList());
@@ -174,7 +182,7 @@ void Game::Finalize() {
 	CoUninitialize();
 }
 
-void Game::SpawnObjectsByMapChip(float mapHeight) {
+void Game::SpawnObjectsByMapChip(Vector2 leftTop) {
 	for (int y = 0; y < map_->GetRowCount(); ++y) {
 		for (int x = 0; x < map_->GetColumnCount(); ++x) {
 			int tile = map_->GetMapData(y, x);
@@ -184,7 +192,7 @@ void Game::SpawnObjectsByMapChip(float mapHeight) {
 				// ブロックの初期化
 				auto block = std::make_unique<Block>();
 				block->Initialize(object3dCommon_.get(), textureManager_.get(), modelManger_.get());
-				block->Spawn({static_cast<float>(x), static_cast<float>(y) + mapHeight, 0.0f});
+				block->Spawn({static_cast<float>(x), static_cast<float>(y), 0.0f});
 				block->SetModel("Box.obj");
 				blocks_.push_back(std::move(block));
 			}
@@ -196,5 +204,11 @@ void Game::ImGuiFPS() {
 	ImGui::Begin("Performance", nullptr, ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoTitleBar);
 	ImGui::Text("FPS: %.1f", fps_);
 	ImGui::Text("Frame Time: %.3f ms", deltaTime_->GetDeltaTime() * 1000.0f);
+	ImGui::End();
+}
+
+void Game::ImGuiDebugCamera() {
+	ImGui::Begin("DebugCamera");
+	ImGui::DragFloat3("Pos", &debugCamera_->GetTranslation().x, 0.01f);
 	ImGui::End();
 }

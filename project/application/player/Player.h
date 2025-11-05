@@ -23,6 +23,10 @@ public:
 
 	// Getter
 	Object3d* GetObject3d() { return object3d_.get(); }
+	Transform GetTransform() { return transform_; }
+	Vector3 GetTranslate() { return transform_.translate; }
+	Vector3 GetRotate() { return transform_.rotate; }
+	Vector3 GetScale() { return transform_.scale; }
 
 private:
 	enum class Direction {
@@ -71,7 +75,7 @@ private:
 	bool isRotate_ = false;
 
 	// 地面の高さ
-	float groundPosY_ = -5.0f;
+	float groundPosY_ = 2.0f;
 
 	// プレイヤーの向いている方向
 	Direction direction_ = Direction::RIGHT;
