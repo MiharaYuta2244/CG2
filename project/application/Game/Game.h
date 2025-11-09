@@ -23,6 +23,7 @@
 #include "DeltaTime.h"
 #include "Map.h"
 #include "Block.h"
+#include "Enemy.h"
 #include <memory>
 #pragma comment(lib, "d3d12.lib")
 #pragma comment(lib, "dxgi.lib")
@@ -126,4 +127,7 @@ private:
 
 	// マップの左上座標
 	Vector2 mapLeftTop_ = {0.0f, 0.0f};
+
+	// 敵
+	std::unique_ptr<Enemy> enemy_ = std::make_unique<Enemy>();
 };

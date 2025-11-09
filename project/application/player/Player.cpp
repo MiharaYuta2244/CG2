@@ -1,9 +1,9 @@
-#include <numbers>
 #include "Player.h"
 #include "GamePad.h"
 #include "ModelManager.h"
 #include "Object3dCommon.h"
 #include "TextureManager.h"
+#include <numbers>
 
 void Player::Initialize(Object3dCommon* obj3dCommon, TextureManager* texMane, ModelManager* ModelMane, DirectInput* input, GamePad* gamePad) {
 	// 3Dオブジェクトの生成
@@ -79,6 +79,9 @@ void Player::UpdateImGui() {
 }
 
 void Player::HorizontalMove() {
+	if (isRotate_)
+		return;
+
 	bool isRightInput = input_->KeyDown(DIK_D) || gamePad_->GetState().axes.lx > 0.3f;
 	bool isLeftInput = input_->KeyDown(DIK_A) || gamePad_->GetState().axes.lx < -0.3f;
 
@@ -114,7 +117,9 @@ void Player::Jump() {
 }
 
 void Player::HipDrop() {
-	bool isHipDropInput = input_->KeyTriggered(DIK_SPACE) || gamePad_->GetState().buttonsPressed.a;
+	// どっちがいいかわからない!!!!!!!!!!!!
+	bool isHipDropInput = input_->KeyTriggered(DIK_SPACE) || gamePad_->GetState().buttonsPressed.a; // スペース
+	// bool isHipDropInput = input_->KeyDown(DIK_S) || gamePad_->GetState().axes.ly > 0.3f; // 下
 
 	// ジャンプ中であれば
 	if (isJump_ && isHipDropInput) {

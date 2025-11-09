@@ -237,7 +237,7 @@ void Model::CreateMaterialData() {
 	// 三角形の色
 	material_.color = {1.0f, 1.0f, 1.0f, 1.0f};
 	material_.enableLighting = false;
-	material_.enableFoging = true;
+	material_.enableFoging = false;
 	// uvTransformなどのデータを設定
 	material_.uvTransform = MathUtility::MakeIdentity4x4();
 	// 反射強度

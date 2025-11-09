@@ -67,6 +67,10 @@ void Game::Initialize(HINSTANCE hInstance) {
 	// マップ
 	map_->Initialize();
 
+	// 敵
+	enemy_->Initialize(object3dCommon_.get(), textureManager_.get(), modelManger_.get());
+	enemy_->SetModel("Box.obj");
+
 	// オブジェクトの配置
 	SpawnObjectsByMapChip(mapLeftTop_);
 }
@@ -86,6 +90,9 @@ void Game::Update() {
 
 	// プレイヤーのimGui
 	player_->UpdateImGui();
+
+	// 敵のImGui
+	enemy_->UpdateImGui();
 
 	// フレームレート表示(ImGui)
 	ImGuiFPS();
@@ -116,6 +123,7 @@ void Game::Update() {
 	// デバッグカメラ更新
 	debugCamera_->Update(*input_, *gamePad_);
 	player_->GetObject3d()->SetViewMatrix(debugCamera_->GetViewMatrix());
+	enemy_->GetObject3d()->SetViewMatrix(debugCamera_->GetViewMatrix());
 
 	for (auto& block : blocks_) {
 		block->GetObject3d()->SetViewMatrix(debugCamera_->GetViewMatrix());
@@ -137,6 +145,9 @@ void Game::Update() {
 	for (auto& block : blocks_) {
 		block->Update();
 	}
+
+	// 敵更新
+	enemy_->Update(deltaTime_->GetDeltaTime());
 }
 
 void Game::Draw() {
@@ -162,10 +173,9 @@ void Game::Draw() {
 	for (auto& block : blocks_) {
 		block->Draw();
 	}
-	
-	// 当たり判定用の線描画
-	ImDrawList* drawList = ImGui::GetBackgroundDrawList();
-	drawList->AddRect(ImVec2(player_->GetTranslate().x, player_->GetTranslate().y), ImVec2(40.0f, 40.0f), IM_COL32(0, 255, 0, 255));
+
+	// 敵描画
+	enemy_->Draw();
 
 	// ImGuiの内部コマンドを生成する
 	imGuiManager_->Render(dxCommon_->GetCommandList());
@@ -194,6 +204,7 @@ void Game::SpawnObjectsByMapChip(Vector2 leftTop) {
 				block->Initialize(object3dCommon_.get(), textureManager_.get(), modelManger_.get());
 				block->Spawn({static_cast<float>(x), static_cast<float>(y), 0.0f});
 				block->SetModel("Box.obj");
+				block->GetObject3d()->SetColor({0.8f, 0.8f, 0.0f, 1.0f});
 				blocks_.push_back(std::move(block));
 			}
 		}

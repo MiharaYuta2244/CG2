@@ -58,7 +58,7 @@ private:
 	float jumpPower_ = 20.0f;
 
 	// ヒップドロップ力
-	float hipDropPower_ = -25.0f;
+	float hipDropPower_ = -35.0f;
 
 	// 速度関連
 	Vector2 acceleration_ = {0.0f, -25.0f};
@@ -79,4 +79,7 @@ private:
 
 	// プレイヤーの向いている方向
 	Direction direction_ = Direction::RIGHT;
+
+	// HP
+	int hp_ = 5;
 };

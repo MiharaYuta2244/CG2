@@ -28,15 +28,12 @@ public:
 
 	void Draw();
 
+	// setter
 	void SetModel(const std::string& filePath);
 	void SetEnableFoging(const bool enableFoging);
 	void SetEnableLighting(const bool enableLighting);
 	void SetColor(Vector4 color);
-
-	// setter
 	void SetModel(Model* model) { model_ = model; }
-
-	// setter
 	void SetScale(const Vector3& scale) { transform_.scale = scale; }
 	void SetRotate(const Vector3& rotate) { transform_.rotate = rotate; }
 	void SetTranslate(const Vector3& translate) { transform_.translate = translate; }
@@ -56,12 +53,6 @@ public:
 	const Matrix4x4& GetProjectionMatrix() const { return projectionMatrix_; }
 
 private:
-	// .mtlファイルの読み取り
-	ModelData LoadObjFile(const std::string& directoryPath, const std::string& filename);
-
-	// .objファイルの読み取り
-	MaterialData LoadMaterialTemplateFile(const std::string& directoryPath, const std::string& filename);
-
 	Microsoft::WRL::ComPtr<ID3D12Resource> CreateBufferResource(Microsoft::WRL::ComPtr<ID3D12Device> device, size_t sizeBytes);
 
 	/// <summary>
