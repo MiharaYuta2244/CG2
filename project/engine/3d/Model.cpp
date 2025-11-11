@@ -49,11 +49,11 @@ void Model::Draw()
 	//commandList->IASetIndexBuffer(&indexBufferView_); // IBVを設定
 	
 	// 描画する数
-	const uint32_t instanceCount = 10;
+	const uint32_t instanceCount = 1;
 
 	// マテリアルCBufferの場所を設定
 	commandList->SetGraphicsRootConstantBufferView(0, materialResource_->GetGPUVirtualAddress());
-	// SRVのDescriptorTableの先頭を設定。2はrootParameter[2]である。
+	// SRVのDescriptorTableの先頭を設定。3はrootParameter[3]（Pixel用テクスチャ）である。
 	commandList->SetGraphicsRootDescriptorTable(2, textureManager_->GetSrvHandleGPU(modelData_.material.textureFilePath));
 	// 描画!(DrawCall/ドローコール)。
 	commandList->DrawInstanced(UINT(modelData_.vertices.size()), instanceCount, 0, 0);
@@ -237,7 +237,7 @@ void Model::CreateMaterialData() {
 	materialResource_->Unmap(0, nullptr);
 	// 三角形の色
 	material_.color = {1.0f, 1.0f, 1.0f, 1.0f};
-	material_.enableLighting = false;
+	material_.enableLighting = true;
 	material_.enableFoging = false;
 	// uvTransformなどのデータを設定
 	material_.uvTransform = MathUtility::MakeIdentity4x4();

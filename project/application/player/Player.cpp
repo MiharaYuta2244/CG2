@@ -11,8 +11,9 @@ void Player::Initialize(Object3dCommon* obj3dCommon, TextureManager* texMane, Mo
 
 	// Object3dの初期化
 	object3d_->Initialize(obj3dCommon, texMane, ModelMane);
+	object3d_->SetColor({1.0f, 0.0f, 0.0f, 1.0f});
 
-	transform_.scale = {1.0f, 1.0f, 1.0f};
+	transform_.scale = {3.0f, 3.0f, 3.0f};
 	transform_.rotate = {0.0f, 0.0f, 0.0f};
 	transform_.translate = {20.0f, 0.0f, 0.0f};
 	size_ = {1.0f, 1.0f, 1.0f};
@@ -26,10 +27,6 @@ void Player::Initialize(Object3dCommon* obj3dCommon, TextureManager* texMane, Mo
 
 void Player::Update(float deltaTime) {
 	gamePad_->Update();
-
-	if (input_->KeyTriggered(DIK_Q)) {
-		object3d_->SetModel("fence.obj");
-	}
 
 	// 経過時間
 	deltaTime_ = deltaTime;
@@ -77,7 +74,11 @@ void Player::UpdateImGui() {
 
 	ImGui::DragFloat3("Position", &transform_.translate.x, 0.01f);
 	ImGui::DragFloat3("Rotate", &transform_.rotate.x, 0.01f);
+	ImGui::DragFloat3("Scale", &transform_.scale.x, 0.01f);
 	ImGui::DragFloat2("Velocity", &velocity_.x, 0.01f);
+	ImGui::DragFloat3("direction", &object3d_->GetDirectionalLight().direction.x, 0.01f);
+	ImGui::DragFloat("intensity", &object3d_->GetDirectionalLight().intensity, 0.01f);
+	ImGui::DragFloat("shininess", &object3d_->GetMaterial().shininess, 0.01f);
 
 	ImGui::End();
 }

@@ -98,6 +98,9 @@ void Sprite::Update() {
 }
 
 void Sprite::Draw() {
+	// Spriteの描画準備。Spriteの描画に共通のグラフィックスコマンドを積む
+	spriteCommon_->DrawSettingCommon();
+
 	// Spriteの描画。
 	spriteCommon_->GetDirectXCommon()->GetCommandList()->IASetVertexBuffers(0, 1, &vertexBufferView_); // VBVを設定
 	spriteCommon_->GetDirectXCommon()->GetCommandList()->IASetIndexBuffer(&indexBufferView_);          // IBVを設定

@@ -63,9 +63,13 @@ PixelShaderOutput main(VertexShaderOutput input)
     // 入射光の反射ベクトルを求める
     float32_t3 reflectLight = reflect(gDirectionalLight.direction, normalize(input.normal));
     
+    float32_t3 halfVector = normalize(-gDirectionalLight.direction + toEye);
+    float NDotH = dot(normalize(input.normal), halfVector);
+    float specularPow = pow(saturate(NDotH), gMaterial.shininess); // 反射強度
+    
     // 内積を取って、saturateして、shininess階乗すると鏡面反射の強度が求まる
-    float RdotE = dot(reflectLight, toEye);
-    float specularPow = pow(saturate(RdotE), gMaterial.shininess); // 反射強度
+    //float RdotE = dot(reflectLight, toEye);
+    //float specularPow = pow(saturate(RdotE), gMaterial.shininess); // 反射強度
     
     PixelShaderOutput output;
     if (gMaterial.enableLighting != 0) // Lightingする場合

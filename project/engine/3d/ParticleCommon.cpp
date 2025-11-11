@@ -1,11 +1,11 @@
-#include <format>
 #include "ParticleCommon.h"
 #include "DirectXCommon.h"
 #include "StringUtility.h"
 #include <TransformationMatrix.h>
 #include <algorithm>
+#include <format>
 
-using namespace Microsoft::WRL;
+    using namespace Microsoft::WRL;
 
 void ParticleCommon::DrawSettingCommon() {
 	// RootSignatureを設定。PSOに設定しているけど別途設定が必要
@@ -27,24 +27,41 @@ void ParticleCommon::Initialize(DirectXCommon* dxCommon) {
 void ParticleCommon::CreateRootSignature() {
 	HRESULT hr;
 
-	D3D12_DESCRIPTOR_RANGE descriptorRange[1] = {};
-	descriptorRange[0].BaseShaderRegister = 0;                                                   // 0から始まる
-	descriptorRange[0].NumDescriptors = 1;                                                       // 数は1つ
-	descriptorRange[0].RangeType = D3D12_DESCRIPTOR_RANGE_TYPE_SRV;                              // SRVを使う
-	descriptorRange[0].OffsetInDescriptorsFromTableStart = D3D12_DESCRIPTOR_RANGE_OFFSET_APPEND; // Offsetを自動計算
+	// インスタンシング用 SRV 範囲 (t0)
+	D3D12_DESCRIPTOR_RANGE descriptorRangeInstancing{};
+	descriptorRangeInstancing.BaseShaderRegister = 0;                                                   // t0
+	descriptorRangeInstancing.NumDescriptors = 1;                                                       // 数は1つ
+	descriptorRangeInstancing.RangeType = D3D12_DESCRIPTOR_RANGE_TYPE_SRV;                              // SRVを使う
+	descriptorRangeInstancing.OffsetInDescriptorsFromTableStart = D3D12_DESCRIPTOR_RANGE_OFFSET_APPEND; // Offsetを自動計算
 
-	// RootParameter作成。複数設定できるので配列。
-	D3D12_ROOT_PARAMETER rootParameters[3] = {};
-	rootParameters[0].ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV;                   // CBVを使う
-	rootParameters[0].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;                // PixelShaderで使う
-	rootParameters[0].Descriptor.ShaderRegister = 0;                                   // レジスタ番号0とバインド
-	rootParameters[1].ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV;                   // CBVを使う
-	rootParameters[1].ShaderVisibility = D3D12_SHADER_VISIBILITY_VERTEX;               // VertexShaderで使う
-	rootParameters[1].Descriptor.ShaderRegister = 0;                                   // レジスタ番号0を使う
-	rootParameters[2].ParameterType = D3D12_ROOT_PARAMETER_TYPE_DESCRIPTOR_TABLE;      // DescriptorTableを使う
-	rootParameters[2].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;                // PixelShaderで使う
-	rootParameters[2].DescriptorTable.pDescriptorRanges = descriptorRange;             // Tableの中身の配列を指定
-	rootParameters[2].DescriptorTable.NumDescriptorRanges = _countof(descriptorRange); // Tableで利用する数
+	// テクスチャ用 SRV 範囲 (t1)
+	D3D12_DESCRIPTOR_RANGE descriptorRangeTexture{};
+	descriptorRangeTexture.BaseShaderRegister = 1;                                                   // t1
+	descriptorRangeTexture.NumDescriptors = 1;                                                       // 数は1つ
+	descriptorRangeTexture.RangeType = D3D12_DESCRIPTOR_RANGE_TYPE_SRV;                              // SRVを使う
+	descriptorRangeTexture.OffsetInDescriptorsFromTableStart = D3D12_DESCRIPTOR_RANGE_OFFSET_APPEND; // Offsetを自動計算
+
+	// RootParameter作成。複数設定できるので配列。今回4要素に拡張
+	D3D12_ROOT_PARAMETER rootParameters[4] = {};
+	rootParameters[0].ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV;    // CBVを使う
+	rootParameters[0].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL; // PixelShaderで使う
+	rootParameters[0].Descriptor.ShaderRegister = 0;                    // レジスタ番号0とバインド
+
+	rootParameters[1].ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV;     // CBVを使う
+	rootParameters[1].ShaderVisibility = D3D12_SHADER_VISIBILITY_VERTEX; // VertexShaderで使う
+	rootParameters[1].Descriptor.ShaderRegister = 0;                     // レジスタ番号0を使う
+
+	// rootParameters[2] : インスタンシング用 SRV テーブル (頂点シェーダ可視)
+	rootParameters[2].ParameterType = D3D12_ROOT_PARAMETER_TYPE_DESCRIPTOR_TABLE;
+	rootParameters[2].ShaderVisibility = D3D12_SHADER_VISIBILITY_VERTEX;
+	rootParameters[2].DescriptorTable.pDescriptorRanges = &descriptorRangeInstancing;
+	rootParameters[2].DescriptorTable.NumDescriptorRanges = 1;
+
+	// rootParameters[3] : テクスチャ用 SRV テーブル (ピクセルシェーダ可視)
+	rootParameters[3].ParameterType = D3D12_ROOT_PARAMETER_TYPE_DESCRIPTOR_TABLE;
+	rootParameters[3].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;
+	rootParameters[3].DescriptorTable.pDescriptorRanges = &descriptorRangeTexture;
+	rootParameters[3].DescriptorTable.NumDescriptorRanges = 1;
 
 	D3D12_STATIC_SAMPLER_DESC staticSamplers[1] = {};
 	staticSamplers[0].Filter = D3D12_FILTER_MIN_MAG_MIP_LINEAR;   // バイリニアフィルタ
@@ -64,7 +81,7 @@ void ParticleCommon::CreateRootSignature() {
 	descriptionRootSignature.pStaticSamplers = staticSamplers;
 	descriptionRootSignature.NumStaticSamplers = _countof(staticSamplers);
 
-	// SRVの作成
+	// SRVの作成（インスタンシング用）
 	const uint32_t kNumInstance = 10;
 	D3D12_SHADER_RESOURCE_VIEW_DESC instancingSrvDesc{};
 	instancingSrvDesc.Format = DXGI_FORMAT_UNKNOWN;
@@ -75,9 +92,10 @@ void ParticleCommon::CreateRootSignature() {
 	instancingSrvDesc.Buffer.NumElements = kNumInstance;
 	instancingSrvDesc.Buffer.StructureByteStride = sizeof(TransformationMatrix);
 
-	D3D12_CPU_DESCRIPTOR_HANDLE instancingSrvHandleCPU = dxCommon_->GetCPUDescriptorHandle(dxCommon_->GetSrvDescriptorHeap(), dxCommon_->GetDescriptorSizeSRV(), 3);
-	D3D12_GPU_DESCRIPTOR_HANDLE instancingSrvHandleGPU = dxCommon_->GetGPUDescriptorHandle(dxCommon_->GetSrvDescriptorHeap(), dxCommon_->GetDescriptorSizeSRV(), 3);
-	dxCommon_->GetDevice()->CreateShaderResourceView(instancingResource_.Get(), &instancingSrvDesc, instancingSrvHandleCPU);
+	// CPU/GPUハンドルをクラスメンバへ取得して保存
+	instancingSrvHandleCPU_ = dxCommon_->GetCPUDescriptorHandle(dxCommon_->GetSrvDescriptorHeap(), dxCommon_->GetDescriptorSizeSRV(), 3);
+	instancingSrvHandleGPU_ = dxCommon_->GetGPUDescriptorHandle(dxCommon_->GetSrvDescriptorHeap(), dxCommon_->GetDescriptorSizeSRV(), 3);
+	dxCommon_->GetDevice()->CreateShaderResourceView(instancingResource_.Get(), &instancingSrvDesc, instancingSrvHandleCPU_);
 
 	// シリアライズしてバイナリにする
 	ID3DBlob* signatureBlob = nullptr;

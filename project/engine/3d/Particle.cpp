@@ -1,7 +1,7 @@
+#include "Particle.h"
 #include "MathOperator.h"
 #include "MathUtility.h"
 #include "Model.h"
-#include "Particle.h"
 #include "ParticleCommon.h"
 #include "TextureManager.h"
 #include <DirectXMath.h>
@@ -22,6 +22,9 @@ void Particle::Initialize(ParticleCommon* particleCommon, TextureManager* textur
 	// インスタンシングデータ作成
 	CreateInstancingData();
 
+	// 頂点バッファ作成（ModelDataに基づく6頂点）
+	CreateVertexBuffer();
+
 	// Transform変数を作る
 	transform_ = {
 	    {1.0f, 1.0f, 1.0f},
@@ -29,74 +32,54 @@ void Particle::Initialize(ParticleCommon* particleCommon, TextureManager* textur
         {0.0f, 0.0f, 0.0f}
     };
 
-	cameraTransform_ = {
-	    {1.0f, 1.0f, 1.0f  },
-        {0.3f, 0.0f, 0.0f  },
-        {0.0f, 4.0f, -10.0f}
-    };
 	worldMatrix_ = MathUtility::MakeAffineMatrix(transform_.scale, transform_.rotate, transform_.translate);
+
+	// カメラをセットする
+	camera_ = particleCommon_->GetDefaultCamera();
 }
 
 void Particle::Update() {
-	// fogの揺れ
-	float elapsedTime = 1.0f / 60.0f;
-	static float totalTime = 0.0f;
-	totalTime += elapsedTime;
-
-	timeParam_.time = totalTime;
-
-	// Matrix4x4 cameraMatrix = MathUtility::MakeAffineMatrix(cameraTransform_.scale, cameraTransform_.rotate, cameraTransform_.translate);
-	// Matrix4x4 viewMatrix = MathUtility::Inverse(cameraMatrix);
 	worldMatrix_ = MathUtility::MakeAffineMatrix(transform_.scale, transform_.rotate, transform_.translate);
-	projectionMatrix_ = MathUtility::MakePerspectiveFovMatrix(0.45f, static_cast<float>(WinApp::kClientWidth) / static_cast<float>(WinApp::kClientHeight), 0.1f, 100.0f);
-	transformMatrixData_->WVP = worldMatrix_ * viewMatrix_ * projectionMatrix_;
+
+	if (camera_) {
+		const Matrix4x4& viewProjectionMatrix = camera_->GetViewProjectionMatrix();
+		worldViewProjectionMatrix_ = MathUtility::Multiply(worldMatrix_, viewProjectionMatrix);
+	} else {
+		worldViewProjectionMatrix_ = worldMatrix_;
+	}
+
+	transformMatrixData_->WVP = worldViewProjectionMatrix_;
 	transformMatrixData_->World = worldMatrix_;
 
 	*transformMatrixData_ = {transformMatrixData_->WVP, transformMatrixData_->World};
-	*directionalLightData_ = directionalLight_;
-	*cameraForGPUData_ = cameraForGPU_;
-	*fogParamData_ = fogParam_;
-	*timeParamData_ = timeParam_;
-
-	if (model_) {
-		model_->Update();
-	}
 }
 
 void Particle::Draw() {
-	auto commadList = particleCommon_->GetDxCommon()->GetCommandList();
+	// Particle描画準備。3Dオブジェクトの描画に共通のグラフィックスコマンドを積む
+	particleCommon_->DrawSettingCommon();
 
-	// commandList->IASetIndexBuffer(&indexBufferView_); // IBVを設定
-	// wvp用のBufferの場所を設定
-	commadList->SetGraphicsRootConstantBufferView(1, wvpResource_->GetGPUVirtualAddress());
+	auto cmd = particleCommon_->GetDxCommon()->GetCommandList();
 
-	// 3Dモデルが割り当てられれいれば描画する
-	if (model_) {
-		model_->Draw();
-	}
-}
+	// ルートシグネチャとPSOは既に設定する共通関数があれば呼ぶ
+	particleCommon_->DrawSettingCommon();
 
-void Particle::SetModel(const std::string& filePath) {
-	// モデルを検索してセットする
-	model_ = modelManager_->FindModel(filePath);
-}
+	// DescriptorHeap をコマンドリストにセット（SRVヒープ）
+	ID3D12DescriptorHeap* heaps[] = {particleCommon_->GetDxCommon()->GetSrvDescriptorHeap().Get()};
+	cmd->SetDescriptorHeaps(_countof(heaps), heaps);
 
-void Particle::SetEnableFoging(const bool enableFoging) {
-	if (model_) {
-		model_->SetEnableFoging(enableFoging);
-	}
-}
+	// ルートパラメータのバインド
+	// rootParameters[1] が Vertex 用 CBV ならここでバインド（例: インスタンス変換を入れるCB）
+	cmd->SetGraphicsRootConstantBufferView(1, transformConstantBuffer_->GetGPUVirtualAddress());
 
-void Particle::SetEnableLighting(const bool enableLighting) {
-	if (model_) {
-		model_->SetEnableLighting(enableLighting);
-	}
-}
+	// rootParameters[2] にインスタンシング用 SRV テーブルをバインド
+	cmd->SetGraphicsRootDescriptorTable(2, particleCommon_->GetInstancingSrvGpuHandle());
 
-void Particle::SetColor(Vector4 color) {
-	if (model_) {
-		model_->SetColor(color);
-	}
+	// 頂点バッファ等の設定（既存の処理）
+	cmd->IASetVertexBuffers(0, 1, &vertexBufferView_);
+
+	// インスタンス数は SRV の要素数（kNumInstance）と合わせる
+	const UINT instanceCount = kNumInstance;
+	cmd->DrawInstanced(UINT(vertexCount_), instanceCount, 0, 0);
 }
 
 ComPtr<ID3D12Resource> Particle::CreateBufferResource(ComPtr<ID3D12Device> device, size_t sizeBytes) {
@@ -128,10 +111,11 @@ ComPtr<ID3D12Resource> Particle::CreateBufferResource(ComPtr<ID3D12Device> devic
 
 void Particle::CreateTransformationMatrixData() {
 	// WVP用のリソースを作る。Matrix4x4 1つ分のサイズを用意する
-	wvpResource_ = CreateBufferResource(particleCommon_->GetDxCommon()->GetDevice(), sizeof(TransformationMatrix));
+	// ここで transformConstantBuffer_ を作成して、transformMatrixData_ をマップする
+	transformConstantBuffer_ = CreateBufferResource(particleCommon_->GetDxCommon()->GetDevice(), sizeof(TransformationMatrix));
 	// 書き込むためのアドレスを取得
-	wvpResource_->Map(0, nullptr, reinterpret_cast<void**>(&transformMatrixData_));
-	wvpResource_->Unmap(0, nullptr);
+	transformConstantBuffer_->Map(0, nullptr, reinterpret_cast<void**>(&transformMatrixData_));
+	transformConstantBuffer_->Unmap(0, nullptr);
 	// 単位行列を書き込んでおく
 	*transformMatrixData_ = {MathUtility::MakeIdentity4x4(), worldMatrix_};
 }
@@ -160,4 +144,54 @@ void Particle::CreateInstancingData() {
 		instancingData[index].WVP = worldViewProjectionMatrix;
 		instancingData[index].World = worldMatrix;
 	}
+}
+
+void Particle::CreateVertexBuffer() {
+	// ModelData に基づく 6 頂点（矩形=三角形2つ）
+	std::vector<VertexData> vertices;
+	vertices.push_back({
+	    .position = {-1.0f, 1.0f, 0.0f, 1.0f},
+          .texcoord = {0.0f, 0.0f},
+          .normal = {0.0f, 0.0f, 1.0f}
+    }); // 左上
+	vertices.push_back({
+	    .position = {1.0f, 1.0f, 0.0f, 1.0f},
+          .texcoord = {1.0f, 0.0f},
+          .normal = {0.0f, 0.0f, 1.0f}
+    }); // 右上
+	vertices.push_back({
+	    .position = {-1.0f, -1.0f, 0.0f, 1.0f},
+          .texcoord = {0.0f, 1.0f},
+          .normal = {0.0f, 0.0f, 1.0f}
+    }); // 左下
+	vertices.push_back({
+	    .position = {-1.0f, -1.0f, 0.0f, 1.0f},
+          .texcoord = {0.0f, 1.0f},
+          .normal = {0.0f, 0.0f, 1.0f}
+    }); // 左下
+	vertices.push_back({
+	    .position = {1.0f, 1.0f, 0.0f, 1.0f},
+          .texcoord = {1.0f, 0.0f},
+          .normal = {0.0f, 0.0f, 1.0f}
+    }); // 右上
+	vertices.push_back({
+	    .position = {1.0f, -1.0f, 0.0f, 1.0f},
+          .texcoord = {1.0f, 1.0f},
+          .normal = {0.0f, 0.0f, 1.0f}
+    }); // 右下
+
+	vertexCount_ = static_cast<uint32_t>(vertices.size());
+
+	// 頂点バッファリソース作成
+	vertexResource_ = CreateBufferResource(particleCommon_->GetDxCommon()->GetDevice(), sizeof(VertexData) * vertexCount_);
+
+	// マップしてデータを書き込む
+	vertexResource_->Map(0, nullptr, reinterpret_cast<void**>(&vertexData_));
+	std::memcpy(vertexData_, vertices.data(), sizeof(VertexData) * vertexCount_);
+	vertexResource_->Unmap(0, nullptr);
+
+	// ビューを作る
+	vertexBufferView_.BufferLocation = vertexResource_->GetGPUVirtualAddress();
+	vertexBufferView_.SizeInBytes = static_cast<UINT>(sizeof(VertexData) * vertexCount_);
+	vertexBufferView_.StrideInBytes = static_cast<UINT>(sizeof(VertexData));
 }

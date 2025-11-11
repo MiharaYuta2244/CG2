@@ -27,10 +27,10 @@ void Game::Initialize(HINSTANCE hInstance) {
 	modelManger_->Initialize(dxCommon_.get(), textureManager_.get());
 
 	// ParticleCommon
-	// particleCommon_->Initialize(dxCommon_.get());
+	//particleCommon_->Initialize(dxCommon_.get());
 
 	// Particle
-	// particle_->Initialize(particleCommon_.get(), textureManager_.get(), modelManger_.get());
+	//particle_->Initialize(particleCommon_.get(), textureManager_.get(), modelManger_.get());
 
 	// .objファイルからモデルを読み込む
 	modelManger_->LoadModel("fence.obj");
@@ -63,20 +63,21 @@ void Game::Initialize(HINSTANCE hInstance) {
 	debugCamera_->Initialize();
 	debugCamera_->SetTranslation({19.45f, 10.5f, -50.0f});
 	object3dCommon_->SetDefaultCamera(debugCamera_.get());
+	//particleCommon_->SetDefaultCamera(debugCamera_.get());
 
 	// プレイヤー
 	player_->Initialize(object3dCommon_.get(), textureManager_.get(), modelManger_.get(), input_.get(), gamePad_.get());
-	player_->SetModel("Box.obj");
+	player_->SetModel("sphere.obj");
 
 	// マップ
-	map_->Initialize();
+	//map_->Initialize();
 
 	// 敵
-	enemy_->Initialize(object3dCommon_.get(), textureManager_.get(), modelManger_.get());
-	enemy_->SetModel("Box.obj");
+	//enemy_->Initialize(object3dCommon_.get(), textureManager_.get(), modelManger_.get());
+	//enemy_->SetModel("Box.obj");
 
 	// オブジェクトの配置
-	SpawnObjectsByMapChip(mapLeftTop_);
+	//SpawnObjectsByMapChip(mapLeftTop_);
 }
 
 void Game::Update() {
@@ -96,7 +97,7 @@ void Game::Update() {
 	player_->UpdateImGui();
 
 	// 敵のImGui
-	enemy_->UpdateImGui();
+	//enemy_->UpdateImGui();
 
 	// フレームレート表示(ImGui)
 	ImGuiFPS();
@@ -134,46 +135,37 @@ void Game::Update() {
 	// ImGui::PopStyleColor();
 
 	// Particle更新
-	// particle_->Update();
+	//particle_->Update();
 
 	// プレイヤー更新
 	player_->Update(deltaTime_->GetDeltaTime());
 
 	// ブロック更新
-	for (auto& block : blocks_) {
-		block->Update();
-	}
+	//for (auto& block : blocks_) {
+	//	block->Update();
+	//}
 
 	// 敵更新
-	enemy_->Update(deltaTime_->GetDeltaTime());
+	//enemy_->Update(deltaTime_->GetDeltaTime());
 }
 
 void Game::Draw() {
 	// 描画開始
 	dxCommon_->BeginFrame();
 
-	// Spriteの描画準備。Spriteの描画に共通のグラフィックスコマンドを積む
-	spriteCommon_->DrawSettingCommon();
-
-	// 3Dオブジェクト描画準備。3Dオブジェクトの描画に共通のグラフィックスコマンドを積む
-	object3dCommon_->DrawSettingCommon();
-
-	// Particle描画準備。3Dオブジェクトの描画に共通のグラフィックスコマンドを積む
-	// particleCommon_->DrawSettingCommon();
-
-	// Particle描画
-	// particle_->Draw();
-
 	// プレイヤー描画
 	player_->Draw();
 
 	// ブロック描画
-	for (auto& block : blocks_) {
-		block->Draw();
-	}
+	// for (auto& block : blocks_) {
+	//	block->Draw();
+	//}
 
 	// 敵描画
-	enemy_->Draw();
+	// enemy_->Draw();
+
+	// Particle描画
+	//particle_->Draw();
 
 	// ImGuiの内部コマンドを生成する
 	imGuiManager_->Render(dxCommon_->GetCommandList());

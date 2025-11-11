@@ -65,10 +65,6 @@ private:
 	void CreateRTV();
 	void InitializeShaderCompiler();
 	void CreateDSV();
-	void CreateRootSignatureObject3d();
-	void CreateRootSignatureParticle();
-	void CreateGraphicsPipelineObject3d();
-	void CreateGraphicsPipelineParticle();
 	void CreateViewport();
 	void CreateScissor();
 	void CreateFence();

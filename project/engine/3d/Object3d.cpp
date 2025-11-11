@@ -32,9 +32,6 @@ void Object3d::Initialize(Object3dCommon* modelCommon, TextureManager* textureMa
 	// タイムパラメータデータ作成
 	CreateTimeParamData();
 
-	// インスタンシングデータ作成
-	CreateInstancingData();
-
 	// Transform変数を作る
 	transform_ = {
 	    {1.0f, 1.0f, 1.0f},
@@ -67,8 +64,9 @@ void Object3d::Update() {
 
 	transformMatrixData_->WVP = worldViewProjectionMatrix_;
 	transformMatrixData_->World = worldMatrix_;
+	transformMatrixData_->WorldInverseTranspose = MathUtility::Transpose(worldMatrix_);
 
-	*transformMatrixData_ = {transformMatrixData_->WVP, transformMatrixData_->World};
+	*transformMatrixData_ = {transformMatrixData_->WVP, transformMatrixData_->World, transformMatrixData_->WorldInverseTranspose};
 	*directionalLightData_ = directionalLight_;
 	*cameraForGPUData_ = cameraForGPU_;
 	*fogParamData_ = fogParam_;
@@ -80,6 +78,9 @@ void Object3d::Update() {
 }
 
 void Object3d::Draw() {
+	// 3Dオブジェクト描画準備。3Dオブジェクトの描画に共通のグラフィックスコマンドを積む
+	object3dCommon_->DrawSettingCommon();
+
 	auto commadList = object3dCommon_->GetDxCommon()->GetCommandList();
 
 	// commandList->IASetIndexBuffer(&indexBufferView_); // IBVを設定
@@ -157,7 +158,7 @@ void Object3d::CreateTransformationMatrixData() {
 	wvpResource_->Map(0, nullptr, reinterpret_cast<void**>(&transformMatrixData_));
 	wvpResource_->Unmap(0, nullptr);
 	// 単位行列を書き込んでおく
-	*transformMatrixData_ = {MathUtility::MakeIdentity4x4(), worldMatrix_};
+	*transformMatrixData_ = {MathUtility::MakeIdentity4x4(), worldMatrix_, MathUtility::Transpose(worldMatrix_)};
 }
 
 void Object3d::CreateDirectionalLightData() {
@@ -221,27 +222,4 @@ void Object3d::CreateTimeParamData() {
 	timeParam_.time = 1.0f / 60.0f;
 	// timeParamDataへの書き込み
 	*timeParamData_ = timeParam_;
-}
-
-void Object3d::CreateInstancingData() {
-	Transform transforms[kNumInstance];
-
-	for (uint32_t index = 0; index < kNumInstance; ++index) {
-		transforms[index].scale = {1.0f, 1.0f, 1.0f};
-		transforms[index].rotate = {0.0f, 0.0f, 0.0f};
-		transforms[index].translate = {index * 0.1f, index * 0.1f, index * 0.1f};
-	}
-
-	// Instancing用のTransformationMatrixリソースを作る
-	instancingResource_ = CreateBufferResource(object3dCommon_->GetDxCommon()->GetDevice(), sizeof(TransformationMatrix) * kNumInstance);
-
-	// 書き込むためのアドレスを取得
-	TransformationMatrix* instancingData = nullptr;
-	instancingResource_->Map(0, nullptr, reinterpret_cast<void**>(&instancingData));
-	instancingResource_->Unmap(0, nullptr);
-
-	for (uint32_t index = 0; index < kNumInstance; ++index) {
-		instancingData[index].WVP = worldViewProjectionMatrix_;
-		instancingData[index].World = worldMatrix_;
-	}
 }

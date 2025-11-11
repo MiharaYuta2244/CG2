@@ -50,6 +50,10 @@ public:
 
 	Matrix4x4& GetWorldMatrix()  { return worldMatrix_; }
 
+	DirectionalLight& GetDirectionalLight() { return directionalLight_; }
+
+	Material& GetMaterial() { return material_; }
+
 private:
 	Microsoft::WRL::ComPtr<ID3D12Resource> CreateBufferResource(Microsoft::WRL::ComPtr<ID3D12Device> device, size_t sizeBytes);
 
@@ -77,11 +81,6 @@ private:
 	/// タイムパラメータデータの作成
 	/// </summary>
 	void CreateTimeParamData();
-
-	/// <summary>
-	/// インスタンシングデータの作成
-	/// </summary>
-	void CreateInstancingData();
 
 private:
 	Object3dCommon* object3dCommon_ = nullptr;
