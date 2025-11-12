@@ -24,8 +24,9 @@ public:
 	void SetModel(const std::string model) { object3d_->SetModel(model); }
 	void SetTranslate(Vector3 translate) { transform_.translate = translate; }
 	void SetVelocity(Vector2 velocity) { velocity_ = velocity; }
-	void SetIsHpSub(bool isHpSub) { isHpSub_ = isHpSub; }
+	void SetIsHitEnemy(bool isHpSub) { isHitEnemy_ = isHpSub; }
 	void SetIsInvincible(bool isInvincible) { isInvincible_ = isInvincible; }
+	void SetIsHitEnemyHipDrop(bool isHitEnemyHipDrop) { isHitEnemyHipDrop_ = isHitEnemyHipDrop; }
 
 	// Getter
 	Object3d* GetObject3d() { return object3d_.get(); }
@@ -34,8 +35,9 @@ public:
 	Vector3 GetRotate() { return transform_.rotate; }
 	Vector3 GetScale() { return transform_.scale; }
 	Vector2 GetVelocity() { return velocity_; }
-	int GetIsHpSub() { return isHpSub_; }
+	int GetIsHpSub() { return isHitEnemy_; }
 	bool GetIsInvincible() { return isInvincible_; }
+	bool GetIsHitEnemyHipDrop() { return isHitEnemyHipDrop_; }
 
 private:
 	enum class Direction {
@@ -59,11 +61,17 @@ private:
 	// 当たり判定の位置更新
 	void UpdateCollisionPos();
 
-	// HP減算処理
-	void SubHp();
+	// 敵との接触時の処理
+	void HitEnemy();
 
 	// 無敵状態フレームカウント
 	void FrameCountIsInvincible();
+
+	// ダメージ処理
+	void SubHP();
+
+	// ヒップドロップが敵に当たった時にプレイヤーを打ち上げる
+	void AfterHipDrop();
 
 private:
 	// 入力
@@ -101,8 +109,8 @@ private:
 	// HP
 	int hp_ = 5;
 
-	// HP減算フラグ
-	bool isHpSub_ = false;
+	// 敵に当たった時に立つフラグ
+	bool isHitEnemy_ = false;
 
 	// 無敵状態フラグ
 	bool isInvincible_ = false;
@@ -115,4 +123,7 @@ private:
 
 	// HPゲージスプライト(ハート)
 	std::unique_ptr<Sprite> spriteHeart_ = std::make_unique<Sprite>();
+
+	// 敵にヒップドロップを当てた時に立つフラグ
+	bool isHitEnemyHipDrop_ = false;
 };

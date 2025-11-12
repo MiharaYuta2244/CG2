@@ -18,6 +18,7 @@ public:
 
 	// Setter
 	void SetModel(const std::string model) { object3d_->SetModel(model); }
+	void SetIsHitPlayerHipDrop(bool isHitPlayerHipDrop) { isHitPlayerHipDrop_ = isHitPlayerHipDrop; }
 
 	// Getter
 	Object3d* GetObject3d() { return object3d_.get(); }
@@ -25,6 +26,8 @@ public:
 	Vector3 GetTranslate() { return transform_.translate; }
 	Vector3 GetRotate() { return transform_.rotate; }
 	Vector3 GetScale() { return transform_.scale; }
+	AABB GetAABBRightSide() { return collisionRightSide_; }
+	AABB GetAABBLeftSide() { return collisionLeftSide_; }
 
 private:
 	// 横移動
@@ -35,6 +38,15 @@ private:
 
 	// 当たり判定の位置更新
 	void UpdateCollisionPos();
+
+	// プレイヤーからヒップドロップを受けた時の処理
+	void HitPlayerHipDrop();
+
+	// ダメージ処理
+	void SubHP();
+
+	// 無敵状態フレームカウント
+	void FrameCountIsInvincible();
 
 private:
 	enum class Direction {
@@ -55,4 +67,22 @@ private:
 
 	// 方向
 	Direction direction_ = Direction::RIGHT;
+
+	// プレイヤーからヒップドロップを受けた時に立つフラグ
+	bool isHitPlayerHipDrop_ = false;
+
+	// 無敵状態フラグ
+	bool isInvincible_ = false;
+
+	// 無敵時間フレームカウント
+	int invincibleFrameCount_ = 0;
+
+	// 無敵時間上限
+	const int kInvincibleFrame_ = 60;
+
+	// 当たり判定　右側
+	AABB collisionRightSide_;
+
+	// 当たり判定　左側
+	AABB collisionLeftSide_;
 };

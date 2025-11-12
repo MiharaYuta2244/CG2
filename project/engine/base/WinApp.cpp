@@ -22,7 +22,7 @@ WinApp::WinApp() {
 
 	// ウィンドウの生成
 	hwnd_ = CreateWindow(
-	    wc_.lpszClassName,     // 利用するクラス名
+	    wc_.lpszClassName,    // 利用するクラス名
 	    L"CG2",               // タイトルバーの文字
 	    WS_OVERLAPPEDWINDOW,  // よく見るウィンドウスタイル
 	    CW_USEDEFAULT,        // 表示X座標 (Windowsに任せる)
@@ -31,7 +31,7 @@ WinApp::WinApp() {
 	    wrc.bottom - wrc.top, // ウィンドウ縦幅
 	    nullptr,              // 親ウィンドウハンドル
 	    nullptr,              // メニューハンドル
-	    wc_.hInstance,         // インスタンスハンドル
+	    wc_.hInstance,        // インスタンスハンドル
 	    nullptr);             // オプション
 
 	// ウィンドウを表示する
@@ -41,16 +41,13 @@ WinApp::WinApp() {
 	timeBeginPeriod(1);
 }
 
-WinApp::~WinApp() { 
-	UnregisterClass(wc_.lpszClassName, wc_.hInstance);
-}
+WinApp::~WinApp() { UnregisterClass(wc_.lpszClassName, wc_.hInstance); }
 
-bool WinApp::ProcessMessage() { 
+bool WinApp::ProcessMessage() {
 	MSG msg{};
 	// Windowにメッセージが来てたら最優先で処理させる
 	while (PeekMessage(&msg, NULL, 0, 0, PM_REMOVE)) {
-		if (msg.message == WM_QUIT)
-		{
+		if (msg.message == WM_QUIT) {
 			return false;
 		}
 		TranslateMessage(&msg);
@@ -60,9 +57,12 @@ bool WinApp::ProcessMessage() {
 }
 
 LRESULT WinApp::WindowProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam) {
+#ifdef USE_IMGUI
 	if (ImGui_ImplWin32_WndProcHandler(hwnd, msg, wparam, lparam)) {
 		return true;
 	}
+#endif
+
 	// メッセージに応じてゲーム固有の処理を行う
 	switch (msg) {
 		// ウィンドウが破棄された

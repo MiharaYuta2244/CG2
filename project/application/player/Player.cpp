@@ -52,6 +52,9 @@ void Player::Update(float deltaTime) {
 	// ヒップドロップアニメーション
 	AnimationHipDrop();
 
+	// ヒップドロップが当たった後の処理
+	AfterHipDrop();
+
 	// ジャンプ
 	Jump();
 
@@ -64,11 +67,10 @@ void Player::Update(float deltaTime) {
 		velocity_.y = 0.0f;
 		transform_.rotate.z = 0.0f;
 		isJump_ = false;
-		isRotate_ = false;
 	}
 
 	// 敵との当たり判定が取れた時にHP減算 & 無敵フラグを立てる
-	SubHp();
+	HitEnemy();
 
 	// 無敵時間を更新　上限に達したら無敵フラグを立てる無敵フラグを下ろす
 	FrameCountIsInvincible();
@@ -98,6 +100,7 @@ void Player::Draw() {
 }
 
 void Player::UpdateImGui() {
+#ifdef USE_IMGUI
 	ImGui::Begin("Player");
 
 	ImGui::Text("HP : %d", hp_);
@@ -113,6 +116,7 @@ void Player::UpdateImGui() {
 	ImGui::DragFloat2("spriteSize", &spriteHeart_->GetSize().x, 1.0f);
 
 	ImGui::End();
+#endif
 }
 
 void Player::HorizontalMove() {
@@ -181,6 +185,7 @@ void Player::AnimationHipDrop() {
 	if (std::abs(transform_.rotate.z) > std::numbers::pi_v<float> * 2) {
 		transform_.rotate.z = (direction_ == Direction::RIGHT) ? -std::numbers::pi_v<float> * 2 : std::numbers::pi_v<float> * 2;
 		velocity_.y = hipDropPower_; // ヒップドロップ
+		isRotate_ = false;
 	}
 }
 
@@ -192,10 +197,10 @@ void Player::UpdateCollisionPos() {
 	sphere_.radius = 0.5f;
 }
 
-void Player::SubHp() {
-	if (isHpSub_ && !isInvincible_) {
+void Player::HitEnemy() {
+	if (isHitEnemy_ && !isInvincible_) {
 		// HP減算
-		hp_--;
+		SubHP();
 
 		// 無敵フラグを立てる
 		isInvincible_ = true;
@@ -208,9 +213,27 @@ void Player::FrameCountIsInvincible() {
 
 		// 無敵時間の上限に達したら
 		if (invincibleFrameCount_ >= kInvincibleFrame_) {
-			isHpSub_ = false;      // HP減算フラグを下ろす
+			isHitEnemy_ = false;      // 敵との当たり判定フラグを下ろす
 			isInvincible_ = false; // 無敵フラグを下ろす
 			invincibleFrameCount_ = 0;
 		}
+	}
+}
+
+void Player::SubHP() {
+	// HP減算
+	hp_--;
+}
+
+void Player::AfterHipDrop() {
+	if (isHitEnemyHipDrop_) {
+		// 打ち上げ
+		velocity_.y = 20.0f;
+
+		// 回転をリセット
+		transform_.rotate.z = 0.0f;
+
+		// 敵にヒップドロップを当てた時のフラグを下ろす
+		isHitEnemyHipDrop_ = false;
 	}
 }

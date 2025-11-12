@@ -26,6 +26,8 @@ public:
 	// SRVインデックスの取得
 	uint32_t GetSrvIndex(const std::string& filePath);
 
+	SrvManager* GetSrvManager() { return srvManager_; }
+
 private:
 	Microsoft::WRL::ComPtr<ID3D12Resource> CreateTextureResource(const DirectX::TexMetadata& metadata);
 	void UploadTextureData(Microsoft::WRL::ComPtr<ID3D12Resource> texture, const DirectX::ScratchImage& mipImages);

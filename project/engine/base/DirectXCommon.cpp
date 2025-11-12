@@ -76,9 +76,6 @@ void DirectXCommon::BeginFrame() {
 	commandList_->ClearRenderTargetView(rtvHandles_[backBufferIndex_], clearColor, 0, nullptr);
 	// 指定した深度で画面全体をクリアする
 	commandList_->ClearDepthStencilView(dsvHandle, D3D12_CLEAR_FLAG_DEPTH, 1.0f, 0, 0, nullptr);
-	// 描画用のDescriptorHeapの設定
-	ComPtr<ID3D12DescriptorHeap> descriptorHeaps[] = {srvDescriptorHeap_};
-	commandList_->SetDescriptorHeaps(1, descriptorHeaps->GetAddressOf());
 
 	commandList_->RSSetViewports(1, &viewport_);       // Viewportを設定
 	commandList_->RSSetScissorRects(1, &scissorRect_); // Scissorを設定

@@ -10,6 +10,7 @@ void Game::Initialize(HINSTANCE hInstance) {
 	// SrvManager
 	srvManager_->Initialize(dxCommon_.get());
 
+#ifdef USE_IMGUI
 	// ImGuiManager
 	imGuiManager_->Initialize(dxCommon_->GetWinApp()->GetHWND(), dxCommon_->GetDevice(), dxCommon_->GetSwapChainDescBufferCount(), dxCommon_->GetRtvFormat(), dxCommon_->GetSrvDescriptorHeap().Get());
 
@@ -17,6 +18,7 @@ void Game::Initialize(HINSTANCE hInstance) {
 	ImGuiStyle& style = ImGui::GetStyle();
 	style.Colors[ImGuiCol_WindowBg] = ImVec4(0.1f, 0.1f, 0.1f, 1.0f); // ダークグレー
 	style.Colors[ImGuiCol_Text] = ImVec4(0.9f, 0.9f, 0.9f, 1.0f);     // 明るいグレー
+#endif
 
 	// テクスチャマネージャー
 	textureManager_->Initialize(dxCommon_.get(), srvManager_.get());
@@ -27,11 +29,14 @@ void Game::Initialize(HINSTANCE hInstance) {
 	// ModelManager
 	modelManger_->Initialize(dxCommon_.get(), textureManager_.get());
 
+	// Sprite共通部
+	spriteCommon_->Initialize(dxCommon_.get());
+
 	// ParticleCommon
-	//particleCommon_->Initialize(dxCommon_.get());
+	// particleCommon_->Initialize(dxCommon_.get());
 
 	// Particle
-	//particle_->Initialize(particleCommon_.get(), textureManager_.get(), modelManger_.get());
+	// particle_->Initialize(particleCommon_.get(), textureManager_.get(), modelManger_.get());
 
 	// .objファイルからモデルを読み込む
 	modelManger_->LoadModel("fence.obj");
@@ -42,16 +47,6 @@ void Game::Initialize(HINSTANCE hInstance) {
 	modelManger_->LoadModel("Field.obj");
 	modelManger_->LoadModel("sphere.obj");
 	modelManger_->LoadModel("Box.obj");
-
-	// modelのポインタを受け取る
-	// object3ds_[0]->SetModel("fence.obj");
-	// object3ds_[1]->SetModel("axis.obj");
-	// object3ds_[2]->SetModel("SkySphere.obj");
-	// object3ds_[3]->SetModel("sphere.obj");
-	// object3ds_[4]->SetModel("Field.obj");
-
-	// Sprite共通部
-	spriteCommon_->Initialize(dxCommon_.get());
 
 	// XAudio
 	audio_->Initialize();
@@ -64,21 +59,21 @@ void Game::Initialize(HINSTANCE hInstance) {
 	debugCamera_->Initialize();
 	debugCamera_->SetTranslation({19.45f, 10.5f, -50.0f});
 	object3dCommon_->SetDefaultCamera(debugCamera_.get());
-	//particleCommon_->SetDefaultCamera(debugCamera_.get());
+	// particleCommon_->SetDefaultCamera(debugCamera_.get());
 
 	// プレイヤー
 	player_->Initialize(object3dCommon_.get(), textureManager_.get(), modelManger_.get(), input_.get(), gamePad_.get(), spriteCommon_.get(), "resources/Heart.png");
 	player_->SetModel("Box.obj");
 
 	// マップ
-	//map_->Initialize();
+	// map_->Initialize();
 
 	// 敵
 	enemy_->Initialize(object3dCommon_.get(), textureManager_.get(), modelManger_.get());
 	enemy_->SetModel("sphere.obj");
 
 	// オブジェクトの配置
-	//SpawnObjectsByMapChip(mapLeftTop_);
+	// SpawnObjectsByMapChip(mapLeftTop_);
 }
 
 void Game::Update() {
@@ -91,6 +86,7 @@ void Game::Update() {
 	// 入力処理更新
 	input_->Update();
 
+#ifdef USE_IMGUI
 	// ImGui前処理
 	imGuiManager_->BeginFrame();
 
@@ -106,46 +102,50 @@ void Game::Update() {
 	// デバッグカメラ(ImGui)
 	ImGuiDebugCamera();
 
-	// ImGuiウィンドウ位置、サイズ固定
-	// ImGui::SetNextWindowPos(ImVec2(0, 0), ImGuiCond_Always);
-	// ImGui::SetNextWindowSize(ImVec2(1280, 720), ImGuiCond_Always);
+// ImGuiウィンドウ位置、サイズ固定
+// ImGui::SetNextWindowPos(ImVec2(0, 0), ImGuiCond_Always);
+// ImGui::SetNextWindowSize(ImVec2(1280, 720), ImGuiCond_Always);
 
-	// ImGui::PushStyleColor(ImGuiCol_WindowBg, ImVec4(0, 0, 0, 0)); // 完全に透明
-	// ImGui::Begin("Gizmo", nullptr, ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoInputs);
-	// ImGuizmo::BeginFrame();
+// ImGui::PushStyleColor(ImGuiCol_WindowBg, ImVec4(0, 0, 0, 0)); // 完全に透明
+// ImGui::Begin("Gizmo", nullptr, ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoInputs);
+// ImGuizmo::BeginFrame();
 
-	// ImGuizmoの設定
-	// ImGuizmo::SetOrthographic(false);
-	// ImGuizmo::Enable(true);
-	// ImGuizmo::SetDrawlist(ImGui::GetWindowDrawList());
+// ImGuizmoの設定
+// ImGuizmo::SetOrthographic(false);
+// ImGuizmo::Enable(true);
+// ImGuizmo::SetDrawlist(ImGui::GetWindowDrawList());
 
-	// ImGuiIO& io = ImGui::GetIO();
-	// float windowWidth = (float)ImGui::GetWindowWidth();
-	// float windowHeight = (float)ImGui::GetWindowHeight();
+// ImGuiIO& io = ImGui::GetIO();
+// float windowWidth = (float)ImGui::GetWindowWidth();
+// float windowHeight = (float)ImGui::GetWindowHeight();
 
-	// ウィンドウサイズを取得してImGuizmoに渡す
-	// ImGuizmo::SetRect(ImGui::GetWindowPos().x, ImGui::GetWindowPos().y, windowWidth, windowHeight);
+// ウィンドウサイズを取得してImGuizmoに渡す
+// ImGuizmo::SetRect(ImGui::GetWindowPos().x, ImGui::GetWindowPos().y, windowWidth, windowHeight);
+
+// ImGuizmo::Manipulate(
+//     *(debugCamera_->GetViewMatrix()).m, *(object3ds_[objIndex_]->GetProjectionMatrix()).m, ImGuizmo::OPERATION::TRANSLATE, ImGuizmo::LOCAL, *(object3ds_[objIndex_]->GetWorldMatrix()).m);
+
+// ImGui::End();
+// ImGui::PopStyleColor();
+#endif
 
 	// デバッグカメラ更新
 	debugCamera_->Update(*input_, *gamePad_);
 
-	// ImGuizmo::Manipulate(
-	//     *(debugCamera_->GetViewMatrix()).m, *(object3ds_[objIndex_]->GetProjectionMatrix()).m, ImGuizmo::OPERATION::TRANSLATE, ImGuizmo::LOCAL, *(object3ds_[objIndex_]->GetWorldMatrix()).m);
-
-	// ImGui::End();
-	// ImGui::PopStyleColor();
-
 	// Particle更新
-	//particle_->Update();
+	// particle_->Update();
 
 	// プレイヤーと敵の当たり判定
 	CollisionPlayerEnemy();
+
+	// 敵がプレイヤーからヒップドロップを受けた時の当たり判定
+	CollisionEnemyPlayerHipDrop();
 
 	// プレイヤー更新
 	player_->Update(deltaTime_->GetDeltaTime());
 
 	// ブロック更新
-	//for (auto& block : blocks_) {
+	// for (auto& block : blocks_) {
 	//	block->Update();
 	//}
 
@@ -156,6 +156,8 @@ void Game::Update() {
 void Game::Draw() {
 	// 描画開始
 	dxCommon_->BeginFrame();
+
+	srvManager_->PreDraw();
 
 	// プレイヤー描画
 	player_->Draw();
@@ -168,18 +170,22 @@ void Game::Draw() {
 	// 敵描画
 	enemy_->Draw();
 
-	// Particle描画
-	//particle_->Draw();
+// Particle描画
+// particle_->Draw();
 
-	// ImGuiの内部コマンドを生成する
+// ImGuiの内部コマンドを生成する
+#ifdef USE_IMGUI
 	imGuiManager_->Render(dxCommon_->GetCommandList());
+#endif
 
 	// 描画終了
 	dxCommon_->EndFrame();
 }
 
 void Game::Finalize() {
+#ifdef USE_IMGUI
 	imGuiManager_->Finalize();
+#endif
 
 	CloseHandle(dxCommon_->GetFenceEvent());
 
@@ -206,23 +212,37 @@ void Game::SpawnObjectsByMapChip(Vector2 leftTop) {
 }
 
 void Game::ImGuiFPS() {
+#ifdef USE_IMGUI
 	ImGui::Begin("Performance", nullptr, ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoTitleBar);
 	ImGui::Text("FPS: %.1f", fps_);
 	ImGui::Text("Frame Time: %.3f ms", deltaTime_->GetDeltaTime() * 1000.0f);
 	ImGui::End();
+#endif
 }
 
 void Game::ImGuiDebugCamera() {
+#ifdef USE_IMGUI
 	ImGui::Begin("DebugCamera");
 	ImGui::DragFloat3("Pos", &debugCamera_->GetTranslation().x, 0.01f);
 	ImGui::End();
+#endif
 }
 
-void Game::CollisionPlayerEnemy() { 
-	if (Collision::Intersect(player_->GetAABB(), enemy_->GetAABB())) {
-		player_->SetVelocity({player_->GetVelocity().x, 20.0f});
+void Game::CollisionPlayerEnemy() {
+	if (Collision::Intersect(player_->GetAABB(), enemy_->GetAABBLeftSide()) || Collision::Intersect(player_->GetAABB(), enemy_->GetAABBRightSide())) {
+		// 敵に当たった時のフラグを立てる
+		player_->SetIsHitEnemy(true);
+	}
+}
 
-		// HP減算フラグを立てる
-		player_->SetIsHpSub(true);
+void Game::CollisionEnemyPlayerHipDrop() {
+	if (Collision::Intersect(player_->GetAABB(), enemy_->GetAABB())) {
+		// プレイヤーからヒップドロップを受けた時のフラグを立てる
+		enemy_->SetIsHitPlayerHipDrop(true);
+
+		// プレイヤーを反動で打ち上げる
+		if (!player_->GetIsHitEnemyHipDrop()) {
+			player_->SetIsHitEnemyHipDrop(true);
+		}
 	}
 }

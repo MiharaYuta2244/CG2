@@ -1,31 +1,31 @@
 #pragma once
+#include <memory>
+#include "Block.h"
 #include "D3DResourceLeakChecker.h"
 #include "DebugCamera.h"
+#include "DeltaTime.h"
 #include "DirectInput.h"
 #include "DirectXCommon.h"
+#include "Enemy.h"
+#include "GamePad.h"
 #include "ImGuiManager.h"
 #include "ImGuizmo.h"
+#include "Map.h"
 #include "MathUtility.h"
 #include "Model.h"
 #include "ModelCommon.h"
 #include "ModelManager.h"
 #include "Object3d.h"
 #include "Object3dCommon.h"
+#include "Particle.h"
+#include "ParticleCommon.h"
+#include "Player.h"
 #include "Sprite.h"
 #include "SpriteCommon.h"
+#include "SrvManager.h"
 #include "TextureManager.h"
 #include "WinApp.h"
 #include "XAudio.h"
-#include "Player.h"
-#include "GamePad.h"
-#include "ParticleCommon.h"
-#include "Particle.h"
-#include "DeltaTime.h"
-#include "Map.h"
-#include "Block.h"
-#include "Enemy.h"
-#include "SrvManager.h"
-#include <memory>
 #pragma comment(lib, "d3d12.lib")
 #pragma comment(lib, "dxgi.lib")
 #include <dxgidebug.h>
@@ -58,6 +58,9 @@ private:
 	// 当たり判定(Player, Enemy)
 	void CollisionPlayerEnemy();
 
+	// 当たり判定(Enemy, Player, ヒップドロップ)
+	void CollisionEnemyPlayerHipDrop();
+
 private:
 	// リリースリークチェック
 	D3DResourceLeakChecker leakCheck_;
@@ -71,8 +74,10 @@ private:
 	// SRVManager
 	std::unique_ptr<SrvManager> srvManager_ = std::make_unique<SrvManager>();
 
+#ifdef USE_IMGUI
 	// ImGuiManager
 	std::unique_ptr<ImGuiManager> imGuiManager_ = std::make_unique<ImGuiManager>();
+#endif
 
 	// テクスチャマネージャー
 	std::unique_ptr<TextureManager> textureManager_ = std::make_unique<TextureManager>();
