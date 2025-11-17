@@ -169,4 +169,7 @@ private:
 
 	// テスト用パーティクル
 	std::unique_ptr<Particle> testParticle_ = std::make_unique<Particle>();
+
+	// Test
+	std::unique_ptr<Sprite> testSprite_ = std::make_unique<Sprite>();
 };

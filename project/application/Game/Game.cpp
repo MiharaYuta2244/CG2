@@ -68,6 +68,9 @@ void Game::Initialize(HINSTANCE hInstance) {
 
 	// オブジェクトの配置
 	SpawnObjectsByMapChip(mapLeftTop_);
+
+	testSprite_->Initialize(spriteCommon_.get(), textureManager_.get(), "resources/white.png");
+	testSprite_->SetSize({100.0f, 100.0f});
 }
 
 void Game::Update() {
@@ -95,6 +98,13 @@ void Game::Update() {
 
 	// デバッグカメラ(ImGui)
 	ImGuiDebugCamera();
+
+	ImGui::SetNextWindowSize(ImVec2(500, 100), ImGuiCond_Always);
+	ImGui::Begin("sprite");
+
+	ImGui::SliderFloat2("Position", &testSprite_->GetPosition().x, 0.0f, 1280.0f, "%04.1f");
+
+	ImGui::End();
 
 // ImGuiウィンドウ位置、サイズ固定
 // ImGui::SetNextWindowPos(ImVec2(0, 0), ImGuiCond_Always);
@@ -156,6 +166,8 @@ void Game::Update() {
 	for (auto& powerUpItem : powerUpItems_) {
 		powerUpItem->Update(deltaTime_->GetDeltaTime());
 	}
+
+	testSprite_->Update();
 }
 
 void Game::Draw() {
@@ -184,7 +196,9 @@ void Game::Draw() {
 //particle_->Draw();
 
 // Testparticle
-testParticle_->Draw();
+//testParticle_->Draw();
+
+testSprite_->Draw();
 
 // ImGuiの内部コマンドを生成する
 #ifdef USE_IMGUI
