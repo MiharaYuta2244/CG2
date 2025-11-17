@@ -11,6 +11,8 @@
 #include "Transform.h"
 #include "TransformationMatrix.h"
 #include "VertexData.h"
+#include "ParticleState.h"
+#include "ParticleForGPU.h"
 #include <d3d12.h>
 #include <string>
 #include <vector>
@@ -33,6 +35,7 @@ public:
 	void SetColor(Vector4 color);
 	void SetWorldMatrix(Matrix4x4 worldMatrix) { worldMatrix_ = worldMatrix; }
 	void SetCamera(DebugCamera* camera) { camera_ = camera; }
+	void SetIsBillboard(bool isBillboard) { isBillboard_ = isBillboard; }
 
 	// getter
 	Vector4& GetColor() { return material_.color; }
@@ -54,6 +57,12 @@ private:
 	// instancingResourceの作成
 	void CreateInstancingResource();
 
+	// パーティクル生成関数
+	ParticleState MakeParticle();
+
+	// BillboardMatrixを作成する
+	Matrix4x4 CreateBillboardMatrix();
+
 private:
 	ParticleCommon* particleCommon_ = nullptr;
 	TextureManager* textureManager_ = nullptr;
@@ -74,10 +83,11 @@ private:
 	Matrix4x4 worldMatrix_;
 
 	// 描画する数
-	static const uint32_t kNumInstance = 10;
+	static const uint32_t kNumMaxInstance = 10;
+	uint32_t numInstance_ = 0;
 
 	// 3Dオブジェクト自体とカメラの座標変換行列の元となるTransform
-	Transform transforms_[kNumInstance];
+	ParticleState particles_[kNumMaxInstance];
 
 	Matrix4x4 worldViewProjectionMatrix_;
 
@@ -97,8 +107,14 @@ private:
 	// Resourceにデータを書き込むためのポインタ
 	VertexData* vertexData_ = nullptr;
 	Material* materialData_ = nullptr;
-	TransformationMatrix* instancingData_ = nullptr;
+	ParticleForGPU* instancingData_ = nullptr;
 
 	D3D12_CPU_DESCRIPTOR_HANDLE instancingSrvHandleCPU_;
 	D3D12_GPU_DESCRIPTOR_HANDLE instancingSrvHandleGPU_;
+
+	// Δt
+	const float kDeltaTime = 1.0f / 60.0f;
+
+	// ビルボードするかどうか
+	bool isBillboard_ = true;
 };

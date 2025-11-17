@@ -26,6 +26,7 @@ void TextureManager::Initialize(DirectXCommon* directXCommon, SrvManager* srvMan
 	LoadTexture("resources/sphere.png");
 	LoadTexture("resources/Heart.png");
 	LoadTexture("resources/monsterBall.png");
+	LoadTexture("resources/circle.png");
 }
 
 void TextureManager::LoadTexture(const std::string& filePath) {

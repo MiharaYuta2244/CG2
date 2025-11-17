@@ -30,7 +30,7 @@ void Model::Initialize(ModelCommon* modelCommon, TextureManager* textureManager,
 	CreateMaterialData();
 
 	// テクスチャ読み込み
-	//textureManager_->LoadTexture(modelData_.material.textureFilePath);
+	textureManager_->LoadTexture(modelData_.material.textureFilePath);
 
 	// テクスチャ番号を取得して、メンバ変数に書き込む
 	modelData_.material.textureIndex = textureManager_->GetSrvIndex(modelData_.material.textureFilePath);

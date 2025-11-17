@@ -12,6 +12,26 @@ inline Vector3 operator/(const Vector3& v, float s) { return MathUtility::Multip
 inline Vector3 operator-(const Vector3& v) { return {-v.x, -v.y, -v.z}; }
 inline Vector3 operator+(const Vector3& v) { return v; }
 
+inline Vector3& operator+=(Vector3& lhs, const Vector3& rhs) {
+	lhs = MathUtility::Add(lhs, rhs);
+	return lhs;
+}
+
+inline Vector3& operator-=(Vector3& lhs, const Vector3& rhs) {
+	lhs = MathUtility::Subtract(lhs, rhs);
+	return lhs;
+}
+
+inline Vector3& operator*=(Vector3& lhs, float s) {
+	lhs = MathUtility::Multiply(s, lhs);
+	return lhs;
+}
+
+inline Vector3& operator/=(Vector3& lhs, float s) {
+	lhs = MathUtility::Multiply(1.0f / s, lhs);
+	return lhs;
+}
+
 inline Matrix4x4 operator+(const Matrix4x4& m1, const Matrix4x4& m2) { return MathUtility::Add(m1, m2); }
 inline Matrix4x4 operator-(const Matrix4x4& m1, const Matrix4x4& m2) { return MathUtility::Subtract(m1, m2); }
 inline Matrix4x4 operator*(const Matrix4x4& m1, const Matrix4x4& m2) { return MathUtility::Multiply(m1, m2); }

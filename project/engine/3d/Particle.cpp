@@ -2,8 +2,9 @@
 #include "MathOperator.h"
 #include "MathUtility.h"
 #include "Model.h"
-#include "particleCommon.h"
+#include "Random.h"
 #include "TextureManager.h"
+#include "particleCommon.h"
 #include <DirectXMath.h>
 #include <fstream>
 #include <sstream>
@@ -23,8 +24,8 @@ void Particle::Initialize(ParticleCommon* particleCommon, TextureManager* textur
 	instancingSrvDesc.ViewDimension = D3D12_SRV_DIMENSION_BUFFER;
 	instancingSrvDesc.Buffer.FirstElement = 0;
 	instancingSrvDesc.Buffer.Flags = D3D12_BUFFER_SRV_FLAG_NONE;
-	instancingSrvDesc.Buffer.NumElements = kNumInstance;
-	instancingSrvDesc.Buffer.StructureByteStride = sizeof(TransformationMatrix);
+	instancingSrvDesc.Buffer.NumElements = kNumMaxInstance;
+	instancingSrvDesc.Buffer.StructureByteStride = sizeof(ParticleForGPU);
 
 	// CPU/GPUハンドルをクラスメンバへ取得して保存
 	instancingSrvHandleCPU_ = particleCommon_->GetDxCommon()->GetCPUDescriptorHandle(particleCommon_->GetDxCommon()->GetSrvDescriptorHeap(), particleCommon_->GetDxCommon()->GetDescriptorSizeSRV(), 3);
@@ -50,10 +51,9 @@ void Particle::Initialize(ParticleCommon* particleCommon, TextureManager* textur
 	// テクスチャ番号を取得して、メンバ変数に書き込む
 	modelData_.material.textureIndex = textureManager_->GetSrvIndex(modelData_.material.textureFilePath);
 
-	for (uint32_t index = 0; index < kNumInstance; ++index) {
-		transforms_[index].scale = {1.0f, 1.0f, 1.0f};
-		transforms_[index].rotate = {0.0f, 0.0f, 0.0f};
-		transforms_[index].translate = {index * 0.1f, index * 0.1f, index * 0.1f};
+	// Transform等設定
+	for (uint32_t index = 0; index < kNumMaxInstance; ++index) {
+		particles_[index] = MakeParticle();
 	}
 
 	// カメラをセットする
@@ -61,8 +61,23 @@ void Particle::Initialize(ParticleCommon* particleCommon, TextureManager* textur
 }
 
 void Particle::Update() {
-	for (uint32_t index = 0; index < kNumInstance; ++index) {
-		worldMatrix_ = MathUtility::MakeAffineMatrix(transforms_[index].scale, transforms_[index].rotate, transforms_[index].translate);
+	// ビルボードマトリックスの作成
+	Matrix4x4 billboardmatrix = CreateBillboardMatrix();
+
+	numInstance_ = 0;
+	for (uint32_t index = 0; index < kNumMaxInstance; ++index) {
+		if (particles_[index].lifeTime <= particles_[index].currentTime) {
+			continue; // 生存時間を過ぎていたら更新せず描画対象にしない
+		}
+
+		// 速度を設定
+		particles_[index].transform.translate += particles_[index].velocity * kDeltaTime;
+		particles_[index].currentTime += kDeltaTime;
+
+		// ビルボード用
+		Matrix4x4 scaleMatrix = MathUtility::MakeScaleMatrix(particles_[index].transform.scale);
+		Matrix4x4 translateMatrix = MathUtility::MakeTranslateMatrix(particles_[index].transform.translate);
+		worldMatrix_ =MathUtility::Multiply(MathUtility::Multiply(scaleMatrix, billboardmatrix),translateMatrix);
 
 		if (camera_) {
 			const Matrix4x4& viewProjectionMatrix = camera_->GetViewProjectionMatrix();
@@ -71,15 +86,26 @@ void Particle::Update() {
 			worldViewProjectionMatrix_ = worldMatrix_;
 		}
 
+		// 透明度の変更
+		float alpha = 1.0f - (particles_[index].currentTime / particles_[index].lifeTime);
+
 		instancingData_[index].WVP = worldViewProjectionMatrix_;
 		instancingData_[index].World = worldMatrix_;
-		instancingData_[index].WorldInverseTranspose = MathUtility::Transpose(worldMatrix_);
+		instancingData_[index].color = particles_[index].color;
+		instancingData_[index].color.w = alpha;
+
+		// 生きているParticleの数を1カウントする
+		++numInstance_;
 	}
 
 	*materialData_ = material_;
 }
 
 void Particle::Draw() {
+	if (numInstance_ <= 0) {
+		return;
+	}
+
 	// 3Dオブジェクト描画準備。3Dオブジェクトの描画に共通のグラフィックスコマンドを積む
 	particleCommon_->DrawSettingCommon();
 
@@ -91,15 +117,14 @@ void Particle::Draw() {
 	// VertexBufferViewを設定
 	commandList->IASetVertexBuffers(0, 1, &vertexBufferView_); // VBVを設定
 
-	// 描画する数
-	const uint32_t instanceCount = 10;
-
 	// マテリアルCBufferの場所を設定
 	commandList->SetGraphicsRootConstantBufferView(0, materialResource_->GetGPUVirtualAddress());
+
 	// SRVのDescriptorTableの先頭を設定。3はrootParameter[3]（Pixel用テクスチャ）である。
 	commandList->SetGraphicsRootDescriptorTable(2, textureManager_->GetSrvHandleGPU(modelData_.material.textureFilePath));
+
 	// 描画!(DrawCall/ドローコール)。
-	commandList->DrawInstanced(UINT(modelData_.vertices.size()), instanceCount, 0, 0);
+	commandList->DrawInstanced(UINT(modelData_.vertices.size()), numInstance_, 0, 0);
 }
 
 ComPtr<ID3D12Resource> Particle::CreateBufferResource(ComPtr<ID3D12Device> device, size_t sizeBytes) {
@@ -205,7 +230,7 @@ void Particle::CreateInstancingResource() {
 	const uint32_t kNumInstance = 10;
 
 	// Instancing用のTransformationMatrixリソースを作る
-	instancingResource_ = CreateBufferResource(particleCommon_->GetDxCommon()->GetDevice(), sizeof(TransformationMatrix) * kNumInstance);
+	instancingResource_ = CreateBufferResource(particleCommon_->GetDxCommon()->GetDevice(), sizeof(ParticleForGPU) * kNumInstance);
 
 	// 書き込むためのアドレス取得
 	instancingResource_->Map(0, nullptr, reinterpret_cast<void**>(&instancingData_));
@@ -215,5 +240,35 @@ void Particle::CreateInstancingResource() {
 	for (uint32_t index = 0; index < kNumInstance; ++index) {
 		instancingData_[index].WVP = MathUtility::MakeIdentity4x4();
 		instancingData_[index].World = MathUtility::MakeIdentity4x4();
+		instancingData_[index].color = {1.0f, 1.0f, 1.0f, 1.0f};
 	}
+}
+
+ParticleState Particle::MakeParticle() { 
+	ParticleState particle;
+	particle.transform.scale = {1.0f, 1.0f, 1.0f};
+	particle.transform.rotate = {0.0f, 0.0f, 0.0f};
+	particle.transform.translate = {12.0f + RandomUtils::RangeFloat(-1, 1), 10.0f + RandomUtils::RangeFloat(-1, 1), RandomUtils::RangeFloat(-1, 1)};
+	particle.velocity = {RandomUtils::RangeFloat(-1, 1), RandomUtils::RangeFloat(-1, 1), RandomUtils::RangeFloat(-1, 1)};
+	particle.color = {RandomUtils::RangeFloat(0, 1), RandomUtils::RangeFloat(0, 1), RandomUtils::RangeFloat(0, 1), 1.0f};
+	particle.lifeTime = RandomUtils::RangeFloat(50, 60);
+	particle.currentTime = 0;
+	return particle;
+}
+
+Matrix4x4 Particle::CreateBillboardMatrix() {
+	Matrix4x4 backToFrontMatrix = MathUtility::MakeYawRotateMatrix(std::numbers::pi_v<float>);
+	Matrix4x4 billboardmatrix;
+
+	if (isBillboard_) {
+		billboardmatrix = MathUtility::Multiply(backToFrontMatrix, camera_->GetWorldMatrix());
+	} else {
+		billboardmatrix = MathUtility::MakeIdentity4x4();
+	}
+
+	billboardmatrix.m[3][0] = 0.0f;
+	billboardmatrix.m[3][1] = 0.0f;
+	billboardmatrix.m[3][2] = 0.0f;
+
+	return billboardmatrix;
 }
