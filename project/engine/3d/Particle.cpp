@@ -56,6 +56,7 @@ void Particle::Initialize(ParticleCommon* particleCommon, TextureManager* textur
 }
 
 void Particle::Update() {
+#ifdef USE_IMGUI
 	ImGui::Begin("Particle");
 
 	if (ImGui::Button("Add Particle")) {
@@ -65,6 +66,7 @@ void Particle::Update() {
 	}
 
 	ImGui::End();
+#endif
 
 	// ビルボードマトリックスの作成
 	Matrix4x4 billboardmatrix = CreateBillboardMatrix();
