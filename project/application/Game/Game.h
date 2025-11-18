@@ -1,5 +1,4 @@
 #pragma once
-#include <memory>
 #include "Block.h"
 #include "D3DResourceLeakChecker.h"
 #include "DebugCamera.h"
@@ -17,16 +16,17 @@
 #include "ModelManager.h"
 #include "Object3d.h"
 #include "Object3dCommon.h"
+#include "Particle.h"
+#include "ParticleCommon.h"
 #include "Player.h"
+#include "PowerUpItem.h"
 #include "Sprite.h"
 #include "SpriteCommon.h"
 #include "SrvManager.h"
 #include "TextureManager.h"
 #include "WinApp.h"
 #include "XAudio.h"
-#include "PowerUpItem.h"
-#include "ParticleCommon.h"
-#include "Particle.h"
+#include <memory>
 #pragma comment(lib, "d3d12.lib")
 #pragma comment(lib, "dxgi.lib")
 #include <dxgidebug.h>
@@ -47,6 +47,17 @@ public:
 	DirectXCommon* GetDxCommon() const { return dxCommon_.get(); }
 
 private:
+	// シーン種別
+	enum class Scene {
+		Title = 0,
+		Game,
+		Result,
+	};
+
+	// シーン管理
+	void ChangeScene(Scene newScene);
+	void StartGameScene(); // ゲームシーン開始（初期化／リセット）
+
 	// マップチップに応じてオブジェクトの配置
 	void SpawnObjectsByMapChip(Vector2 leftTop);
 
@@ -72,6 +83,9 @@ private:
 	void CreatePowerUpItem();
 
 private:
+	// 現在のシーン
+	Scene currentScene_ = Scene::Title;
+
 	// リリースリークチェック
 	D3DResourceLeakChecker leakCheck_;
 

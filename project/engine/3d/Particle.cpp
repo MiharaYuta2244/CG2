@@ -57,7 +57,7 @@ void Particle::Initialize(ParticleCommon* particleCommon, TextureManager* textur
 
 void Particle::Update() {
 #ifdef USE_IMGUI
-	ImGui::Begin("Particle");
+	/*ImGui::Begin("Particle");
 
 	if (ImGui::Button("Add Particle")) {
 		particles_.push_back(MakeParticle());
@@ -65,7 +65,7 @@ void Particle::Update() {
 		particles_.push_back(MakeParticle());
 	}
 
-	ImGui::End();
+	ImGui::End();*/
 #endif
 
 	// ビルボードマトリックスの作成

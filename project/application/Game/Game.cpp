@@ -2,7 +2,8 @@
 #include "Collision.h"
 #include "Random.h"
 
-void Game::Initialize(HINSTANCE hInstance) {
+    void
+    Game::Initialize(HINSTANCE hInstance) {
 	CoInitializeEx(0, COINIT_MULTITHREADED);
 
 	// DirectX12 デバイス初期化
@@ -17,8 +18,8 @@ void Game::Initialize(HINSTANCE hInstance) {
 
 	// ImGuiの色変更
 	ImGuiStyle& style = ImGui::GetStyle();
-	style.Colors[ImGuiCol_WindowBg] = ImVec4(0.1f, 0.1f, 0.1f, 1.0f); // ダークグレー
-	style.Colors[ImGuiCol_Text] = ImVec4(0.9f, 0.9f, 0.9f, 1.0f);     // 明るいグレー
+	style.Colors[ImGuiCol_WindowBg] = ImVec4(0.1f, 0.1f, 0.1f, 1.0f);
+	style.Colors[ImGuiCol_Text] = ImVec4(0.9f, 0.9f, 0.9f, 1.0f);
 #endif
 
 	// テクスチャマネージャー
@@ -55,81 +56,145 @@ void Game::Initialize(HINSTANCE hInstance) {
 	// Particle
 	particle_->Initialize(particleCommon_.get(), textureManager_.get(), modelManger_.get());
 
-	// プレイヤー
+	currentScene_ = Scene::Title;
+}
+
+void Game::ChangeScene(Scene newScene) {
+	if (currentScene_ == newScene)
+		return;
+
+	currentScene_ = newScene;
+	if (currentScene_ == Scene::Game) {
+		StartGameScene();
+	}
+
+	// 遷移時処理はここに追加
+
+}
+
+void Game::StartGameScene() {
+	// 既存のブロックを破棄
+	blocks_.clear();
+
+	// マップ初期化
+	map_->Initialize();
+
+	// プレイヤー初期化
 	player_->Initialize(object3dCommon_.get(), textureManager_.get(), modelManger_.get(), input_.get(), gamePad_.get(), spriteCommon_.get());
 	player_->SetModel("Box.obj");
 
-	// マップ
-	map_->Initialize();
-
-	// 敵
+	// 敵初期化
 	enemy_->Initialize(object3dCommon_.get(), textureManager_.get(), modelManger_.get(), spriteCommon_.get());
 	enemy_->SetModel("sphere.obj");
+
+	// パワーアップアイテム初期化
+	//powerUpItems_.clear();
+	//powerUpItemCreateFrameCount_ = 0;
 
 	// オブジェクトの配置
 	SpawnObjectsByMapChip(mapLeftTop_);
 }
 
 void Game::Update() {
-	// 経過時間
+	// シーンに依らず、経過時間と入力は更新しておく
 	deltaTime_->Update();
-
-	// フレームレート
 	fps_ = 1.0f / deltaTime_->GetDeltaTime();
-
-	// 入力処理更新
 	input_->Update();
 
 #ifdef USE_IMGUI
 	// ImGui前処理
 	imGuiManager_->BeginFrame();
-
-	// プレイヤーのimGui
-	player_->UpdateImGui();
-
-	// 敵のImGui
-	enemy_->UpdateImGui();
-
-	// フレームレート表示(ImGui)
-	//ImGuiFPS();
-
-	// デバッグカメラ(ImGui)
-	ImGuiDebugCamera();
 #endif
 
-	// 一定時間おきにパワーアップアイテム生成
-	CreatePowerUpItem();
+	// シーン毎の処理
+	if (currentScene_ == Scene::Title) {
+		// タイトル
+#ifdef USE_IMGUI
+		ImGui::Begin("Title");
+		ImGui::TextWrapped("Title Scene");
+		ImGui::TextWrapped("Press Space or GamePad A to Start");
+		ImGui::End();
+#endif
+		bool startInput = input_->KeyTriggered(DIK_SPACE) || gamePad_->GetState().buttonsPressed.a;
+		if (startInput) {
+			ChangeScene(Scene::Game);
+		}
 
-	// デバッグカメラ更新
-	debugCamera_->Update(*input_, *gamePad_);
+		// デバッグカメラ更新
+		debugCamera_->Update(*input_, *gamePad_);
+		gamePad_->Update();
+	} else if (currentScene_ == Scene::Game) {
+		// ゲームシーン
+#ifdef USE_IMGUI
+		//player_->UpdateImGui();
+		//enemy_->UpdateImGui();
+		// ImGuiFPS();
+		//ImGuiDebugCamera();
 
-	// プレイヤーと敵の当たり判定
-	CollisionPlayerEnemy();
+		ImGui::Begin("Rule");
 
-	// 敵がプレイヤーからヒップドロップを受けた時の当たり判定
-	CollisionEnemyPlayerHipDrop();
+		ImGui::Text("Move with the AD or stick");
+		ImGui::Text("Press Space or A button while on the ground to Jump");
+		ImGui::Text("Press Space or A button in midair to perform a Hip Drop");
 
-	// プレイヤーとパワーアップアイテムの当たり判定
-	CollisionPlayerPowerUpItem();
+		ImGui::End();
+#endif
 
-	// プレイヤー更新
-	player_->Update(deltaTime_->GetDeltaTime());
+		// 一定時間おきにパワーアップアイテム生成
+		//CreatePowerUpItem();
 
-	// ブロック更新
-	for (auto& block : blocks_) {
-		block->Update();
+		// デバッグカメラ更新
+		debugCamera_->Update(*input_, *gamePad_);
+
+		// 当たり判定
+		CollisionPlayerEnemy();
+		CollisionEnemyPlayerHipDrop();
+		//CollisionPlayerPowerUpItem();
+
+		// プレイヤー更新
+		player_->Update(deltaTime_->GetDeltaTime());
+
+		// ブロック更新
+		for (auto& block : blocks_) {
+			block->Update();
+		}
+
+		// 敵更新
+		enemy_->Update(deltaTime_->GetDeltaTime());
+
+		// パワーアップアイテム更新
+		//for (auto& powerUpItem : powerUpItems_) {
+		//	powerUpItem->Update(deltaTime_->GetDeltaTime());
+		//}
+
+		// Particle
+		particle_->Update();
+
+		// ゲーム終了判定
+		if (player_->GetHP() <= 0 || enemy_->GetHP() <= 0) {
+			ChangeScene(Scene::Result);
+		}
+	} else if (currentScene_ == Scene::Result) {
+		// リザルト
+#ifdef USE_IMGUI
+		ImGui::Begin("Result");
+		ImGui::TextWrapped("Result Scene");
+		ImGui::TextWrapped("Press Space or GamePad A to Return to Title");
+		ImGui::End();
+#endif
+		bool backInput = input_->KeyTriggered(DIK_SPACE) || gamePad_->GetState().buttonsPressed.a;
+		if (backInput) {
+			ChangeScene(Scene::Title);
+		}
+
+		// デバッグカメラ更新
+		debugCamera_->Update(*input_, *gamePad_);
+		gamePad_->Update();
 	}
 
-	// 敵更新
-	enemy_->Update(deltaTime_->GetDeltaTime());
-
-	// パワーアップアイテム更新
-	for (auto& powerUpItem : powerUpItems_) {
-		powerUpItem->Update(deltaTime_->GetDeltaTime());
-	}
-
-	// Particle
-	particle_->Update();
+#ifdef USE_IMGUI
+	// ImGui のフレームは EndFrame 時に描画される（Draw内で Render を呼ぶ）
+#endif
 }
 
 void Game::Draw() {
@@ -138,26 +203,30 @@ void Game::Draw() {
 
 	srvManager_->PreDraw();
 
-	// プレイヤー描画
-	player_->Draw();
+	// シーンごとの描画
+	if (currentScene_ == Scene::Game) {
+		// プレイヤー描画
+		player_->Draw();
 
-	// ブロック描画
-	for (auto& block : blocks_) {
-		block->Draw();
+		// ブロック描画
+		for (auto& block : blocks_) {
+			block->Draw();
+		}
+
+		// 敵描画
+		enemy_->Draw();
+
+		// パワーアップアイテム描画
+		//for (auto& powerUpItem : powerUpItems_) {
+		//	powerUpItem->Draw();
+		//}
+
+		// Particle
+		particle_->Draw();
+	} else {
 	}
 
-	// 敵描画
-	enemy_->Draw();
-
-	// パワーアップアイテム描画
-	for (auto& powerUpItem : powerUpItems_) {
-		powerUpItem->Draw();
-	}
-
-	// Particle
-	particle_->Draw();
-
-// ImGuiの内部コマンドを生成する
+	// ImGuiの内部コマンドを生成する
 #ifdef USE_IMGUI
 	imGuiManager_->Render(dxCommon_->GetCommandList());
 #endif

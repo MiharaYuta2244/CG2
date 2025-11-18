@@ -1,8 +1,8 @@
 #pragma once
-#include <array>
 #include "Actor.h"
 #include "DirectInput.h"
 #include "Sprite.h"
+#include <array>
 
 class Object3dCommon;
 class SpriteCommon;
@@ -33,6 +33,10 @@ public:
 	int GetIsHpSub() { return isHitEnemy_; }
 	bool GetIsInvincible() { return isInvincible_; }
 	bool GetIsHitEnemyHipDrop() { return isHitEnemyHipDrop_; }
+
+	// HPを取得
+	int GetHP() const { return hp_; }
+	bool GetIsHipDrop() const { return isRotate_; }
 
 private:
 	enum class Direction {

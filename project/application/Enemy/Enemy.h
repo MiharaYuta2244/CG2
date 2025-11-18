@@ -24,6 +24,9 @@ public:
 	AABB GetAABBRightSide() { return collisionRightSide_; }
 	AABB GetAABBLeftSide() { return collisionLeftSide_; }
 
+	// HPを取得
+	int GetHP() const { return hp_; }
+
 private:
 	// 横移動
 	void HorizontalMove();
@@ -55,7 +58,7 @@ private:
 	Vector2 velocity_ = {10.0f, 0.0f};
 
 	// HP
-	const int kMaxHP = 10;
+	const int kMaxHP = 3;
 	int hp_ = kMaxHP;
 
 	// 経過時間
