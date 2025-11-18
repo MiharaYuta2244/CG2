@@ -20,13 +20,6 @@ public:
 
 	void Update();
 
-	void SetEnableFoging(bool enableFoging) { material_.enableFoging = enableFoging; }
-
-	void SetEnableLighting(bool enableLighting) { material_.enableLighting = enableLighting; }
-
-	void SetColor(Vector4 color) { material_.color = color; }
-
-
 private:
 	ModelData LoadObjFile(const std::string& filename);
 
@@ -42,11 +35,6 @@ private:
 	/// インデックスデータ作成
 	/// </summary>
 	void CreateIndexData();
-
-	/// <summary>
-	/// マテリアルデータ作成
-	/// </summary>
-	void CreateMaterialData();
 
 private: 
 	ModelCommon* modelCommon_ = nullptr;
@@ -66,16 +54,11 @@ private:
 	// Rsource
 	Microsoft::WRL::ComPtr<ID3D12Resource> vertexResource_;
 	Microsoft::WRL::ComPtr<ID3D12Resource> indexResource_;
-	Microsoft::WRL::ComPtr<ID3D12Resource> materialResource_;
 
 	// Resourceにデータを書き込むためのポインタ
 	VertexData* vertexData_ = nullptr;
 	uint32_t* indexData_ = nullptr;
-	Material* materialData_ = nullptr;
 
 	// インデックスカウント
 	uint32_t indexCount_;
-
-	// データ変更用の変数
-	Material material_;
 };

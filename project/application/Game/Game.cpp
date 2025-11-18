@@ -65,7 +65,6 @@ void Game::Initialize(HINSTANCE hInstance) {
 	// 敵
 	enemy_->Initialize(object3dCommon_.get(), textureManager_.get(), modelManger_.get(), spriteCommon_.get());
 	enemy_->SetModel("sphere.obj");
-	enemy_->SetColor({1.0f, 0.0f, 0.0f, 1.0f});
 
 	// オブジェクトの配置
 	SpawnObjectsByMapChip(mapLeftTop_);
@@ -189,7 +188,6 @@ void Game::SpawnObjectsByMapChip(Vector2 leftTop) {
 				block->Initialize(object3dCommon_.get(), textureManager_.get(), modelManger_.get());
 				block->Spawn({static_cast<float>(x) - 11.0f, static_cast<float>(y) * -1.0f + 19.0f, 0.0f});
 				block->SetModel("Box.obj");
-				block->GetObject3d()->SetColor({0.8f, 0.8f, 0.0f, 1.0f});
 				blocks_.push_back(std::move(block));
 			}
 		}
@@ -241,6 +239,7 @@ void Game::CollisionPlayerPowerUpItem() {
 		        if (Collision::Intersect(player_->GetAABB(), item->GetAABB())) {
 			        // プレイヤーのパワーアップフラグを立てる
 			        player_->SetIsPowerUp(true);
+
 			        return true;
 		        }
 		        return false;

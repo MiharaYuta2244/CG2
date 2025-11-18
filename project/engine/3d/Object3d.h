@@ -1,21 +1,20 @@
 #pragma once
+#include <d3d12.h>
+#include <string>
+#include <vector>
+#include <wrl.h>
 #include "CameraForGPU.h"
+#include "DebugCamera.h"
 #include "DirectionalLight.h"
 #include "FogParam.h"
 #include "Material.h"
 #include "MaterialData.h"
 #include "ModelData.h"
+#include "ModelManager.h"
 #include "TimeParam.h"
+#include "Transform.h"
 #include "TransformationMatrix.h"
 #include "VertexData.h"
-#include "Transform.h"
-#include "ModelManager.h"
-#include "DebugCamera.h"
-#include <wrl.h>
-#include <d3d12.h>
-#include <string>
-#include <vector>
-
 
 class Object3dCommon;
 class TextureManager;
@@ -31,8 +30,8 @@ public:
 
 	// setter
 	void SetModel(const std::string& filePath);
-	void SetEnableFoging(const bool enableFoging);
-	void SetEnableLighting(const bool enableLighting);
+	void SetEnableFoging(const bool enableFoging) { material_.enableFoging = enableFoging; }
+	void SetEnableLighting(const bool enableLighting) { material_.enableLighting = enableLighting; }
 	void SetColor(Vector4 color);
 	void SetModel(Model* model) { model_ = model; }
 	void SetScale(const Vector3& scale) { transform_.scale = scale; }
@@ -48,7 +47,7 @@ public:
 	Vector3& GetTranslate() { return transform_.translate; }
 	Vector4& GetColor() { return material_.color; }
 
-	Matrix4x4& GetWorldMatrix()  { return worldMatrix_; }
+	Matrix4x4& GetWorldMatrix() { return worldMatrix_; }
 
 	DirectionalLight& GetDirectionalLight() { return directionalLight_; }
 
@@ -82,6 +81,11 @@ private:
 	/// </summary>
 	void CreateTimeParamData();
 
+	/// <summary>
+	/// マテリアルデータの作成（インスタンス毎に持つ）
+	/// </summary>
+	void CreateMaterialData();
+
 private:
 	Object3dCommon* object3dCommon_ = nullptr;
 	TextureManager* textureManager_ = nullptr;
@@ -96,6 +100,7 @@ private:
 	Microsoft::WRL::ComPtr<ID3D12Resource> fogParamResource_;
 	Microsoft::WRL::ComPtr<ID3D12Resource> timeParamResource_;
 	Microsoft::WRL::ComPtr<ID3D12Resource> instancingResource_;
+	Microsoft::WRL::ComPtr<ID3D12Resource> materialResource_;
 
 	// バッファリソース内のデータを指すポインタ
 	uint32_t* indexData_ = nullptr;
@@ -104,6 +109,7 @@ private:
 	CameraForGPU* cameraForGPUData_ = nullptr;
 	FogParam* fogParamData_ = nullptr;
 	TimeParam* timeParamData_ = nullptr;
+	Material* materialData_ = nullptr;
 
 	// バッファリソースの使い道を補足するバッファビュー
 	D3D12_INDEX_BUFFER_VIEW indexBufferView_;

@@ -1,13 +1,12 @@
-#include <DirectXMath.h>
-#include <fstream>
-#include <sstream>
 #include "Object3d.h"
 #include "MathOperator.h"
 #include "MathUtility.h"
+#include "Model.h"
 #include "Object3dCommon.h"
 #include "TextureManager.h"
-#include "Model.h"
-
+#include <DirectXMath.h>
+#include <fstream>
+#include <sstream>
 
 using namespace Microsoft::WRL;
 using namespace DirectX;
@@ -31,6 +30,9 @@ void Object3d::Initialize(Object3dCommon* modelCommon, TextureManager* textureMa
 
 	// タイムパラメータデータ作成
 	CreateTimeParamData();
+
+	// マテリアル作成
+	CreateMaterialData();
 
 	// Transform変数を作る
 	transform_ = {
@@ -72,6 +74,10 @@ void Object3d::Update() {
 	*fogParamData_ = fogParam_;
 	*timeParamData_ = timeParam_;
 
+	if (materialData_) {
+		*materialData_ = material_;
+	}
+
 	if (model_) {
 		model_->Update();
 	}
@@ -86,6 +92,8 @@ void Object3d::Draw() {
 	// commandList->IASetIndexBuffer(&indexBufferView_); // IBVを設定
 	// wvp用のBufferの場所を設定
 	commadList->SetGraphicsRootConstantBufferView(1, wvpResource_->GetGPUVirtualAddress());
+	// --- インスタンスのマテリアルを先にセット（root b0） ---
+	commadList->SetGraphicsRootConstantBufferView(0, materialResource_->GetGPUVirtualAddress());
 	// ライティングCBufferの場所を指定
 	commadList->SetGraphicsRootConstantBufferView(3, directionalLightResource_->GetGPUVirtualAddress());
 	// CameraForGPUCBufferの場所を指定
@@ -106,22 +114,9 @@ void Object3d::SetModel(const std::string& filePath) {
 	model_ = modelManager_->FindModel(filePath);
 }
 
-void Object3d::SetEnableFoging(const bool enableFoging) { 
-	if (model_) {
-		model_->SetEnableFoging(enableFoging);
-	}
-}
-
-void Object3d::SetEnableLighting(const bool enableLighting) { 
-	if (model_) {
-		model_->SetEnableLighting(enableLighting);
-	}
-}
-
 void Object3d::SetColor(Vector4 color) {
-	if (model_) {
-		model_->SetColor(color);
-	}
+	// 変更: モデル共有の material を直接変更しない。インスタンス側の material_ を変更する
+	material_.color = color;
 }
 
 ComPtr<ID3D12Resource> Object3d::CreateBufferResource(ComPtr<ID3D12Device> device, size_t sizeBytes) {
@@ -222,4 +217,20 @@ void Object3d::CreateTimeParamData() {
 	timeParam_.time = 1.0f / 60.0f;
 	// timeParamDataへの書き込み
 	*timeParamData_ = timeParam_;
+}
+
+void Object3d::CreateMaterialData() {
+	// マテリアル用のリソースを作る
+	materialResource_ = CreateBufferResource(object3dCommon_->GetDxCommon()->GetDevice(), sizeof(Material));
+	// アドレス取得
+	materialResource_->Map(0, nullptr, reinterpret_cast<void**>(&materialData_));
+	materialResource_->Unmap(0, nullptr);
+	// 初期化
+	material_.color = {1.0f, 1.0f, 1.0f, 1.0f};
+	material_.enableLighting = true;
+	material_.enableFoging = false;
+	material_.uvTransform = MathUtility::MakeIdentity4x4();
+	material_.shininess = 2.0f;
+	// GPUへ書き込み
+	*materialData_ = material_;
 }

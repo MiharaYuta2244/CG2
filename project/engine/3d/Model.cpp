@@ -1,18 +1,18 @@
 #include "Model.h"
-#include "ModelCommon.h"
 #include "MathUtility.h"
-#include "TextureManager.h"
+#include "ModelCommon.h"
 #include "SphereMeshGenerator.h"
+#include "TextureManager.h"
 #include "TransformationMatrix.h"
+#include <Transform.h>
 #include <assert.h>
 #include <fstream>
 #include <sstream>
-#include <Transform.h>
 
 using namespace Microsoft::WRL;
 
-void Model::Initialize(ModelCommon* modelCommon, TextureManager* textureManager, const std::string& filename) { 
-	modelCommon_ = modelCommon; 
+void Model::Initialize(ModelCommon* modelCommon, TextureManager* textureManager, const std::string& filename) {
+	modelCommon_ = modelCommon;
 	textureManager_ = textureManager;
 	filename_ = filename;
 
@@ -23,10 +23,7 @@ void Model::Initialize(ModelCommon* modelCommon, TextureManager* textureManager,
 	CreateVertexData();
 
 	// インデックスデータの初期化
-	//CreateIndexData();
-
-	// マテリアルの初期化
-	CreateMaterialData();
+	// CreateIndexData();
 
 	// テクスチャ読み込み
 	textureManager_->LoadTexture(modelData_.material.textureFilePath);
@@ -35,26 +32,21 @@ void Model::Initialize(ModelCommon* modelCommon, TextureManager* textureManager,
 	modelData_.material.textureIndex = textureManager_->GetSrvIndex(modelData_.material.textureFilePath);
 }
 
-void Model::Update()
-{ *materialData_ = material_; }
+void Model::Update() {}
 
-void Model::Draw()
-{
+void Model::Draw() {
 	auto commandList = modelCommon_->GetDxCommon()->GetCommandList();
 
 	// VertexBufferViewを設定
 	commandList->IASetVertexBuffers(0, 1, &vertexBufferView_); // VBVを設定
 	// IndexBufferViewを設定
-	//commandList->IASetIndexBuffer(&indexBufferView_); // IBVを設定
+	// commandList->IASetIndexBuffer(&indexBufferView_); // IBVを設定
 
-
-	// マテリアルCBufferの場所を設定
-	commandList->SetGraphicsRootConstantBufferView(0, materialResource_->GetGPUVirtualAddress());
 	// SRVのDescriptorTableの先頭を設定。3はrootParameter[3]（Pixel用テクスチャ）である。
 	commandList->SetGraphicsRootDescriptorTable(2, textureManager_->GetSrvHandleGPU(modelData_.material.textureFilePath));
 	// 描画!(DrawCall/ドローコール)。
 	commandList->DrawInstanced(UINT(modelData_.vertices.size()), 1, 0, 0);
-	//modelCommon_->GetDxCommon()->GetCommandList()->DrawIndexedInstanced(indexCount_, 1, 0, 0, 0);
+	// modelCommon_->GetDxCommon()->GetCommandList()->DrawIndexedInstanced(indexCount_, 1, 0, 0, 0);
 }
 
 ModelData Model::LoadObjFile(const std::string& filename) {
@@ -65,7 +57,7 @@ ModelData Model::LoadObjFile(const std::string& filename) {
 	std::string line;               // ファイルから読んだ1行を格納するもの
 
 	std::ifstream file("resources/model/" + filename); // ファイルを開く
-	assert(file.is_open());                             // とりあえず開けなかったら止める
+	assert(file.is_open());                            // とりあえず開けなかったら止める
 
 	while (std::getline(file, line)) {
 		std::string identifier;
@@ -127,10 +119,10 @@ ModelData Model::LoadObjFile(const std::string& filename) {
 }
 
 MaterialData Model::LoadMaterialTemplateFile(const std::string& filename) {
-	MaterialData materialData;                          // 構築するMaterialData
-	std::string line;                                   // ファイルから読んだ1行を格納するもの
+	MaterialData materialData;                         // 構築するMaterialData
+	std::string line;                                  // ファイルから読んだ1行を格納するもの
 	std::ifstream file("resources/model/" + filename); // ファイルを開く
-	assert(file.is_open());                             // とりあえず開けなかったら止める
+	assert(file.is_open());                            // とりあえず開けなかったら止める
 
 	while (std::getline(file, line)) {
 		std::string identifier;
@@ -209,22 +201,4 @@ void Model::CreateIndexData() {
 	indexResource_->Map(0, nullptr, reinterpret_cast<void**>(&indexData_));
 	indexResource_->Unmap(0, nullptr);
 	std::memcpy(indexData_, meshData_.vertices.data(), sizeof(uint32_t) * indexCount_);
-}
-
-void Model::CreateMaterialData() {
-	// マテリアル用のリソースを作る。今回はcolor1つ分のサイズを用意する
-	materialResource_ = CreateBufferResource(modelCommon_->GetDxCommon()->GetDevice(), sizeof(Material));
-	// 書き込むためのアドレスを取得
-	materialResource_->Map(0, nullptr, reinterpret_cast<void**>(&materialData_));
-	materialResource_->Unmap(0, nullptr);
-	// 三角形の色
-	material_.color = {1.0f, 1.0f, 1.0f, 1.0f};
-	material_.enableLighting = true;
-	material_.enableFoging = false;
-	// uvTransformなどのデータを設定
-	material_.uvTransform = MathUtility::MakeIdentity4x4();
-	// 反射強度
-	material_.shininess = 1.0f;
-	// materialDataに代入
-	*materialData_ = material_;
 }

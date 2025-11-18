@@ -9,7 +9,8 @@ void Enemy::Initialize(Object3dCommon* obj3dCommon, TextureManager* texMane, Mod
 
 	// Object3dの初期化
 	object3d_->Initialize(obj3dCommon, texMane, ModelMane);
-	object3d_->SetColor({1.0f, 0.0f, 0.0f, 1.0f});
+	object3d_->SetColor({0.0f, 0.0f, 1.0f, 1.0f});
+	//object3d_->SetEnableLighting(false);
 
 	transform_.scale = {2.0f, 2.0f, 2.0f};
 	transform_.rotate = {0.0f, 0.0f, 0.0f};
