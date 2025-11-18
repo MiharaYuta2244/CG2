@@ -3,7 +3,7 @@
 #include "Object3dCommon.h"
 #include "TextureManager.h"
 
-void Enemy::Initialize(Object3dCommon* obj3dCommon, TextureManager* texMane, ModelManager* ModelMane) {
+void Enemy::Initialize(Object3dCommon* obj3dCommon, TextureManager* texMane, ModelManager* ModelMane, SpriteCommon* spriteCommon) {
 	// 3Dオブジェクトの生成
 	object3d_ = std::make_unique<Object3d>();
 
@@ -20,6 +20,9 @@ void Enemy::Initialize(Object3dCommon* obj3dCommon, TextureManager* texMane, Mod
 
 	// 当たり判定の位置更新
 	UpdateCollisionPos();
+
+	// HPゲージスプライト管理クラス
+	hpGauge_->Initialize(spriteCommon, texMane);
 }
 
 void Enemy::Update(float deltaTime) {
@@ -46,6 +49,12 @@ void Enemy::Update(float deltaTime) {
 
 	// Object3dの更新
 	object3d_->Update();
+
+	// HPゲージスプライトサイズ更新
+	hpGauge_->HPBarSpriteApply(hp_, kMaxHP);
+
+	// HPゲージスプライト管理クラス
+	hpGauge_->Update();
 }
 
 void Enemy::Draw() { 
@@ -53,6 +62,9 @@ void Enemy::Draw() {
 	if (invincibleFrameCount_ % 2 == 0) {
 		object3d_->Draw();
 	}
+
+	// HPゲージスプライト管理クラス
+	hpGauge_->Draw();
 }
 
 void Enemy::UpdateImGui() {

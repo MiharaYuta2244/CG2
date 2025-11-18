@@ -1,5 +1,6 @@
 #pragma once
 #include "Actor.h"
+#include "EnemyHPGauge.h"
 
 class Object3dCommon;
 class TextureManager;
@@ -7,7 +8,7 @@ class ModelManager;
 
 class Enemy : public Actor {
 public:
-	void Initialize(Object3dCommon* obj3dCommon, TextureManager* texMane, ModelManager* ModelMane);
+	void Initialize(Object3dCommon* obj3dCommon, TextureManager* texMane, ModelManager* ModelMane, SpriteCommon* spriteCommon);
 
 	void Update(float deltaTime);
 
@@ -54,7 +55,8 @@ private:
 	Vector2 velocity_ = {8.0f, 0.0f};
 
 	// HP
-	int hp_ = 10;
+	const int kMaxHP = 10;
+	int hp_ = kMaxHP;
 
 	// 経過時間
 	float deltaTime_;
@@ -79,4 +81,7 @@ private:
 
 	// 当たり判定　左側
 	AABB collisionLeftSide_;
+
+	// HPゲージスプライト管理クラス
+	std::unique_ptr<EnemyHPGauge> hpGauge_ = std::make_unique<EnemyHPGauge>();
 };

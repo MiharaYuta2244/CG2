@@ -28,10 +28,8 @@ void Player::Initialize(Object3dCommon* obj3dCommon, TextureManager* texMane, Mo
 	input_ = input;
 	gamePad_ = gamePad;
 
-	// HPゲージスプライト(ハート)
-	spriteHeart_->Initialize(spriteCommon, texMane, "resources/uvChecker.png");
-	spriteHPBar_->Initialize(spriteCommon, texMane, "resources/monsterBall.png");
-	spriteHPBarBG_->Initialize(spriteCommon, texMane, "resources/circle.png");
+	// HPゲージスプライト
+	spriteHeart_->Initialize(spriteCommon, texMane, "resources/Heart.png");
 }
 
 void Player::Update(float deltaTime) {
@@ -80,11 +78,8 @@ void Player::Update(float deltaTime) {
 	// 当たり判定位置更新
 	UpdateCollisionPos();
 
-	// HPゲージスプライト(ハート)
-	spriteHeart_->SetPosition({transform_.translate.x, transform_.translate.y});
+	// HPゲージスプライト
 	spriteHeart_->Update();
-	spriteHPBar_->Update();
-	spriteHPBarBG_->Update();
 
 	// 位置の更新
 	object3d_->SetTransform(transform_);
@@ -99,10 +94,8 @@ void Player::Draw() {
 		object3d_->Draw();
 	}
 
-	// HPゲージスプライト(ハート)
-	//spriteHeart_->Draw();
-	//spriteHPBar_->Draw();
-	//spriteHPBarBG_->Draw();
+	// HPゲージスプライト
+	spriteHeart_->Draw();
 }
 
 void Player::UpdateImGui() {

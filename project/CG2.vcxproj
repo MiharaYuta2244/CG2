@@ -152,6 +152,7 @@ copy "$(windowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="application\Block\Block.cpp" />
     <ClCompile Include="application\Enemy\Enemy.cpp" />
     <ClCompile Include="application\Collision\Collision.cpp" />
+    <ClCompile Include="application\Enemy\EnemyHPGauge.cpp" />
     <ClCompile Include="engine\deltaTime\DeltaTime.cpp" />
     <ClCompile Include="engine\base\D3DResourceLeakChecker.cpp" />
     <ClCompile Include="engine\base\DebugCamera.cpp" />
@@ -266,6 +267,7 @@ copy "$(windowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="application\Block\Block.h" />
     <ClInclude Include="application\Enemy\Enemy.h" />
     <ClInclude Include="application\Collision\Collision.h" />
+    <ClInclude Include="application\Enemy\EnemyHPGauge.h" />
     <ClInclude Include="engine\base\ParticleForGPU.h" />
     <ClInclude Include="engine\base\ParticleState.h" />
     <ClInclude Include="engine\deltaTime\DeltaTime.h" />

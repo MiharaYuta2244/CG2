@@ -123,8 +123,4 @@ private:
 
 	// プレイヤーのパワーアップフラグ
 	bool isPowerUp_ = false;
-
-	// 仮のHPバー
-	std::unique_ptr<Sprite> spriteHPBar_ = std::make_unique<Sprite>();
-	std::unique_ptr<Sprite> spriteHPBarBG_ = std::make_unique<Sprite>();
 };

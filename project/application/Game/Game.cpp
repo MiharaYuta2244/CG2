@@ -63,7 +63,7 @@ void Game::Initialize(HINSTANCE hInstance) {
 	map_->Initialize();
 
 	// 敵
-	enemy_->Initialize(object3dCommon_.get(), textureManager_.get(), modelManger_.get());
+	enemy_->Initialize(object3dCommon_.get(), textureManager_.get(), modelManger_.get(), spriteCommon_.get());
 	enemy_->SetModel("sphere.obj");
 
 	// オブジェクトの配置
