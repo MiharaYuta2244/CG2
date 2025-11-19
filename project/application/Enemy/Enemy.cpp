@@ -19,6 +19,9 @@ void Enemy::Initialize(Object3dCommon* obj3dCommon, TextureManager* texMane, Mod
 	collisionSize = {1.0f, 1.0f, 1.0f};
 	isActive_ = true;
 
+	// HP
+	hp_ = kMaxHP;
+
 	// 当たり判定の位置更新
 	UpdateCollisionPos();
 

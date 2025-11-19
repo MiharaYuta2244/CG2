@@ -43,6 +43,15 @@ public:
 	Material& GetMaterial() { return material_; }
 
 private:
+	struct Emitter
+	{
+		Transform transform; // エミッタのトランスフォーム
+		uint32_t count; // 発生数
+		float frequency; // 発生頻度
+		float frequencyTime; // 頻度用時刻
+	};
+
+private:
 	Microsoft::WRL::ComPtr<ID3D12Resource> CreateBufferResource(Microsoft::WRL::ComPtr<ID3D12Device> device, size_t sizeBytes);
 
 	// 四角形の作成
@@ -62,6 +71,9 @@ private:
 
 	// BillboardMatrixを作成する
 	Matrix4x4 CreateBillboardMatrix();
+
+	// エミッターを使ってパーティクルの生成
+	std::list<ParticleState> Emit(const Emitter& emitter);
 
 private:
 	ParticleCommon* particleCommon_ = nullptr;
@@ -83,7 +95,7 @@ private:
 	Matrix4x4 worldMatrix_;
 
 	// 描画する数
-	static const uint32_t kNumMaxInstance = 20;
+	static const uint32_t kNumMaxInstance = 100;
 	uint32_t numInstance_ = 0;
 
 	// 3Dオブジェクト自体とカメラの座標変換行列の元となるTransform
@@ -117,4 +129,7 @@ private:
 
 	// ビルボードするかどうか
 	bool isBillboard_ = true;
+
+	// エミッタ
+	Emitter emitter{};
 };

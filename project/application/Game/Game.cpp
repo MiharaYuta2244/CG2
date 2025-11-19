@@ -2,8 +2,7 @@
 #include "Collision.h"
 #include "Random.h"
 
-    void
-    Game::Initialize(HINSTANCE hInstance) {
+void Game::Initialize(HINSTANCE hInstance) {
 	CoInitializeEx(0, COINIT_MULTITHREADED);
 
 	// DirectX12 デバイス初期化
@@ -69,7 +68,6 @@ void Game::ChangeScene(Scene newScene) {
 	}
 
 	// 遷移時処理はここに追加
-
 }
 
 void Game::StartGameScene() {
@@ -88,8 +86,8 @@ void Game::StartGameScene() {
 	enemy_->SetModel("sphere.obj");
 
 	// パワーアップアイテム初期化
-	//powerUpItems_.clear();
-	//powerUpItemCreateFrameCount_ = 0;
+	// powerUpItems_.clear();
+	// powerUpItemCreateFrameCount_ = 0;
 
 	// オブジェクトの配置
 	SpawnObjectsByMapChip(mapLeftTop_);
@@ -126,22 +124,14 @@ void Game::Update() {
 	} else if (currentScene_ == Scene::Game) {
 		// ゲームシーン
 #ifdef USE_IMGUI
-		//player_->UpdateImGui();
-		//enemy_->UpdateImGui();
-		// ImGuiFPS();
-		//ImGuiDebugCamera();
-
-		ImGui::Begin("Rule");
-
-		ImGui::Text("Move with the AD or stick");
-		ImGui::Text("Press Space or A button while on the ground to Jump");
-		ImGui::Text("Press Space or A button in midair to perform a Hip Drop");
-
-		ImGui::End();
+		player_->UpdateImGui();
+		enemy_->UpdateImGui();
+		ImGuiFPS();
+		ImGuiDebugCamera();
 #endif
 
 		// 一定時間おきにパワーアップアイテム生成
-		//CreatePowerUpItem();
+		// CreatePowerUpItem();
 
 		// デバッグカメラ更新
 		debugCamera_->Update(*input_, *gamePad_);
@@ -149,7 +139,7 @@ void Game::Update() {
 		// 当たり判定
 		CollisionPlayerEnemy();
 		CollisionEnemyPlayerHipDrop();
-		//CollisionPlayerPowerUpItem();
+		// CollisionPlayerPowerUpItem();
 
 		// プレイヤー更新
 		player_->Update(deltaTime_->GetDeltaTime());
@@ -163,7 +153,7 @@ void Game::Update() {
 		enemy_->Update(deltaTime_->GetDeltaTime());
 
 		// パワーアップアイテム更新
-		//for (auto& powerUpItem : powerUpItems_) {
+		// for (auto& powerUpItem : powerUpItems_) {
 		//	powerUpItem->Update(deltaTime_->GetDeltaTime());
 		//}
 
@@ -206,18 +196,18 @@ void Game::Draw() {
 	// シーンごとの描画
 	if (currentScene_ == Scene::Game) {
 		// プレイヤー描画
-		player_->Draw();
+		//player_->Draw();
 
 		// ブロック描画
-		for (auto& block : blocks_) {
-			block->Draw();
-		}
+		//for (auto& block : blocks_) {
+		//	block->Draw();
+		//}
 
 		// 敵描画
-		enemy_->Draw();
+		//enemy_->Draw();
 
 		// パワーアップアイテム描画
-		//for (auto& powerUpItem : powerUpItems_) {
+		// for (auto& powerUpItem : powerUpItems_) {
 		//	powerUpItem->Draw();
 		//}
 

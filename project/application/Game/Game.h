@@ -84,7 +84,7 @@ private:
 
 private:
 	// 現在のシーン
-	Scene currentScene_ = Scene::Title;
+	Scene currentScene_ = Scene::Game;
 
 	// リリースリークチェック
 	D3DResourceLeakChecker leakCheck_;

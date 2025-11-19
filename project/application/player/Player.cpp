@@ -4,11 +4,15 @@
 #include "Object3dCommon.h"
 #include "SpriteCommon.h"
 #include "TextureManager.h"
+#include "MathUtility.h"
+#include "MathOperator.h"
 #include <numbers>
 
 void Player::Initialize(Object3dCommon* obj3dCommon, TextureManager* texMane, ModelManager* ModelMane, DirectInput* input, GamePad* gamePad, SpriteCommon* spriteCommon) {
 	// 3Dオブジェクトの生成
 	object3d_ = std::make_unique<Object3d>();
+
+	object3dCommon_ = obj3dCommon;
 
 	// Object3dの初期化
 	object3d_->Initialize(obj3dCommon, texMane, ModelMane);
@@ -27,6 +31,9 @@ void Player::Initialize(Object3dCommon* obj3dCommon, TextureManager* texMane, Mo
 	// 入力
 	input_ = input;
 	gamePad_ = gamePad;
+
+	// HP
+	hp_ = 5;
 
 	// HPゲージスプライトサイズ設定
 	spriteHPGauge_.resize(hp_);
@@ -97,6 +104,9 @@ void Player::Update(float deltaTime) {
 	for (auto& hpGauge : spriteHPGauge_) {
 		hpGauge->Update();
 	}
+
+	// スプライトに変換した座標をセットする
+	spriteHPGaugeBG_->SetPosition(ScreenToWorldPoint(transform_.translate, spriteMargin_));
 
 	// HPゲージ背景スプライト
 	spriteHPGaugeBG_->Update();
@@ -265,4 +275,18 @@ void Player::AfterHipDrop() {
 		// 敵にヒップドロップを当てた時のフラグを下ろす
 		isHitEnemyHipDrop_ = false;
 	}
+}
+
+Vector2 Player::ScreenToWorldPoint(Vector3 worldPosition, Vector2 margin) { 
+	// ビューポートマトリックス
+	Matrix4x4 viewportMatrix = MathUtility::MakeViewPortMatrix(0, 0, 1280.0f, 720.0f, 0.0f, 1.0f);
+
+	// カメラのViewProjectionとビューポートを合成してワールド→スクリーン変換行列を作る
+	Matrix4x4 matVPV = MathUtility::Multiply(object3dCommon_->GetDefaultCamera()->GetViewProjectionMatrix(), viewportMatrix);
+
+	// プレイヤーのワールド座標をスクリーン座標に変換
+	Vector3 worldPos = {transform_.translate.x + spriteMargin_.x, transform_.translate.y + spriteMargin_.y, transform_.translate.z};
+	Vector3 screenPos = MathUtility::Transform(worldPos, matVPV);
+
+	return {screenPos.x, screenPos.y};
 }

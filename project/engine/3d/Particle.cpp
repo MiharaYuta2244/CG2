@@ -53,20 +53,20 @@ void Particle::Initialize(ParticleCommon* particleCommon, TextureManager* textur
 
 	// カメラをセットする
 	camera_ = particleCommon_->GetDefaultCamera();
+
+	// エミッタの設定
+	emitter.count = 3;
+	emitter.frequency = 0.5f;
+	emitter.frequencyTime = 0.0f;
 }
 
 void Particle::Update() {
-#ifdef USE_IMGUI
-	/*ImGui::Begin("Particle");
-
-	if (ImGui::Button("Add Particle")) {
-		particles_.push_back(MakeParticle());
-		particles_.push_back(MakeParticle());
-		particles_.push_back(MakeParticle());
+	// エミッタの更新処理
+	emitter.frequencyTime += kDeltaTime;
+	if (emitter.frequency <= emitter.frequencyTime) {
+		particles_.splice(particles_.end(), Emit(emitter)); // 発生処理
+		emitter.frequencyTime -= emitter.frequency; // 余計に過ぎた時間も加味して頻度計算する
 	}
-
-	ImGui::End();*/
-#endif
 
 	// ビルボードマトリックスの作成
 	Matrix4x4 billboardmatrix = CreateBillboardMatrix();
@@ -75,6 +75,7 @@ void Particle::Update() {
 	for (std::list<ParticleState>::iterator particleIterator = particles_.begin(); particleIterator != particles_.end();) {
 		if ((*particleIterator).lifeTime <= (*particleIterator).currentTime) {
 			particleIterator = particles_.erase(particleIterator); // 生存期間が過ぎたParticleはlistから消す。戻り値が次のイテレータとなる
+			continue;
 		}
 
 		// 速度を設定
@@ -200,7 +201,7 @@ ModelData Particle::CreatePrimitive() {
           .normal = {0.0f, 0.0f, 1.0f}
     }); // 右下
 
-	modelData.material.textureFilePath = "resources/uvChecker.png";
+	modelData.material.textureFilePath = "resources/circle.png";
 
 	return modelData;
 }
@@ -261,7 +262,7 @@ ParticleState Particle::MakeParticle() {
 	particle.transform.translate = {12.0f + RandomUtils::RangeFloat(-1, 1), 10.0f + RandomUtils::RangeFloat(-1, 1), RandomUtils::RangeFloat(-1, 1)};
 	particle.velocity = {RandomUtils::RangeFloat(-1, 1), RandomUtils::RangeFloat(-1, 1), RandomUtils::RangeFloat(-1, 1)};
 	particle.color = {RandomUtils::RangeFloat(0, 1), RandomUtils::RangeFloat(0, 1), RandomUtils::RangeFloat(0, 1), 1.0f};
-	particle.lifeTime = RandomUtils::RangeFloat(50, 60);
+	particle.lifeTime = RandomUtils::RangeFloat(1, 3);
 	particle.currentTime = 0;
 	return particle;
 }
@@ -281,4 +282,13 @@ Matrix4x4 Particle::CreateBillboardMatrix() {
 	billboardmatrix.m[3][2] = 0.0f;
 
 	return billboardmatrix;
+}
+
+std::list<ParticleState> Particle::Emit(const Emitter& emitter) { 
+	std::list<ParticleState> particles;
+	for (uint32_t count = 0; count < emitter.count; ++count) {
+		particles.push_back(MakeParticle());
+	}
+
+	return particles; 
 }

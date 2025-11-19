@@ -72,6 +72,9 @@ private:
 	// ヒップドロップが敵に当たった時にプレイヤーを打ち上げる
 	void AfterHipDrop();
 
+	// スクリーン座標からワールド座標への変換
+	Vector2 ScreenToWorldPoint(Vector3 worldPosition, Vector2 margin);
+
 private:
 	// 入力
 	DirectInput* input_ = nullptr;
@@ -106,7 +109,7 @@ private:
 	Direction direction_ = Direction::RIGHT;
 
 	// HP
-	int hp_ = 5;
+	int hp_;
 
 	// 敵に当たった時に立つフラグ
 	bool isHitEnemy_ = false;
@@ -131,4 +134,9 @@ private:
 
 	// プレイヤーのパワーアップフラグ
 	bool isPowerUp_ = false;
+
+	Object3dCommon* object3dCommon_ = nullptr;
+
+	// HPゲージ用プレイヤーとの距離
+	Vector2 spriteMargin_ = {2.0f, 3.0f};
 };
