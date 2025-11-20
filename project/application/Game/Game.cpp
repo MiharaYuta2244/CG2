@@ -55,7 +55,7 @@ void Game::Initialize(HINSTANCE hInstance) {
 	// Particle
 	particle_->Initialize(particleCommon_.get(), textureManager_.get(), modelManger_.get());
 
-	currentScene_ = Scene::Title;
+	currentScene_ = Scene::Game;
 }
 
 void Game::ChangeScene(Scene newScene) {
