@@ -55,7 +55,141 @@ void Game::Initialize(HINSTANCE hInstance) {
 	// Particle
 	particle_->Initialize(particleCommon_.get(), textureManager_.get(), modelManger_.get());
 
-	currentScene_ = Scene::Game;
+	currentScene_ = Scene::Title;
+}
+
+void Game::Update() {
+	// シーンに依らず、経過時間と入力は更新しておく
+	deltaTime_->Update();
+	fps_ = 1.0f / deltaTime_->GetDeltaTime();
+	input_->Update();
+
+#ifdef USE_IMGUI
+	// ImGui前処理
+	imGuiManager_->BeginFrame();
+#endif
+
+	// シーン毎の処理
+	if (currentScene_ == Scene::Title) {
+		// タイトル
+#ifdef USE_IMGUI
+		ImGui::Begin("Title");
+		ImGui::TextWrapped("Title Scene");
+		ImGui::TextWrapped("Press Space or GamePad A to Start");
+		ImGui::End();
+#endif
+		bool startInput = input_->KeyTriggered(DIK_SPACE) || gamePad_->GetState().buttonsPressed.a;
+		if (startInput) {
+			ChangeScene(Scene::Game);
+		}
+
+	} else if (currentScene_ == Scene::Game) {
+		// ゲームシーン
+#ifdef USE_IMGUI
+		player_->UpdateImGui();
+		enemy_->UpdateImGui();
+		ImGuiFPS();
+		ImGuiDebugCamera();
+#endif
+
+		// 一定時間おきにパワーアップアイテム生成
+		CreatePowerUpItem();
+
+		// 当たり判定
+		CollisionPlayerEnemy();
+		CollisionEnemyPlayerHipDrop();
+		CollisionPlayerPowerUpItem();
+
+		// プレイヤー更新
+		player_->Update(deltaTime_->GetDeltaTime());
+
+		// ブロック更新
+		for (auto& block : blocks_) {
+			block->Update();
+		}
+
+		// 敵更新
+		enemy_->Update(deltaTime_->GetDeltaTime());
+
+		for (auto& model : testModels_) {
+			model->Update();
+		}
+
+		// パワーアップアイテム更新
+		for (auto& powerUpItem : powerUpItems_) {
+			powerUpItem->Update(deltaTime_->GetDeltaTime());
+		}
+
+		// Particle
+		particle_->Update();
+
+		// ゲーム終了判定
+		if (player_->GetHP() <= 0 || enemy_->GetHP() <= 0) {
+			ChangeScene(Scene::Result);
+		}
+	} else if (currentScene_ == Scene::Result) {
+		// リザルト
+#ifdef USE_IMGUI
+		ImGui::Begin("Result");
+		ImGui::TextWrapped("Result Scene");
+		ImGui::TextWrapped("Press Space or GamePad A to Return to Title");
+		ImGui::End();
+#endif
+		bool backInput = input_->KeyTriggered(DIK_SPACE) || gamePad_->GetState().buttonsPressed.a;
+		if (backInput) {
+			ChangeScene(Scene::Title);
+		}
+	}
+
+	// デバッグカメラ更新
+	debugCamera_->Update(*input_, *gamePad_);
+	gamePad_->Update();
+
+#ifdef USE_IMGUI
+	// ImGuiのフレームはEndFrame時に描画される
+#endif
+}
+
+void Game::Draw() {
+	// 描画開始
+	dxCommon_->BeginFrame();
+
+	srvManager_->PreDraw();
+
+	// シーンごとの描画
+	if (currentScene_ == Scene::Game) {
+		// プレイヤー描画
+		player_->Draw();
+
+		// for (auto& model : testModels_) {
+		//	model->Draw();
+		// }
+
+		// ブロック描画
+		for (auto& block : blocks_) {
+			block->Draw();
+		}
+
+		// 敵描画
+		enemy_->Draw();
+
+		// パワーアップアイテム描画
+		for (auto& powerUpItem : powerUpItems_) {
+			powerUpItem->Draw();
+		}
+
+		// Particle
+		particle_->Draw();
+	} else {
+	}
+
+	// ImGuiの内部コマンドを生成する
+#ifdef USE_IMGUI
+	imGuiManager_->Render(dxCommon_->GetCommandList());
+#endif
+
+	// 描画終了
+	dxCommon_->EndFrame();
 }
 
 void Game::ChangeScene(Scene newScene) {
@@ -99,151 +233,11 @@ void Game::StartGameScene() {
 	testModels_[3]->SetModel("HiyokoAfro.obj");
 
 	// パワーアップアイテム初期化
-	// powerUpItems_.clear();
-	// powerUpItemCreateFrameCount_ = 0;
+	powerUpItems_.clear();
+	powerUpItemCreateFrameCount_ = 0;
 
 	// オブジェクトの配置
 	SpawnObjectsByMapChip(mapLeftTop_);
-}
-
-void Game::Update() {
-	// シーンに依らず、経過時間と入力は更新しておく
-	deltaTime_->Update();
-	fps_ = 1.0f / deltaTime_->GetDeltaTime();
-	input_->Update();
-
-#ifdef USE_IMGUI
-	// ImGui前処理
-	imGuiManager_->BeginFrame();
-#endif
-
-	// シーン毎の処理
-	if (currentScene_ == Scene::Title) {
-		// タイトル
-#ifdef USE_IMGUI
-		ImGui::Begin("Title");
-		ImGui::TextWrapped("Title Scene");
-		ImGui::TextWrapped("Press Space or GamePad A to Start");
-		ImGui::End();
-#endif
-		bool startInput = input_->KeyTriggered(DIK_SPACE) || gamePad_->GetState().buttonsPressed.a;
-		if (startInput) {
-			ChangeScene(Scene::Game);
-		}
-
-		// デバッグカメラ更新
-		debugCamera_->Update(*input_, *gamePad_);
-		gamePad_->Update();
-	} else if (currentScene_ == Scene::Game) {
-		// ゲームシーン
-#ifdef USE_IMGUI
-		player_->UpdateImGui();
-		enemy_->UpdateImGui();
-		ImGuiFPS();
-		ImGuiDebugCamera();
-#endif
-
-		// 一定時間おきにパワーアップアイテム生成
-		// CreatePowerUpItem();
-
-		// デバッグカメラ更新
-		debugCamera_->Update(*input_, *gamePad_);
-
-		// 当たり判定
-		// CollisionPlayerEnemy();
-		// CollisionEnemyPlayerHipDrop();
-		// CollisionPlayerPowerUpItem();
-
-		// プレイヤー更新
-		player_->Update(deltaTime_->GetDeltaTime());
-
-		// ブロック更新
-		for (auto& block : blocks_) {
-			block->Update();
-		}
-
-		// 敵更新
-		enemy_->Update(deltaTime_->GetDeltaTime());
-
-		for (auto& model : testModels_) {
-			model->Update();
-		}
-
-		// パワーアップアイテム更新
-		// for (auto& powerUpItem : powerUpItems_) {
-		//	powerUpItem->Update(deltaTime_->GetDeltaTime());
-		//}
-
-		// Particle
-		particle_->Update();
-
-		// ゲーム終了判定
-		if (player_->GetHP() <= 0 || enemy_->GetHP() <= 0) {
-			ChangeScene(Scene::Result);
-		}
-	} else if (currentScene_ == Scene::Result) {
-		// リザルト
-#ifdef USE_IMGUI
-		ImGui::Begin("Result");
-		ImGui::TextWrapped("Result Scene");
-		ImGui::TextWrapped("Press Space or GamePad A to Return to Title");
-		ImGui::End();
-#endif
-		bool backInput = input_->KeyTriggered(DIK_SPACE) || gamePad_->GetState().buttonsPressed.a;
-		if (backInput) {
-			ChangeScene(Scene::Title);
-		}
-
-		// デバッグカメラ更新
-		debugCamera_->Update(*input_, *gamePad_);
-		gamePad_->Update();
-	}
-
-#ifdef USE_IMGUI
-	// ImGui のフレームは EndFrame 時に描画される（Draw内で Render を呼ぶ）
-#endif
-}
-
-void Game::Draw() {
-	// 描画開始
-	dxCommon_->BeginFrame();
-
-	srvManager_->PreDraw();
-
-	// シーンごとの描画
-	if (currentScene_ == Scene::Game) {
-		// プレイヤー描画
-		player_->Draw();
-
-		//for (auto& model : testModels_) {
-		//	model->Draw();
-		//}
-
-		// ブロック描画
-		// for (auto& block : blocks_) {
-		//	block->Draw();
-		//}
-
-		// 敵描画
-		// enemy_->Draw();
-
-		// パワーアップアイテム描画
-		// for (auto& powerUpItem : powerUpItems_) {
-		//	powerUpItem->Draw();
-		//}
-
-		// Particle
-		particle_->Draw();
-	} else {
-	}
-
-	// ImGuiの内部コマンドを生成する
-#ifdef USE_IMGUI
-	imGuiManager_->Render(dxCommon_->GetCommandList());
-#endif
-
-	// 描画終了
-	dxCommon_->EndFrame();
 }
 
 void Game::Finalize() {

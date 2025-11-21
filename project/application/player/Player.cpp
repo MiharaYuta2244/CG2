@@ -18,8 +18,8 @@ void Player::Initialize(Object3dCommon* obj3dCommon, TextureManager* texMane, Mo
 	object3d_->Initialize(obj3dCommon, texMane, ModelMane);
 	//object3d_->SetColor({1.0f, 0.0f, 0.0f, 1.0f});
 
-	transform_.scale = {5.0f, 5.0f, 5.0f};
-	transform_.rotate = {0.0f, std::numbers::pi_v<float>, 0.0f};
+	transform_.scale = {1.0f, 1.0f, 1.0f};
+	transform_.rotate = {0.0f, std::numbers::pi_v<float> / 2, 0.0f};
 	transform_.translate = {20.0f, 0.0f, 0.0f};
 	size_ = {1.0f, 1.0f, 1.0f};
 	collisionSize = {1.0f, 1.0f, 1.0f};
