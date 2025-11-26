@@ -1,10 +1,10 @@
 #pragma once
+#include <array>
 #include <assert.h>
 #include <fstream>
+#include <vector>
 #include <wrl.h>
 #include <xaudio2.h>
-#include <array>
-#pragma comment(lib, "xaudio2.lib")
 
 // チャンクヘッダ
 struct ChunkHeader {
@@ -20,19 +20,16 @@ struct RiffHeader {
 
 // FMTチャンク
 struct FormatChunk {
-	ChunkHeader chunk; // "fmt"
+	ChunkHeader chunk;          // "fmt"
 	std::array<BYTE, 40> fmt{}; // 波形フォーマット
 };
 
 // 音声データ
-struct SoundData
-{
+struct SoundData {
 	// 波形フォーマット
 	WAVEFORMATEXTENSIBLE wfex;
-	// バッファの先頭アドレス
-	BYTE* pBuffer;
-	// バッファのサイズ
-	uint32_t bufferSize;
+	// バッファ
+	std::vector<BYTE> buffer;
 };
 
 class XAudio {
@@ -40,7 +37,7 @@ public:
 	~XAudio();
 	void Initialize();
 	void SoundsAllLoad();
-	SoundData SoundLoadWave(const char* filename);
+	void SoundLoadFile(const std::string& filename);
 	void SoundPlayWave(IXAudio2* xAudio2, const SoundData& soundData);
 	Microsoft::WRL::ComPtr<IXAudio2> GetXAudio2() { return xAudio2_; }
 	SoundData GetSound() { return sound_; }
