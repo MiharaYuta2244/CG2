@@ -11,8 +11,8 @@ void RisingModule::Initialize(ParticleState& particle, EngineContext* /*ctx*/) {
 	float s = RandomUtils::RangeFloat(sizeMin_, sizeMax_);
 	particle.transform.scale = {s, s, s};
 
-	// 柔らかい光の粒のような色
-	float base = RandomUtils::RangeFloat(0.85f, 1.0f);
+	// 色
+	float base = RandomUtils::RangeFloat(0.0f, 1.0f);
 	particle.color = {base, base, base, 1.0f};
 
 	// 初速

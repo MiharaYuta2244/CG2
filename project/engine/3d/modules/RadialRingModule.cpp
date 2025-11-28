@@ -12,15 +12,17 @@ void RadialRingModule::Initialize(ParticleState& particle, EngineContext* /*ctx*
 	particle.transform.scale = {s, s, s};
 
 	// 色
-	float g = RandomUtils::RangeFloat(0.85f, 1.0f);
-	particle.color = {g, 0.0f, 0.0f, 1.0f};
+	float r = RandomUtils::RangeFloat(0.85f, 1.0f);
+	float g = RandomUtils::RangeFloat(0.0f, 0.5f);
+	float b = RandomUtils::RangeFloat(0.0f, 0.5f);
+	particle.color = {r, g, b, 1.0f};
 
 	// 角度を決めて円に広がる方向に発射
 	float angle = RandomUtils::RangeFloat(0.0f, 2.0f * std::numbers::pi_v<float>);
 	float speed = RandomUtils::RangeFloat(baseSpeed_ * 0.7f, baseSpeed_);
 	particle.velocity.x = std::cos(angle) * speed;
 	particle.velocity.z = std::sin(angle) * speed;
-	particle.velocity.y = yVelocity_; // 上下の動きは微量
+	particle.velocity.y = yVelocity_;
 }
 
 void RadialRingModule::Update(ParticleState& particle, float deltaTime, EngineContext* /*ctx*/) {
