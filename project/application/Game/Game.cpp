@@ -28,13 +28,54 @@ void Game::Initialize() {
 
 	// 現在のシーン初期化
 	currentScene_ = Scene::Title;
+
+	// フェード用スプライト初期化
+	fadeSprite_ = std::make_unique<Sprite>();
+	fadeSprite_->Initialize(&GetEngineContext(), "resources/white.png");
+	fadeSprite_->SetPosition({0.0f, 0.0f});
+	fadeSprite_->SetSize({static_cast<float>(WinApp::kClientWidth), static_cast<float>(WinApp::kClientHeight)});
+	fadeSprite_->SetAnchorPoint({0.0f, 0.0f});
+	fadeSprite_->SetColor({0.0f, 0.0f, 0.0f, 0.0f});
+	fadeState_ = FadeState::None;
+	fadeTimer_ = 0.0f;
 }
 
 void Game::Update() {
 	// 基底クラスの更新処理
 	Framework::Update();
 
-	// シーン毎の処理
+	// フェード更新（優先して処理）
+	if (fadeState_ != FadeState::None) {
+		float dt = GetTimeManager()->GetDeltaTime();
+		fadeTimer_ += dt;
+		float t = fadeDuration_ > 0.0f ? std::clamp(fadeTimer_ / fadeDuration_, 0.0f, 1.0f) : 1.0f;
+
+		if (fadeState_ == FadeState::FadeOut) {
+			// フェードアウト進行（透明->不透明）
+			fadeSprite_->SetColor({0.0f, 0.0f, 0.0f, t});
+			if (t >= 1.0f) {
+				// フェードアウト完了 → 実際のシーン切替を行う
+				currentScene_ = nextScene_;
+				if (currentScene_ == Scene::Game) {
+					StartGameScene();
+				}
+				// フェードインに移行
+				fadeState_ = FadeState::FadeIn;
+				fadeTimer_ = 0.0f;
+			}
+		} else if (fadeState_ == FadeState::FadeIn) {
+			// フェードイン進行（不透明->透明）
+			fadeSprite_->SetColor({0.0f, 0.0f, 0.0f, 1.0f - t});
+			if (t >= 1.0f) {
+				// フェード完了
+				fadeState_ = FadeState::None;
+				fadeTimer_ = 0.0f;
+				fadeSprite_->SetColor({0.0f, 0.0f, 0.0f, 0.0f});
+			}
+		}
+	}
+
+	// シーン毎の処理（フェード中でもゲーム進行を止めたい場合はここで early return して下さい）
 	if (currentScene_ == Scene::Title) {
 		// タイトル
 #ifdef USE_IMGUI
@@ -174,6 +215,15 @@ void Game::Draw() {
 	} else {
 	}
 
+	// フェードスプライトを上書きで描画（常に最後に）
+	// フェード中でなくても alpha が 0 以外なら描画する（安全策）
+	if (fadeSprite_) {
+		// Update して最新の行列/アルファを反映
+		fadeSprite_->Update();
+		// Draw（アルファにより画面を覆う）
+		fadeSprite_->Draw();
+	}
+
 	// 描画後処理
 	Framework::PostDraw();
 }
@@ -182,12 +232,18 @@ void Game::ChangeScene(Scene newScene) {
 	if (currentScene_ == newScene)
 		return;
 
-	currentScene_ = newScene;
-	if (currentScene_ == Scene::Game) {
-		StartGameScene();
-	}
+	// フェードが既に進行中なら無視
+	if (fadeState_ != FadeState::None)
+		return;
 
-	// 遷移時処理はここに追加
+	// フェードアウト開始
+	nextScene_ = newScene;
+	fadeState_ = FadeState::FadeOut;
+	fadeTimer_ = 0.0f;
+	// 初期アルファは 0（透明）
+	if (fadeSprite_) {
+		fadeSprite_->SetColor({0.0f, 0.0f, 0.0f, 0.0f});
+	}
 }
 
 void Game::StartGameScene() {
@@ -217,6 +273,8 @@ void Game::Finalize() {
 	// 基底クラスの終了処理
 	Framework::Finalize();
 }
+
+// ... 以下既存メソッドは変更無し ...
 
 void Game::SpawnObjectsByMapChip(Vector2 leftTop) {
 	for (int y = 0; y < map_->GetRowCount(); ++y) {

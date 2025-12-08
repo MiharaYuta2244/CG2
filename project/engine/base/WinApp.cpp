@@ -17,7 +17,7 @@ WinApp::WinApp() {
 	// ウィンドウサイズを表す構造体にクライアント領域を入れる
 	RECT wrc = {0, 0, kClientWidth, kClientHeight};
 
-	// クライアント領域を基に実際のサイズにwrcを変更してもらう
+	// クライアント領域を基に実際のサイズにwrcを変更してもらう                                       
 	AdjustWindowRect(&wrc, WS_OVERLAPPEDWINDOW, false);
 
 	// ウィンドウの生成
@@ -56,7 +56,7 @@ bool WinApp::ProcessMessage() {
 	return true;
 }
 
-LRESULT WinApp::WindowProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam) {
+LRESULT CALLBACK WinApp::WindowProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam) {
 #ifdef USE_IMGUI
 	if (ImGui_ImplWin32_WndProcHandler(hwnd, msg, wparam, lparam)) {
 		return true;

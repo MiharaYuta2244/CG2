@@ -26,6 +26,13 @@ private:
 		Result,
 	};
 
+	// フェード状態
+	enum class FadeState {
+		None = 0,
+		FadeOut,
+		FadeIn,
+	};
+
 	// シーン管理
 	void ChangeScene(Scene newScene);
 	void StartGameScene(); // ゲームシーン開始（初期化／リセット）
@@ -60,6 +67,15 @@ private:
 private:
 	// 現在のシーン
 	Scene currentScene_ = Scene::Game;
+
+	// 次に切り替えるシーン（フェード進行中に保持）
+	Scene nextScene_ = Scene::Game;
+
+	// フェード管理
+	FadeState fadeState_ = FadeState::None;
+	float fadeDuration_ = 0.4f; // フェード時間（秒）
+	float fadeTimer_ = 0.0f;
+	std::unique_ptr<Sprite> fadeSprite_;
 
 	// model座標
 	Transform transform_[5];

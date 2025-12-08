@@ -126,7 +126,7 @@ void Player::Draw() {
 	}
 
 	// HPゲージ背景スプライト
-	spriteHPGaugeBG_->Draw();
+	//spriteHPGaugeBG_->Draw();
 
 	// HPゲージスプライト
 	for (auto& hpGauge : spriteHPGauge_) {
