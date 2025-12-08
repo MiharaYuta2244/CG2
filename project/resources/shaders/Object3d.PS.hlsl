@@ -39,6 +39,13 @@ struct PixelShaderOutput
     float32_t4 color : SV_TARGET0;
 };
 
+struct PointLight
+{
+    float32_t4 color;
+    float32_t3 position;
+    float intensity;
+};
+
 ConstantBuffer<Material> gMaterial : register(b0);
 Texture2D<float32_t4> gTexture : register(t0);
 SamplerState gSampler : register(s0);
@@ -46,6 +53,7 @@ ConstantBuffer<DirectionalLight> gDirectionalLight : register(b1);
 ConstantBuffer<Camera> gCamera : register(b2);
 ConstantBuffer<FogParam> gFogParam : register(b3);
 ConstantBuffer<TimeParam> gTimeParam : register(b4);
+ConstantBuffer<PointLight> gPointLight : register(b5);
 
 PixelShaderOutput main(VertexShaderOutput input)
 {

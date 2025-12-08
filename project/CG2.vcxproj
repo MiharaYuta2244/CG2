@@ -80,7 +80,7 @@
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
       <TreatWarningAsError>true</TreatWarningAsError>
-      <AdditionalIncludeDirectories>$(ProjectDir)externals\imguizmo;$(ProjectDir)externals\imgui;$(ProjectDir)externals\DirectXTex;$(ProjectDir)resources\shaders;$(ProjectDir)engine\math;$(ProjectDir)engine\input;$(ProjectDir)engine\base;$(ProjectDir)engine\audio;$(ProjectDir)engine\3d;$(ProjectDir)engine\2d;$(ProjectDir)engine;$(WindowsSdkDir)Include\10.0.26100.0\um;$(ProjectDir)application\player;$(ProjectDir)application\text3d;$(ProjectDir)application;$(ProjectDir)engine\math\mathLib;$(ProjectDir)engine\base\imGuiManager;$(ProjectDir)engine\deltaTime;$(ProjectDir)application\Game;$(ProjectDir)application\Map;$(ProjectDir)application\Block;$(ProjectDir)application\Enemy;$(ProjectDir)application\Collision;$(ProjectDir)application\PowerUpItem;$(ProjectDir)engine\3d\modules;$(ProjectDir)engine\base\random;</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)externals\imguizmo;$(ProjectDir)externals\imgui;$(ProjectDir)externals\DirectXTex;$(ProjectDir)resources\shaders;$(ProjectDir)engine\math;$(ProjectDir)engine\input;$(ProjectDir)engine\base;$(ProjectDir)engine\audio;$(ProjectDir)engine\3d;$(ProjectDir)engine\2d;$(ProjectDir)engine;$(WindowsSdkDir)Include\10.0.26100.0\um;$(ProjectDir)application\player;$(ProjectDir)application\text3d;$(ProjectDir)application;$(ProjectDir)engine\math\mathLib;$(ProjectDir)engine\base\imGuiManager;$(ProjectDir)engine\deltaTime;$(ProjectDir)application\Game;$(ProjectDir)application\Map;$(ProjectDir)application\Block;$(ProjectDir)application\Enemy;$(ProjectDir)application\Collision;$(ProjectDir)application\PowerUpItem;$(ProjectDir)engine\3d\modules;$(ProjectDir)engine\Framework;$(ProjectDir)engine\base\random;</AdditionalIncludeDirectories>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <DisableLanguageExtensions>false</DisableLanguageExtensions>
     </ClCompile>
@@ -106,7 +106,7 @@ copy "$(windowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
       <AdditionalOptions>/utf-8 %(AdditionalOptions)</AdditionalOptions>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
-      <AdditionalIncludeDirectories>$(ProjectDir)externals\imguizmo;$(ProjectDir)externals\imgui;$(ProjectDir)externals\DirectXTex;$(ProjectDir)resources\shaders;$(ProjectDir)engine\math;$(ProjectDir)engine\input;$(ProjectDir)engine\base;$(ProjectDir)engine\audio;$(ProjectDir)engine\3d;$(ProjectDir)engine\2d;$(ProjectDir)engine;$(WindowsSdkDir)Include\10.0.26100.0\um;$(ProjectDir)application\player;$(ProjectDir)application\text3d;$(ProjectDir)application;$(ProjectDir)engine\math\mathLib;$(ProjectDir)engine\base\imGuiManager;$(ProjectDir)engine\deltaTime;$(ProjectDir)application\Game;$(ProjectDir)application\Map;$(ProjectDir)application\Block;$(ProjectDir)application\Enemy;$(ProjectDir)application\Collision;$(ProjectDir)application\PowerUpItem;$(ProjectDir)engine\3d\modules;$(ProjectDir)engine\base\random;$(ProjectDir)application\PowerUpItem</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)externals\imguizmo;$(ProjectDir)externals\imgui;$(ProjectDir)externals\DirectXTex;$(ProjectDir)resources\shaders;$(ProjectDir)engine\math;$(ProjectDir)engine\input;$(ProjectDir)engine\base;$(ProjectDir)engine\audio;$(ProjectDir)engine\3d;$(ProjectDir)engine\2d;$(ProjectDir)engine;$(WindowsSdkDir)Include\10.0.26100.0\um;$(ProjectDir)application\player;$(ProjectDir)application\text3d;$(ProjectDir)application;$(ProjectDir)engine\math\mathLib;$(ProjectDir)engine\base\imGuiManager;$(ProjectDir)engine\deltaTime;$(ProjectDir)application\Game;$(ProjectDir)application\Map;$(ProjectDir)application\Block;$(ProjectDir)application\Enemy;$(ProjectDir)application\Collision;$(ProjectDir)application\PowerUpItem;$(ProjectDir)engine\3d\modules;$(ProjectDir)engine\Framework;$(ProjectDir)engine\base\random;$(ProjectDir)application\PowerUpItem</AdditionalIncludeDirectories>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <DisableLanguageExtensions>false</DisableLanguageExtensions>
       <TreatWarningAsError>true</TreatWarningAsError>
@@ -134,7 +134,7 @@ copy "$(windowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
       <AdditionalOptions>/utf-8 %(AdditionalOptions)</AdditionalOptions>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
-      <AdditionalIncludeDirectories>$(ProjectDir)externals\imguizmo;$(ProjectDir)externals\imgui;$(ProjectDir)externals\DirectXTex;$(ProjectDir)resources\shaders;$(ProjectDir)engine\math;$(ProjectDir)engine\input;$(ProjectDir)engine\base;$(ProjectDir)engine\audio;$(ProjectDir)engine\3d;$(ProjectDir)engine\2d;$(ProjectDir)engine;$(WindowsSdkDir)Include\10.0.26100.0\um;$(ProjectDir)application\player;$(ProjectDir)application\text3d;$(ProjectDir)application;$(ProjectDir)engine\math\mathLib;$(ProjectDir)engine\base\imGuiManager;$(ProjectDir)engine\deltaTime;$(ProjectDir)application\Game;$(ProjectDir)application\Map;$(ProjectDir)application\Block;$(ProjectDir)application\Enemy;$(ProjectDir)application\Collision;$(ProjectDir)application\PowerUpItem;$(ProjectDir)engine\3d\modules;$(ProjectDir)engine\base\random;</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)externals\imguizmo;$(ProjectDir)externals\imgui;$(ProjectDir)externals\DirectXTex;$(ProjectDir)resources\shaders;$(ProjectDir)engine\math;$(ProjectDir)engine\input;$(ProjectDir)engine\base;$(ProjectDir)engine\audio;$(ProjectDir)engine\3d;$(ProjectDir)engine\2d;$(ProjectDir)engine;$(WindowsSdkDir)Include\10.0.26100.0\um;$(ProjectDir)application\player;$(ProjectDir)application\text3d;$(ProjectDir)application;$(ProjectDir)engine\math\mathLib;$(ProjectDir)engine\base\imGuiManager;$(ProjectDir)engine\deltaTime;$(ProjectDir)application\Game;$(ProjectDir)application\Map;$(ProjectDir)application\Block;$(ProjectDir)application\Enemy;$(ProjectDir)application\Collision;$(ProjectDir)application\PowerUpItem;$(ProjectDir)engine\3d\modules;$(ProjectDir)engine\Framework;$(ProjectDir)engine\base\random;</AdditionalIncludeDirectories>
       <Optimization>Disabled</Optimization>
       <WholeProgramOptimization>false</WholeProgramOptimization>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
@@ -193,6 +193,7 @@ copy "$(windowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="engine\base\Logger.cpp" />
     <ClCompile Include="application\Game\Game.cpp" />
     <ClCompile Include="engine\input\GamePad.cpp" />
+    <ClCompile Include="engine\Framework\Framework.cpp" />
     <ClCompile Include="main.cpp">
       <Optimization Condition="'$(Configuration)|$(Platform)'=='Development|x64'">MaxSpeed</Optimization>
       <WholeProgramOptimization Condition="'$(Configuration)|$(Platform)'=='Development|x64'">true</WholeProgramOptimization>
@@ -283,6 +284,7 @@ copy "$(windowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="engine\base\EngineContext.h" />
     <ClInclude Include="engine\base\ParticleForGPU.h" />
     <ClInclude Include="engine\base\ParticleState.h" />
+    <ClInclude Include="engine\base\PointLight.h" />
     <ClInclude Include="engine\deltaTime\DeltaTime.h" />
     <ClInclude Include="engine\base\CameraForGPU.h" />
     <ClInclude Include="engine\base\D3DResourceLeakChecker.h" />
@@ -345,6 +347,7 @@ copy "$(windowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="engine\base\random\Random.h" />
     <ClInclude Include="engine\3d\modules\RisingModule.h" />
     <ClInclude Include="engine\3d\modules\RadialRingModule.h" />
+    <ClInclude Include="engine\Framework\Framework.h" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="externals\imgui\LICENSE.txt" />

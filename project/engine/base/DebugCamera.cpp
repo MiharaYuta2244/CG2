@@ -9,7 +9,7 @@ DebugCamera::DebugCamera()
           {0.0f, 0.0f, 0.0f},
           {0.0f, 0.0f, 0.0f}
 }),
-      fovY_(0.45f), aspectRatio_(float(WinApp::kClientWidth) / float(WinApp::kClientHeight)), nearClip_(0.1f), farClip_(100.0f),
+      fovY_(0.45f), aspectRatio_(float(WinApp::kClientWidth) / float(WinApp::kClientHeight)), nearClip_(0.1f), farClip_(1000.0f),
       worldMatrix_(MathUtility::MakeAffineMatrix(transform_.scale, transform_.rotate, transform_.translate)), viewMatrix_(MathUtility::Inverse(worldMatrix_)),
       projectionMatrix_(MathUtility::MakePerspectiveFovMatrix(fovY_, aspectRatio_, nearClip_, farClip_)), viewProjectionMatrix_(MathUtility::Multiply(viewMatrix_, projectionMatrix_)),
       orientation_(MathUtility::MakeIdentity4x4()), pivot_({0.0f, 0.0f, 0.0f}) {}
