@@ -91,6 +91,11 @@ void Framework::Run() {
 	Initialize();
 
 	while (true) {
+		// ウィンドウメッセージの処理
+		if (!winApp_->ProcessMessage()) {
+			break;
+		}
+
 		// 毎フレーム更新
 		Update();
 
