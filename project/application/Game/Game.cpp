@@ -46,7 +46,7 @@ void Game::Initialize() {
 			auto tree = std::make_unique<Object3d>();
 			tree->Initialize(&GetEngineContext());
 			tree->SetModel("tree.obj");
-			tree->SetTranslate({i * 5.5f - 5.0f, 0.0f, 5.0f});
+			tree->SetTranslate({i * 5.5f - 5.0f, 0.0f, 8.0f});
 			tree->SetScale({3.0f, 3.0f, 3.0f});
 
 			tree->Update();

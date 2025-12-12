@@ -82,14 +82,22 @@ PixelShaderOutput main(VertexShaderOutput input)
     PixelShaderOutput output;
     if (gMaterial.enableLighting != 0) // Lightingする場合
     {
+        //float32_t3 pointLightDirection = normalize(input.worldPosition - gPointLight.position);
+        
         float NdotL = dot(normalize(input.normal), -gDirectionalLight.direction);
         float cos = (NdotL * 0.5f + 0.5f) * (NdotL * 0.5f + 0.5f);
-        // 拡散反射
-        float32_t3 diffuse = gMaterial.color.rgb * textureColor.rgb * gDirectionalLight.color.rgb * cos * gDirectionalLight.intensity;
-        // 鏡面反射
-        float32_t3 specular = gDirectionalLight.color.rgb * gDirectionalLight.intensity * specularPow * float32_t3(1.0f, 1.0f, 1.0f);
+        
+        // 拡散反射 directional
+        float32_t3 diffuseDirectionalLight = gMaterial.color.rgb * textureColor.rgb * gDirectionalLight.color.rgb * cos * gDirectionalLight.intensity;
+        // 鏡面反射 directional
+        float32_t3 specularDirectionalLight = gDirectionalLight.color.rgb * gDirectionalLight.intensity * specularPow * float32_t3(1.0f, 1.0f, 1.0f);
+        // 拡散反射 point
+        //float32_t3 diffusePointLight = gMaterial.color.rgb * textureColor.rgb * gPointLight.color.rgb * cos * gPointLight.intensity;
+        // 鏡面反射 point
+        //float32_t3 specularPointLight = gPointLight.color.rgb * gPointLight.intensity * specularPow * float32_t3(1.0f, 1.0f, 1.0f);
+        
         // 拡散反射+鏡面反射
-        output.color.rgb = diffuse + specular;
+        output.color.rgb = diffuseDirectionalLight + specularDirectionalLight/* + diffusePointLight + specularPointLight*/;
         // アルファ
         output.color.a = gMaterial.color.a * textureColor.a;
     }

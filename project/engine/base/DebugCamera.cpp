@@ -37,8 +37,8 @@ void DebugCamera::Update(const DirectInput& input, const GamePad& gamePad) {
 		orientation_ = MathUtility::Orthonormalize(orientation_);
 	}
 
-	// ピボット回転
-	if (input.MouseButtonDown(2)) {
+	// ホイールドラッグ: 原点中心の回転
+	if (!input.KeyDown(DIK_LSHIFT) && input.MouseButtonDown(2)) {
 		float dx = input.GetMouseDeltaX() * 0.001f;
 		float dy = input.GetMouseDeltaY() * 0.001f;
 
@@ -46,9 +46,10 @@ void DebugCamera::Update(const DirectInput& input, const GamePad& gamePad) {
 		Matrix4x4 pitch = MathUtility::MakePitchRotateMatrix(dy);
 		Matrix4x4 rot = MathUtility::Multiply(pitch, yaw);
 
-		Vector3 offset = MathUtility::Subtract(transform_.translate, pivot_);
-		offset = MathUtility::MultiplyVector(offset, rot);
-		transform_.translate = MathUtility::Add(pivot_, offset);
+		// 原点中心の回転（pivotを使わず、transformの位置を直接回転）
+		Vector3 pos = transform_.translate;
+		pos = MathUtility::MultiplyVector(pos, rot);
+		transform_.translate = pos;
 
 		orientation_ = MathUtility::Multiply(rot, orientation_);
 		orientation_ = MathUtility::Orthonormalize(orientation_);
@@ -60,40 +61,25 @@ void DebugCamera::Update(const DirectInput& input, const GamePad& gamePad) {
 		pivot_ = MathUtility::Add(pivot_, world);
 	};
 
-	const float speed = 0.1f;
+	const float speed = 0.8f;
 
-	if (!input.KeyDown(DIK_LSHIFT)) {
-		// 前移動
-		if (input.KeyDown(DIK_W) || gamePad.GetState().axes.ry < -0.3f) {
-			MoveLocal({0.0f, 0.0f, speed});
-		}
-
-		// 後ろ移動
-		if (input.KeyDown(DIK_S) || gamePad.GetState().axes.ry > 0.3f) {
-			MoveLocal({0.0f, 0.0f, -speed});
-		}
+	// マウスホイール回転で前後移動
+	float wheelDelta = input.GetMouseWheel();
+	if (wheelDelta != 0.0f) {
+		float moveSpeed = wheelDelta > 0.0f ? speed : -speed;
+		MoveLocal({0.0f, 0.0f, moveSpeed});
 	}
 
-	if (input.KeyDown(DIK_LSHIFT)) {
-		// 右移動
-		if (input.KeyDown(DIK_D)) {
-			MoveLocal({speed, 0.0f, 0.0f});
-		}
+	// Shift + ホイールドラッグ中のマウス移動で上下左右移動（Blenderスタイル）
+	if (input.KeyDown(DIK_LSHIFT) && input.MouseButtonDown(2)) {
+		float dx = input.GetMouseDeltaX() * 0.1f;
+		float dy = input.GetMouseDeltaY() * 0.1f;
 
-		// 左移動
-		if (input.KeyDown(DIK_A)) {
-			MoveLocal({-speed, 0.0f, 0.0f});
-		}
-
-		// 上移動
-		if (input.KeyDown(DIK_W)) {
-			MoveLocal({0.0f, speed, 0.0f});
-		}
-
-		// 下移動
-		if (input.KeyDown(DIK_S)) {
-			MoveLocal({0.0f, -speed, 0.0f});
-		}
+		// マウス移動量に応じた連続的な移動
+		Vector3 moveVec = {-dx, dy, 0.0f};  // マウスX移動で左右、Y移動で上下
+		Vector3 world = MathUtility::MultiplyVector(moveVec, orientation_);
+		transform_.translate = MathUtility::Add(transform_.translate, world);
+		pivot_ = MathUtility::Add(pivot_, world);
 	}
 
 	UpdateViewMatrix();
