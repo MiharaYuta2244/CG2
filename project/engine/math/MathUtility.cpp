@@ -425,3 +425,11 @@ Matrix4x4 MathUtility::Orthonormalize(const Matrix4x4& m) {
 
 	return result;
 }
+
+Vector3 MathUtility::Lerp(const Vector3& start, const Vector3& end, float t) { 
+	Vector3 result;
+	result.x = start.x + (end.x - start.x) * t;
+	result.y = start.y + (end.y - start.y) * t;
+	result.z = start.z + (end.z - start.z) * t;
+	return result;
+}

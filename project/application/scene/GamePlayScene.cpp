@@ -30,7 +30,7 @@ void GamePlayScene::Initialize(EngineContext* ctx, DirectInput* keyboard, GamePa
 		auto tree = std::make_unique<Object3d>();
 		tree->Initialize(engineContext_);
 		tree->SetModel("tree.obj");
-		tree->SetTranslate({i * 5.5f - 5.0f, 0.0f, 8.0f});
+		tree->SetTranslate({i * 7.0f - 5.0f, 0.0f, 8.0f});
 		tree->SetScale({3.0f, 3.0f, 3.0f});
 		tree->Update();
 		treeModels_[i] = std::move(tree);

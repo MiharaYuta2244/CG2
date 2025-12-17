@@ -85,11 +85,15 @@ void TitleScene::ChangeScene() {
 	// 上入力の場合
 	if (upInput) {
 		titleState_ = TitleState::START; // ゲーム開始
+		startModel_->SetSelected(true);  // 選択状態にする
+		endModel_->SetSelected(false);   // 選択状態を解除
 	}
 
 	// 下入力の場合
 	if (downInput) {
-		titleState_ = TitleState::END; // ゲーム終了
+		titleState_ = TitleState::END;   // ゲーム終了
+		endModel_->SetSelected(true);    // 選択状態にする
+		startModel_->SetSelected(false); // 選択状態を解除
 	}
 
 	// ゲーム開始入力
@@ -97,6 +101,6 @@ void TitleScene::ChangeScene() {
 	if (startInput && titleState_ == TitleState::START) {
 		sceneManager_->ChangeScene("GamePlay"); // ゲームシーンへ
 	} else if (startInput && titleState_ == TitleState::END) {
-		// ゲーム終了
+		PostQuitMessage(0); // ゲーム終了
 	}
 }

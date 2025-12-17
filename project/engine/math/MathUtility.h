@@ -166,6 +166,8 @@ public:
 
 	static Matrix4x4 Orthonormalize(const Matrix4x4& m);
 
+	static Vector3 Lerp(const Vector3& start, const Vector3& end, float t);
+
 public:
 	static constexpr float pi_ = static_cast<float>(std::numbers::pi);
 };
