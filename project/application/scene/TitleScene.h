@@ -3,8 +3,10 @@
 #include "Object3d.h"
 #include "Sprite.h"
 #include "TitleText.h"
-#include <memory>
+#include "StartModel.h"
+#include "EndModel.h"
 #include <array>
+#include <memory>
 
 class TitleScene : public BaseScene {
 public:
@@ -17,23 +19,25 @@ public:
 	void Finalize() override;
 
 private:
+	// 必要なモデルの読み込み
 	void AllModelLoad();
+
+	// シーン切り替え処理
+	void ChangeScene();
+
+private:
+	enum class TitleState { START = 0, END = 1 };
 
 private:
 	// タイトルテキストモデル
 	std::unique_ptr<TitleText> titleText_;
 
 	// はじめるモデル
-	std::unique_ptr<Object3d> startModel_;
+	std::unique_ptr<StartModel> startModel_;
 
 	// おわるモデル
-	std::unique_ptr<Object3d> endModel_;
+	std::unique_ptr<EndModel> endModel_;
 
-	// タイトルテキストの回転
-	float titleRotateY_ = 0.0f;
-
-	// 木のアニメーション用
-	float t_ = 0.0f;
-	const float kTimer = 2.0f;
-	float timer_ = 0.0f;
+	// タイトルの状態
+	TitleState titleState_ = TitleState::START;
 };

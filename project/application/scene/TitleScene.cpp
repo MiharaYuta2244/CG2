@@ -1,8 +1,8 @@
 #include "TitleScene.h"
-#include "SceneManager.h"
 #include "Easing.h"
-#include <numbers>
+#include "SceneManager.h"
 #include <algorithm>
+#include <numbers>
 
 void TitleScene::Initialize(EngineContext* ctx, DirectInput* keyboard, GamePad* gamePad, DebugCamera* debugCamera, DeltaTime* timeManager, SceneManager* sceneManager) {
 	engineContext_ = ctx;
@@ -20,43 +20,25 @@ void TitleScene::Initialize(EngineContext* ctx, DirectInput* keyboard, GamePad* 
 	titleText_->Initialize(engineContext_);
 
 	// はじめるモデル
-	startModel_ = std::make_unique<Object3d>();
+	startModel_ = std::make_unique<StartModel>();
 	startModel_->Initialize(engineContext_);
-	startModel_->SetModel("start.obj");
-	startModel_->SetTranslate({20.0f, 2.0f, 0.0f});
-	startModel_->SetScale({5.0f, 5.0f, 5.0f});
-	startModel_->SetRotate({0.0f, std::numbers::pi_v<float>, 0.0f});
 
 	// おわるモデル
-	endModel_ = std::make_unique<Object3d>();
+	endModel_ = std::make_unique<EndModel>();
 	endModel_->Initialize(engineContext_);
-	endModel_->SetModel("end.obj");
-	endModel_->SetTranslate({20.0f, -2.0f, 0.0f});
-	endModel_->SetScale({5.0f, 5.0f, 5.0f});
-	endModel_->SetRotate({0.0f, std::numbers::pi_v<float>, 0.0f});
 
-	// アニメーション用の変数をリセット
-	timer_ = 0.0f;
-	t_ = 0.0f;
+	// タイトルの状態
+	titleState_ = TitleState::START;
 }
 
 void TitleScene::Update() {
-	// 木のモデルアニメーション
-	timer_ += timeManager_->GetDeltaTime();
-	t_ = timer_ / kTimer;
-	t_ = std::clamp(t_, 0.0f, 1.0f);
-
-	float x = Easing::easeInOutBack(t_) * 5.0f;
-
+	// モデルの更新
 	titleText_->Update(timeManager_->GetDeltaTime());
-	startModel_->Update();
-	endModel_->Update();
+	startModel_->Update(timeManager_->GetDeltaTime());
+	endModel_->Update(timeManager_->GetDeltaTime());
 
-	// ゲーム開始入力
-	bool startInput = keyboard_->KeyTriggered(DIK_SPACE) || gamePad_->GetState().buttonsPressed.a;
-	if (startInput) {
-		sceneManager_->ChangeScene("GamePlay");
-	}
+	// シーン切り替え処理
+	ChangeScene();
 }
 
 void TitleScene::Draw() {
@@ -93,4 +75,28 @@ void TitleScene::AllModelLoad() {
 	engineContext_->modelManager->LoadModel("ToTitle2.obj");
 	engineContext_->modelManager->LoadModel("start.obj");
 	engineContext_->modelManager->LoadModel("end.obj");
+}
+
+void TitleScene::ChangeScene() {
+	// 入力
+	bool upInput = keyboard_->KeyTriggered(DIK_W) || gamePad_->GetState().buttonsPressed.dpadUp;
+	bool downInput = keyboard_->KeyTriggered(DIK_S) || gamePad_->GetState().buttonsPressed.dpadDown;
+
+	// 上入力の場合
+	if (upInput) {
+		titleState_ = TitleState::START; // ゲーム開始
+	}
+
+	// 下入力の場合
+	if (downInput) {
+		titleState_ = TitleState::END; // ゲーム終了
+	}
+
+	// ゲーム開始入力
+	bool startInput = keyboard_->KeyTriggered(DIK_SPACE) || gamePad_->GetState().buttonsPressed.a;
+	if (startInput && titleState_ == TitleState::START) {
+		sceneManager_->ChangeScene("GamePlay"); // ゲームシーンへ
+	} else if (startInput && titleState_ == TitleState::END) {
+		// ゲーム終了
+	}
 }

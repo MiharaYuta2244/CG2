@@ -251,6 +251,7 @@ void GamePlayScene::SpawnObjectsByMapChip(Vector2 leftTop) {
 #ifdef USE_IMGUI
 void GamePlayScene::ImGuiFPS() {
 	ImGui::Begin("Performance", nullptr, ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoTitleBar);
+	ImGui::Text("FPS: %.3f", 1.0f / timeManager_->GetDeltaTime());
 	ImGui::Text("Frame Time: %.3f ms", timeManager_->GetDeltaTime() * 1000.0f);
 	ImGui::End();
 }

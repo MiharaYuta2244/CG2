@@ -269,7 +269,7 @@ void Object3d::CreateMaterialData() {
 	materialResource_->Unmap(0, nullptr);
 	// 初期化
 	material_.color = {1.0f, 1.0f, 1.0f, 1.0f};
-	material_.enableLighting = true;
+	material_.enableLighting = false;
 	material_.enableFoging = false;
 	material_.uvTransform = MathUtility::MakeIdentity4x4();
 	material_.shininess = 2.0f;
