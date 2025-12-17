@@ -17,7 +17,7 @@ void StartModel::Update(float deltaTime) {
 	Animation(deltaTime);
 
 	if (!isSelected_) {
-		startModel_->SetScale(baseScale_ * 0.6f); // 非選択状態のときは通常よりサイズを小さくする
+		startModel_->SetScale(baseScale_ * 0.5f); // 非選択状態のときは通常よりサイズを小さくする
 		animationTime_ = 0.0f;                    // アニメーションタイムをリセット
 	}
 

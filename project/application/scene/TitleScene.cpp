@@ -75,6 +75,7 @@ void TitleScene::AllModelLoad() {
 	engineContext_->modelManager->LoadModel("ToTitle2.obj");
 	engineContext_->modelManager->LoadModel("start.obj");
 	engineContext_->modelManager->LoadModel("end.obj");
+	engineContext_->modelManager->LoadModel("grape.obj");
 }
 
 void TitleScene::ChangeScene() {
