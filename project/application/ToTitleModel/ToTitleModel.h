@@ -3,7 +3,7 @@
 #include "Object3d.h"
 #include <memory>
 
-class StageModel {
+class ToTitleModel {
 public:
 	void Initialize(EngineContext* ctx);
 	void Update(float deltaTime);
@@ -15,7 +15,7 @@ private:
 	void Animation(float deltaTime);
 
 private:
-	std::unique_ptr<Object3d> stageModel_;
+	std::unique_ptr<Object3d> toTitleModel_;
 
 	// 選択状態かどうか
 	bool isSelected_ = true;

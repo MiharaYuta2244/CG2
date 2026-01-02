@@ -101,4 +101,7 @@ void SceneManager::AllModelLoad() {
 	engineContext_->modelManager->LoadModel("grape.obj");
 	engineContext_->modelManager->LoadModel("apple.obj");
 	engineContext_->modelManager->LoadModel("orange.obj");
+	engineContext_->modelManager->LoadModel("return.obj");
+	engineContext_->modelManager->LoadModel("stage1.obj");
+	engineContext_->modelManager->LoadModel("charaSelect.obj");
 }

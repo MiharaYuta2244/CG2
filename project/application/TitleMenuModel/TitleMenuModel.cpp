@@ -1,18 +1,18 @@
 #include "MathOperator.h"
 #include "MathUtility.h"
-#include "StageModel.h"
+#include "TitleMenuModel.h"
 #include <numbers>
 
-void StageModel::Initialize(EngineContext* ctx) {
+void TitleMenuModel::Initialize(EngineContext* ctx, Vector3 pos) {
 	stageModel_ = std::make_unique<Object3d>();
 	stageModel_->Initialize(ctx);
 	stageModel_->SetModel("start.obj");
-	stageModel_->SetTranslate({20.0f, 2.0f, 0.0f});
+	stageModel_->SetTranslate(pos);
 	stageModel_->SetScale(baseScale_);
 	stageModel_->SetRotate({0.0f, std::numbers::pi_v<float>, 0.0f});
 }
 
-void StageModel::Update(float deltaTime) {
+void TitleMenuModel::Update(float deltaTime) {
 	// 拡縮アニメーション
 	Animation(deltaTime);
 
@@ -24,9 +24,9 @@ void StageModel::Update(float deltaTime) {
 	stageModel_->Update();
 }
 
-void StageModel::Draw() { stageModel_->Draw(); }
+void TitleMenuModel::Draw() { stageModel_->Draw(); }
 
-void StageModel::Animation(float deltaTime) {
+void TitleMenuModel::Animation(float deltaTime) {
 	if (!isSelected_)
 		return;
 

@@ -24,15 +24,39 @@ void TitleScene::Initialize(EngineContext* ctx, DirectInput* keyboard, GamePad* 
 	endModel_ = std::make_unique<EndModel>();
 	endModel_->Initialize(engineContext_);
 
-	// ステージ1モデル
-	stage1Model_ = std::make_unique<StageModel>();
-	stage1Model_->Initialize(engineContext_);
+	// 画面両端の幕
+	rightCurtain_ = std::make_unique<BothCurtain>();
+	rightCurtain_->Initialize(ctx);
+	leftCurtain_ = std::make_unique<BothCurtain>();
+	leftCurtain_->Initialize(ctx);
+
+	// menuLayoutsの初期化
+	InitMenuLayouts();
+
+	// タイトルメニューモデル
+	for (size_t i = 0; i < titleMenuModels_.size(); i++) {
+		titleMenuModels_[i] = std::make_unique<TitleMenuModel>();
+		titleMenuModels_[i]->Initialize(engineContext_, positions_[i]);
+	}
+
+	// 読み込むモデル
+	titleMenuModels_[0]->SetModel("return.obj");
+	titleMenuModels_[1]->SetModel("stage1.obj");
+	titleMenuModels_[2]->SetModel("stage1.obj");
+	titleMenuModels_[3]->SetModel("stage1.obj");
+	titleMenuModels_[4]->SetModel("charaSelect.obj");
+
+	titleMenuModels_[2]->SetColor({1.0f, 0.0f, 0.0f, 1.0f});
+	titleMenuModels_[3]->SetColor({0.0f, 0.0f, 1.0f, 1.0f});
 
 	// タイトルの状態
 	titleState_ = TitleState::START;
 
 	// タイトルシーン1か2か
 	titleNumber_ = TitleNumber::TITLE1;
+
+	// スプライトの生成&初期化
+	CreateAndInitializeSprites();
 }
 
 void TitleScene::Update() {
@@ -41,6 +65,10 @@ void TitleScene::Update() {
 
 	// モデルの更新　タイトル2
 	Title2Update();
+
+	// 両シーン共通の更新処理
+	rightCurtain_->Update();
+	leftCurtain_->Update();
 
 	// タイトルの状態切り替え
 	StateChange();
@@ -55,6 +83,10 @@ void TitleScene::Draw() {
 
 	// タイトル番号が2の時
 	Title2Draw();
+
+	// 両シーン共通の描画処理
+	rightCurtain_->Draw();
+	leftCurtain_->Draw();
 }
 
 void TitleScene::Finalize() {
@@ -130,6 +162,14 @@ void TitleScene::StateChange() {
 		titleState_ = t.right;
 	if (decideInput)
 		t.onDecide();
+
+	// 選択状態に応じてモデルの座標変更
+	if (prevState_ != titleState_) {
+		ApplyMenuLayout();
+	}
+
+	// タイトルの状態を記録
+	prevState_ = titleState_;
 }
 
 void TitleScene::Title1Update() {
@@ -142,7 +182,13 @@ void TitleScene::Title1Update() {
 
 void TitleScene::Title2Update() {
 	if (titleNumber_ == TitleNumber::TITLE2) {
-		stage1Model_->Update(timeManager_->GetDeltaTime());
+		for (auto& model : titleMenuModels_) {
+			model->Update(timeManager_->GetDeltaTime());
+		}
+
+		selectSprite_->Update();
+		selectIconSprite_->Update();
+		menuSprite_->Update();
 	}
 }
 
@@ -156,6 +202,50 @@ void TitleScene::Title1Draw() {
 
 void TitleScene::Title2Draw() {
 	if (titleNumber_ == TitleNumber::TITLE2) {
-		stage1Model_->Draw();
+		for (auto& model : titleMenuModels_) {
+			model->Draw();
+		}
 	}
+
+	selectSprite_->Draw();
+	selectIconSprite_->Draw();
+	menuSprite_->Draw();
+}
+
+void TitleScene::ApplyMenuLayout() {
+	const auto& layout = menuLayouts.at(titleState_);
+
+	for (size_t i = 0; i < titleMenuModels_.size(); i++) {
+		titleMenuModels_[i]->SetTranslate(layout.positions[i]);
+	}
+}
+
+void TitleScene::InitMenuLayouts() {
+	for (auto& [state, shift] : shiftTable) {
+
+		MenuLayout layout{};
+
+		for (int i = 0; i < positions_.size(); i++) {
+			layout.positions[i] = positions_[(i - shift + positions_.size()) % positions_.size()];
+		}
+
+		menuLayouts[state] = layout;
+	}
+}
+
+void TitleScene::CreateAndInitializeSprites() {
+	selectSprite_ = std::make_unique<Sprite>();
+	selectSprite_->Initialize(engineContext_, "resources/select.png");
+	selectSprite_->GetPosition() = {240.0f, 620.0f};
+	selectSprite_->SetSize({124.0f, 32.0f});
+
+	selectIconSprite_ = std::make_unique<Sprite>();
+	selectIconSprite_->Initialize(engineContext_, "resources/selectIcon.png");
+	selectIconSprite_->GetPosition() = {200.0f, 620.0f};
+	selectIconSprite_->SetSize({32.0f, 32.0f});
+
+	menuSprite_ = std::make_unique<Sprite>();
+	menuSprite_->Initialize(engineContext_, "resources/menu.png");
+	menuSprite_->GetPosition() = {200.0f, 50.0f};
+	menuSprite_->SetSize({256.0f, 64.0f});
 }

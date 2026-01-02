@@ -33,6 +33,9 @@ void TextureManager::Initialize(DirectXCommon* directXCommon, SrvManager* srvMan
 	LoadTexture("resources/HiyokoGlassIcon.png");
 	LoadTexture("resources/HiyokoIcon.png");
 	LoadTexture("resources/HiyokoStudentIcon.png");
+	LoadTexture("resources/select.png");
+	LoadTexture("resources/selectIcon.png");
+	LoadTexture("resources/menu.png");
 }
 
 void TextureManager::LoadTexture(const std::string& filePath) {

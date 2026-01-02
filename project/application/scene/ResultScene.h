@@ -1,6 +1,8 @@
 #pragma once
 #include "BaseScene.h"
 #include "Object3d.h"
+#include "ReStartModel.h"
+#include "ToTitleModel.h"
 #include <memory>
 
 class ResultScene : public BaseScene {
@@ -15,8 +17,8 @@ public:
 
 private:
 	// さいかいモデル
-	std::unique_ptr<Object3d> restartModel_;
+	std::unique_ptr<ReStartModel> restartModel_;
 
 	// たいとるへモデル
-	std::unique_ptr<Object3d> toTitleModel_;
+	std::unique_ptr<ToTitleModel> toTitleModel_;
 };

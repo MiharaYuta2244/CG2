@@ -10,7 +10,7 @@ void TitleText::Initialize(EngineContext* ctx) {
 	textModel_->SetScale({12.0f, 12.0f, 12.0f});
 	float posY = std::numbers::pi_v<float>;
 	textModel_->SetRotate({0.0f, posY, 0.0f});
-	textModel_->SetTranslate({20.0f, 8.0f, 0.0f});
+	textModel_->SetTranslate({19.0f, 8.0f, 0.0f});
 }
 
 void TitleText::Update(float deltaTime) {

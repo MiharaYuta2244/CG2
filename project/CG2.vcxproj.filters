@@ -258,7 +258,13 @@
     <ClCompile Include="application\Fruit\Orange\Orange.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
-    <ClCompile Include="application\StageModel\StageModel.cpp">
+    <ClCompile Include="application\TitleMenuModel\TitleMenuModel.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="application\ReStartModel\ReStartModel.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="application\ToTitleModel\ToTitleModel.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
   </ItemGroup>
@@ -548,7 +554,13 @@
     <ClInclude Include="application\Fruit\Orange\Orange.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
-    <ClInclude Include="application\StageModel\StageModel.h">
+    <ClInclude Include="application\TitleMenuModel\TitleMenuModel.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="application\ReStartModel\ReStartModel.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="application\ToTitleModel\ToTitleModel.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
   </ItemGroup>

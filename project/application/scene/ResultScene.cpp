@@ -11,25 +11,17 @@ void ResultScene::Initialize(EngineContext* ctx, DirectInput* keyboard, GamePad*
 	sceneManager_ = sceneManager;
 
 	// さいかいモデル
-	restartModel_ = std::make_unique<Object3d>();
+	restartModel_ = std::make_unique<ReStartModel>();
 	restartModel_->Initialize(engineContext_);
-	restartModel_->SetModel("saikai.obj");
-	restartModel_->SetTranslate({5.0f, 0.0f, 0.0f});
-	restartModel_->SetScale({5.0f, 5.0f, 5.0f});
-	restartModel_->SetRotate({0.0f, std::numbers::pi_v<float>, 0.0f});
 
 	// たいとるへモデル
-	toTitleModel_ = std::make_unique<Object3d>();
+	toTitleModel_ = std::make_unique<ToTitleModel>();
 	toTitleModel_->Initialize(engineContext_);
-	toTitleModel_->SetModel("ToTitle2.obj");
-	toTitleModel_->SetTranslate({35.0f, 0.0f, 0.0f});
-	toTitleModel_->SetScale({5.0f, 5.0f, 5.0f});
-	toTitleModel_->SetRotate({0.0f, std::numbers::pi_v<float>, 0.0f});
 }
 
 void ResultScene::Update() {
-	restartModel_->Update();
-	toTitleModel_->Update();
+	restartModel_->Update(timeManager_->GetDeltaTime());
+	toTitleModel_->Update(timeManager_->GetDeltaTime());
 
 	bool backInput = keyboard_->KeyTriggered(DIK_SPACE) || gamePad_->GetState().buttonsPressed.a;
 	if (backInput) {

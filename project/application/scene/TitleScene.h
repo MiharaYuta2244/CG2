@@ -4,8 +4,9 @@
 #include "Object3d.h"
 #include "Sprite.h"
 #include "StartModel.h"
+#include "TitleMenuModel.h"
 #include "TitleText.h"
-#include "StageModel.h"
+#include "BothCurtain.h"
 #include <array>
 #include <memory>
 
@@ -38,6 +39,15 @@ private:
 	// タイトル2の描画
 	void Title2Draw();
 
+	// 選択状態に応じてモデルの座標変更
+	void ApplyMenuLayout();
+
+	// menuLayoutsの初期化関数
+	void InitMenuLayouts();
+
+	// スプライトの生成&初期化
+	void CreateAndInitializeSprites();
+
 private:
 	enum class TitleState { START, END, BACK_SCENE, STAGE1, STAGE2, STAGE3, CHARACTER_SELECT };
 
@@ -47,6 +57,10 @@ private:
 		TitleState left;
 		TitleState right;
 		std::function<void()> onDecide;
+	};
+
+	struct MenuLayout {
+		std::array<Vector3, 5> positions;
 	};
 
 private:
@@ -60,7 +74,7 @@ private:
 	std::unique_ptr<EndModel> endModel_;
 
 	// ステージ1モデル
-	std::unique_ptr<StageModel> stage1Model_;
+	std::array<std::unique_ptr<TitleMenuModel>, 5> titleMenuModels_;
 
 	// タイトルの状態
 	TitleState titleState_ = TitleState::START;
@@ -68,6 +82,42 @@ private:
 	// タイトルシーン1か2か
 	TitleNumber titleNumber_ = TitleNumber::TITLE1;
 
+	// せんたく画像
+	std::unique_ptr<Sprite> selectSprite_;
+
+	// せんたくアイコン画像
+	std::unique_ptr<Sprite> selectIconSprite_;
+
+	// めにゅー画像
+	std::unique_ptr<Sprite> menuSprite_;
+
+	// 画面両端の幕
+	std::unique_ptr<BothCurtain> rightCurtain_;
+	std::unique_ptr<BothCurtain> leftCurtain_;
+
 	// キャラクターセレクト画面かどうか
 	bool isCharacterSelection_ = false;
+
+	// モデル座標格納用配列
+	std::array<Vector3, 5> positions_ = {
+	    Vector3{20.0f, 2.0f, 0.0f },
+        Vector3{40.0f, 2.0f, 20.0f},
+        Vector3{30.0f, 2.0f, 60.0f},
+        Vector3{10.0f, 2.0f, 60.0f},
+        Vector3{0.0f,  2.0f, 20.0f},
+	};
+
+	std::unordered_map<TitleState, int> shiftTable = {
+	    {TitleState::BACK_SCENE,       0},
+        {TitleState::STAGE1,           1},
+        {TitleState::STAGE2,           2},
+        {TitleState::STAGE3,           3},
+        {TitleState::CHARACTER_SELECT, 4},
+	};
+
+	// 5つのモデルの座標
+	std::unordered_map<TitleState, MenuLayout> menuLayouts;
+
+	// 1フレーム前のタイトルの状態
+	TitleState prevState_;
 };
