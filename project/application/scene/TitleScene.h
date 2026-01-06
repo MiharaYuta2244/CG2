@@ -171,4 +171,8 @@ private:
 	TitleNumber prevTitleNumber_;
 
 	bool menuSelected_=false;
+
+	// ルール
+	std::unique_ptr<Sprite> ruleSprite1_;
+	std::unique_ptr<Sprite> ruleSprite2_;
 };

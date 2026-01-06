@@ -25,6 +25,13 @@ public:
 	void SetScale(Vector3 scale) { transform_.scale = scale; }
 	void SetTransform(Transform transform) { transform_ = transform; }
 
+	// フルーツの色を変更
+	void SetFruitColor(Vector4 color) {
+		if (object3d_) {
+			object3d_->SetColor(color);
+		}
+	}
+
 protected:
 	std::unique_ptr<Object3d> object3d_ = nullptr; // モデル
 

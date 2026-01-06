@@ -24,6 +24,9 @@ public:
 	// HPを取得
 	int GetHP() const { return hp_; }
 
+	// ダメージ処理
+	void SubHP(int damage);
+
 private:
 	// 横移動
 	void HorizontalMove();
@@ -36,9 +39,6 @@ private:
 
 	// プレイヤーからヒップドロップを受けた時の処理
 	void HitPlayerHipDrop();
-
-	// ダメージ処理
-	void SubHP();
 
 	// 無敵状態フレームカウント
 	void FrameCountIsInvincible();
@@ -55,7 +55,7 @@ private:
 	Vector2 velocity_ = {10.0f, 0.0f};
 
 	// HP
-	const int kMaxHP = 3;
+	const int kMaxHP = 20;
 	int hp_ = kMaxHP;
 
 	// 経過時間

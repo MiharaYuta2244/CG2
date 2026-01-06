@@ -83,6 +83,15 @@ void TitleScene::Initialize(EngineContext* ctx, DirectInput* keyboard, GamePad* 
 	// スプライトの生成&初期化
 	CreateAndInitializeSprites();
 
+	ruleSprite1_ = std::make_unique<Sprite>();
+	ruleSprite1_->Initialize(engineContext_, "resources/rule1.png");
+	ruleSprite1_->GetPosition() = {200.0f, 30.0f};
+	ruleSprite1_->GetSize() = {275.0f, 35.0f};
+	ruleSprite2_ = std::make_unique<Sprite>();
+	ruleSprite2_->Initialize(engineContext_, "resources/rule2.png");
+	ruleSprite2_->GetPosition() = {200.0f, 65.0f};
+	ruleSprite2_->GetSize() = {555.0f, 35.0f};
+
 	// イージング初期化
 	for (auto& easing : easingMoves_) {
 		easing.isMoving = false;
@@ -296,6 +305,8 @@ void TitleScene::Title1Update() {
 		titleText_->Update(timeManager_->GetDeltaTime());
 		startModel_->Update(timeManager_->GetDeltaTime());
 		endModel_->Update(timeManager_->GetDeltaTime());
+		ruleSprite1_->Update();
+		ruleSprite2_->Update();
 	}
 }
 
@@ -325,6 +336,8 @@ void TitleScene::Title1Draw() {
 		titleText_->Draw();
 		startModel_->Draw();
 		endModel_->Draw();
+		ruleSprite1_->Draw();
+		ruleSprite2_->Draw();
 	}
 }
 
@@ -333,13 +346,12 @@ void TitleScene::Title2Draw() {
 		for (auto& model : titleMenuModels_) {
 			model->Draw();
 		}
+		menuBackSprite_->Draw();
+		selectBackSprite_->Draw();
+		selectSprite_->Draw();
+		selectIconSprite_->Draw();
+		menuSprite_->Draw();
 	}
-
-	menuBackSprite_->Draw();
-	selectBackSprite_->Draw();
-	selectSprite_->Draw();
-	selectIconSprite_->Draw();
-	menuSprite_->Draw();
 }
 
 void TitleScene::ApplyMenuLayout() {

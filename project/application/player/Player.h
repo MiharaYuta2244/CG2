@@ -31,10 +31,15 @@ public:
 	int GetIsHpSub() { return isHitEnemy_; }
 	bool GetIsInvincible() { return isInvincible_; }
 	bool GetIsHitEnemyHipDrop() { return isHitEnemyHipDrop_; }
+	int GetHipDropPowerLevel() const { return hipDropPowerLevel_; }
+	int GetHipDropDamage() const { return isHipDropDamage_; }
 
 	// HPを取得
 	int GetHP() const { return hp_; }
 	bool GetIsHipDrop() const { return isRotate_; }
+
+	// ヒップドロップパワーレベルを上昇
+	void IncrementHipDropPowerLevel();
 
 private:
 	enum class Direction {
@@ -138,4 +143,9 @@ private:
 
 	// コンテキスト構造体
 	EngineContext* ctx_;
+
+	// プレイヤーのヒップドロップパワー
+	int hipDropPowerLevel_ = 1;
+
+	bool isHipDropDamage_=false;
 };

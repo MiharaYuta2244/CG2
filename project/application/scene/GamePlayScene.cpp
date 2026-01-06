@@ -69,14 +69,30 @@ void GamePlayScene::Initialize(EngineContext* ctx, DirectInput* keyboard, GamePa
 		cloud->Initialize(engineContext_);
 	}
 
+	// 目標フルーツ背景スプライトの初期化
+	targetFruitBG_ = std::make_unique<Sprite>();
+	targetFruitBG_->Initialize(engineContext_, "resources/white.png");
+	targetFruitBG_->SetPosition({0.0f, 30.0f});
+	targetFruitBG_->SetSize({1280.0f, 80.0f});
+	targetFruitBG_->SetColor({0.2f, 0.2f, 0.2f, 0.5f});
+
+	// 初期フルーツ数設定
+	initialFruitCount_ = 3;
+
+	// 木のアニメーション用タイマー初期化
+	timer_ = 0.0f;
+
+	// 目標フルーツの初期化
+	GenerateTargetFruits();
+
 	// ゲームシーン開始
 	StartGameScene();
+
+	// BGM再生
+
 }
 
 void GamePlayScene::Update() {
-	// 一定時間おきにパワーアップアイテム生成
-	CreatePowerUpItem();
-
 	// 一定時間おきにフルーツ生成
 	CreateGrape();
 	CreateApple();
@@ -85,8 +101,10 @@ void GamePlayScene::Update() {
 	// 当たり判定
 	CollisionPlayerEnemy();
 	CollisionEnemyPlayerHipDrop();
-	CollisionPlayerPowerUpItem();
 	CollisionPlayerFruits();
+
+	// 目標フルーツの判定と更新
+	UpdateTargetFruits();
 
 	// プレイヤー更新
 	player_->Update(timeManager_->GetDeltaTime());
@@ -153,7 +171,11 @@ void GamePlayScene::Update() {
 		}
 	}
 
+	// 地形モデル
 	terrainModel_->Update();
+
+	// 目標フルーツ背景スプライト更新
+	targetFruitBG_->Update();
 
 	// カメラシェイク
 	ShakeCamera();
@@ -180,7 +202,7 @@ void GamePlayScene::Update() {
 
 		// 結果文字列をファイルに保存
 		SaveResultStatus(resultStatus);
-		sceneManager_->ChangeScene("Result");
+		RequestSceneChange("Result");
 	}
 
 #ifdef USE_IMGUI
@@ -225,11 +247,6 @@ void GamePlayScene::Draw() {
 	// フィールドモデル
 	// fieldModel_->Draw();
 
-	// パワーアップアイテム描画
-	/*for (auto& powerUpItem : powerUpItems_) {
-	    powerUpItem->Draw();
-	}*/
-
 	// 雲
 	for (auto& cloud : clouds_) {
 		cloud->Draw();
@@ -261,12 +278,18 @@ void GamePlayScene::Draw() {
 	particleDustPlayer_->Draw();
 	particleDustEnemy_->Draw();
 
+	// ヒップドロップゲージ
+	hipDropGauge_->Draw();
+
+	// 目標フルーツ背景スプライトの描画
+	targetFruitBG_->Draw();
+
+	// 目標フルーツの描画
+	DrawTargetFruits();
+
 	// 画面両端の幕
 	rightCurtain_->Draw();
 	leftCurtain_->Draw();
-
-	// ヒップドロップゲージ
-	hipDropGauge_->Draw();
 }
 
 void GamePlayScene::Finalize() {
@@ -274,7 +297,6 @@ void GamePlayScene::Finalize() {
 	map_.reset();
 	blocks_.clear();
 	enemy_.reset();
-	powerUpItems_.clear();
 	particleDustPlayer_.reset();
 	particleDustEnemy_.reset();
 	for (auto& tree : treeModels_) {
@@ -292,15 +314,11 @@ void GamePlayScene::StartGameScene() {
 
 	// プレイヤー初期化
 	player_->Initialize(engineContext_, keyboard_, gamePad_);
-	player_->SetModel("Hiyoko.obj");
+	player_->SetModel("HiyokoGlass.obj");
 
 	// 敵初期化
 	enemy_->Initialize(engineContext_);
 	enemy_->SetModel("sphere.obj");
-
-	// パワーアップアイテム初期化
-	powerUpItems_.clear();
-	powerUpItemCreateFrameCount_ = 0;
 
 	// オブジェクトの配置
 	SpawnObjectsByMapChip(mapLeftTop_);
@@ -346,28 +364,16 @@ void GamePlayScene::CollisionPlayerEnemy() {
 }
 
 void GamePlayScene::CollisionEnemyPlayerHipDrop() {
-	if (Collision::Intersect(player_->GetAABB(), enemy_->GetAABB())) {
+	if (Collision::Intersect(player_->GetAABB(), enemy_->GetAABB()) && player_->GetHipDropDamage()) {
 		enemy_->SetIsHitPlayerHipDrop(true);
 
 		if (!player_->GetIsHitEnemyHipDrop()) {
 			player_->SetIsHitEnemyHipDrop(true);
+			int damage = player_->GetHipDropPowerLevel();
+			enemy_->SubHP(damage);
 			StartShake(30, 0.5f);
 		}
 	}
-}
-
-void GamePlayScene::CollisionPlayerPowerUpItem() {
-	powerUpItems_.erase(
-	    std::remove_if(
-	        powerUpItems_.begin(), powerUpItems_.end(),
-	        [this](std::unique_ptr<PowerUpItem>& item) {
-		        if (Collision::Intersect(player_->GetAABB(), item->GetAABB())) {
-			        player_->SetIsPowerUp(true);
-			        return true;
-		        }
-		        return false;
-	        }),
-	    powerUpItems_.end());
 }
 
 void GamePlayScene::CollisionPlayerFruits() {
@@ -376,6 +382,16 @@ void GamePlayScene::CollisionPlayerFruits() {
 	        grapes_.begin(), grapes_.end(),
 	        [this](std::unique_ptr<Grape>& grape) {
 		        if (Collision::Intersect(player_->GetAABB(), grape->GetAABB())) {
+			        // 目標フルーツの中から未収集のブドウを探す
+			        for (auto& fruit : fruitOrder_) {
+				        if (fruit.fruitType == "grape" && !fruit.isCollected) {
+					        fruit.isCollected = true;
+					        collectedFruitCount_++;
+					        // ブドウの色を変更（例：グレー）
+					        fruit.sprite->SetColor({0.5f, 0.5f, 0.5f, 0.5f});
+					        break;
+				        }
+			        }
 			        player_->SetIsPowerUp(true);
 			        return true;
 		        }
@@ -388,6 +404,16 @@ void GamePlayScene::CollisionPlayerFruits() {
 	        apples_.begin(), apples_.end(),
 	        [this](std::unique_ptr<Apple>& apple) {
 		        if (Collision::Intersect(player_->GetAABB(), apple->GetAABB())) {
+			        // 目標フルーツの中から未収集のリンゴを探す
+			        for (auto& fruit : fruitOrder_) {
+				        if (fruit.fruitType == "apple" && !fruit.isCollected) {
+					        fruit.isCollected = true;
+					        collectedFruitCount_++;
+					        // リンゴの色を変更（例：グレー）
+					        fruit.sprite->SetColor({0.5f, 0.5f, 0.5f, 0.5f});
+					        break;
+				        }
+			        }
 			        player_->SetIsPowerUp(true);
 			        return true;
 		        }
@@ -400,6 +426,16 @@ void GamePlayScene::CollisionPlayerFruits() {
 	        oranges_.begin(), oranges_.end(),
 	        [this](std::unique_ptr<Orange>& orange) {
 		        if (Collision::Intersect(player_->GetAABB(), orange->GetAABB())) {
+			        // 目標フルーツの中から未収集のオレンジを探す
+			        for (auto& fruit : fruitOrder_) {
+				        if (fruit.fruitType == "orange" && !fruit.isCollected) {
+					        fruit.isCollected = true;
+					        collectedFruitCount_++;
+					        // オレンジの色を変更（例：グレー）
+					        fruit.sprite->SetColor({0.5f, 0.5f, 0.5f, 0.5f});
+					        break;
+				        }
+			        }
 			        player_->SetIsPowerUp(true);
 			        return true;
 		        }
@@ -408,94 +444,72 @@ void GamePlayScene::CollisionPlayerFruits() {
 	    oranges_.end());
 }
 
-void GamePlayScene::CreatePowerUpItem() {
-	if (powerUpItems_.size() >= kPowerUpItemCountMax)
-		return;
-
-	powerUpItemCreateFrameCount_++;
-
-	if (powerUpItemCreateFrameCount_ >= kPowerUpItemFrameCountMax) {
-		auto powerUpItem = std::make_unique<PowerUpItem>();
-		powerUpItem->Initialize(engineContext_);
-
-		Vector3 pos;
-		pos.x = RandomUtils::RangeFloat(2.0f, 30.0f);
-		pos.y = RandomUtils::RangeFloat(2.0f, 20.0f);
-		pos.z = 0.0f;
-
-		powerUpItem->SetTranslate(pos);
-		powerUpItems_.push_back(std::move(powerUpItem));
-
-		powerUpItemCreateFrameCount_ = 0;
-	}
-}
-
 void GamePlayScene::CreateGrape() {
-	if (grapes_.size() >= grapeGenarator_.kCount)
+	if (grapes_.size() >= grapeGenerator_.kCount)
 		return;
 
 	// 生成タイマーカウント
-	grapeGenarator_.generateTimer += timeManager_->GetDeltaTime();
+	grapeGenerator_.generateTimer += timeManager_->GetDeltaTime();
 
-	if (grapeGenarator_.generateTimer >= grapeGenarator_.kGenerateTimer) {
+	if (grapeGenerator_.generateTimer >= grapeGenerator_.kGenerateTimer) {
 		auto grape = std::make_unique<Grape>();
 		grape->Initialize(engineContext_);
 
 		Vector3 pos;
 		pos.x = RandomUtils::RangeFloat(2.0f, 30.0f);
-		pos.y = RandomUtils::RangeFloat(2.0f, 20.0f);
+		pos.y = RandomUtils::RangeFloat(2.0f, 10.0f);
 		pos.z = 0.0f;
 
 		grape->SetTranslate(pos);
 		grapes_.push_back(std::move(grape));
 
-		grapeGenarator_.generateTimer = 0.0f;
+		grapeGenerator_.generateTimer = 0.0f;
 	}
 }
 
 void GamePlayScene::CreateApple() {
-	if (grapes_.size() >= appleGenarator_.kCount)
+	if (grapes_.size() >= appleGenerator_.kCount)
 		return;
 
 	// 生成タイマーカウント
-	appleGenarator_.generateTimer += timeManager_->GetDeltaTime();
+	appleGenerator_.generateTimer += timeManager_->GetDeltaTime();
 
-	if (appleGenarator_.generateTimer >= appleGenarator_.kGenerateTimer) {
+	if (appleGenerator_.generateTimer >= appleGenerator_.kGenerateTimer) {
 		auto apple = std::make_unique<Apple>();
 		apple->Initialize(engineContext_);
 
 		Vector3 pos;
 		pos.x = RandomUtils::RangeFloat(2.0f, 30.0f);
-		pos.y = RandomUtils::RangeFloat(2.0f, 20.0f);
+		pos.y = RandomUtils::RangeFloat(2.0f, 10.0f);
 		pos.z = 0.0f;
 
 		apple->SetTranslate(pos);
 		apples_.push_back(std::move(apple));
 
-		appleGenarator_.generateTimer = 0.0f;
+		appleGenerator_.generateTimer = 0.0f;
 	}
 }
 
 void GamePlayScene::CreateOrange() {
-	if (grapes_.size() >= orangeGenarator_.kCount)
+	if (grapes_.size() >= orangeGenerator_.kCount)
 		return;
 
 	// 生成タイマーカウント
-	orangeGenarator_.generateTimer += timeManager_->GetDeltaTime();
+	orangeGenerator_.generateTimer += timeManager_->GetDeltaTime();
 
-	if (orangeGenarator_.generateTimer >= orangeGenarator_.kGenerateTimer) {
+	if (orangeGenerator_.generateTimer >= orangeGenerator_.kGenerateTimer) {
 		auto orange = std::make_unique<Orange>();
 		orange->Initialize(engineContext_);
 
 		Vector3 pos;
 		pos.x = RandomUtils::RangeFloat(2.0f, 30.0f);
-		pos.y = RandomUtils::RangeFloat(2.0f, 20.0f);
+		pos.y = RandomUtils::RangeFloat(2.0f, 10.0f);
 		pos.z = 0.0f;
 
 		orange->SetTranslate(pos);
 		oranges_.push_back(std::move(orange));
 
-		orangeGenarator_.generateTimer = 0.0f;
+		orangeGenerator_.generateTimer = 0.0f;
 	}
 }
 
@@ -532,5 +546,68 @@ void GamePlayScene::SaveResultStatus(const std::string& status) {
 	if (file.is_open()) {
 		file << status;
 		file.close();
+	}
+}
+
+void GamePlayScene::GenerateTargetFruits() {
+	fruitOrder_.clear();
+	collectedFruitCount_ = 0;
+
+	const std::vector<std::string> fruitTypes = {"grape", "apple", "orange"};
+
+	// initialFruitCount_個のランダムなフルーツを生成
+	for (int i = 0; i < initialFruitCount_; ++i) {
+		int randomIndex = RandomUtils::RangeInt(0, static_cast<int>(fruitTypes.size()) - 1);
+		std::string fruitType = fruitTypes[randomIndex];
+
+		auto newSprite = std::make_unique<Sprite>();
+		newSprite->Initialize(engineContext_, "resources/" + fruitType + ".png");
+		newSprite->SetSize({42.0f, 42.0f});
+		fruitOrder_.push_back({fruitType, false, std::move(newSprite)});
+	}
+}
+
+void GamePlayScene::DrawTargetFruits() {
+	// 画面上部にUIとして目標フルーツを表示
+	float startX = 640.0f - (fruitOrder_.size() - 2) * 21.0f;
+	float startY = 40.0f;
+	float spacing = 42.0f;
+
+	for (size_t i = 0; i < fruitOrder_.size(); ++i) {
+		auto& fruit = fruitOrder_[i];
+		auto& sprite = fruit.sprite;
+
+		sprite->SetPosition({startX + i * spacing, startY});
+
+		// 収集済みの場合は薄い色、未収集の場合は通常の色
+		if (fruit.isCollected) {
+			sprite->SetColor({0.5f, 0.5f, 0.5f, 0.5f}); // グレーアウト
+		} else {
+			sprite->SetColor({1.0f, 1.0f, 1.0f, 1.0f}); // 通常の色
+		}
+
+		sprite->Update();
+		sprite->Draw();
+	}
+}
+
+void GamePlayScene::UpdateTargetFruits() {
+	// すべてのフルーツが収集されたかチェック
+	bool allCollected = true;
+	for (const auto& fruit : fruitOrder_) {
+		if (!fruit.isCollected) {
+			allCollected = false;
+			break;
+		}
+	}
+
+	// すべて収集された場合、新しい目標を生成
+	if (allCollected && fruitOrder_.size() > 0) {
+		initialFruitCount_++; // 目標フルーツ数を増やす
+
+		initialFruitCount_ = std::min(initialFruitCount_, kMaxFruitCount_); // 最大数を超えないように制限
+
+		player_->IncrementHipDropPowerLevel(); // プレイヤーのヒップドロップパワーを上昇
+		GenerateTargetFruits();
 	}
 }

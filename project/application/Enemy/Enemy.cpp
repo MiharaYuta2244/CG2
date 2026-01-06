@@ -120,7 +120,7 @@ void Enemy::UpdateCollisionPos() {
 void Enemy::HitPlayerHipDrop() {
 	if (isHitPlayerHipDrop_ && !isInvincible_) {
 		// HP減算
-		SubHP();
+		SubHP(1); // ここでダメージ量を渡す
 
 		// 無敵フラグを立てる
 		isInvincible_ = true;
@@ -140,7 +140,7 @@ void Enemy::FrameCountIsInvincible() {
 	}
 }
 
-void Enemy::SubHP() {
+void Enemy::SubHP(int damage) {
 	// HP減算処理
-	hp_--;
+	hp_ -= damage;
 }

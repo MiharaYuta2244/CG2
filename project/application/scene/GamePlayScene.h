@@ -40,14 +40,8 @@ private:
 	// 当たり判定(Enemy, Player, ヒップドロップ)
 	void CollisionEnemyPlayerHipDrop();
 
-	// プレイヤーとパワーアップアイテムの当たり判定
-	void CollisionPlayerPowerUpItem();
-
 	// プレイヤーとフルーツの当たり判定
 	void CollisionPlayerFruits();
-
-	// パワーアップアイテムの生成
-	void CreatePowerUpItem();
 
 	// ブドウの生成
 	void CreateGrape();
@@ -57,6 +51,15 @@ private:
 
 	// オレンジの生成
 	void CreateOrange();
+
+	// 目標フルーツの生成
+	void GenerateTargetFruits();
+
+	// 目標フルーツの描画
+	void DrawTargetFruits();
+
+	// 目標フルーツの判定と更新
+	void UpdateTargetFruits();
 
 	// シェイク初期設定用
 	void StartShake(int frames, float magnitude);
@@ -82,6 +85,13 @@ private:
 		int kCount;
 	};
 
+	// 目標フルーツ構造体
+	struct TargetFruit {
+		std::string fruitType; // "Grape", "Apple", "Orange"
+		bool isCollected = false;
+		std::unique_ptr<Sprite> sprite; // 個別のスプライト
+	};
+
 private:
 	// プレイヤー
 	std::unique_ptr<Player> player_;
@@ -97,18 +107,6 @@ private:
 
 	// 敵
 	std::unique_ptr<Enemy> enemy_;
-
-	// プレイヤーのパワーアップアイテム
-	std::vector<std::unique_ptr<PowerUpItem>> powerUpItems_;
-
-	// パワーアップアイテム生成フレームカウント
-	int powerUpItemCreateFrameCount_ = 0;
-
-	// パワーアップアイテムが生成されるまでの最大フレームカウント
-	const int kPowerUpItemFrameCountMax = 60;
-
-	// パワーアップアイテムの画面上に存在できる最大数
-	const int kPowerUpItemCountMax = 5;
 
 	// 土埃パーティクル プレイヤー用
 	std::unique_ptr<Particle> particleDustPlayer_;
@@ -145,21 +143,21 @@ private:
 	std::vector<std::unique_ptr<Orange>> oranges_;
 
 	// ブドウの生成構造体
-	FruitGenerator grapeGenarator_ = {
+	FruitGenerator grapeGenerator_ = {
 	    .generateTimer = 0.0f,
 	    .kGenerateTimer = 1.0f,
 	    .kCount = 5,
 	};
 
 	// リンゴの生成構造体
-	FruitGenerator appleGenarator_ = {
+	FruitGenerator appleGenerator_ = {
 	    .generateTimer = 0.0f,
 	    .kGenerateTimer = 1.0f,
 	    .kCount = 5,
 	};
 
 	// オレンジの生成構造体
-	FruitGenerator orangeGenarator_ = {
+	FruitGenerator orangeGenerator_ = {
 	    .generateTimer = 0.0f,
 	    .kGenerateTimer = 1.0f,
 	    .kCount = 5,
@@ -176,4 +174,25 @@ private:
 	float t_ = 0.0f;
 	const float kTimer = 2.0f;
 	float timer_ = 0.0f;
+
+	// フルーツの画像集
+	std::array<std::unique_ptr<Sprite>,3> fruitSprites_;
+
+	// 目標フルーツ
+	std::unordered_map<std::string, Sprite*> fruitMap_;
+
+	// 目標配列（目標フルーツの可変長配列）
+	std::vector<TargetFruit> fruitOrder_;
+
+	// 初期フルーツ数
+	int initialFruitCount_ = 3;
+
+	// 収集済みフルーツ数
+	int collectedFruitCount_ = 0;
+
+	// 目標フルーツの背景
+	std::unique_ptr<Sprite> targetFruitBG_;
+
+	// 目標フルーツの最大数
+	const int kMaxFruitCount_= 10;
 };

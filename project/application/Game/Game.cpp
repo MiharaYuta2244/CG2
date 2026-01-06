@@ -18,7 +18,7 @@ void Game::Initialize() {
 	sceneManager_->AddScene("Result", std::make_unique<ResultScene>());
 
 	// 最初のシーンを初期化
-	sceneManager_->ChangeScene("Result");
+	sceneManager_->ChangeScene("Title");
 
 	// フェード用スプライト初期化
 	fadeSprite_ = std::make_unique<Sprite>();

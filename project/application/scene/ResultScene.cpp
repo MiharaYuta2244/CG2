@@ -58,11 +58,11 @@ void ResultScene::Update() {
 	}
 
 	if (decideInput && toTitleModel_->GetSelected()) {
-		sceneManager_->ChangeScene("Title");
+		RequestSceneChange("Title");
 	}
 
 	if (decideInput && restartModel_->GetSelected()) {
-		sceneManager_->ChangeScene("GamePlay");
+		RequestSceneChange("GamePlay");
 	}
 
 #ifdef USE_IMGUI

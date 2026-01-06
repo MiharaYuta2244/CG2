@@ -65,6 +65,12 @@ void Player::Update(float deltaTime) {
 	// 横移動
 	HorizontalMove();
 
+	if (transform_.translate.x >= 42.0f) {
+		transform_.translate.x = 42.0f;
+	} else if (transform_.translate.x <= -3.0f) {
+		transform_.translate.x = -3.0f;
+	}
+
 	// ヒップドロップ
 	HipDrop();
 
@@ -86,6 +92,7 @@ void Player::Update(float deltaTime) {
 		velocity_.y = 0.0f;
 		transform_.rotate.z = 0.0f;
 		isJump_ = false;
+		isHipDropDamage_ = false;
 	}
 
 	// 敵との当たり判定が取れた時にHP減算 & 無敵フラグを立てる
@@ -197,14 +204,13 @@ void Player::Jump() {
 }
 
 void Player::HipDrop() {
-	// どっちがいいかわからない!!!!!!!!!!!!
 	bool isHipDropInput = input_->KeyTriggered(DIK_SPACE) || gamePad_->GetState().buttonsPressed.a; // スペース
-	// bool isHipDropInput = input_->KeyDown(DIK_S) || gamePad_->GetState().axes.ly > 0.3f; // 下
 
 	// ジャンプ中であれば
 	if (isJump_ && isHipDropInput) {
 		isRotate_ = true;
 		velocity_.y = 0.0f;
+		isHipDropDamage_ = true;
 	}
 }
 
@@ -250,6 +256,9 @@ void Player::HitEnemy() {
 
 		// 無敵フラグを立てる
 		isInvincible_ = true;
+
+		// 当たり判定用ヒップドロップ判定フラグを下ろす
+		isHipDropDamage_ = false;
 	}
 }
 
@@ -283,6 +292,8 @@ void Player::AfterHipDrop() {
 		isHitEnemyHipDrop_ = false;
 	}
 }
+
+void Player::IncrementHipDropPowerLevel() { hipDropPowerLevel_ += 1; }
 
 Vector2 Player::ScreenToWorldPoint(Vector3 worldPosition, Vector2 margin) {
 	// ビューポートマトリックス
