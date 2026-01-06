@@ -9,12 +9,12 @@ void Enemy::Initialize(EngineContext* ctx) {
 
 	// Object3dの初期化
 	object3d_->Initialize(ctx_);
-	object3d_->SetColor({0.0f, 0.0f, 1.0f, 1.0f});
-	//object3d_->SetEnableLighting(false);
+	object3d_->SetColor({1.0f, 1.0f, 1.0f, 1.0f});
+	// object3d_->SetEnableLighting(false);
 
 	transform_.scale = {2.0f, 2.0f, 2.0f};
-	transform_.rotate = {0.0f, 0.0f, 0.0f};
-	transform_.translate = {50.0f, 1.0f, 0.0f};
+	transform_.rotate = {0.0f, std::numbers::pi_v<float>, 0.0f};
+	transform_.translate = {50.0f, -1.0f, 0.0f};
 	size_ = {1.0f, 1.0f, 1.0f};
 	collisionSize = {1.0f, 1.0f, 1.0f};
 	isActive_ = true;
@@ -61,7 +61,7 @@ void Enemy::Update(float deltaTime) {
 	hpGauge_->Update();
 }
 
-void Enemy::Draw() { 
+void Enemy::Draw() {
 	// 無敵状態時に点滅
 	if (invincibleFrameCount_ % 2 == 0) {
 		object3d_->Draw();
@@ -120,7 +120,7 @@ void Enemy::UpdateCollisionPos() {
 void Enemy::HitPlayerHipDrop() {
 	if (isHitPlayerHipDrop_ && !isInvincible_) {
 		// HP減算
-		SubHP(1); // ここでダメージ量を渡す
+		// SubHP(1); // ここでダメージ量を渡す
 
 		// 無敵フラグを立てる
 		isInvincible_ = true;
@@ -134,7 +134,7 @@ void Enemy::FrameCountIsInvincible() {
 		// 無敵時間の上限に達したら
 		if (invincibleFrameCount_ >= kInvincibleFrame_) {
 			isHitPlayerHipDrop_ = false; // プレイヤーからヒップドロップを受けた時に立つフラグを下ろす
-			isInvincible_ = false; // 無敵フラグを下ろす
+			isInvincible_ = false;       // 無敵フラグを下ろす
 			invincibleFrameCount_ = 0;
 		}
 	}
@@ -143,4 +143,6 @@ void Enemy::FrameCountIsInvincible() {
 void Enemy::SubHP(int damage) {
 	// HP減算処理
 	hp_ -= damage;
+
+	hp_ = std::max(hp_, 0);
 }

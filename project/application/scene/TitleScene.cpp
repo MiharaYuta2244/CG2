@@ -518,6 +518,7 @@ void TitleScene::UpdateMoveRotateY(EasingMoveRotate& move, Transform& transform,
 			RequestSceneChange("GamePlay"); // ステージ3へ
 			break;
 		case TitleState::CHARACTER_SELECT:
+			RequestSceneChange("GamePlay"); // ステージ1へ
 			isCharacterSelection_ = true; // キャラクターセレクト画面へ
 			break;
 		}

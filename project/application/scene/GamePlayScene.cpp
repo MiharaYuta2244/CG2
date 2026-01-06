@@ -374,7 +374,7 @@ void GamePlayScene::StartGameScene() {
 
 	// 敵初期化
 	enemy_->Initialize(engineContext_);
-	enemy_->SetModel("sphere.obj");
+	enemy_->SetModel("enemy.obj");
 
 	// オブジェクトの配置
 	SpawnObjectsByMapChip(mapLeftTop_);
