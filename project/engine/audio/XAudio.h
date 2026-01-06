@@ -20,7 +20,7 @@ class XAudio {
 public:
 	~XAudio();
 	void Initialize();
-	void SoundsAllLoad();
+	void SoundsAllLoad(const std::string& filename);
 	void SoundPlayWave();
 
 private:

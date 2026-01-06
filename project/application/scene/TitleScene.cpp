@@ -14,6 +14,11 @@ void TitleScene::Initialize(EngineContext* ctx, DirectInput* keyboard, GamePad* 
 	timeManager_ = timeManager;
 	sceneManager_ = sceneManager;
 
+	audio_ = std::make_unique<XAudio>();
+	audio_->Initialize();
+	audio_->SoundsAllLoad("resources/TitleScene.mp3");
+	audio_->SoundPlayWave();
+
 	debugCamera_->SetTranslation({19.45f, 28.0f, -75.0f});
 	debugCamera_->SetRotate({0.0f, 0.0f, 0.2f});
 
@@ -206,6 +211,7 @@ void TitleScene::Finalize() {
 	titleText_.reset();
 	startModel_.reset();
 	endModel_.reset();
+	audio_->~XAudio();
 }
 
 void TitleScene::ChangeScene() {

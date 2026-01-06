@@ -18,6 +18,11 @@ void GamePlayScene::Initialize(EngineContext* ctx, DirectInput* keyboard, GamePa
 	enemy_ = std::make_unique<Enemy>();
 	map_ = std::make_unique<Map>();
 
+	audio_ = std::make_unique<XAudio>();
+	audio_->Initialize();
+	audio_->SoundsAllLoad("resources/GameScene.mp3");
+	audio_->SoundPlayWave();
+
 	// 土埃パーティクル プレイヤー用
 	particleDustPlayer_ = std::make_unique<Particle>();
 	particleDustPlayer_->Initialize(engineContext_, {30.0f, 10.0f, 0.0f}, "resources/smoke.png", 3, "Dust");
@@ -353,6 +358,7 @@ void GamePlayScene::Finalize() {
 		tree.reset();
 	}
 	terrainModel_.reset();
+	audio_->~XAudio();
 }
 
 void GamePlayScene::StartGameScene() {

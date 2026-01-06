@@ -13,6 +13,7 @@
 #include "PowerUpItem.h"
 #include "Sprite.h"
 #include "Cloud.h"
+#include "XAudio.h"
 #include <array>
 #include <memory>
 #include <vector>
@@ -204,4 +205,6 @@ private:
 
 	// プレイヤーのヒップドロップパワースプライト
 	std::unique_ptr<Sprite> hipDropPowerSprite_;
+
+	std::unique_ptr<XAudio> audio_;
 };

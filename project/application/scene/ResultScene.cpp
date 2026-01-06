@@ -11,6 +11,11 @@ void ResultScene::Initialize(EngineContext* ctx, DirectInput* keyboard, GamePad*
 	timeManager_ = timeManager;
 	sceneManager_ = sceneManager;
 
+	audio_ = std::make_unique<XAudio>();
+	audio_->Initialize();
+	audio_->SoundsAllLoad("resources/ResultScene.mp3");
+	audio_->SoundPlayWave();
+
 	// さいかいモデル
 	restartModel_ = std::make_unique<ReStartModel>();
 	restartModel_->Initialize(engineContext_);
@@ -87,6 +92,7 @@ void ResultScene::Draw() {
 void ResultScene::Finalize() {
 	restartModel_.reset();
 	toTitleModel_.reset();
+	audio_->~XAudio();
 }
 
 std::string ResultScene::LoadResultStatus() {

@@ -5,6 +5,7 @@
 #include "ToTitleModel.h"
 #include "BothCurtain.h"
 #include "ResultModel.h"
+#include "XAudio.h"
 #include <memory>
 
 class ResultScene : public BaseScene {
@@ -34,4 +35,6 @@ private:
 
 	// リザルトモデル
 	std::unique_ptr<ResultModel> resultModel_;
+
+	std::unique_ptr<XAudio> audio_;
 };

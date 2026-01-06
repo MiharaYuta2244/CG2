@@ -7,6 +7,7 @@
 #include "TitleMenuModel.h"
 #include "TitleText.h"
 #include "BothCurtain.h"
+#include "XAudio.h"
 #include <array>
 #include <memory>
 
@@ -175,4 +176,6 @@ private:
 	// ルール
 	std::unique_ptr<Sprite> ruleSprite1_;
 	std::unique_ptr<Sprite> ruleSprite2_;
+
+	std::unique_ptr<XAudio> audio_;
 };

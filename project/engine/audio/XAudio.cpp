@@ -36,7 +36,7 @@ void XAudio::Initialize() {
 	assert(SUCCEEDED(result));
 }
 
-void XAudio::SoundsAllLoad() { SoundLoadFile("resources/Test.mp3"); }
+void XAudio::SoundsAllLoad(const std::string& filename) { SoundLoadFile(filename); }
 
 void XAudio::SoundLoadFile(const std::string& filename) {
 	// フルパスをワイド文字列に変換
