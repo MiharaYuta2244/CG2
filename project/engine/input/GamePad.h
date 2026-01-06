@@ -18,7 +18,7 @@ struct GamepadButtons {
 struct GamepadState {
 	bool connected = false;
 	GamepadButtons buttons{};
-	GamepadButtons buttonsPressed{};  // 立ち上がり
+	GamepadButtons buttonsPressed{};  // 立ち上がり 
 	GamepadButtons buttonsReleased{}; // 立ち下がり
 	GamepadAxes axes{};
 };

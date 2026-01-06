@@ -22,7 +22,7 @@ GamePad::~GamePad() {
 }
 
 float GamePad::NormalizeThumb(SHORT v, SHORT deadzone) {
-	// deadzoneの外だけを[-1,1]に再マップ
+	// deadzoneの外だけを[-1,1]に再マップ 
 	int sv = (int)v;
 	int dz = (int)deadzone;
 	if (std::abs(sv) <= dz)
