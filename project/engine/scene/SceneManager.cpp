@@ -103,6 +103,8 @@ void SceneManager::AllModelLoad() {
 	engineContext_->modelManager->LoadModel("orange.obj");
 	engineContext_->modelManager->LoadModel("return.obj");
 	engineContext_->modelManager->LoadModel("stage1.obj");
+	engineContext_->modelManager->LoadModel("stage2.obj");
+	engineContext_->modelManager->LoadModel("stage3.obj");
 	engineContext_->modelManager->LoadModel("charaSelect.obj");
 	engineContext_->modelManager->LoadModel("Cloud2.obj");
 	engineContext_->modelManager->LoadModel("StageClear.obj");

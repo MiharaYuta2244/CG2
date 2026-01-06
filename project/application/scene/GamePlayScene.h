@@ -76,9 +76,9 @@ private:
 #endif
 
 private:
-	struct FruitGenarator {
-		float genarateTimer;
-		const float kGenarateTimer;
+	struct FruitGenerator {
+		float generateTimer;
+		const float kGenerateTimer;
 		int kCount;
 	};
 
@@ -145,23 +145,23 @@ private:
 	std::vector<std::unique_ptr<Orange>> oranges_;
 
 	// ブドウの生成構造体
-	FruitGenarator grapeGenarator_ = {
-	    .genarateTimer = 0.0f,
-	    .kGenarateTimer = 1.0f,
+	FruitGenerator grapeGenarator_ = {
+	    .generateTimer = 0.0f,
+	    .kGenerateTimer = 1.0f,
 	    .kCount = 5,
 	};
 
 	// リンゴの生成構造体
-	FruitGenarator appleGenarator_ = {
-	    .genarateTimer = 0.0f,
-	    .kGenarateTimer = 1.0f,
+	FruitGenerator appleGenarator_ = {
+	    .generateTimer = 0.0f,
+	    .kGenerateTimer = 1.0f,
 	    .kCount = 5,
 	};
 
 	// オレンジの生成構造体
-	FruitGenarator orangeGenarator_ = {
-	    .genarateTimer = 0.0f,
-	    .kGenarateTimer = 1.0f,
+	FruitGenerator orangeGenarator_ = {
+	    .generateTimer = 0.0f,
+	    .kGenerateTimer = 1.0f,
 	    .kCount = 5,
 	};
 

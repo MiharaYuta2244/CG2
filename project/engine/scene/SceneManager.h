@@ -21,6 +21,11 @@ public:
 	// 現在のシーンを取得
 	BaseScene* GetCurrentScene() const { return currentScene_; }
 
+	// 要求されているシーン名を取得
+	std::string GetRequestedSceneName() const { return requestedSceneName_; }
+
+	void SetRequestedSceneName(const std::string& sceneName) { requestedSceneName_ = sceneName; }
+
 	// 現在のシーン名を取得
 	const std::string& GetCurrentSceneName() const { return currentSceneName_; }
 
@@ -45,6 +50,9 @@ private:
 
 	// 現在のシーン名
 	std::string currentSceneName_;
+
+	// リクエストされたシーン名
+	std::string requestedSceneName_;
 
 	// 次のシーン名（遅延切り替え用）
 	std::string nextSceneName_;

@@ -34,6 +34,7 @@ void DebugCamera::SetRotate(const Vector3& rotate) {
 }
 
 void DebugCamera::Update(const DirectInput& input, const GamePad& gamePad) {
+#ifdef _DEBUG
 	// フリー回転
 	if (input.MouseButtonDown(1)) {
 		float dx = input.GetMouseDeltaX() * 0.001f;
@@ -91,6 +92,7 @@ void DebugCamera::Update(const DirectInput& input, const GamePad& gamePad) {
 		pivot_ = MathUtility::Add(pivot_, world);
 	}
 
+#endif
 	UpdateViewMatrix();
 }
 

@@ -169,4 +169,6 @@ private:
 
 	// 1フレーム前のタイトル番号
 	TitleNumber prevTitleNumber_;
+
+	bool menuSelected_=false;
 };

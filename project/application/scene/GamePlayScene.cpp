@@ -435,9 +435,9 @@ void GamePlayScene::CreateGrape() {
 		return;
 
 	// 生成タイマーカウント
-	grapeGenarator_.genarateTimer += timeManager_->GetDeltaTime();
+	grapeGenarator_.generateTimer += timeManager_->GetDeltaTime();
 
-	if (grapeGenarator_.genarateTimer >= grapeGenarator_.kGenarateTimer) {
+	if (grapeGenarator_.generateTimer >= grapeGenarator_.kGenerateTimer) {
 		auto grape = std::make_unique<Grape>();
 		grape->Initialize(engineContext_);
 
@@ -449,7 +449,7 @@ void GamePlayScene::CreateGrape() {
 		grape->SetTranslate(pos);
 		grapes_.push_back(std::move(grape));
 
-		grapeGenarator_.genarateTimer = 0.0f;
+		grapeGenarator_.generateTimer = 0.0f;
 	}
 }
 
@@ -458,9 +458,9 @@ void GamePlayScene::CreateApple() {
 		return;
 
 	// 生成タイマーカウント
-	appleGenarator_.genarateTimer += timeManager_->GetDeltaTime();
+	appleGenarator_.generateTimer += timeManager_->GetDeltaTime();
 
-	if (appleGenarator_.genarateTimer >= appleGenarator_.kGenarateTimer) {
+	if (appleGenarator_.generateTimer >= appleGenarator_.kGenerateTimer) {
 		auto apple = std::make_unique<Apple>();
 		apple->Initialize(engineContext_);
 
@@ -472,7 +472,7 @@ void GamePlayScene::CreateApple() {
 		apple->SetTranslate(pos);
 		apples_.push_back(std::move(apple));
 
-		appleGenarator_.genarateTimer = 0.0f;
+		appleGenarator_.generateTimer = 0.0f;
 	}
 }
 
@@ -481,9 +481,9 @@ void GamePlayScene::CreateOrange() {
 		return;
 
 	// 生成タイマーカウント
-	orangeGenarator_.genarateTimer += timeManager_->GetDeltaTime();
+	orangeGenarator_.generateTimer += timeManager_->GetDeltaTime();
 
-	if (orangeGenarator_.genarateTimer >= orangeGenarator_.kGenarateTimer) {
+	if (orangeGenarator_.generateTimer >= orangeGenarator_.kGenerateTimer) {
 		auto orange = std::make_unique<Orange>();
 		orange->Initialize(engineContext_);
 
@@ -495,7 +495,7 @@ void GamePlayScene::CreateOrange() {
 		orange->SetTranslate(pos);
 		oranges_.push_back(std::move(orange));
 
-		orangeGenarator_.genarateTimer = 0.0f;
+		orangeGenarator_.generateTimer = 0.0f;
 	}
 }
 

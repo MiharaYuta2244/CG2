@@ -1,7 +1,7 @@
 #include "Game.h"
-#include "TitleScene.h"
 #include "GamePlayScene.h"
 #include "ResultScene.h"
+#include "TitleScene.h"
 #include <algorithm>
 #include <numbers>
 
@@ -36,12 +36,15 @@ void Game::Update() {
 	// 基底クラスの更新処理
 	Framework::Update();
 
-	// シーンの切り替わりを検知してフェード処理を開始
-	const std::string& currentSceneName = sceneManager_->GetCurrentSceneName();
-	if (lastSceneName_ != currentSceneName && fadeState_ == FadeState::None) {
+	if (sceneManager_->GetRequestedSceneName() != "") {
+		requestedSceneName_ = sceneManager_->GetRequestedSceneName();
+		sceneManager_->SetRequestedSceneName("");
+	}
+
+	if (requestedSceneName_ != "" && fadeState_ == FadeState::None) {
+		// シーン切り替え要求があり、フェード中でなければフェードアウト開始
 		fadeState_ = FadeState::FadeOut;
 		fadeTimer_ = 0.0f;
-		lastSceneName_ = currentSceneName;
 	}
 
 	// フェード更新（優先して処理）
@@ -54,7 +57,22 @@ void Game::Update() {
 			// フェードアウト進行（透明->不透明）
 			fadeSprite_->SetColor({0.0f, 0.0f, 0.0f, t});
 			if (t >= 1.0f) {
-				// フェードアウト完了 → フェードインに移行
+				// フェードアウト完了 → シーン切り替え
+				fadeState_ = FadeState::WaitingForSceneChange;
+				fadeTimer_ = 0.0f;
+				isSceneChangeRequested_ = true;
+			}
+		} else if (fadeState_ == FadeState::WaitingForSceneChange) {
+			// シーン切り替えを実行
+			if (isSceneChangeRequested_) {
+				sceneManager_->ChangeScene(requestedSceneName_);
+				isSceneChangeRequested_ = false;
+				requestedSceneName_ = "";
+			}
+			// シーン切り替え完了後、フェードインへ移行
+			const std::string& currentSceneName = sceneManager_->GetCurrentSceneName();
+			if (lastSceneName_ != currentSceneName) {
+				lastSceneName_ = currentSceneName;
 				fadeState_ = FadeState::FadeIn;
 				fadeTimer_ = 0.0f;
 			}

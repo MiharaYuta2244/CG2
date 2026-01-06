@@ -1,9 +1,9 @@
 #pragma once
-#include "EngineContext.h"
-#include "DirectInput.h"
-#include "GamePad.h"
-#include "DeltaTime.h"
 #include "DebugCamera.h"
+#include "DeltaTime.h"
+#include "DirectInput.h"
+#include "EngineContext.h"
+#include "GamePad.h"
 #include <memory>
 
 class SceneManager;
@@ -23,6 +23,8 @@ public:
 
 	// シーン終了処理
 	virtual void Finalize() = 0;
+
+	virtual void RequestSceneChange(const std::string& sceneName);
 
 protected:
 	EngineContext* engineContext_ = nullptr;

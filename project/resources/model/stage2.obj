@@ -4,7 +4,7 @@
 o 
 
 # material
-mtllib stage1.mtl
+mtllib stage2.mtl
 usemtl palette
 
 # normals
@@ -17,7 +17,7 @@ vn 0 1 0
 
 # texcoords
 vt 0.00195312 0.5
-vt 0.337891 0.5
+vt 0.361328 0.5
 vt 0.365234 0.5
 vt 0.595703 0.5
 

@@ -162,6 +162,7 @@ copy "$(windowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="application\BothCurtain\BothCurtain.cpp" />
     <ClCompile Include="application\EndModel\EndModel.cpp" />
     <ClCompile Include="application\Cloud\Cloud.cpp" />
+    <ClCompile Include="engine\scene\BaseScene.cpp" />
     <ClCompile Include="engine\scene\SceneManager.cpp" />
     <ClCompile Include="engine\base\utility\easing\Easing.cpp" />
     <ClCompile Include="engine\3d\modules\DustModule.cpp" />
@@ -239,6 +240,8 @@ copy "$(windowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="application\ReStartModel\ReStartModel.cpp" />
     <ClCompile Include="application\ToTitleModel\ToTitleModel.cpp" />
     <ClCompile Include="application\ResultModel\ResultModel.cpp" />
+    <ClCompile Include="application\scene\Stage2.cpp" />
+    <ClCompile Include="application\scene\Stage3.cpp" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="resources\shaders\Object3d.PS.hlsl">
@@ -387,6 +390,8 @@ copy "$(windowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="application\ReStartModel\ReStartModel.h" />
     <ClInclude Include="application\ToTitleModel\ToTitleModel.h" />
     <ClInclude Include="application\ResultModel\ResultModel.h" />
+    <ClInclude Include="application\scene\Stage2.h" />
+    <ClInclude Include="application\scene\Stage3.h" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="externals\imgui\LICENSE.txt" />

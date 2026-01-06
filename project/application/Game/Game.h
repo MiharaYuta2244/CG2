@@ -19,7 +19,8 @@ private:
 	enum class FadeState {
 		None = 0,
 		FadeOut,
-		FadeIn,
+		FadeIn, 
+		WaitingForSceneChange,
 	};
 
 	// フェード用スプライト
@@ -35,4 +36,8 @@ private:
 
 	// 現在のシーン名を記録（変更検知用）
 	std::string lastSceneName_;
+
+	// シーン切り替え要求
+	std::string requestedSceneName_;
+	bool isSceneChangeRequested_ = false;
 };

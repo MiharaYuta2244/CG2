@@ -38,6 +38,26 @@ void TitleScene::Initialize(EngineContext* ctx, DirectInput* keyboard, GamePad* 
 	// menuLayoutsの初期化
 	InitMenuLayouts();
 
+	// キャラクターセレクト画面かどうか
+	isCharacterSelection_ = false;
+
+	// モデル座標格納用配列
+	positions_ = {
+	    Vector3{20.0f, 2.0f, 0.0f },
+        Vector3{40.0f, 2.0f, 20.0f},
+        Vector3{30.0f, 2.0f, 60.0f},
+        Vector3{10.0f, 2.0f, 60.0f},
+        Vector3{0.0f,  2.0f, 20.0f},
+	};
+
+	shiftTable = {
+	    {TitleState::BACK_SCENE,       0},
+        {TitleState::STAGE1,           1},
+        {TitleState::STAGE2,           2},
+        {TitleState::STAGE3,           3},
+        {TitleState::CHARACTER_SELECT, 4},
+	};
+
 	// タイトルメニューモデル
 	for (size_t i = 0; i < titleMenuModels_.size(); i++) {
 		titleMenuModels_[i] = std::make_unique<TitleMenuModel>();
@@ -47,8 +67,8 @@ void TitleScene::Initialize(EngineContext* ctx, DirectInput* keyboard, GamePad* 
 	// 読み込むモデル
 	titleMenuModels_[0]->SetModel("return.obj");
 	titleMenuModels_[1]->SetModel("stage1.obj");
-	titleMenuModels_[2]->SetModel("stage1.obj");
-	titleMenuModels_[3]->SetModel("stage1.obj");
+	titleMenuModels_[2]->SetModel("stage2.obj");
+	titleMenuModels_[3]->SetModel("stage3.obj");
 	titleMenuModels_[4]->SetModel("charaSelect.obj");
 
 	// ひとつだけ選択状態にする
@@ -72,12 +92,16 @@ void TitleScene::Initialize(EngineContext* ctx, DirectInput* keyboard, GamePad* 
 	for (auto& easing : easingMoveRotates_) {
 		easing.isActive = false;
 	}
+
+	menuSelected_ = false;
 }
 
 void TitleScene::Update() {
-	if (prevState_ != titleState_) {
-		for (auto& model : titleMenuModels_) {
-			model->SetRotate({0.0f, std::numbers::pi_v<float>, 0.0f});
+	for (int i = 0; i < easingMoveRotates_.size(); i++) {
+		if (!easingMoveRotates_[i].isActive) {
+			for (auto& model : titleMenuModels_) {
+				model->SetRotate({0.0f, std::numbers::pi_v<float>, 0.0f});
+			}
 		}
 	}
 
@@ -107,7 +131,7 @@ void TitleScene::Update() {
 	ChangeScene();
 
 	// タイトル番号の記録
-	prevTitleNumber_=titleNumber_;
+	prevTitleNumber_ = titleNumber_;
 
 #ifdef USE_IMGUI
 	for (auto& model : titleMenuModels_) {
@@ -190,25 +214,48 @@ void TitleScene::StateChange() {
 	      TitleState::STAGE1,           // right
 	      [this]() {                    // decide
 		      OnMenuDecide();
-	      }}	                                                                                                       },
-	    {TitleState::STAGE1,           {TitleState::BACK_SCENE, TitleState::STAGE2, [this]() { OnMenuDecide(); }}      }, // ステージ1へ
-	    {TitleState::STAGE2,           {TitleState::STAGE1, TitleState::STAGE3, [this]() { OnMenuDecide(); }}          }, // ステージ2へ
-	    {TitleState::STAGE3,           {TitleState::STAGE2, TitleState::CHARACTER_SELECT, [this]() { OnMenuDecide(); }}}, // ステージ3へ
-	    {TitleState::CHARACTER_SELECT, {TitleState::STAGE3, TitleState::BACK_SCENE, [this]() { OnMenuDecide(); }}      }, // キャラクターセレクトへ
+		      menuSelected_ = true;
+	      }}},
+	    {TitleState::STAGE1,
+	     {TitleState::BACK_SCENE, TitleState::STAGE2,
+	      [this]() {
+		      OnMenuDecide();
+		      menuSelected_ = true;
+	      }}}, // ステージ1へ
+	    {TitleState::STAGE2,
+	     {TitleState::STAGE1, TitleState::STAGE3,
+	      [this]() {
+		      OnMenuDecide();
+		      menuSelected_ = true;
+	      }}}, // ステージ2へ
+	    {TitleState::STAGE3,
+	     {TitleState::STAGE2, TitleState::CHARACTER_SELECT,
+	      [this]() {
+		      OnMenuDecide();
+		      menuSelected_ = true;
+	      }}}, // ステージ3へ
+	    {TitleState::CHARACTER_SELECT,
+	     {TitleState::STAGE3, TitleState::BACK_SCENE,
+	      [this]() {
+		      OnMenuDecide();
+		      menuSelected_ = true;
+	      }}}, // キャラクターセレクトへ
 	};
 
-	const auto& t = transitions.at(titleState_);
+	if (!menuSelected_) {
+		const auto& t = transitions.at(titleState_);
 
-	if (leftInput)
-		titleState_ = t.left;
-	if (rightInput)
-		titleState_ = t.right;
-	if (decideInput)
-		t.onDecide();
+		if (leftInput)
+			titleState_ = t.left;
+		if (rightInput)
+			titleState_ = t.right;
+		if (decideInput)
+			t.onDecide();
 
-	// 選択状態に応じてモデルの座標変更
-	if (prevState_ != titleState_ && titleNumber_ == TitleNumber::TITLE2) {
-		ApplyMenuLayout();
+		// 選択状態に応じてモデルの座標変更
+		if (prevState_ != titleState_ && titleNumber_ == TitleNumber::TITLE2) {
+			ApplyMenuLayout();
+		}
 	}
 
 	// タイトルの状態を記録
@@ -224,11 +271,11 @@ void TitleScene::OnMenuDecide() {
 
 	// 画面外の目標座標（左右で分け、円形に配置）
 	std::array<Vector3, 5> offscreenPositions = {
-	    Vector3{-50.0f, 2.0f, 30.0f }, // 左奥
-	    Vector3{90.0f,  2.0f, 30.0f }, // 右奥
-	    Vector3{70.0f,  2.0f, 30.0f }, // 右奥
-	    Vector3{20.0f,  2.0f, -50.0f}, // 手前
-	    Vector3{50.0f,  2.0f, -30.0f}, // 手前右
+	    Vector3{-50.0f, 2.0f,  30.0f }, // 左奥
+	    Vector3{90.0f,  2.0f,  30.0f }, // 右奥
+	    Vector3{20.0f,  40.0f, 0.0f  }, // 上
+	    Vector3{20.0f,  2.0f,  -50.0f}, // 手前                                                                                                          
+	    Vector3{50.0f,  2.0f,  -30.0f}, // 手前右
 	};
 
 	// 各モデルのイージング移動と回転を開始
@@ -384,9 +431,9 @@ void TitleScene::UpdateMoveRotateY(EasingMoveRotate& move, Transform& transform,
 
 	// Y軸回転補間（最短回転）
 	float deltaYaw = move.targetYaw - move.startYaw;
-	while (deltaYaw > std::numbers::pi_v<float>)
+	while (deltaYaw > std::numbers::pi_v<float> * 2.0f)
 		deltaYaw -= std::numbers::pi_v<float> * 2.0f;
-	while (deltaYaw < -std::numbers::pi_v<float>)
+	while (deltaYaw < -std::numbers::pi_v<float> * 2.0f)
 		deltaYaw += std::numbers::pi_v<float> * 2.0f;
 
 	// 追加回転数
@@ -406,15 +453,16 @@ void TitleScene::UpdateMoveRotateY(EasingMoveRotate& move, Transform& transform,
 			keyboard_->Reset();                 // 入力状態をリセット
 			titleNumber_ = TitleNumber::TITLE1; // タイトル番号を元に戻す
 			titleState_ = TitleState::START;    // タイトルの状態も初期状態元に戻す
+			menuSelected_ = false;
 			break;
 		case TitleState::STAGE1:
-			sceneManager_->ChangeScene("GamePlay"); // ステージ1へ
+			RequestSceneChange("GamePlay"); // ステージ1へ
 			break;
 		case TitleState::STAGE2:
-			sceneManager_->ChangeScene("GamePlay"); // ステージ2へ
+			RequestSceneChange("GamePlay"); // ステージ2へ
 			break;
 		case TitleState::STAGE3:
-			sceneManager_->ChangeScene("GamePlay"); // ステージ3へ
+			RequestSceneChange("GamePlay"); // ステージ3へ
 			break;
 		case TitleState::CHARACTER_SELECT:
 			isCharacterSelection_ = true; // キャラクターセレクト画面へ
