@@ -90,7 +90,6 @@ void SceneManager::AllModelLoad() {
 	engineContext_->modelManager->LoadModel("HiyokoGlass.obj");
 	engineContext_->modelManager->LoadModel("HiyokoStudent.obj");
 	engineContext_->modelManager->LoadModel("HiyokoAfro.obj");
-	engineContext_->modelManager->LoadModel("Title.obj");
 	engineContext_->modelManager->LoadModel("HiyokoPropeller.obj");
 	engineContext_->modelManager->LoadModel("ClimbDrop.obj");
 	engineContext_->modelManager->LoadModel("tree.obj");

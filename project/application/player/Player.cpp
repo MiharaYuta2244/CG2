@@ -52,8 +52,6 @@ void Player::Initialize(EngineContext* ctx, DirectInput* input, GamePad* gamePad
 }
 
 void Player::Update(float deltaTime) {
-	//gamePad_->Update(0);
-
 	// 経過時間
 	deltaTime_ = deltaTime;
 
