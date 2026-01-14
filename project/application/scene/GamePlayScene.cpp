@@ -96,6 +96,10 @@ void GamePlayScene::Initialize(EngineContext* ctx, DirectInput* keyboard, GamePa
 	hipDropPowerSprite_ = std::make_unique<Sprite>();
 	hipDropPowerSprite_->Initialize(engineContext_, "resources/attackAmount.png");
 	hipDropPowerSprite_->SetPosition({1140.0f, 50.0f});
+
+	// 砲台の生成&初期化
+	gunTurret_=std::make_unique<GunTurret>();
+	gunTurret_->Initialize(engineContext_);
 }
 
 void GamePlayScene::Update() {
@@ -127,6 +131,9 @@ void GamePlayScene::Update() {
 	for (auto& block : blocks_) {
 		block->Update();
 	}
+
+	// 砲台の更新
+	gunTurret_->Update(timeManager_->GetDeltaTime());
 
 	// 敵更新
 	enemy_->Update(timeManager_->GetDeltaTime());
@@ -205,6 +212,9 @@ void GamePlayScene::Draw() {
 	for (auto& block : blocks_) {
 		block->Draw();
 	}
+
+	// 砲台の描画
+	gunTurret_->Draw();
 
 	// 敵描画
 	enemy_->Draw();
