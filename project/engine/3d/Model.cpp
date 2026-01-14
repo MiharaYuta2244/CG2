@@ -96,11 +96,8 @@ ModelData Model::LoadModelFile(const std::string& filename) {
 			aiString textureFilePath;
 			material->GetTexture(aiTextureType_DIFFUSE, 0, &textureFilePath);
 
-			// ファイルパス長さ最低値
-			size_t filePathMinLength = 17; // "resources/model/"の長さ
-
-			// テクスチャファイルの指定がないときはwhite.pngを使う
-			if (textureFilePath.length > filePathMinLength) { 
+			// テクスチャファイルパスが空でない場合は指定したパスを使用
+			if (textureFilePath.length > 0) {
 				modelData.material.textureFilePath = "resources/model/" + std::string(textureFilePath.C_Str());
 			}
 		}
@@ -193,3 +190,19 @@ void Model::CreateIndexData() {
 	indexResource_->Unmap(0, nullptr);
 	std::memcpy(indexData_, meshData_.vertices.data(), sizeof(uint32_t) * indexCount_);
 }
+
+//Node Model::ReadNode(aiNode* node) {
+//	Node result;
+//	aiMatrix4x4 aiLocalMatrix = node->mTransformation; // nodeのlocalMatrixを取得
+//	aiLocalMatrix.Transpose();                        // 別ベクトル形式を行ベクトル形式に転置
+//	result.localMatrix.m[0][0];                       // 他の要素も同様に
+//
+//	result.name = node->mName.C_Str();          // Node名を格納
+//	result.children.resize(node->mNumChildren); // 子供の数だけ確保
+//	for (uint32_t childIndex = 0; childIndex < node->mNumChildren; ++childIndex) {
+//		// 再帰的に読んで階層構造を作っていく
+//		result.children[childIndex] = ReadNode(node->mChildren[childIndex]);
+//	}
+//
+//	return result;
+//}

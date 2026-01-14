@@ -6,7 +6,7 @@
 void TitleText::Initialize(EngineContext* ctx) {
 	textModel_ = std::make_unique<Object3d>();
 	textModel_->Initialize(ctx);
-	textModel_->SetModel("AirplaneLow.glb");
+	textModel_->SetModel("ClimbDrop.obj");
 	textModel_->SetTranslate({21.68f, 13.39f, 12.76f});
 	textModel_->SetRotate({-0.72f, 2.612f, 0.2f});
 	textModel_->SetScale({15.0f, 15.0f, 6.0f});
@@ -19,18 +19,6 @@ void TitleText::Initialize(EngineContext* ctx) {
 
 void TitleText::Update(float deltaTime) {
 	(void)deltaTime;
-	/*Vector3 scale = textModel_->GetScale();
-
-	timer_ += deltaTime;
-	float duration = 0.5f;
-
-	float t = fmod(timer_, duration) / duration;
-	float eased = Easing::easeInOutQuad(t);
-
-	scale.x = std::lerp(11.0f, 13.0f, eased);
-	scale.y = std::lerp(11.0f, 13.0f, eased);
-
-	textModel_->SetScale(scale);*/
 
 	textModel_->Update();
 }

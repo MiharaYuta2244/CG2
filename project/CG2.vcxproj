@@ -305,6 +305,7 @@ copy "$(windowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="application\EndModel\EndModel.h" />
     <ClInclude Include="application\Fruit\IFruit.h" />
     <ClInclude Include="application\Cloud\Cloud.h" />
+    <ClInclude Include="engine\base\Node.h" />
     <ClInclude Include="engine\scene\BaseScene.h" />
     <ClInclude Include="application\Block\Block.h" />
     <ClInclude Include="application\Enemy\Enemy.h" />

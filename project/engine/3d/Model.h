@@ -1,5 +1,4 @@
 #pragma once
-
 #include <wrl.h>
 #include "Material.h"
 #include "MaterialData.h"
@@ -9,6 +8,7 @@
 #include "IMeshGenerator.h"
 #include <d3d12.h>
 #include <string>
+#include <vector>
 
 class TextureManager;
 
@@ -36,6 +36,9 @@ private:
 	/// </summary>
 	void CreateIndexData();
 
+	// assimpのNode(aiNode)から、右の構造体に変換する関数を作る
+	//Node ReadNode(aiNode* node);
+
 private: 
 	ModelCommon* modelCommon_ = nullptr;
 	TextureManager* textureManager_ = nullptr;
@@ -51,7 +54,7 @@ private:
 	D3D12_VERTEX_BUFFER_VIEW vertexBufferView_;
 	D3D12_INDEX_BUFFER_VIEW indexBufferView_;
 
-	// Rsource
+	// Resource
 	Microsoft::WRL::ComPtr<ID3D12Resource> vertexResource_;
 	Microsoft::WRL::ComPtr<ID3D12Resource> indexResource_;
 

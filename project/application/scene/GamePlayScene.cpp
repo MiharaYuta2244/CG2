@@ -14,10 +14,11 @@ void GamePlayScene::Initialize(EngineContext* ctx, DirectInput* keyboard, GamePa
 	timeManager_ = timeManager;
 	sceneManager_ = sceneManager;
 
-	player_ = std::make_unique<Player>();
-	enemy_ = std::make_unique<Enemy>();
-	map_ = std::make_unique<Map>();
+	player_ = std::make_unique<Player>(); // プレイヤー生成
+	enemy_ = std::make_unique<Enemy>(); // 敵生成
+	map_ = std::make_unique<Map>(); // マップ生成
 
+	// オーディオ初期化
 	audio_ = std::make_unique<XAudio>();
 	audio_->Initialize();
 	audio_->SoundsAllLoad("resources/GameScene.mp3");
@@ -42,14 +43,6 @@ void GamePlayScene::Initialize(EngineContext* ctx, DirectInput* keyboard, GamePa
 		treeModels_[i] = std::move(tree);
 	}
 
-	// 地形モデル
-	terrainModel_ = std::make_unique<Object3d>();
-	terrainModel_->Initialize(engineContext_);
-	terrainModel_->SetModel("terrain.obj");
-	terrainModel_->SetTranslate({20.0f, 0.0f, 0.0f});
-	terrainModel_->SetScale({1.0f, 1.0f, 1.0f});
-	terrainModel_->SetRotate({0.0f, std::numbers::pi_v<float>, 0.0f});
-
 	// 画面両端の幕
 	rightCurtain_ = std::make_unique<BothCurtain>();
 	rightCurtain_->Initialize(ctx);
@@ -59,14 +52,6 @@ void GamePlayScene::Initialize(EngineContext* ctx, DirectInput* keyboard, GamePa
 	// ヒップドロップゲージ
 	hipDropGauge_ = std::make_unique<PlayerGauge>();
 	hipDropGauge_->Initialize(ctx);
-
-	// フィールドモデル
-	/*fieldModel_ = std::make_unique<Object3d>();
-	fieldModel_->Initialize(engineContext_);
-	fieldModel_->SetModel("field1.obj");
-	fieldModel_->SetTranslate({20.0f, 0.0f, 0.0f});
-	fieldModel_->SetScale({4.0f, 4.0f, 4.0f});
-	fieldModel_->SetRotate({0.0f, std::numbers::pi_v<float>, 0.0f});*/
 
 	// 雲
 	for (auto& cloud : clouds_) {
@@ -98,8 +83,6 @@ void GamePlayScene::Initialize(EngineContext* ctx, DirectInput* keyboard, GamePa
 		numberSprites_[i] = std::make_unique<Sprite>();
 		numberSprites_[i]->Initialize(engineContext_, "resources/" + std::to_string(i) + ".png");
 	}
-
-	// BGM再生
 
 	// ヒップドロップダメージ表示用スプライトの初期化
 	for (int i = 0; i < hipDropDamageSprites_.size(); ++i) {
@@ -148,14 +131,6 @@ void GamePlayScene::Update() {
 	// 敵更新
 	enemy_->Update(timeManager_->GetDeltaTime());
 
-	// フィールドモデル
-	// fieldModel_->Update();
-
-	// パワーアップアイテム更新
-	/*for (auto& powerUpItem : powerUpItems_) {
-	    powerUpItem->Update(timeManager_->GetDeltaTime());
-	}*/
-
 	// 雲
 	for (auto& cloud : clouds_) {
 		cloud->Update(timeManager_->GetDeltaTime());
@@ -177,25 +152,7 @@ void GamePlayScene::Update() {
 	}
 
 	// 木のモデル
-	{
-		timer_ += timeManager_->GetDeltaTime();
-		t_ = timer_ / kTimer;
-		t_ = std::clamp(t_, 0.0f, 1.0f);
-
-		float x = Easing::easeInOutBack(t_) * 5.0f;
-
-		for (auto& tree : treeModels_) {
-			tree->SetScale({x + 1.0f, x + 1.0f, x + 1.0f});
-			tree->SetRotate({0.0f, x * std::numbers::pi_v<float> * 2.0f, 0.0f});
-		}
-
-		for (auto& tree : treeModels_) {
-			tree->Update();
-		}
-	}
-
-	// 地形モデル
-	terrainModel_->Update();
+	TreeAnimation();
 
 	// 目標フルーツ背景スプライト更新
 	targetFruitBG_->Update();
@@ -214,58 +171,18 @@ void GamePlayScene::Update() {
 	// ヒップドロップゲージ
 	hipDropGauge_->Update();
 
-	// ゲーム終了判定
 	// ヒップドロップダメージ表示の更新
-	{
-		int hipDropDamage = player_->GetHipDropPowerLevel();
-		// 10の位
-		int digit10 = hipDropDamage / 10;
-		// 1の位
-		int digit1 = hipDropDamage % 10;
-
-		if (digit10 > 0) { // 10の位がある場合のみ表示
-			hipDropDamageSprites_[0]->SetTexture("resources/" + std::to_string(digit10) + ".png");
-			hipDropDamageSprites_[0]->SetPosition({1150.0f, 100.0f}); // 位置調整
-			hipDropDamageSprites_[0]->SetSize({30.0f, 50.0f});
-			hipDropDamageSprites_[0]->Update();
-		} else {
-			hipDropDamageSprites_[0]->SetSize({0.0f, 0.0f}); // 10の位が0の場合は表示しない
-		}
-
-		hipDropDamageSprites_[1]->SetTexture("resources/" + std::to_string(digit1) + ".png");
-		hipDropDamageSprites_[1]->SetPosition({1180.0f, 100.0f}); // 位置調整
-		hipDropDamageSprites_[1]->Update();
-	}
+	UpdateHipDropDamageDisplay();
 
 	// ゲーム終了判定
-	if (player_->GetHP() <= 0 || enemy_->GetHP() <= 0) {
-		std::string resultStatus;
-		if (player_->GetHP() <= 0) {
-			resultStatus = "GameOver2.obj";
-		} else if (enemy_->GetHP() <= 0) {
-			resultStatus = "StageClear.obj";
-		}
+	EndGameCheck();
 
-		// 結果文字列をファイルに保存
-		SaveResultStatus(resultStatus);
-		RequestSceneChange("Result");
-	}
-
+	// ヒップドロップパワースプライト更新
 	hipDropPowerSprite_->Update();
 
 #ifdef USE_IMGUI
-	player_->UpdateImGui();
-	enemy_->UpdateImGui();
-	ImGuiFPS();
-	ImGuiDebugCamera();
-
-	ImGui::Begin("PointLight");
-	ImGui::DragFloat3("position", &terrainModel_->GetSpotLight().position.x, 0.1f);
-	ImGui::DragFloat("intensity", &terrainModel_->GetSpotLight().intensity, 0.01f);
-	ImGui::DragFloat("distance", &terrainModel_->GetSpotLight().distance, 0.01f);
-	ImGui::DragFloat("decay", &terrainModel_->GetSpotLight().decay, 0.01f);
-	ImGui::DragFloat("cos", &terrainModel_->GetSpotLight().cosAngle, 0.01f);
-	ImGui::End();
+	// ImGuiデバッグ表示
+	ImGuiUpdate();
 #endif
 
 #ifdef _DEBUG
@@ -292,9 +209,6 @@ void GamePlayScene::Draw() {
 	// 敵描画
 	enemy_->Draw();
 
-	// フィールドモデル
-	// fieldModel_->Draw();
-
 	// 雲
 	for (auto& cloud : clouds_) {
 		cloud->Draw();
@@ -320,8 +234,6 @@ void GamePlayScene::Draw() {
 		tree->Draw();
 	}
 
-	terrainModel_->Draw();
-
 	// Particle
 	particleDustPlayer_->Draw();
 	particleDustEnemy_->Draw();
@@ -344,6 +256,7 @@ void GamePlayScene::Draw() {
 		sprite->Draw();
 	}
 
+	// ヒップドロップパワースプライト描画
 	hipDropPowerSprite_->Draw();
 }
 
@@ -357,7 +270,6 @@ void GamePlayScene::Finalize() {
 	for (auto& tree : treeModels_) {
 		tree.reset();
 	}
-	terrainModel_.reset();
 	audio_->~XAudio();
 }
 
@@ -410,6 +322,13 @@ void GamePlayScene::ImGuiDebugCamera() {
 	ImGui::Begin("DebugCamera");
 	ImGui::DragFloat3("Position", &debugCamera_->GetTranslation().x, 0.01f);
 	ImGui::End();
+}
+
+void GamePlayScene::ImGuiUpdate() {
+	player_->UpdateImGui();
+	enemy_->UpdateImGui();
+	ImGuiFPS();
+	ImGuiDebugCamera();
 }
 #endif
 
@@ -603,6 +522,59 @@ void GamePlayScene::SaveResultStatus(const std::string& status) {
 		file << status;
 		file.close();
 	}
+}
+
+void GamePlayScene::EndGameCheck() {
+	if (player_->GetHP() <= 0 || enemy_->GetHP() <= 0) {
+		std::string resultStatus;
+		if (player_->GetHP() <= 0) {
+			resultStatus = "GameOver2.obj";
+		} else if (enemy_->GetHP() <= 0) {
+			resultStatus = "StageClear.obj";
+		}
+
+		// 結果文字列をファイルに保存
+		SaveResultStatus(resultStatus);
+		RequestSceneChange("Result");
+	}
+}
+
+void GamePlayScene::TreeAnimation() {
+	timer_ += timeManager_->GetDeltaTime();
+	t_ = timer_ / kTimer;
+	t_ = std::clamp(t_, 0.0f, 1.0f);
+
+	float x = Easing::easeInOutBack(t_) * 5.0f;
+
+	for (auto& tree : treeModels_) {
+		tree->SetScale({x + 1.0f, x + 1.0f, x + 1.0f});
+		tree->SetRotate({0.0f, x * std::numbers::pi_v<float> * 2.0f, 0.0f});
+	}
+
+	for (auto& tree : treeModels_) {
+		tree->Update();
+	}
+}
+
+void GamePlayScene::UpdateHipDropDamageDisplay() {
+	int hipDropDamage = player_->GetHipDropPowerLevel();
+	// 10の位
+	int digit10 = hipDropDamage / 10;
+	// 1の位
+	int digit1 = hipDropDamage % 10;
+
+	if (digit10 > 0) { // 10の位がある場合のみ表示
+		hipDropDamageSprites_[0]->SetTexture("resources/" + std::to_string(digit10) + ".png");
+		hipDropDamageSprites_[0]->SetPosition({1150.0f, 100.0f}); // 位置調整
+		hipDropDamageSprites_[0]->SetSize({30.0f, 50.0f});
+		hipDropDamageSprites_[0]->Update();
+	} else {
+		hipDropDamageSprites_[0]->SetSize({0.0f, 0.0f}); // 10の位が0の場合は表示しない
+	}
+
+	hipDropDamageSprites_[1]->SetTexture("resources/" + std::to_string(digit1) + ".png");
+	hipDropDamageSprites_[1]->SetPosition({1180.0f, 100.0f}); // 位置調整
+	hipDropDamageSprites_[1]->Update();
 }
 
 void GamePlayScene::GenerateTargetFruits() {
