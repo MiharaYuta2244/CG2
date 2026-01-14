@@ -186,7 +186,7 @@
     <ClCompile Include="engine\base\SrvManager.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
-    <ClCompile Include="application\Collision\Collision.cpp">
+    <ClCompile Include="engine\Collision\Collision.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
     <ClCompile Include="application\PowerUpItem\PowerUpItem.cpp">
@@ -222,13 +222,13 @@
     <ClCompile Include="engine\base\utility\easing\Easing.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
-    <ClCompile Include="application\scene\GamePlayScene.cpp">
+    <ClCompile Include="application\Scene\GamePlayScene.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
-    <ClCompile Include="application\scene\TitleScene.cpp">
+    <ClCompile Include="application\Scene\TitleScene.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
-    <ClCompile Include="application\scene\ResultScene.cpp">
+    <ClCompile Include="application\Scene\ResultScene.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
     <ClCompile Include="engine\scene\SceneManager.cpp">
@@ -276,10 +276,13 @@
     <ClCompile Include="engine\scene\BaseScene.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
-    <ClCompile Include="application\scene\Stage2.cpp">
+    <ClCompile Include="application\Scene\Stage2.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
-    <ClCompile Include="application\scene\Stage3.cpp">
+    <ClCompile Include="application\Scene\Stage3.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="application\GunTurret\GunTurret.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
   </ItemGroup>
@@ -467,7 +470,7 @@
     <ClInclude Include="engine\base\SrvManager.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
-    <ClInclude Include="application\Collision\Collision.h">
+    <ClInclude Include="engine\Collision\Collision.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
     <ClInclude Include="engine\math\mathLib\AABB.h">
@@ -527,13 +530,13 @@
     <ClInclude Include="engine\base\SpotLight.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
-    <ClInclude Include="application\scene\GamePlayScene.h">
+    <ClInclude Include="application\Scene\GamePlayScene.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
-    <ClInclude Include="application\scene\TitleScene.h">
+    <ClInclude Include="application\Scene\TitleScene.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
-    <ClInclude Include="application\scene\ResultScene.h">
+    <ClInclude Include="application\Scene\ResultScene.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
     <ClInclude Include="engine\scene\BaseScene.h">
@@ -584,13 +587,16 @@
     <ClInclude Include="application\ResultModel\ResultModel.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
-    <ClInclude Include="application\scene\Stage2.h">
+    <ClInclude Include="application\Scene\Stage2.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
-    <ClInclude Include="application\scene\Stage3.h">
+    <ClInclude Include="application\Scene\Stage3.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
     <ClInclude Include="engine\base\Node.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="application\GunTurret\GunTurret.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
   </ItemGroup>

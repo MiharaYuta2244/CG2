@@ -1,12 +1,12 @@
 #pragma once
 #include "BaseScene.h"
-#include "EndModel.h"
+#include "BothCurtain/BothCurtain.h"
+#include "EndModel/EndModel.h"
 #include "Object3d.h"
 #include "Sprite.h"
-#include "StartModel.h"
-#include "TitleMenuModel.h"
-#include "TitleText.h"
-#include "BothCurtain.h"
+#include "StartModel/StartModel.h"
+#include "TitleMenuModel/TitleMenuModel.h"
+#include "TitleText/TitleText.h"
 #include "XAudio.h"
 #include <array>
 #include <memory>
@@ -171,7 +171,7 @@ private:
 	// 1フレーム前のタイトル番号
 	TitleNumber prevTitleNumber_;
 
-	bool menuSelected_=false;
+	bool menuSelected_ = false;
 
 	// ルール
 	std::unique_ptr<Sprite> ruleSprite1_;

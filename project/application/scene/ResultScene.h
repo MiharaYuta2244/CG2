@@ -1,10 +1,10 @@
 #pragma once
 #include "BaseScene.h"
 #include "Object3d.h"
-#include "ReStartModel.h"
-#include "ToTitleModel.h"
-#include "BothCurtain.h"
-#include "ResultModel.h"
+#include "RestartModel/ReStartModel.h"
+#include "ToTitleModel/ToTitleModel.h"
+#include "BothCurtain/BothCurtain.h"
+#include "ResultModel/ResultModel.h"
 #include "XAudio.h"
 #include <memory>
 

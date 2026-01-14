@@ -1,19 +1,20 @@
 #pragma once
-#include "Apple.h"
+#include "Fruit/Apple/Apple.h"
 #include "BaseScene.h"
-#include "Block.h"
-#include "BothCurtain.h"
-#include "Enemy.h"
-#include "Grape.h"
-#include "Map.h"
+#include "Block/Block.h"
+#include "BothCurtain/BothCurtain.h"
+#include "Enemy/Enemy.h"
+#include "Fruit/Grape/Grape.h"
+#include "Map/Map.h"
 #include "Object3d.h"
-#include "Orange.h"
+#include "Fruit/Orange/Orange.h"
 #include "Particle.h"
-#include "Player.h"
-#include "PowerUpItem.h"
+#include "Player/Player.h"
+#include "PowerUpItem/PowerUpItem.h"
 #include "Sprite.h"
-#include "Cloud.h"
+#include "Cloud/Cloud.h"
 #include "XAudio.h"
+#include "GunTurret/GunTurret.h"
 #include <array>
 #include <memory>
 #include <vector>
@@ -215,5 +216,9 @@ private:
 	// プレイヤーのヒップドロップパワースプライト
 	std::unique_ptr<Sprite> hipDropPowerSprite_;
 
+	// サウンド管理クラス
 	std::unique_ptr<XAudio> audio_;
+
+	// 砲台
+	std::unique_ptr<GunTurret> gunTurret_;
 };

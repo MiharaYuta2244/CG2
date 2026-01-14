@@ -1,7 +1,7 @@
 #include "Game.h"
-#include "GamePlayScene.h"
-#include "ResultScene.h"
-#include "TitleScene.h"
+#include "Scene/GamePlayScene.h"
+#include "Scene/ResultScene.h"
+#include "Scene/TitleScene.h"
 #include <algorithm>
 #include <numbers>
 
