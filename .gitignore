@@ -56,7 +56,8 @@ ScaffoldingReadMe.txt
 StyleCopReport.xml
 
 # Files built by Visual Studio
-
+# Debug symbols
+*.pdb
 
 # Chutzpah Test files
 _Chutzpah*
