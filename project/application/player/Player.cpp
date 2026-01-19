@@ -81,6 +81,9 @@ void Player::Update(float deltaTime) {
 	// ジャンプ
 	Jump();
 
+	// ジャンプアニメーション
+	AnimationJump();
+
 	// Y座標更新
 	transform_.translate.y += velocity_.y * deltaTime_;
 
@@ -198,6 +201,12 @@ void Player::Jump() {
 	if (isJumpInput && !isJump_) {
 		velocity_.y = jumpPower_;
 		isJump_ = true;
+
+		// ジャンプ時のスケールに変更していく
+		jumpScaleAnim.start = {transform_.translate};
+		jumpScaleAnim.end = {1.0f, 1.5f, 1.0f};
+		jumpScaleAnim.temp = {transform_.translate};
+		jumpScaleAnim.anim = {transform_.scale, jumpScaleAnim.end, 0.5f, EaseType::EASEOUTCUBIC};
 	}
 }
 
@@ -305,4 +314,27 @@ Vector2 Player::ScreenToWorldPoint(Vector3 worldPosition, Vector2 margin) {
 	Vector3 screenPos = MathUtility::Transform(worldPos, matVPV);
 
 	return {screenPos.x, screenPos.y};
+}
+
+void Player::AnimationJump() {
+	// ジャンプ中アニメーション
+	if (jumpScaleAnim.anim.GetIsActive()) {
+		bool playing = jumpScaleAnim.anim.Update(deltaTime_, jumpScaleAnim.temp);
+		transform_.scale = jumpScaleAnim.temp;
+
+		// 終了したら次のアニメーションへ
+		if (!playing) {
+			afterJumpScaleAnim.anim = {
+			    transform_.scale, {1.0f, 1.0f, 1.0f},
+                 0.5f, EaseType::EASEOUTCUBIC
+            };
+		}
+		return;
+	}
+
+	// ジャンプ後アニメーション
+	if (afterJumpScaleAnim.anim.GetIsActive()) {
+		bool playing = afterJumpScaleAnim.anim.Update(deltaTime_, afterJumpScaleAnim.temp);
+		transform_.scale = afterJumpScaleAnim.temp;
+	}
 }

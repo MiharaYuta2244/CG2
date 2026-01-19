@@ -6,7 +6,7 @@
 void GunTurret::Initialize(EngineContext* ctx) {
 	gunTurretModel_ = std::make_unique<Object3d>();
 	gunTurretModel_->Initialize(ctx);
-	gunTurretModel_->SetModel("Cube.obj");
+	gunTurretModel_->SetModel("GunTurret.obj");
 	gunTurretModel_->SetTranslate({0.0f, 0.0f, 0.0f});
 	gunTurretModel_->SetScale({1.0f, 1.0f, 1.0f});
 	gunTurretModel_->SetRotate({0.0f, std::numbers::pi_v<float>, 0.0f});
@@ -184,7 +184,7 @@ Vector3 GunTurret::EasingVector3(const Vector3 start, const Vector3 end) {
 	float t = std::clamp(timer_ / kEasingDuration, 0.0f, 1.0f);
 
 	// イージング
-	float e = Easing::easeOutCubic(t);
+	float e = Easing::EaseOutCubic(t);
 
 	// 終了判定
 	if (t >= 1.0f) {

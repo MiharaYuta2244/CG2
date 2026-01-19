@@ -98,6 +98,9 @@ private:
 	// Space キーが押されたときの処理
 	void OnMenuDecide();
 
+	// 選択中の項目に応じてスプライトの変更
+	void ChangeMenuSelectSprite();
+
 private:
 	// タイトルテキストモデル
 	std::unique_ptr<TitleText> titleText_;
@@ -178,4 +181,7 @@ private:
 	std::unique_ptr<Sprite> ruleSprite2_;
 
 	std::unique_ptr<XAudio> audio_;
+
+	// メニューで選択中の項目スプライト
+	std::unique_ptr<Sprite> menuSelectSprite_;
 };

@@ -557,7 +557,7 @@ void GamePlayScene::TreeAnimation() {
 	t_ = timer_ / kTimer;
 	t_ = std::clamp(t_, 0.0f, 1.0f);
 
-	float x = Easing::easeInOutBack(t_) * 5.0f;
+	float x = Easing::EaseInOutBack(t_) * 5.0f;
 
 	for (auto& tree : treeModels_) {
 		tree->SetScale({x + 1.0f, x + 1.0f, x + 1.0f});

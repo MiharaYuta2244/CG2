@@ -1,9 +1,11 @@
 #pragma once
 #include "Actor.h"
 #include "DirectInput.h"
-#include "Sprite.h"
+#include "EasingAnimation.h"
 #include "EngineContext.h"
 #include "PlayerGauge/PlayerGauge.h"
+#include "Sprite.h"
+#include "AnimationBundle.h"
 #include <array>
 
 class GamePad;
@@ -78,6 +80,9 @@ private:
 	// スクリーン座標からワールド座標への変換
 	Vector2 ScreenToWorldPoint(Vector3 worldPosition, Vector2 margin);
 
+	// ジャンプ時スケールアニメーション
+	void AnimationJump();
+
 private:
 	// 入力
 	DirectInput* input_ = nullptr;
@@ -147,5 +152,11 @@ private:
 	// プレイヤーのヒップドロップパワー
 	int hipDropPowerLevel_ = 1;
 
-	bool isHipDropDamage_=false;
+	bool isHipDropDamage_ = false;
+
+	// ジャンプアニメーション
+	AnimationBundle<Vector3> jumpScaleAnim;
+
+	// ジャンプ後アニメーション
+	AnimationBundle<Vector3> afterJumpScaleAnim;
 };

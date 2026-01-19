@@ -8,7 +8,7 @@ TurretBullet::TurretBullet(EngineContext* ctx, Vector3 pos) {
 void TurretBullet::Initialize(EngineContext* ctx, Vector3 pos) {
 	bulletModel_ = std::make_unique<Object3d>();
 	bulletModel_->Initialize(ctx);
-	bulletModel_->SetModel("sphere.obj");
+	bulletModel_->SetModel("TurretBullet.obj");
 	bulletModel_->SetTranslate(pos);
 	bulletModel_->SetScale({1.0f, 1.0f, 1.0f});
 	bulletModel_->SetRotate({0.0f, 0.0f, 0.0f});

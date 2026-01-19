@@ -1,56 +1,72 @@
 #pragma once
+#include "EaseType.h"
 #include <cmath>
 #include <numbers>
+
+using EaseFunc = float (*)(float);
 
 class Easing {
 public:
 	// Sine
-	static float easeInSine(float t);
-	static float easeOutSine(float t);
-	static float easeInOutSine(float t);
+	static float EaseInSine(float t);
+	static float EaseOutSine(float t);
+	static float EaseInOutSine(float t);
 
 	// Quadratic
-	static float easeInQuad(float t);
-	static float easeOutQuad(float t);
-	static float easeInOutQuad(float t);
+	static float EaseInQuad(float t);
+	static float EaseOutQuad(float t);
+	static float EaseInOutQuad(float t);
 
 	// Cubic
-	static float easeInCubic(float t);
-	static float easeOutCubic(float t);
-	static float easeInOutCubic(float t);
+	static float EaseInCubic(float t);
+	static float EaseOutCubic(float t);
+	static float EaseInOutCubic(float t);
 
 	// Quartic
-	static float easeInQuart(float t);
-	static float easeOutQuart(float t);
-	static float easeInOutQuart(float t);
+	static float EaseInQuart(float t);
+	static float EaseOutQuart(float t);
+	static float EaseInOutQuart(float t);
 
 	// Quintic
-	static float easeInQuint(float t);
-	static float easeOutQuint(float t);
-	static float easeInOutQuint(float t);
+	static float EaseInQuint(float t);
+	static float EaseOutQuint(float t);
+	static float EaseInOutQuint(float t);
 
 	// Expo
-	static float easeInExpo(float t);
-	static float easeOutExpo(float t);
-	static float easeInOutExpo(float t);
+	static float EaseInExpo(float t);
+	static float EaseOutExpo(float t);
+	static float EaseInOutExpo(float t);
 
 	// Circ
-	static float easeInCirc(float t);
-	static float easeOutCirc(float t);
-	static float easeInOutCirc(float t);
+	static float EaseInCirc(float t);
+	static float EaseOutCirc(float t);
+	static float EaseInOutCirc(float t);
 
 	// Back
-	static float easeInBack(float t);
-	static float easeOutBack(float t);
-	static float easeInOutBack(float t);
+	static float EaseInBack(float t);
+	static float EaseOutBack(float t);
+	static float EaseInOutBack(float t);
 
 	// Elastic
-	static float easeInElastic(float t);
-	static float easeOutElastic(float t);
-	static float easeInOutElastic(float t);
+	static float EaseInElastic(float t);
+	static float EaseOutElastic(float t);
+	static float EaseInOutElastic(float t);
 
 	// Bounce
-	static float easeOutBounce(float t);
-	static float easeInBounce(float t);
-	static float easeInOutBounce(float t);
+	static float EaseOutBounce(float t);
+	static float EaseInBounce(float t);
+	static float EaseInOutBounce(float t);
+
+	static inline float ApplyEasing(EaseType type, float t) {
+		return EaseTable[static_cast<int>(type)](t);
+	}
+
+private:
+	static constexpr EaseFunc EaseTable[] = {
+	    &Easing::EaseInSine,    &Easing::EaseOutSine,    &Easing::EaseInOutSine,    &Easing::EaseInQuad,    &Easing::EaseOutQuad,  &Easing::EaseInOutQuad,
+	    &Easing::EaseInCubic,   &Easing::EaseOutCubic,   &Easing::EaseInOutCubic,   &Easing::EaseInQuart,   &Easing::EaseOutQuart, &Easing::EaseInOutQuart,
+	    &Easing::EaseInQuint,   &Easing::EaseOutQuint,   &Easing::EaseInOutQuint,   &Easing::EaseInExpo,    &Easing::EaseOutExpo,  &Easing::EaseInOutExpo,
+	    &Easing::EaseInCirc,    &Easing::EaseOutCirc,    &Easing::EaseInOutCirc,    &Easing::EaseInBack,    &Easing::EaseOutBack,  &Easing::EaseInOutBack,
+	    &Easing::EaseInElastic, &Easing::EaseOutElastic, &Easing::EaseInOutElastic, &Easing::EaseOutBounce, &Easing::EaseInBounce, &Easing::EaseInOutBounce,
+	};
 };

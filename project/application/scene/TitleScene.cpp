@@ -88,15 +88,6 @@ void TitleScene::Initialize(EngineContext* ctx, DirectInput* keyboard, GamePad* 
 	// スプライトの生成&初期化
 	CreateAndInitializeSprites();
 
-	ruleSprite1_ = std::make_unique<Sprite>();
-	ruleSprite1_->Initialize(engineContext_, "resources/rule1.png");
-	ruleSprite1_->GetPosition() = {200.0f, 30.0f};
-	ruleSprite1_->GetSize() = {275.0f, 35.0f};
-	ruleSprite2_ = std::make_unique<Sprite>();
-	ruleSprite2_->Initialize(engineContext_, "resources/rule2.png");
-	ruleSprite2_->GetPosition() = {200.0f, 75.0f};
-	ruleSprite2_->GetSize() = {555.0f, 35.0f};
-
 	// イージング初期化
 	for (auto& easing : easingMoves_) {
 		easing.isMoving = false;
@@ -139,6 +130,9 @@ void TitleScene::Update() {
 		// 位置と回転のイージング更新
 		Transform& transform = titleMenuModels_[i]->GetTransform();
 		UpdateMoveRotateY(easingMoveRotates_[i], transform, timeManager_->GetDeltaTime());
+
+		// 項目スプライトの変更
+		ChangeMenuSelectSprite();
 	}
 
 	// シーン切り替え処理
@@ -341,6 +335,36 @@ void TitleScene::OnMenuDecide() {
 	}
 }
 
+void TitleScene::ChangeMenuSelectSprite() {
+	switch (titleState_) {
+	case TitleState::STAGE1:
+		menuSelectSprite_->SetTexture("resources/stage1.png");
+		menuSelectSprite_->SetSize({288.0f, 64.0f});
+		menuSelectSprite_->SetTextureSize({288.0f, 64.0f});
+		break;
+	case TitleState::STAGE2:
+		menuSelectSprite_->SetTexture("resources/stage2.png");
+		menuSelectSprite_->SetSize({288.0f, 64.0f});
+		menuSelectSprite_->SetTextureSize({288.0f, 64.0f});
+		break;
+	case TitleState::STAGE3:
+		menuSelectSprite_->SetTexture("resources/stage3.png");
+		menuSelectSprite_->SetSize({288.0f, 64.0f});
+		menuSelectSprite_->SetTextureSize({288.0f, 64.0f});
+		break;
+	case TitleState::BACK_SCENE:
+		menuSelectSprite_->SetTexture("resources/back.png");
+		menuSelectSprite_->SetSize({184.0f, 64.0f});
+		menuSelectSprite_->SetTextureSize({184.0f, 64.0f});
+		break;
+	case TitleState::CHARACTER_SELECT:
+		menuSelectSprite_->SetTexture("resources/player.png");
+		menuSelectSprite_->SetSize({320.0f, 64.0f});
+		menuSelectSprite_->SetTextureSize({320.0f, 64.0f});
+		break;
+	}
+}
+
 void TitleScene::Title1Update() {
 	if (titleNumber_ == TitleNumber::TITLE1) {
 		titleText_->Update(timeManager_->GetDeltaTime());
@@ -369,6 +393,7 @@ void TitleScene::Title2Update() {
 		selectSprite_->Update();
 		selectIconSprite_->Update();
 		menuSprite_->Update();
+		menuSelectSprite_->Update();
 	}
 }
 
@@ -392,6 +417,7 @@ void TitleScene::Title2Draw() {
 		selectSprite_->Draw();
 		selectIconSprite_->Draw();
 		menuSprite_->Draw();
+		menuSelectSprite_->Draw();
 	}
 }
 
@@ -435,7 +461,7 @@ void TitleScene::UpdateEasing() {
 		float progress = std::clamp(easingMoves_[i].elapsed / easingMoves_[i].duration, 0.0f, 1.0f);
 
 		// イージング関数を適用（easeOutCubicを使用）
-		float easeProgress = Easing::easeOutCubic(progress);
+		float easeProgress = Easing::EaseOutCubic(progress);
 
 		// 補間計算
 		Vector3 easedPosition = MathUtility::Lerp(easingMoves_[i].start, easingMoves_[i].target, easeProgress);
@@ -477,7 +503,7 @@ void TitleScene::UpdateMoveRotateY(EasingMoveRotate& move, Transform& transform,
 	float t = move.elapsed / move.duration;
 	t = std::clamp(t, 0.0f, 1.0f);
 
-	float eased = Easing::easeOutCubic(t);
+	float eased = Easing::EaseOutCubic(t);
 
 	// 位置補間
 	transform.translate = {std::lerp(move.startPos.x, move.targetPos.x, eased), std::lerp(move.startPos.y, move.targetPos.y, eased), std::lerp(move.startPos.z, move.targetPos.z, eased)};
@@ -519,7 +545,7 @@ void TitleScene::UpdateMoveRotateY(EasingMoveRotate& move, Transform& transform,
 			break;
 		case TitleState::CHARACTER_SELECT:
 			RequestSceneChange("GamePlay"); // ステージ1へ
-			isCharacterSelection_ = true; // キャラクターセレクト画面へ
+			isCharacterSelection_ = true;   // キャラクターセレクト画面へ
 			break;
 		}
 	}
@@ -550,4 +576,19 @@ void TitleScene::CreateAndInitializeSprites() {
 	menuBackSprite_->Initialize(engineContext_, "resources/menuBG.png");
 	menuBackSprite_->GetPosition() = {160.0f, 34.0f};
 	menuBackSprite_->SetSize({416.0f, 96.0f});
+
+	ruleSprite1_ = std::make_unique<Sprite>();
+	ruleSprite1_->Initialize(engineContext_, "resources/rule1.png");
+	ruleSprite1_->SetPosition({200.0f, 30.0f});
+	ruleSprite1_->SetSize({275.0f, 35.0f});
+	ruleSprite2_ = std::make_unique<Sprite>();
+	ruleSprite2_->Initialize(engineContext_, "resources/rule2.png");
+	ruleSprite2_->SetPosition({200.0f, 75.0f});
+	ruleSprite2_->SetSize({555.0f, 35.0f});
+
+	// 選択中の項目スプライト
+	menuSelectSprite_ = std::make_unique<Sprite>();
+	menuSelectSprite_->Initialize(engineContext_, "resources/stage1.png");
+	menuSelectSprite_->SetPosition({750.0f, 50.0f});
+	menuSelectSprite_->SetSize({288.0f, 64.0f});
 }
