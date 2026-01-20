@@ -58,9 +58,11 @@ StyleCopReport.xml
 # Files built by Visual Studio
 # Debug symbols
 *.pdb
+*.log
 
 # Executable build outputs
 *.exe
+*.dll
 
 # External library debug symbols
 externals/**/Debug/*.pdb
