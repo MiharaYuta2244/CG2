@@ -64,8 +64,9 @@ StyleCopReport.xml
 *.exe
 *.dll
 
-# External library debug symbols
-externals/**/Debug/*.pdb
+# Ignore external library Development builds
+project/externals/**/Development/
+project/externals/**/Debug/
 
 # Chutzpah Test files
 _Chutzpah*
