@@ -201,7 +201,7 @@ void GamePlayScene::Update() {
 
 #ifdef USE_IMGUI
 	// ImGuiデバッグ表示
-	ImGuiUpdate();
+	ImGuiUpdate();                   
 #endif
 
 #ifdef _DEBUG
