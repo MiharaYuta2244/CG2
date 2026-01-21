@@ -14,6 +14,9 @@ public:
 
 	void Draw();
 
+	// Getter
+	std::vector<std::unique_ptr<TurretBullet>>& GetBullet() { return bullets_; }
+
 	// Setter
 	void SetTargetPos(Vector3 targetPos) { targetPos_ = targetPos; }
 
@@ -24,7 +27,7 @@ private:
 		AIMING,       // 狙い
 		CHARGING,     // タメ
 		SHOT,         // 発射
-		WAITING,       // 待機
+		WAITING,      // 待機
 		DISAPPEARING, // 退場
 	};
 

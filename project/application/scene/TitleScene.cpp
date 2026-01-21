@@ -383,14 +383,14 @@ void TitleScene::AnimationTitle() {
 }
 
 void TitleScene::Title1Update() {
-	// if (titleNumber_ == TitleNumber::TITLE1) {
-	AnimationTitle();
-	titleText_->Update(timeManager_->GetDeltaTime());
-	startModel_->Update(timeManager_->GetDeltaTime());
-	endModel_->Update(timeManager_->GetDeltaTime());
-	ruleSprite1_->Update();
-	ruleSprite2_->Update();
-	//}
+	if (titleNumber_ == TitleNumber::TITLE1) {
+		AnimationTitle();
+		titleText_->Update(timeManager_->GetDeltaTime());
+		startModel_->Update(timeManager_->GetDeltaTime());
+		endModel_->Update(timeManager_->GetDeltaTime());
+		ruleSprite1_->Update();
+		ruleSprite2_->Update();
+	}
 }
 
 void TitleScene::Title2Update() {
@@ -416,13 +416,13 @@ void TitleScene::Title2Update() {
 }
 
 void TitleScene::Title1Draw() {
-	// if (titleNumber_ == TitleNumber::TITLE1) {
-	titleText_->Draw();
-	startModel_->Draw();
-	endModel_->Draw();
-	ruleSprite1_->Draw();
-	ruleSprite2_->Draw();
-	//}
+	if (titleNumber_ == TitleNumber::TITLE1) {
+		titleText_->Draw();
+		startModel_->Draw();
+		endModel_->Draw();
+		ruleSprite1_->Draw();
+		ruleSprite2_->Draw();
+	}
 }
 
 void TitleScene::Title2Draw() {

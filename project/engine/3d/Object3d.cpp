@@ -172,8 +172,8 @@ void Object3d::CreateDirectionalLightData() {
 	directionalLightResource_->Unmap(0, nullptr);
 	// 初期化
 	directionalLight_.color = {1.0f, 1.0f, 1.0f, 1.0f};
-	directionalLight_.direction = {0.0f, -1.0f, 0.0f};
-	directionalLight_.intensity = 0.0f;
+	directionalLight_.direction = {0.0f, 1.0f, 0.0f};
+	directionalLight_.intensity = 1.0f;
 
 	// Vector3 → XMVECTOR 変換
 	XMVECTOR dirVec = XMVectorSet(
@@ -236,7 +236,7 @@ void Object3d::CreatePointLightData() {
 	// 初期化
 	pointLight_.color = {1.0f, 1.0f, 1.0f, 1.0f};
 	pointLight_.position = {0.0f, 5.0f, 0.0f};
-	pointLight_.intensity = 0.0f;
+	pointLight_.intensity = 1.0f;
 	pointLight_.radius = 10.0f;
 	pointLight_.decay = 1.0f;
 	// pointLightDataへの書き込み
@@ -269,7 +269,7 @@ void Object3d::CreateMaterialData() {
 	materialResource_->Unmap(0, nullptr);
 	// 初期化
 	material_.color = {1.0f, 1.0f, 1.0f, 1.0f};
-	material_.enableLighting = false;
+	material_.enableLighting = true;
 	material_.enableFoging = false;
 	material_.uvTransform = MathUtility::MakeIdentity4x4();
 	material_.shininess = 2.0f;

@@ -249,6 +249,7 @@ copy "$(windowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="application\Scene\Stage2.cpp" />
     <ClCompile Include="application\Scene\Stage3.cpp" />
     <ClCompile Include="application\GunTurret\TurretBullet.cpp" />
+    <ClCompile Include="application\WaveTimer\WaveTimer.cpp" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="resources\shaders\Object3d.PS.hlsl">
@@ -404,6 +405,7 @@ copy "$(windowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="application\Scene\Stage3.h" />
     <ClInclude Include="application\GunTurret\GunTurret.h" />
     <ClInclude Include="application\GunTurret\TurretBullet.h" />
+    <ClInclude Include="application\WaveTimer\WaveTimer.h" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="externals\imgui\LICENSE.txt" />

@@ -18,6 +18,10 @@ void TurretBullet::Update(float deltaTime, Vector3 direction) {
 	// 移動処理
 	Move(deltaTime, direction);
 
+	// 当たり判定の更新
+	aabb_.min = {bulletModel_->GetTranslate().x - 0.5f, bulletModel_->GetTranslate().y - 0.5f, bulletModel_->GetTranslate().z - 0.5f};
+	aabb_.max = {bulletModel_->GetTranslate().x + 0.5f, bulletModel_->GetTranslate().y + 0.5f, bulletModel_->GetTranslate().z + 0.5f};
+
 	// Object3dの更新
 	bulletModel_->Update();
 }

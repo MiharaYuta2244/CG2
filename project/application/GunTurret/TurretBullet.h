@@ -1,6 +1,7 @@
 #pragma once
 #include "EngineContext.h"
 #include "Object3d.h"
+#include "AABB.h"
 #include <memory>
 
 class TurretBullet {
@@ -16,6 +17,9 @@ public:
 	// 範囲外に出たか判定
 	bool IsOutside();
 
+	// Getter
+	AABB GetAABB() { return aabb_; }
+
 private:
 	// 移動
 	void Move(float deltaTime, Vector3 direction);
@@ -26,4 +30,7 @@ private:
 
 	// 速度
 	float velocity_ = 10.0f;
+
+	// AABB
+	AABB aabb_{};
 };

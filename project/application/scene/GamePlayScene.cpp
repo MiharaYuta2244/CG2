@@ -15,8 +15,8 @@ void GamePlayScene::Initialize(EngineContext* ctx, DirectInput* keyboard, GamePa
 	sceneManager_ = sceneManager;
 
 	player_ = std::make_unique<Player>(); // プレイヤー生成
-	enemy_ = std::make_unique<Enemy>(); // 敵生成
-	map_ = std::make_unique<Map>(); // マップ生成
+	enemy_ = std::make_unique<Enemy>();   // 敵生成
+	map_ = std::make_unique<Map>();       // マップ生成
 
 	// オーディオ初期化
 	audio_ = std::make_unique<XAudio>();
@@ -98,8 +98,13 @@ void GamePlayScene::Initialize(EngineContext* ctx, DirectInput* keyboard, GamePa
 	hipDropPowerSprite_->SetPosition({1140.0f, 50.0f});
 
 	// 砲台の生成&初期化
-	gunTurret_=std::make_unique<GunTurret>();
+	gunTurret_ = std::make_unique<GunTurret>();
 	gunTurret_->Initialize(engineContext_);
+
+	// ウェーブタイマーの生成&初期化
+	waveTimer_ = std::make_unique<WaveTimer>();
+	waveTimer_->Initialize(60.0f, engineContext_);
+	;
 }
 
 void GamePlayScene::Update() {
@@ -112,6 +117,7 @@ void GamePlayScene::Update() {
 	CollisionPlayerEnemy();
 	CollisionEnemyPlayerHipDrop();
 	CollisionPlayerFruits();
+	CollisionPlayerTurretBullet();
 
 	// 目標フルーツの判定と更新
 	UpdateTargetFruits();
@@ -180,6 +186,9 @@ void GamePlayScene::Update() {
 
 	// ヒップドロップゲージ
 	hipDropGauge_->Update();
+
+	// ウェーブタイマー更新
+	waveTimer_->Update(timeManager_->GetDeltaTime());
 
 	// ヒップドロップダメージ表示の更新
 	UpdateHipDropDamageDisplay();
@@ -271,6 +280,9 @@ void GamePlayScene::Draw() {
 
 	// ヒップドロップパワースプライト描画
 	hipDropPowerSprite_->Draw();
+
+	// ウェーブタイマー描画
+	waveTimer_->Draw();
 }
 
 void GamePlayScene::Finalize() {
@@ -365,71 +377,51 @@ void GamePlayScene::CollisionEnemyPlayerHipDrop() {
 }
 
 void GamePlayScene::CollisionPlayerFruits() {
-	grapes_.erase(
-	    std::remove_if(
-	        grapes_.begin(), grapes_.end(),
-	        [this](std::unique_ptr<Grape>& grape) {
-		        if (Collision::Intersect(player_->GetAABB(), grape->GetAABB())) {
-			        // 目標フルーツの中から未収集のブドウを探す
-			        for (auto& fruit : fruitOrder_) {
-				        if (fruit.fruitType == "grape" && !fruit.isCollected) {
-					        fruit.isCollected = true;
-					        collectedFruitCount_++;
-					        // ブドウの色を変更（例：グレー）
-					        fruit.sprite->SetColor({0.5f, 0.5f, 0.5f, 0.5f});
-					        break;
-				        }
-			        }
-			        player_->SetIsPowerUp(true);
-			        return true;
-		        }
-		        return false;
-	        }),
-	    grapes_.end());
+	HandleFruitCollision(grapes_, "grape");
+	HandleFruitCollision(apples_, "apple");
+	HandleFruitCollision(oranges_, "orange");
+}
 
-	apples_.erase(
+template<typename FruitType> void GamePlayScene::HandleFruitCollision(std::vector<std::unique_ptr<FruitType>>& fruits, const std::string& fruitName) {
+	fruits.erase(
 	    std::remove_if(
-	        apples_.begin(), apples_.end(),
-	        [this](std::unique_ptr<Apple>& apple) {
-		        if (Collision::Intersect(player_->GetAABB(), apple->GetAABB())) {
-			        // 目標フルーツの中から未収集のリンゴを探す
-			        for (auto& fruit : fruitOrder_) {
-				        if (fruit.fruitType == "apple" && !fruit.isCollected) {
-					        fruit.isCollected = true;
+	        fruits.begin(), fruits.end(),
+	        [this, &fruitName](std::unique_ptr<FruitType>& fruit) {
+		        if (Collision::Intersect(player_->GetAABB(), fruit->GetAABB())) {
+			        // 目標フルーツの中から未収集のフルーツを探す
+			        for (auto& targetFruit : fruitOrder_) {
+				        if (targetFruit.fruitType == fruitName && !targetFruit.isCollected) {
+					        targetFruit.isCollected = true;
 					        collectedFruitCount_++;
-					        // リンゴの色を変更（例：グレー）
-					        fruit.sprite->SetColor({0.5f, 0.5f, 0.5f, 0.5f});
+					        // フルーツの色を変更（グレーアウト）
+					        targetFruit.sprite->SetColor({0.5f, 0.5f, 0.5f, 0.5f});
 					        break;
 				        }
 			        }
 			        player_->SetIsPowerUp(true);
-			        return true;
-		        }
-		        return false;
-	        }),
-	    apples_.end());
 
-	oranges_.erase(
-	    std::remove_if(
-	        oranges_.begin(), oranges_.end(),
-	        [this](std::unique_ptr<Orange>& orange) {
-		        if (Collision::Intersect(player_->GetAABB(), orange->GetAABB())) {
-			        // 目標フルーツの中から未収集のオレンジを探す
-			        for (auto& fruit : fruitOrder_) {
-				        if (fruit.fruitType == "orange" && !fruit.isCollected) {
-					        fruit.isCollected = true;
-					        collectedFruitCount_++;
-					        // オレンジの色を変更（例：グレー）
-					        fruit.sprite->SetColor({0.5f, 0.5f, 0.5f, 0.5f});
-					        break;
-				        }
-			        }
-			        player_->SetIsPowerUp(true);
+			        // フルーツ取得時プレイヤーのスケールアニメーションフラグをたてる
+			        player_->SetIsGetFruit(true);
+
 			        return true;
 		        }
 		        return false;
 	        }),
-	    oranges_.end());
+	    fruits.end());
+}
+
+void GamePlayScene::CollisionPlayerTurretBullet() {
+	gunTurret_->GetBullet().erase(
+	    std::remove_if(
+	        gunTurret_->GetBullet().begin(), gunTurret_->GetBullet().end(),
+	        [this](std::unique_ptr<TurretBullet>& bullet) {
+		        if (Collision::Intersect(player_->GetAABB(), bullet->GetAABB())) {
+			        player_->SetIsHitEnemy(true);
+			        return true;
+		        }
+		        return false;
+	        }),
+	    gunTurret_->GetBullet().end());
 }
 
 void GamePlayScene::CreateGrape() {

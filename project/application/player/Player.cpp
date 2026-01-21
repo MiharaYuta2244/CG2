@@ -84,6 +84,9 @@ void Player::Update(float deltaTime) {
 	// ジャンプアニメーション
 	AnimationJump();
 
+	// フルーツ取得アニメーション
+	AnimationFruitGet();
+
 	// Y座標更新
 	transform_.translate.y += velocity_.y * deltaTime_;
 
@@ -125,6 +128,8 @@ void Player::Update(float deltaTime) {
 
 	// Object3dの更新
 	object3d_->Update();
+
+	UpdateImGui();
 }
 
 void Player::Draw() {
@@ -146,12 +151,12 @@ void Player::UpdateImGui() {
 #ifdef USE_IMGUI
 	ImGui::Begin("Player");
 
-	ImGui::Text("HP : %d", hp_);
+	/*ImGui::Text("HP : %d", hp_);
 	ImGui::Text("InvincibleFrameCount : %d", invincibleFrameCount_);
 	ImGui::DragFloat3("Position", &transform_.translate.x, 0.01f);
 	ImGui::DragFloat3("Rotate", &transform_.rotate.x, 0.01f);
 	ImGui::DragFloat3("Scale", &transform_.scale.x, 0.01f);
-	ImGui::DragFloat2("Velocity", &velocity_.x, 0.01f);
+	ImGui::DragFloat2("Velocity", &velocity_.x, 0.01f);*/
 	ImGui::DragFloat3("direction", &object3d_->GetDirectionalLight().direction.x, 0.01f);
 	ImGui::DragFloat("intensity", &object3d_->GetDirectionalLight().intensity, 0.01f);
 	ImGui::DragFloat("shininess", &object3d_->GetMaterial().shininess, 0.01f);
@@ -196,6 +201,12 @@ void Player::HorizontalMove() {
 
 void Player::Jump() {
 	bool isJumpInput = input_->KeyTriggered(DIK_SPACE) || gamePad_->GetState().buttonsPressed.a;
+	// bool isJumpHoldInput = input_->KeyDown(DIK_SPACE) || gamePad_->GetState().buttons.a;
+
+	// キーの入力時間に応じてジャンプ力を設定
+	/*if (isJumpHoldInput && !isJump_) {
+	    jumpPower_ += addChargeJumpAmount_;
+	}*/
 
 	// ジャンプ
 	if (isJumpInput && !isJump_) {
@@ -336,5 +347,16 @@ void Player::AnimationJump() {
 	if (afterJumpScaleAnim.anim.GetIsActive()) {
 		bool playing = afterJumpScaleAnim.anim.Update(deltaTime_, afterJumpScaleAnim.temp);
 		transform_.scale = afterJumpScaleAnim.temp;
+	}
+}
+
+void Player::AnimationFruitGet() {
+	if (!isGetFruit_)
+		return;
+
+	// フルーツ取得時のスケールアニメーション
+	if (fruitGetAnim_.anim.GetIsActive()) {
+		bool playing = fruitGetAnim_.anim.Update(deltaTime_, fruitGetAnim_.temp);
+		transform_.scale = fruitGetAnim_.temp;
 	}
 }

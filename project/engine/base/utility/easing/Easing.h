@@ -62,6 +62,7 @@ public:
 	}
 
 private:
+	// イージングテーブル
 	static constexpr EaseFunc EaseTable[] = {
 	    &Easing::EaseInSine,    &Easing::EaseOutSine,    &Easing::EaseInOutSine,    &Easing::EaseInQuad,    &Easing::EaseOutQuad,  &Easing::EaseInOutQuad,
 	    &Easing::EaseInCubic,   &Easing::EaseOutCubic,   &Easing::EaseInOutCubic,   &Easing::EaseInQuart,   &Easing::EaseOutQuart, &Easing::EaseInOutQuart,

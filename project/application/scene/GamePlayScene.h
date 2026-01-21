@@ -14,6 +14,7 @@
 #include "Cloud/Cloud.h"
 #include "XAudio.h"
 #include "GunTurret/GunTurret.h"
+#include "WaveTimer/WaveTimer.h"
 #include <array>
 #include <memory>
 #include <vector>
@@ -43,6 +44,9 @@ private:
 
 	// プレイヤーとフルーツの当たり判定
 	void CollisionPlayerFruits();
+
+	// プレイヤーと大砲の弾の当たり判定
+	void CollisionPlayerTurretBullet();
 
 	// ブドウの生成
 	void CreateGrape();
@@ -79,6 +83,8 @@ private:
 
 	// ヒップドロップダメージ表示更新
 	void UpdateHipDropDamageDisplay();
+
+	template<typename FruitType> void HandleFruitCollision(std::vector<std::unique_ptr<FruitType>>& fruits, const std::string& fruitName);
 
 #ifdef USE_IMGUI
 	// フレームレートの表示
@@ -220,4 +226,7 @@ private:
 
 	// 砲台
 	std::unique_ptr<GunTurret> gunTurret_;
+
+	// ウェーブタイマー
+	std::unique_ptr<WaveTimer> waveTimer_;
 };

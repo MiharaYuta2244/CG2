@@ -27,6 +27,7 @@ public:
 	void SetIsInvincible(bool isInvincible) { isInvincible_ = isInvincible; }
 	void SetIsHitEnemyHipDrop(bool isHitEnemyHipDrop) { isHitEnemyHipDrop_ = isHitEnemyHipDrop; }
 	void SetIsPowerUp(bool isPowerUp) { isPowerUp_ = isPowerUp; }
+	void SetIsGetFruit(bool isGetFruit) { isGetFruit_ = isGetFruit; }
 
 	// Getter
 	Vector2 GetVelocity() { return velocity_; }
@@ -35,6 +36,7 @@ public:
 	bool GetIsHitEnemyHipDrop() { return isHitEnemyHipDrop_; }
 	int GetHipDropPowerLevel() const { return hipDropPowerLevel_; }
 	int GetHipDropDamage() const { return isHipDropDamage_; }
+	DirectionalLight GetDirectionalLight(){return object3d_->GetDirectionalLight();}
 
 	// HPを取得
 	int GetHP() const { return hp_; }
@@ -82,6 +84,9 @@ private:
 
 	// ジャンプ時スケールアニメーション
 	void AnimationJump();
+
+	// フルーツを手に入れたときのスケールアニメーション
+	void AnimationFruitGet();
 
 private:
 	// 入力
@@ -163,4 +168,19 @@ private:
 	// プレイヤーの移動制限値
 	float rightMoveLimit_ = 42.0f;
 	float leftMoveLimit_ = -3.0f;
+
+	// チャージジャンプ用のゲージ
+	float chargeJumpGauge_ = 0.0f;
+
+	// チャージジャンプの最大値
+	const float kMaxChargeJumpGauge = 4.0f;
+
+	// チャージジャンプの加算量
+	float addChargeJumpAmount_ = 0.1f;
+
+	// フルーツ取得時アニメーション
+	AnimationBundle<Vector3> fruitGetAnim_;
+
+	// フルーツをゲットしたかどうか
+	bool isGetFruit_ = false;
 };

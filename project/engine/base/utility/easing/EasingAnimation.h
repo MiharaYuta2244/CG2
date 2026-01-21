@@ -5,12 +5,17 @@
 #include "Vector3.h"
 #include <algorithm>
 
+/// <summary>
+/// イージングアニメーションテンプレートクラスクラス
+/// </summary>
+/// <typeparam name="T">扱うデータ型</typeparam>
 template<typename T> class EasingAnimation {
 public:
 	EasingAnimation() : isActive_(false) {}
 
 	EasingAnimation(T start, T end, float duration, EaseType easeType) : start_(start), end_(end), duration_(duration), time_(0.0f), easeType_(easeType), isActive_(true) {}
 
+	// 更新処理
 	bool Update(float deltaTime, T& outValue) {
 		if (!isActive_)
 			return false;

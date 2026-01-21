@@ -103,10 +103,23 @@ void GunTurret::Appear() {
 }
 
 void GunTurret::AimAtTarget() {
-	// 弾の発射方向を設定
-	bulletDirection_ = MathUtility::Normalize(targetPos_ - gunTurretModel_->GetTranslate());
+	// 砲台からターゲットへのベクトル
+	Vector3 direction = targetPos_ - gunTurretModel_->GetTranslate();
+	direction = MathUtility::Normalize(direction);
 
-	state_ = State::CHARGING; // 状態遷移
+	// 弾の発射方向を設定
+	bulletDirection_ = direction;
+
+	// Y軸の回転角度を計算
+	float rotateY = std::atan2(direction.x, direction.z);
+
+	// 砲台のモデルの回転を設定
+	gunTurretModel_->SetRotate({0.0f, rotateY, 0.0f});
+
+	if (timer_ >= kAimDuration) {
+		state_ = State::CHARGING; // 状態遷移
+		ResetTimer();
+	}
 }
 
 void GunTurret::Charge() {
@@ -207,7 +220,7 @@ void GunTurret::UpdateRandomEscapePosTable() {
 	kEscapePosTable = {
 	    Vector3{gunTurretModel_->GetTranslate().x, 36.0f,                             0.0f}, // TOP
 	    Vector3{50.0f,	                         gunTurretModel_->GetTranslate().y, 0.0f}, // RIGHT
-	    Vector3{-10.0f,	                         gunTurretModel_->GetTranslate().y, 0.0f}, // LEFT
+	    Vector3{-10.0f,	                        gunTurretModel_->GetTranslate().y, 0.0f}, // LEFT
 	};
 }
 
