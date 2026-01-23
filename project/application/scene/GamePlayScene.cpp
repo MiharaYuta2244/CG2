@@ -295,7 +295,9 @@ void GamePlayScene::Finalize() {
 	for (auto& tree : treeModels_) {
 		tree.reset();
 	}
-	audio_->~XAudio();
+	if (audio_) {
+		audio_->~XAudio();
+	}
 }
 
 void GamePlayScene::StartGameScene() {
@@ -347,7 +349,7 @@ void GamePlayScene::ChangingColorHipDropPowerSprite() {
 		// 色の適用
 		if (!playing) {
 			hipDropPowerSprite_->SetColor(hipDropPowerSpriteAnimation_.temp);
-		}else{
+		} else {
 			hipDropPowerSprite_->SetColor({1.0f, 1.0f, 1.0f, 1.0f});
 		}
 	}

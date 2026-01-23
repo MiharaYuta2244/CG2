@@ -71,6 +71,12 @@ void Object3d::Update() {
 	transformMatrixData_->WorldInverseTranspose = MathUtility::Transpose(worldMatrix_);
 
 	*transformMatrixData_ = {transformMatrixData_->WVP, transformMatrixData_->World, transformMatrixData_->WorldInverseTranspose};
+
+	// DirectionalLightの方向を正規化
+	XMVECTOR dirVec = XMVectorSet(directionalLight_.direction.x, directionalLight_.direction.y, directionalLight_.direction.z, 0.0f);
+	dirVec = XMVector3Normalize(dirVec);
+	XMStoreFloat3(reinterpret_cast<XMFLOAT3*>(&directionalLight_.direction), dirVec);
+
 	*directionalLightData_ = directionalLight_;
 	*pointLightData_ = pointLight_;
 	*spotLightData_ = spotLight_;
@@ -172,7 +178,7 @@ void Object3d::CreateDirectionalLightData() {
 	directionalLightResource_->Unmap(0, nullptr);
 	// 初期化
 	directionalLight_.color = {1.0f, 1.0f, 1.0f, 1.0f};
-	directionalLight_.direction = {0.0f, 1.0f, 0.0f};
+	directionalLight_.direction = {0.0f, -1.0f, 0.0f};
 	directionalLight_.intensity = 1.0f;
 
 	// Vector3 → XMVECTOR 変換
@@ -252,7 +258,7 @@ void Object3d::CreateSpotLightData() {
 	// 初期化
 	spotLight_.color = {1.0f, 1.0f, 1.0f, 1.0f};
 	spotLight_.position = {0.0f, 10.0f, 0.0f};
-	spotLight_.intensity = 2.0f;
+	spotLight_.intensity = 1.0f;
 	spotLight_.direction = {0.0f, -1.0f, 0.0f};
 	spotLight_.distance = 20.0f;
 	spotLight_.decay = 1.0f;
@@ -272,7 +278,7 @@ void Object3d::CreateMaterialData() {
 	material_.enableLighting = true;
 	material_.enableFoging = false;
 	material_.uvTransform = MathUtility::MakeIdentity4x4();
-	material_.shininess = 2.0f;
+	material_.shininess = 64.0f;
 	// GPUへ書き込み
 	*materialData_ = material_;
 }

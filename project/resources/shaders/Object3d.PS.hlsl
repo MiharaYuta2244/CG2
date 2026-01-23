@@ -90,14 +90,14 @@ PixelShaderOutput main(VertexShaderOutput input)
     PixelShaderOutput output;
     // DirectionalLight計算
     float NdotL = dot(normalize(input.normal), -gDirectionalLight.direction);
-    float cos = (NdotL * 0.5f + 0.5f) * (NdotL * 0.5f + 0.5f);
+    float cos = pow(NdotL * 0.5f + 0.5f, 2.0f);
         
     float3 baseColor = (gMaterial.color.rgb * textureColor.rgb);
     
     // 拡散反射 directional
     float3 diffuseDirectionalLight = baseColor * gDirectionalLight.color.rgb * cos * gDirectionalLight.intensity;
     // 鏡面反射 directional
-    float3 specularDirectionalLight = baseColor * specularPow * gDirectionalLight.intensity;
+    float3 specularDirectionalLight = gDirectionalLight.color.rgb * gDirectionalLight.intensity * specularPow;
         
     // ポイントライト計算
     float3 pointLightDirection = normalize(gPointLight.position - input.worldPosition);
@@ -150,12 +150,15 @@ PixelShaderOutput main(VertexShaderOutput input)
     
     // PointLightの色
     float3 pLightColor = diffusePointLight + specularPointLight;
+    
+    // SpotLightの色
+    float3 sLightColor = diffuseSpotLight + specularSpotLight;
 
     // 最終色
-    float3 lightFinalColor = dirLightColor + pLightColor;
+    float3 lightFinalColor = pLightColor;
         
     // 拡散反射+鏡面反射
-    output.color.rgb = dirLightColor /* + diffuseSpotLight + specularSpotLight*/;
+    output.color.rgb = dirLightColor;
     // アルファ
     output.color.a = gMaterial.color.a * textureColor.a;
     

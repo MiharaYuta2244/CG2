@@ -18,4 +18,10 @@ public:
 private:
 	// 球モデル
 	std::unique_ptr<Object3d> sphereModel_;
+
+	// Plane.obj
+	std::unique_ptr<Object3d> planeObjModel_;
+
+	// Plane.glb
+	std::unique_ptr<Object3d> planeGltfModel_;
 };

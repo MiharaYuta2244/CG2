@@ -210,7 +210,9 @@ void TitleScene::Finalize() {
 	titleText_.reset();
 	startModel_.reset();
 	endModel_.reset();
-	audio_->~XAudio();
+	if (audio_) {
+		audio_->~XAudio();
+	}
 }
 
 void TitleScene::ChangeScene() {

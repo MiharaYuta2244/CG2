@@ -1,7 +1,7 @@
 #include "ResultScene.h"
 #include "SceneManager.h"
-#include <numbers>
 #include <fstream>
+#include <numbers>
 
 void ResultScene::Initialize(EngineContext* ctx, DirectInput* keyboard, GamePad* gamePad, DebugCamera* debugCamera, DeltaTime* timeManager, SceneManager* sceneManager) {
 	engineContext_ = ctx;
@@ -92,7 +92,9 @@ void ResultScene::Draw() {
 void ResultScene::Finalize() {
 	restartModel_.reset();
 	toTitleModel_.reset();
-	audio_->~XAudio();
+	if (audio_) {
+		audio_->~XAudio();
+	}
 }
 
 std::string ResultScene::LoadResultStatus() {

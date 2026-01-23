@@ -293,7 +293,7 @@ void Player::IncrementHipDropPowerLevel() { hipDropPowerLevel_ += 1; }
 
 void Player::SetFruitGetAnimation() {
 	fruitGetAnim_.anim = {
-	    transform_.scale, {2.0f, 2.0f, 2.0f},
+	    transform_.scale, {1.5f, 1.5f, 1.5f},
          0.3f, EaseType::EASEOUTCUBIC
     };
 
