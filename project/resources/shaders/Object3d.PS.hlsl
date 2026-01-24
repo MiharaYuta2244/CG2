@@ -159,7 +159,7 @@ PixelShaderOutput main(VertexShaderOutput input)
     float3 lightFinalColor = dirLightColor + pLightColor + sLightColor;
         
     // 拡散反射+鏡面反射
-    output.color.rgb = lightFinalColor;
+    output.color.rgb = dirLightColor;
     // アルファ
     output.color.a = gMaterial.color.a * textureColor.a;
     

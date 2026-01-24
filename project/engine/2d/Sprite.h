@@ -1,14 +1,14 @@
 #pragma once
 
-#include <d3d12.h>
-#include <memory>
-#include <string>
-#include <wrl.h>
+#include "EngineContext.h"
 #include "Matrix4x4.h"
 #include "Transform.h"
 #include "Vector2.h"
 #include "Vector4.h"
-#include "EngineContext.h"
+#include <d3d12.h>
+#include <memory>
+#include <string>
+#include <wrl.h>
 
 class Sprite {
 public:
@@ -59,6 +59,9 @@ public:
 	void SetIsFlipY(const bool& isFlipY) { isFlipY_ = isFlipY; }
 	void SetTextureLeftTop(const Vector2& textureLeftTop) { textureLeftTop_ = textureLeftTop; }
 	void SetTextureSize(const Vector2& textureSize) { textureSize_ = textureSize; }
+	void SetEnableShine(const uint32_t& enableShine) { materialData_->enableShine = enableShine; }
+	void SetShineColor(const Vector4& shineColor) { materialData_->shineColor = shineColor; }
+	void SetShineParams(const Vector4& shineParams) { materialData_->shineParams = shineParams; }
 
 private:
 	struct VertexData {
@@ -73,6 +76,9 @@ private:
 	struct Material {
 		Vector4 color;
 		Matrix4x4 uvTransform;
+		Vector4 shineParams;
+		Vector4 shineColor;
+		int32_t enableShine;
 	};
 
 private:
@@ -86,6 +92,9 @@ private:
 
 	// テクスチャサイズをイメージに合わせる
 	void AdjustTextureSize();
+
+	// 発光更新処理
+	void UpdateShine();
 
 private:
 	std::string textureFilePath_;
@@ -148,4 +157,7 @@ private:
 
 	// コンテキスト構造体
 	EngineContext* ctx_;
+
+	// 発光処理タイマー
+	float shineTimer_ = 0.0f;
 };

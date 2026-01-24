@@ -99,11 +99,6 @@ void TitleScene::Initialize(EngineContext* ctx, DirectInput* keyboard, GamePad* 
 	}
 
 	menuSelected_ = false;
-
-	// タイトルアニメーション
-	animationTitle_.start = titleText_->GetTranslate();
-	animationTitle_.end = {0.0f, 0.0f, 0.0f};
-	animationTitle_.temp = animationTitle_.start;
 }
 
 void TitleScene::Update() {
@@ -373,7 +368,7 @@ void TitleScene::AnimationTitle() {
 
 void TitleScene::Title1Update() {
 	if (titleNumber_ == TitleNumber::TITLE1) {
-		AnimationTitle();
+		//AnimationTitle();
 		titleText_->Update(timeManager_->GetDeltaTime());
 		startModel_->Update(timeManager_->GetDeltaTime());
 		endModel_->Update(timeManager_->GetDeltaTime());

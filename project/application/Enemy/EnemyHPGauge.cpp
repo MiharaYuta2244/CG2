@@ -11,6 +11,9 @@ void EnemyHPGauge::Initialize(EngineContext* ctx) {
 	spriteHPBar_->SetPosition({340.0f, 668.0f});
 	spriteHPBar_->SetSize({spriteHPBarSizeX_, 32.0f});
 	spriteHPBar_->SetColor({0.69f, 0.13f, 0.1f, 1.0f});
+	spriteHPBar_->SetEnableShine(true);
+	spriteHPBar_->SetShineColor({0.9f, 0.1f, 0.1f, 1.0f});
+	spriteHPBar_->SetShineParams({0.0f, 0.7f, 0.6f, 1.0f});
 
 	// HPゲージスプライト残像の初期化
 	spriteHPBarAfter_ = std::make_unique<Sprite>();
@@ -36,7 +39,7 @@ void EnemyHPGauge::Update(float deltaTime) {
 	} else if (spriteHPBarAfterSizeX_ > spriteHPBarSizeX_) {
 		if (!afterAnimation_.anim.GetIsActive()) {
 			// 残像アニメーション初期設定
-			afterAnimation_.anim = {spriteHPBarAfterSizeX_, spriteHPBarSizeX_, 0.5f, EaseType::EASEINCUBIC};
+			afterAnimation_.anim = {spriteHPBarAfterSizeX_, spriteHPBarSizeX_, 1.0f, EaseType::EASEINCUBIC};
 		} else {
 			bool playing = afterAnimation_.anim.Update(deltaTime, afterAnimation_.temp);
 			spriteHPBarAfterSizeX_ = afterAnimation_.temp; // サイズの更新

@@ -621,6 +621,9 @@ void GamePlayScene::GenerateTargetFruits() {
 		auto newSprite = std::make_unique<Sprite>();
 		newSprite->Initialize(engineContext_, "resources/" + fruitType + ".png");
 		newSprite->SetSize({42.0f, 42.0f});
+		newSprite->SetEnableShine(true);
+		newSprite->SetShineColor({0.8f, 0.8f, 0.8f, 1.0f});
+		newSprite->SetShineParams({0.0f, 0.3f, 0.5f, 1.0f});
 		fruitOrder_.push_back({fruitType, false, std::move(newSprite)});
 	}
 }
@@ -640,6 +643,7 @@ void GamePlayScene::DrawTargetFruits() {
 		// 収集済みの場合は薄い色、未収集の場合は通常の色
 		if (fruit.isCollected) {
 			sprite->SetColor({0.5f, 0.5f, 0.5f, 0.5f}); // グレーアウト
+			sprite->SetEnableShine(false);              // 発光を切る
 		} else {
 			sprite->SetColor({1.0f, 1.0f, 1.0f, 1.0f}); // 通常の色
 		}

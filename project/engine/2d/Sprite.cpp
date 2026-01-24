@@ -77,6 +77,9 @@ void Sprite::Update() {
         {position_.x, position_.y, 0.0f     }
     };
 
+	// 発光処理の更新
+	UpdateShine();
+
 	worldMatrix_ = MathUtility::MakeAffineMatrix(transform_.scale, transform_.rotate, transform_.translate);
 	Matrix4x4 viewMatrix = MathUtility::MakeIdentity4x4();
 	Matrix4x4 projectionMatrix = MathUtility::MakeOrthographicMatrix(0.0f, 0.0f, static_cast<float>(WinApp::kClientWidth), static_cast<float>(WinApp::kClientHeight), 0.0f, 100.0f);
@@ -146,6 +149,9 @@ void Sprite::CreateMaterialData() {
 
 	material_.color = {1.0f, 1.0f, 1.0f, 1.0f};
 	material_.uvTransform = MathUtility::MakeIdentity4x4();
+	material_.shineParams = {0.0f, 0.5f, 1.0f, 1.0f};
+	material_.shineColor = {1.0f, 1.0f, 1.0f, 1.0f};
+	material_.enableShine = false;
 	*materialData_ = material_;
 }
 
@@ -226,4 +232,20 @@ void Sprite::AdjustTextureSize() {
 
 	// 画像サイズをテクスチャサイズに合わせる
 	size_ = textureSize_;
+}
+
+void Sprite::UpdateShine() {
+	shineTimer_ += 1.0f / 60.0f;
+
+	float cycle = 3.0f;
+	float t = fmod(shineTimer_, cycle);
+
+	if (t < 1.0f) {
+		material_.shineParams.x = t;
+	} else {
+		material_.shineParams.x = -1.0f;
+		shineTimer_ = 0.0f;
+	}
+
+	materialData_->shineParams.x = material_.shineParams.x;
 }

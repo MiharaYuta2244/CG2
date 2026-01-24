@@ -1,1 +1,1 @@
-GameOver2.obj
+StageClear.obj

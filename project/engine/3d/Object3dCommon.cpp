@@ -318,9 +318,9 @@ void Object3dCommon::CreateGlobalDirectionalLightData() {
 	globalDirectionalLightResource_->Map(0, nullptr, reinterpret_cast<void**>(&globalDirectionalLightData_));
 	globalDirectionalLightResource_->Unmap(0, nullptr);
 	// 初期化
-	globalDirectionalLight_.color = {1.0f, 1.0f, 1.0f, 1.0f};
-	globalDirectionalLight_.direction = {0.0f, -1.0f, 0.0f};
-	globalDirectionalLight_.intensity = 1.0f;
+	globalDirectionalLight_.color = {1.0f, 0.7f, 0.4f, 1.0f};
+	globalDirectionalLight_.direction = {-0.702f, -0.253f, 0.666f};
+	globalDirectionalLight_.intensity = 1.2f;
 
 	// Vector3 → XMVECTOR 変換
 	XMVECTOR dirVec = XMVectorSet(globalDirectionalLight_.direction.x, globalDirectionalLight_.direction.y, globalDirectionalLight_.direction.z, 0.0f);
