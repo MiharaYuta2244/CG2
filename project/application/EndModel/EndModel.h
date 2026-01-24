@@ -12,7 +12,6 @@ public:
 	void SetSelected(bool isSelected) { isSelected_ = isSelected; }
 
 	Transform& GetTransform() { return endModel_->GetTransform(); }
-	DirectionalLight& GetDirectLight(){return endModel_->GetDirectionalLight();}
 	Material& GetMaterial() { return endModel_->GetMaterial(); }
 	Vector4& GetColor() { return endModel_->GetColor(); }
 

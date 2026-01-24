@@ -11,8 +11,6 @@ void StartModel::Initialize(EngineContext* ctx) {
 	startModel_->SetScale(baseScale_);
 	startModel_->SetRotate({0.0f, 3.6f, 0.0f});
 	startModel_->SetEnableLighting(true);
-	startModel_->GetDirectionalLight().direction = {3.0f, -1.0f, 0.0f};
-	startModel_->GetDirectionalLight().intensity = 1.0f;
 }
 
 void StartModel::Update(float deltaTime) {

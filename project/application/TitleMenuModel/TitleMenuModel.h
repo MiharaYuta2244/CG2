@@ -12,8 +12,6 @@ public:
 	// Getter
 	Vector3 GetTranslate() const { return stageModel_->GetTranslate(); }
 	bool GetSelected() const { return isSelected_; }
-	PointLight& GetPointLight() { return stageModel_->GetPointLight(); }
-	DirectionalLight& GetDirectionalLight() { return stageModel_->GetDirectionalLight(); }
 	Material& GetMaterial() { return stageModel_->GetMaterial(); }
 	Transform& GetTransform() { return stageModel_->GetTransform(); }
 

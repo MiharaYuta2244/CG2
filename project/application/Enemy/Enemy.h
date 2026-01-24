@@ -2,6 +2,7 @@
 #include "Actor.h"
 #include "EnemyHPGauge.h"
 #include "EngineContext.h"
+#include "AnimationBundle.h"
 
 class Enemy : public Actor {
 public:
@@ -10,9 +11,6 @@ public:
 	void Update(float deltaTime);
 
 	void Draw();
-
-	// ImGui
-	void UpdateImGui();
 
 	// Setter
 	void SetIsHitPlayerHipDrop(bool isHitPlayerHipDrop) { isHitPlayerHipDrop_ = isHitPlayerHipDrop; }
@@ -28,6 +26,9 @@ public:
 	void SubHP(int damage);
 
 private:
+	// ImGui
+	void UpdateImGui();
+
 	// 横移動
 	void HorizontalMove();
 
@@ -42,6 +43,12 @@ private:
 
 	// 無敵状態フレームカウント
 	void FrameCountIsInvincible();
+
+	// 被ダメージ時のアニメーション初期設定
+	void SettingDamageAnimation();
+
+	// 被ダメージ時のアニメーション
+	void UpdateDamageAnimation();
 
 private:
 	enum class Direction {
@@ -87,4 +94,7 @@ private:
 
 	// コンテキスト構造体
 	EngineContext* ctx_;
+
+	// 被ダメージ時のアニメーション
+	AnimationBundle<Vector3> damageAnimation_;
 };

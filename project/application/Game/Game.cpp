@@ -2,7 +2,6 @@
 #include "Scene/GamePlayScene.h"
 #include "Scene/ResultScene.h"
 #include "Scene/TitleScene.h"
-#include "Scene/TestScene.h"
 #include <algorithm>
 #include <numbers>
 
@@ -17,10 +16,9 @@ void Game::Initialize() {
 	sceneManager_->AddScene("Title", std::make_unique<TitleScene>());
 	sceneManager_->AddScene("GamePlay", std::make_unique<GamePlayScene>());
 	sceneManager_->AddScene("Result", std::make_unique<ResultScene>());
-	sceneManager_->AddScene("Test", std::make_unique<TestScene>());
 
 	// 最初のシーンを初期化
-	sceneManager_->ChangeScene("Test");
+	sceneManager_->ChangeScene("Title");
 
 	// フェード用スプライト初期化
 	fadeSprite_ = std::make_unique<Sprite>();

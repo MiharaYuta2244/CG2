@@ -75,6 +75,8 @@ void ResultScene::Update() {
 	ImGui::TextWrapped("Result Scene");
 	ImGui::TextWrapped("Press Space or GamePad A to Return to Title");
 	ImGui::End();
+
+	engineContext_->object3dCommon->DrawImGuiLighting();
 #endif
 }
 

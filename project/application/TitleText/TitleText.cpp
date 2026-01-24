@@ -11,8 +11,6 @@ void TitleText::Initialize(EngineContext* ctx) {
 	textModel_->SetRotate({-0.72f, 2.612f, 0.2f});
 	textModel_->SetScale({15.0f, 15.0f, 6.0f});
 	textModel_->SetEnableLighting(true);
-	textModel_->GetDirectionalLight().direction = {12.0f, 3.8f, 12.0f};
-	textModel_->GetDirectionalLight().intensity = 0.05f;
 	textModel_->GetMaterial().shininess = 64.0f;
 	textModel_->SetColor({1.0f, 0.7f, 0.0f, 1.0f});
 }

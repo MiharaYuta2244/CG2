@@ -10,7 +10,6 @@ void Enemy::Initialize(EngineContext* ctx) {
 	// Object3dの初期化
 	object3d_->Initialize(ctx_);
 	object3d_->SetColor({1.0f, 1.0f, 1.0f, 1.0f});
-	// object3d_->SetEnableLighting(false);
 
 	transform_.scale = {2.0f, 2.0f, 2.0f};
 	transform_.rotate = {0.0f, std::numbers::pi_v<float>, 0.0f};
@@ -50,6 +49,9 @@ void Enemy::Update(float deltaTime) {
 
 	// 位置の更新
 	object3d_->SetTransform(transform_);
+
+	// 被ダメージ時のアニメーション
+	UpdateDamageAnimation();
 
 	// Object3dの更新
 	object3d_->Update();
@@ -119,11 +121,11 @@ void Enemy::UpdateCollisionPos() {
 
 void Enemy::HitPlayerHipDrop() {
 	if (isHitPlayerHipDrop_ && !isInvincible_) {
-		// HP減算
-		// SubHP(1); // ここでダメージ量を渡す
-
 		// 無敵フラグを立てる
 		isInvincible_ = true;
+
+		// 被ダメージ時のアニメーション初期設定
+		SettingDamageAnimation();
 	}
 }
 
@@ -137,6 +139,20 @@ void Enemy::FrameCountIsInvincible() {
 			isInvincible_ = false;       // 無敵フラグを下ろす
 			invincibleFrameCount_ = 0;
 		}
+	}
+}
+
+void Enemy::SettingDamageAnimation() {
+	damageAnimation_.anim = { 
+		object3d_->GetScale(), {1.0f, 1.0f, 1.0f},
+         1.0f, EaseType::EASEOUTELASTIC
+    };
+}
+
+void Enemy::UpdateDamageAnimation() {
+	if (damageAnimation_.anim.GetIsActive()) {
+		damageAnimation_.anim.Update(deltaTime_, damageAnimation_.temp);
+		object3d_->SetScale(damageAnimation_.temp);
 	}
 }
 

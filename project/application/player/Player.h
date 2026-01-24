@@ -18,9 +18,6 @@ public:
 
 	void Draw();
 
-	// ImGui
-	void UpdateImGui();
-
 	// Setter
 	void SetVelocity(Vector2 velocity) { velocity_ = velocity; }
 	void SetIsHitEnemy(bool isHpSub) { isHitEnemy_ = isHpSub; }
@@ -36,7 +33,6 @@ public:
 	bool GetIsHitEnemyHipDrop() { return isHitEnemyHipDrop_; }
 	int GetHipDropPowerLevel() const { return hipDropPowerLevel_; }
 	int GetHipDropDamage() const { return isHipDropDamage_; }
-	DirectionalLight GetDirectionalLight(){return object3d_->GetDirectionalLight();}
 
 	// HPを取得
 	int GetHP() const { return hp_; }
@@ -55,6 +51,9 @@ private:
 	};
 
 private:
+	// ImGui
+	void UpdateImGui();
+
 	// 横移動
 	void HorizontalMove();
 

@@ -1,9 +1,11 @@
 #include "Object3dCommon.h"
 #include "DirectXCommon.h"
 #include "StringUtility.h"
+#include <DirectXMath.h>
 #include <format>
 
 using namespace Microsoft::WRL;
+using namespace DirectX;
 
 void Object3dCommon::DrawSettingCommon() {
 	// RootSignatureを設定。PSOに設定しているけど別途設定が必要
@@ -11,6 +13,13 @@ void Object3dCommon::DrawSettingCommon() {
 	dxCommon_->GetCommandList()->SetPipelineState(graphicsPipelineState_.Get()); // PSOを設定
 	// 形状を設定。PSOに設定しているものとはまた別。同じものを設定すると考えておけば良い
 	dxCommon_->GetCommandList()->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+
+	// ライティングCBufferの場所を指定
+	dxCommon_->GetCommandList()->SetGraphicsRootConstantBufferView(3, globalDirectionalLightResource_->GetGPUVirtualAddress());
+	// ポイントライトCBufferの場所を指定
+	dxCommon_->GetCommandList()->SetGraphicsRootConstantBufferView(7, globalPointLightResource_->GetGPUVirtualAddress());
+	// スポットライトCBufferの場所を指定
+	dxCommon_->GetCommandList()->SetGraphicsRootConstantBufferView(8, globalSpotLightResource_->GetGPUVirtualAddress());
 }
 
 void Object3dCommon::Initialize(DirectXCommon* dxCommon) {
@@ -20,7 +29,45 @@ void Object3dCommon::Initialize(DirectXCommon* dxCommon) {
 
 	// グラフィックスパイプラインの生成
 	CreateGraphicsPipeline();
+
+	// グローバルライティングリソースの生成
+	CreateGlobalDirectionalLightData();
+	CreateGlobalPointLightData();
+	CreateGlobalSpotLightData();
 }
+
+void Object3dCommon::Update() {
+	// グローバルライティングバッファ更新
+	UpdateGlobalLightingBuffers();
+}
+
+#ifdef USE_IMGUI
+void Object3dCommon::DrawImGuiLighting() {
+	ImGui::Begin("DirectionalLight");
+	ImGui::DragFloat3("Direction", &globalDirectionalLight_.direction.x, 0.01f);
+	ImGui::DragFloat("Intensity", &globalDirectionalLight_.intensity, 0.01f);
+	ImGui::ColorEdit4("Color", &globalDirectionalLight_.color.x);
+	ImGui::End();
+
+	ImGui::Begin("PointLight");
+	ImGui::DragFloat3("Direction", &globalPointLight_.position.x, 0.01f);
+	ImGui::DragFloat("Intensity", &globalPointLight_.intensity, 0.01f);
+	ImGui::DragFloat("Radius", &globalPointLight_.radius, 0.01f);
+	ImGui::DragFloat("Decay", &globalPointLight_.decay, 0.01f);
+	ImGui::ColorEdit4("Color", &globalPointLight_.color.x);
+	ImGui::End();
+
+	ImGui::Begin("SpotLight");
+	ImGui::DragFloat3("Direction", &globalSpotLight_.direction.x, 0.01f);
+	ImGui::DragFloat3("Direction", &globalSpotLight_.position.x, 0.01f);
+	ImGui::DragFloat("Intensity", &globalSpotLight_.intensity, 0.01f);
+	ImGui::DragFloat("Distance", &globalSpotLight_.distance, 0.01f);
+	ImGui::DragFloat("CosAngle", &globalSpotLight_.cosAngle, 0.01f);
+	ImGui::DragFloat("Decay", &globalSpotLight_.decay, 0.01f);
+	ImGui::ColorEdit4("Color", &globalSpotLight_.color.x);
+	ImGui::End();
+}
+#endif // USE_IMGUI
 
 void Object3dCommon::CreateRootSignature() {
 	HRESULT hr;
@@ -33,34 +80,34 @@ void Object3dCommon::CreateRootSignature() {
 
 	// RootParameter作成。複数設定できるので配列。
 	D3D12_ROOT_PARAMETER rootParameters[9] = {};
-	rootParameters[0].ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV;           // CBVを使う
-	rootParameters[0].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;       // PixelShaderで使う
-	rootParameters[0].Descriptor.ShaderRegister = 0;       // レジスタ番号0とバインド
-	rootParameters[1].ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV;         // CBVを使う
-	rootParameters[1].ShaderVisibility = D3D12_SHADER_VISIBILITY_VERTEX;       // VertexShaderで使う
-	rootParameters[1].Descriptor.ShaderRegister = 0;    // レジスタ番号0を使う
+	rootParameters[0].ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV;                   // CBVを使う
+	rootParameters[0].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;                // PixelShaderで使う
+	rootParameters[0].Descriptor.ShaderRegister = 0;                                   // レジスタ番号0とバインド
+	rootParameters[1].ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV;                   // CBVを使う
+	rootParameters[1].ShaderVisibility = D3D12_SHADER_VISIBILITY_VERTEX;               // VertexShaderで使う
+	rootParameters[1].Descriptor.ShaderRegister = 0;                                   // レジスタ番号0を使う
 	rootParameters[2].ParameterType = D3D12_ROOT_PARAMETER_TYPE_DESCRIPTOR_TABLE;      // DescriptorTableを使う
 	rootParameters[2].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;                // PixelShaderで使う
 	rootParameters[2].DescriptorTable.pDescriptorRanges = descriptorRange;             // Tableの中身の配列を指定
 	rootParameters[2].DescriptorTable.NumDescriptorRanges = _countof(descriptorRange); // Tableで利用する数
-	rootParameters[3].ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV;        // CBVを使う
-	rootParameters[3].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;       // PixelShaderで使う
-	rootParameters[3].Descriptor.ShaderRegister = 1;       // レジスタ番号1を使う
-	rootParameters[4].ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV;         // CBVを使う
-	rootParameters[4].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;     // PixelShaderで使う
-	rootParameters[4].Descriptor.ShaderRegister = 2;            // レジスタ番号2を使う
-	rootParameters[5].ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV;           // CBVを使う
-	rootParameters[5].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;              // PixelShaderで使う
-	rootParameters[5].Descriptor.ShaderRegister = 3;  // レジスタ番号3を使う
-	rootParameters[6].ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV;       // CBVを使う
-	rootParameters[6].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;       // PixelShaderで使う
-	rootParameters[6].Descriptor.ShaderRegister = 4;         // レジスタ番号4を使う
-	rootParameters[7].ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV;// CBVを使う
-	rootParameters[7].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;        // PixelShaderで使う
-	rootParameters[7].Descriptor.ShaderRegister = 5;               // レジスタ番号5を使う（PointLight）
-	rootParameters[8].ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV;       // CBVを使う
-	rootParameters[8].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;            // PixelShaderで使う
-	rootParameters[8].Descriptor.ShaderRegister = 6;        // レジスタ番号6を使う（SpotLight）
+	rootParameters[3].ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV;                   // CBVを使う
+	rootParameters[3].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;                // PixelShaderで使う
+	rootParameters[3].Descriptor.ShaderRegister = 1;                                   // レジスタ番号1を使う
+	rootParameters[4].ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV;                   // CBVを使う
+	rootParameters[4].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;                // PixelShaderで使う
+	rootParameters[4].Descriptor.ShaderRegister = 2;                                   // レジスタ番号2を使う
+	rootParameters[5].ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV;                   // CBVを使う
+	rootParameters[5].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;                // PixelShaderで使う
+	rootParameters[5].Descriptor.ShaderRegister = 3;                                   // レジスタ番号3を使う
+	rootParameters[6].ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV;                   // CBVを使う
+	rootParameters[6].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;                // PixelShaderで使う
+	rootParameters[6].Descriptor.ShaderRegister = 4;                                   // レジスタ番号4を使う
+	rootParameters[7].ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV;                   // CBVを使う
+	rootParameters[7].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;                // PixelShaderで使う
+	rootParameters[7].Descriptor.ShaderRegister = 5;                                   // レジスタ番号5を使う（PointLight）
+	rootParameters[8].ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV;                   // CBVを使う
+	rootParameters[8].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;                // PixelShaderで使う
+	rootParameters[8].Descriptor.ShaderRegister = 6;                                   // レジスタ番号6を使う（SpotLight）
 
 	D3D12_STATIC_SAMPLER_DESC staticSamplers[1] = {};
 	staticSamplers[0].Filter = D3D12_FILTER_MIN_MAG_MIP_LINEAR;   // バイリニアフィルタ
@@ -245,4 +292,112 @@ IDxcBlob* Object3dCommon::CompileShader(
 	shaderError->Release();
 	// 実行用のバイナリを返却
 	return shaderBlob;
+}
+
+void Object3dCommon::UpdateGlobalLightingBuffers() {
+	// DirectionalLightの方向を正規化
+	XMVECTOR dirVec = XMVectorSet(globalDirectionalLight_.direction.x, globalDirectionalLight_.direction.y, globalDirectionalLight_.direction.z, 0.0f);
+	dirVec = XMVector3Normalize(dirVec);
+	XMStoreFloat3(reinterpret_cast<XMFLOAT3*>(&globalDirectionalLight_.direction), dirVec);
+
+	// SpotLightの方向を正規化
+	XMVECTOR spotDirVec = XMVectorSet(globalSpotLight_.direction.x, globalSpotLight_.direction.y, globalSpotLight_.direction.z, 0.0f);
+	spotDirVec = XMVector3Normalize(spotDirVec);
+	XMStoreFloat3(reinterpret_cast<XMFLOAT3*>(&globalSpotLight_.direction), spotDirVec);
+
+	// バッファを更新
+	*globalDirectionalLightData_ = globalDirectionalLight_;
+	*globalPointLightData_ = globalPointLight_;
+	*globalSpotLightData_ = globalSpotLight_;
+}
+
+void Object3dCommon::CreateGlobalDirectionalLightData() {
+	// 平行光源用のリソースを作る
+	globalDirectionalLightResource_ = CreateBufferResource(dxCommon_->GetDevice(), sizeof(DirectionalLight));
+	// アドレス取得
+	globalDirectionalLightResource_->Map(0, nullptr, reinterpret_cast<void**>(&globalDirectionalLightData_));
+	globalDirectionalLightResource_->Unmap(0, nullptr);
+	// 初期化
+	globalDirectionalLight_.color = {1.0f, 1.0f, 1.0f, 1.0f};
+	globalDirectionalLight_.direction = {0.0f, -1.0f, 0.0f};
+	globalDirectionalLight_.intensity = 1.0f;
+
+	// Vector3 → XMVECTOR 変換
+	XMVECTOR dirVec = XMVectorSet(globalDirectionalLight_.direction.x, globalDirectionalLight_.direction.y, globalDirectionalLight_.direction.z, 0.0f);
+	// 正規化
+	dirVec = XMVector3Normalize(dirVec);
+	// XMVECTOR → Vector3 に戻す
+	XMStoreFloat3(reinterpret_cast<XMFLOAT3*>(&globalDirectionalLight_.direction), dirVec);
+
+	// globalDirectionalLightDataへの書き込み
+	*globalDirectionalLightData_ = globalDirectionalLight_;
+}
+
+void Object3dCommon::CreateGlobalPointLightData() {
+	// ポイントライト用のリソースを作る
+	globalPointLightResource_ = CreateBufferResource(dxCommon_->GetDevice(), sizeof(PointLight));
+	// アドレス取得
+	globalPointLightResource_->Map(0, nullptr, reinterpret_cast<void**>(&globalPointLightData_));
+	globalPointLightResource_->Unmap(0, nullptr);
+	// 初期化
+	globalPointLight_.color = {1.0f, 1.0f, 1.0f, 1.0f};
+	globalPointLight_.position = {0.0f, 5.0f, 0.0f};
+	globalPointLight_.intensity = 1.0f;
+	globalPointLight_.radius = 10.0f;
+	globalPointLight_.decay = 1.0f;
+	// globalPointLightDataへの書き込み
+	*globalPointLightData_ = globalPointLight_;
+}
+
+void Object3dCommon::CreateGlobalSpotLightData() {
+	// スポットライト用のリソースを作る
+	globalSpotLightResource_ = CreateBufferResource(dxCommon_->GetDevice(), sizeof(SpotLight));
+	// アドレス取得
+	globalSpotLightResource_->Map(0, nullptr, reinterpret_cast<void**>(&globalSpotLightData_));
+	globalSpotLightResource_->Unmap(0, nullptr);
+	// 初期化
+	globalSpotLight_.color = {1.0f, 1.0f, 1.0f, 1.0f};
+	globalSpotLight_.position = {0.0f, 10.0f, 0.0f};
+	globalSpotLight_.intensity = 1.0f;
+	globalSpotLight_.direction = {0.0f, -1.0f, 0.0f};
+	globalSpotLight_.distance = 20.0f;
+	globalSpotLight_.decay = 1.0f;
+	globalSpotLight_.cosAngle = 0.707f; // 約45度のコサイン値
+
+	// Vector3 → XMVECTOR 変換
+	XMVECTOR dirVec = XMVectorSet(globalSpotLight_.direction.x, globalSpotLight_.direction.y, globalSpotLight_.direction.z, 0.0f);
+	// 正規化
+	dirVec = XMVector3Normalize(dirVec);
+	// XMVECTOR → Vector3 に戻す
+	XMStoreFloat3(reinterpret_cast<XMFLOAT3*>(&globalSpotLight_.direction), dirVec);
+
+	// globalSpotLightDataへの書き込み
+	*globalSpotLightData_ = globalSpotLight_;
+}
+
+ComPtr<ID3D12Resource> Object3dCommon::CreateBufferResource(ComPtr<ID3D12Device> device, size_t sizeBytes) {
+	if (!device)
+		return nullptr;
+
+	// 頂点リソース用のヒープの設定
+	D3D12_HEAP_PROPERTIES heapProperties{};
+	heapProperties.Type = D3D12_HEAP_TYPE_UPLOAD; // uploadHeapを使う
+	// 頂点にリソースの設定
+	D3D12_RESOURCE_DESC resourceDesc{};
+	// バッファリソース。テクスチャの場合はまた別の設定をする
+	resourceDesc.Dimension = D3D12_RESOURCE_DIMENSION_BUFFER;
+	resourceDesc.Width = sizeBytes; // リソースのサイズ。今回はVector4を3頂点分
+	// バッファの場合はこれらは1にする決まり
+	resourceDesc.Height = 1;
+	resourceDesc.DepthOrArraySize = 1;
+	resourceDesc.MipLevels = 1;
+	resourceDesc.SampleDesc.Count = 1;
+	// バッファの場合はこれにする決まり
+	resourceDesc.Layout = D3D12_TEXTURE_LAYOUT_ROW_MAJOR;
+	// 実際に頂点リソースを作る
+	ComPtr<ID3D12Resource> resource = nullptr;
+	HRESULT hr = device->CreateCommittedResource(&heapProperties, D3D12_HEAP_FLAG_NONE, &resourceDesc, D3D12_RESOURCE_STATE_GENERIC_READ, nullptr, IID_PPV_ARGS(&resource));
+	assert(SUCCEEDED(hr));
+
+	return resource;
 }

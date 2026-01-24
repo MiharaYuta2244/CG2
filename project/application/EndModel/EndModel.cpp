@@ -11,8 +11,6 @@ void EndModel::Initialize(EngineContext* ctx) {
 	endModel_->SetScale(baseScale_);
 	endModel_->SetRotate({0.0f, 3.6f, 0.0f});
 	endModel_->SetEnableLighting(true);
-	endModel_->GetDirectionalLight().direction = {3.0f, -1.0f, 0.0f};
-	endModel_->GetDirectionalLight().intensity = 1.0f;
 }
 
 void EndModel::Update(float deltaTime) {

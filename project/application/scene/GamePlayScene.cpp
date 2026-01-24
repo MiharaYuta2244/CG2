@@ -370,10 +370,9 @@ void GamePlayScene::ImGuiDebugCamera() {
 }
 
 void GamePlayScene::ImGuiUpdate() {
-	player_->UpdateImGui();
-	enemy_->UpdateImGui();
 	ImGuiFPS();
 	ImGuiDebugCamera();
+	engineContext_->object3dCommon->DrawImGuiLighting();
 }
 #endif
 
@@ -390,8 +389,8 @@ void GamePlayScene::CollisionEnemyPlayerHipDrop() {
 		if (!player_->GetIsHitEnemyHipDrop()) {
 			player_->SetIsHitEnemyHipDrop(true);
 			int damage = player_->GetHipDropPowerLevel();
-			enemy_->SubHP(damage);
-			StartShake(30, 0.5f);
+			enemy_->SubHP(damage); // ダメージ減算
+			StartShake(30, 0.5f); // カメラシェイク
 		}
 	}
 }

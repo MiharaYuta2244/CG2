@@ -118,6 +118,7 @@ void Player::Update(float deltaTime) {
 	// Object3dの更新
 	object3d_->Update();
 
+	// ImGui
 	UpdateImGui();
 }
 
@@ -142,9 +143,6 @@ void Player::UpdateImGui() {
 	ImGui::DragFloat3("Rotate", &transform_.rotate.x, 0.01f);
 	ImGui::DragFloat3("Scale", &transform_.scale.x, 0.01f);
 	ImGui::DragFloat2("Velocity", &velocity_.x, 0.01f);
-	ImGui::DragFloat3("direction", &object3d_->GetDirectionalLight().direction.x, 0.01f);
-	ImGui::DragFloat("intensity", &object3d_->GetDirectionalLight().intensity, 0.01f);
-	ImGui::DragFloat("shininess", &object3d_->GetMaterial().shininess, 0.01f);
 	ImGui::End();
 #endif
 }

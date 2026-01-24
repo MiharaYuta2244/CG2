@@ -147,22 +147,10 @@ void TitleScene::Update() {
 	prevTitleNumber_ = titleNumber_;
 
 #ifdef USE_IMGUI
-	for (auto& model : titleMenuModels_) {
-		ImGui::Begin("Model");
-
-		ImGui::DragFloat3("direction", &model->GetDirectionalLight().direction.x, 0.01f);
-		ImGui::DragFloat("intensity", &model->GetDirectionalLight().intensity, 0.01f);
-		ImGui::DragFloat("shininess", &model->GetMaterial().shininess, 0.01f);
-
-		ImGui::End();
-	}
-
 	ImGui::Begin("Title");
 	ImGui::DragFloat3("position", &titleText_->GetTranslate().x, 0.01f);
 	ImGui::DragFloat3("rotate", &titleText_->GetRotate().x, 0.01f);
 	ImGui::DragFloat3("scale", &titleText_->GetScale().x, 0.01f);
-	ImGui::DragFloat3("direction", &titleText_->GetDirectLight().direction.x, 0.01f);
-	ImGui::DragFloat("intensity", &titleText_->GetDirectLight().intensity, 0.01f);
 	ImGui::DragFloat("shininess", &titleText_->GetMaterial().shininess, 0.01f);
 	ImGui::ColorEdit4("color", &titleText_->GetColor().x);
 	ImGui::End();
@@ -176,8 +164,6 @@ void TitleScene::Update() {
 	ImGui::DragFloat3("position", &startModel_->GetTransform().translate.x, 0.01f);
 	ImGui::DragFloat3("rotate", &startModel_->GetTransform().rotate.x, 0.01f);
 	ImGui::DragFloat3("scale", &startModel_->GetTransform().scale.x, 0.01f);
-	ImGui::DragFloat3("direction", &startModel_->GetDirectLight().direction.x, 0.01f);
-	ImGui::DragFloat("intensity", &startModel_->GetDirectLight().intensity, 0.01f);
 	ImGui::DragFloat("shininess", &startModel_->GetMaterial().shininess, 0.01f);
 	ImGui::ColorEdit4("color", &startModel_->GetColor().x);
 	ImGui::End();
@@ -186,11 +172,12 @@ void TitleScene::Update() {
 	ImGui::DragFloat3("position", &endModel_->GetTransform().translate.x, 0.01f);
 	ImGui::DragFloat3("rotate", &endModel_->GetTransform().rotate.x, 0.01f);
 	ImGui::DragFloat3("scale", &endModel_->GetTransform().scale.x, 0.01f);
-	ImGui::DragFloat3("direction", &endModel_->GetDirectLight().direction.x, 0.01f);
-	ImGui::DragFloat("intensity", &endModel_->GetDirectLight().intensity, 0.01f);
 	ImGui::DragFloat("shininess", &endModel_->GetMaterial().shininess, 0.01f);
 	ImGui::ColorEdit4("color", &endModel_->GetColor().x);
 	ImGui::End();
+
+	// Lighting
+	engineContext_->object3dCommon->DrawImGuiLighting();
 #endif
 }
 

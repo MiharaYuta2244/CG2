@@ -1,6 +1,9 @@
 #pragma once
-#include "DirectXCommon.h"
 #include "DebugCamera.h"
+#include "DirectXCommon.h"
+#include "DirectionalLight.h"
+#include "PointLight.h"
+#include "SpotLight.h"
 
 class Object3dCommon {
 public:
@@ -11,12 +14,22 @@ public:
 
 	void Initialize(DirectXCommon* dxCommon);
 
-	// setter
+	void Update();
+
+	// カメラのセッター
 	void SetDefaultCamera(DebugCamera* camera) { defaultCamera_ = camera; }
 
 	// getter
 	DirectXCommon* GetDxCommon() const { return dxCommon_; }
 	DebugCamera* GetDefaultCamera() { return defaultCamera_; }
+	DirectionalLight& GetDirectionalLight() { return globalDirectionalLight_; }
+	PointLight& GetPointLight() { return globalPointLight_; }
+	SpotLight& GetSpotLight() { return globalSpotLight_; }
+
+#ifdef USE_IMGUI
+	// Lighting用ImGuiの描画
+	void DrawImGuiLighting();
+#endif // USE_IMGUI
 
 private:
 	/// <summary>
@@ -40,6 +53,16 @@ private:
 	    // 初期化で生成したものを3つ
 	    IDxcUtils* dxcUtils, IDxcCompiler3* dxcCompiler, IDxcIncludeHandler* includeHandler);
 
+	// グローバルライティングバッファの更新
+	void UpdateGlobalLightingBuffers();
+
+	// グローバルライティングリソースの生成
+	void CreateGlobalDirectionalLightData();
+	void CreateGlobalPointLightData();
+	void CreateGlobalSpotLightData();
+
+	Microsoft::WRL::ComPtr<ID3D12Resource> CreateBufferResource(Microsoft::WRL::ComPtr<ID3D12Device> device, size_t sizeBytes);
+
 private:
 	DirectXCommon* dxCommon_;
 
@@ -54,4 +77,19 @@ private:
 
 	// カメラ
 	DebugCamera* defaultCamera_ = nullptr;
+
+	// グローバルライティングリソース
+	Microsoft::WRL::ComPtr<ID3D12Resource> globalDirectionalLightResource_;
+	Microsoft::WRL::ComPtr<ID3D12Resource> globalPointLightResource_;
+	Microsoft::WRL::ComPtr<ID3D12Resource> globalSpotLightResource_;
+
+	// グローバルライティングデータポインタ
+	DirectionalLight* globalDirectionalLightData_ = nullptr;
+	PointLight* globalPointLightData_ = nullptr;
+	SpotLight* globalSpotLightData_ = nullptr;
+
+	// グローバルライティングデータ
+	DirectionalLight globalDirectionalLight_;
+	PointLight globalPointLight_;
+	SpotLight globalSpotLight_;
 };

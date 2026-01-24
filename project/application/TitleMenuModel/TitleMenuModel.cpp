@@ -12,8 +12,6 @@ void TitleMenuModel::Initialize(EngineContext* ctx, Vector3 pos) {
 	stageModel_->SetRotate({0.0f, std::numbers::pi_v<float>, 0.0f});
 	stageModel_->SetColor(notSelectColor_);
 	stageModel_->SetEnableLighting(true);
-	stageModel_->GetDirectionalLight().intensity = 4.0f;
-	stageModel_->GetDirectionalLight().direction = {-1.0f, -0.6f, -0.2f};
 	stageModel_->GetMaterial().shininess = 64.0f;
 }
 
