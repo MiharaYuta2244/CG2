@@ -4,7 +4,6 @@
 #include "DirectInput.h"
 #include "EasingAnimation.h"
 #include "EngineContext.h"
-#include "PlayerGauge/PlayerGauge.h"
 #include "Sprite.h"
 #include <array>
 

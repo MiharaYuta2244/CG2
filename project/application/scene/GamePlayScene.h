@@ -149,9 +149,6 @@ private:
 	// 雲
 	std::array<std::unique_ptr<Cloud>,10> clouds_;
 
-	// ヒップドロップゲージ
-	std::unique_ptr<PlayerGauge> hipDropGauge_;
-
 	// ブドウ
 	std::vector<std::unique_ptr<Grape>> grapes_;
 

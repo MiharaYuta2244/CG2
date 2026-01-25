@@ -16,8 +16,9 @@ public:
 
 	void Update();
 
-	// カメラのセッター
+	// Setter
 	void SetDefaultCamera(DebugCamera* camera) { defaultCamera_ = camera; }
+	void SetDirectionalLightIntensity(const float& intensity) { globalDirectionalLight_.intensity = intensity; }
 
 	// getter
 	DirectXCommon* GetDxCommon() const { return dxCommon_; }

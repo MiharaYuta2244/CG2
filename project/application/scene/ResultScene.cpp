@@ -36,6 +36,9 @@ void ResultScene::Initialize(EngineContext* ctx, DirectInput* keyboard, GamePad*
 	// リザルトモデル
 	resultModel_ = std::make_unique<ResultModel>();
 	resultModel_->Initialize(engineContext_, resultStatus);
+
+	// タイトルシーンのライト初期設定
+	engineContext_->object3dCommon->SetDirectionalLightIntensity(2.0f);
 }
 
 void ResultScene::Update() {

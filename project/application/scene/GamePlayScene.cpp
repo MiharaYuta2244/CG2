@@ -49,10 +49,6 @@ void GamePlayScene::Initialize(EngineContext* ctx, DirectInput* keyboard, GamePa
 	leftCurtain_ = std::make_unique<BothCurtain>();
 	leftCurtain_->Initialize(ctx);
 
-	// ヒップドロップゲージ
-	hipDropGauge_ = std::make_unique<PlayerGauge>();
-	hipDropGauge_->Initialize(ctx);
-
 	// 雲
 	for (auto& cloud : clouds_) {
 		cloud = std::make_unique<Cloud>();
@@ -104,6 +100,9 @@ void GamePlayScene::Initialize(EngineContext* ctx, DirectInput* keyboard, GamePa
 	// ウェーブタイマーの生成&初期化
 	waveTimer_ = std::make_unique<WaveTimer>();
 	waveTimer_->Initialize(60.0f, engineContext_);
+
+	// タイトルシーンのライト初期設定
+	engineContext_->object3dCommon->SetDirectionalLightIntensity(0.5f);
 }
 
 void GamePlayScene::Update() {
@@ -183,9 +182,6 @@ void GamePlayScene::Update() {
 	rightCurtain_->Update();
 	leftCurtain_->Update();
 
-	// ヒップドロップゲージ
-	hipDropGauge_->Update();
-
 	// ウェーブタイマー更新
 	waveTimer_->Update(timeManager_->GetDeltaTime());
 
@@ -259,9 +255,6 @@ void GamePlayScene::Draw() {
 	// Particle
 	particleDustPlayer_->Draw();
 	particleDustEnemy_->Draw();
-
-	// ヒップドロップゲージ
-	hipDropGauge_->Draw();
 
 	// 目標フルーツ背景スプライトの描画
 	targetFruitBG_->Draw();

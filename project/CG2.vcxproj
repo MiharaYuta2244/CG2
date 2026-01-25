@@ -239,7 +239,6 @@ copy "$(windowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="engine\3d\modules\RadialRingModule.cpp" />
     <ClCompile Include="application\Scene\ResultScene.cpp" />
     <ClCompile Include="application\Scene\TitleScene.cpp" />
-    <ClCompile Include="application\PlayerGauge\PlayerGauge.cpp" />
     <ClCompile Include="application\TitleText\TitleText.cpp" />
     <ClCompile Include="application\StartModel\StartModel.cpp" />
     <ClCompile Include="application\Fruit\Orange\Orange.cpp" />
@@ -393,7 +392,6 @@ copy "$(windowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="application\Scene\GamePlayScene.h" />
     <ClInclude Include="application\Scene\ResultScene.h" />
     <ClInclude Include="application\Scene\TitleScene.h" />
-    <ClInclude Include="application\PlayerGauge\PlayerGauge.h" />
     <ClInclude Include="application\TitleText\TitleText.h" />
     <ClInclude Include="application\StartModel\StartModel.h" />
     <ClInclude Include="application\Fruit\Grape\Grape.h" />

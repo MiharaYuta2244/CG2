@@ -40,12 +40,6 @@ void TitleScene::Initialize(EngineContext* ctx, DirectInput* keyboard, GamePad* 
 	leftCurtain_ = std::make_unique<BothCurtain>();
 	leftCurtain_->Initialize(ctx);
 
-	// menuLayoutsの初期化
-	InitMenuLayouts();
-
-	// キャラクターセレクト画面かどうか
-	isCharacterSelection_ = false;
-
 	// モデル座標格納用配列
 	positions_ = {
 	    Vector3{20.0f, 2.0f, 0.0f },
@@ -62,6 +56,12 @@ void TitleScene::Initialize(EngineContext* ctx, DirectInput* keyboard, GamePad* 
         {TitleState::STAGE3,           3},
         {TitleState::CHARACTER_SELECT, 4},
 	};
+
+	// menuLayoutsの初期化
+	InitMenuLayouts();
+
+	// キャラクターセレクト画面かどうか
+	isCharacterSelection_ = false;
 
 	// タイトルメニューモデル
 	for (size_t i = 0; i < titleMenuModels_.size(); i++) {
@@ -99,6 +99,9 @@ void TitleScene::Initialize(EngineContext* ctx, DirectInput* keyboard, GamePad* 
 	}
 
 	menuSelected_ = false;
+
+	// タイトルシーンのライト初期設定
+	engineContext_->object3dCommon->SetDirectionalLightIntensity(2.0f);
 }
 
 void TitleScene::Update() {
@@ -224,6 +227,7 @@ void TitleScene::ChangeScene() {
 	if (startInput && titleState_ == TitleState::START) {
 		titleNumber_ = TitleNumber::TITLE2; // タイトル2へ
 		titleState_ = TitleState::STAGE1;   // タイトルの状態をステージ1に変更
+		ApplyMenuLayout();
 	} else if (startInput && titleState_ == TitleState::END) {
 		PostQuitMessage(0); // ゲーム終了
 	}
@@ -320,7 +324,7 @@ void TitleScene::OnMenuDecide() {
 		Transform& transform = titleMenuModels_[i]->GetTransform();
 
 		// イージング回転と移動を開始
-		StartMoveRotateY(easingMoveRotates_[i], transform, targetPos, 1.0f, 2);
+		StartMoveRotateY(easingMoveRotates_[i], transform, targetPos, 1.0f, 1);
 	}
 }
 
@@ -510,18 +514,11 @@ void TitleScene::UpdateMoveRotateY(EasingMoveRotate& move, Transform& transform,
 	// 位置補間
 	transform.translate = {std::lerp(move.startPos.x, move.targetPos.x, eased), std::lerp(move.startPos.y, move.targetPos.y, eased), std::lerp(move.startPos.z, move.targetPos.z, eased)};
 
-	// Y軸回転補間（最短回転）
-	float deltaYaw = move.targetYaw - move.startYaw;
-	while (deltaYaw > std::numbers::pi_v<float> * 2.0f)
-		deltaYaw -= std::numbers::pi_v<float> * 2.0f;
-	while (deltaYaw < -std::numbers::pi_v<float> * 2.0f)
-		deltaYaw += std::numbers::pi_v<float> * 2.0f;
-
 	// 追加回転数
-	float extraRotations = move.rotationCount * (std::numbers::pi_v<float> * 2.0f);
+	float extraRotations = move.rotationCount * (std::numbers::pi_v<float> * 2);
 
 	// eased補間に追加
-	transform.rotate.y = move.startYaw + (deltaYaw + extraRotations) * eased;
+	transform.rotate.y = move.startYaw + extraRotations * eased;
 
 	// 終了処理
 	if (t >= 1.0f) {

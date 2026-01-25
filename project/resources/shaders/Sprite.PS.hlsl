@@ -59,9 +59,9 @@ PixelShaderOutput main(VertexShaderOutput input)
     float3 shineColor = float3(gMaterial.shineColor.x, gMaterial.shineColor.y, gMaterial.shineColor.z) * shineFactor * shineIntensity;
 
     PixelShaderOutput output;
-    // 元の色に乗算色を掛け、その上に光沢色を足す
     if (gMaterial.enableShine)
     {
+        // 元の色に乗算色を掛け、その上に光沢色を足す
         output.color.rgb = (gMaterial.color.rgb * textureColor.rgb) + shineColor;
     }
     else

@@ -237,7 +237,7 @@ void Sprite::AdjustTextureSize() {
 void Sprite::UpdateShine() {
 	shineTimer_ += 1.0f / 60.0f;
 
-	float cycle = 3.0f;
+	float cycle = 1.0f;
 	float t = fmod(shineTimer_, cycle);
 
 	if (t < 1.0f) {
