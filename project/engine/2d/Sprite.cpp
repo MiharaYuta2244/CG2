@@ -53,10 +53,10 @@ void Sprite::Update() {
 	TextureRangeSelection();
 
 	// 頂点データ4つで四角形の描画
-	vertexData_[0].position = {left_, bottom_, 0.0f, 1.0f};  // 左下
-	vertexData_[1].position = {left_, top_, 0.0f, 1.0f};     // 左上
-	vertexData_[2].position = {right_, bottom_, 0.0f, 1.0f}; // 右下
-	vertexData_[3].position = {right_, top_, 0.0f, 1.0f};    // 右上
+	vertexData_[0].position = {left_ + vertexOffsets_[0].x, bottom_ + vertexOffsets_[0].y, 0.0f, 1.0f};  // 左下
+	vertexData_[1].position = {left_ + vertexOffsets_[1].x, top_ + vertexOffsets_[1].y, 0.0f, 1.0f};     // 左上
+	vertexData_[2].position = {right_ + vertexOffsets_[2].x, bottom_ + vertexOffsets_[2].y, 0.0f, 1.0f}; // 右下
+	vertexData_[3].position = {right_ + vertexOffsets_[3].x, top_ + vertexOffsets_[3].y, 0.0f, 1.0f};    // 右上
 
 	vertexData_[0].texcoord = {tex_left_, tex_bottom_};
 	vertexData_[1].texcoord = {tex_left_, tex_top_};

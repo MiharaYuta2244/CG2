@@ -211,6 +211,7 @@ copy "$(windowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="application\Scene\GamePlayScene.cpp" />
     <ClCompile Include="application\Fruit\Grape\Grape.cpp" />
     <ClCompile Include="application\GunTurret\GunTurret.cpp" />
+    <ClCompile Include="application\HipDropPowerBG\HipDropPowerBG.cpp" />
     <ClCompile Include="main.cpp">
       <Optimization Condition="'$(Configuration)|$(Platform)'=='Development|x64'">MaxSpeed</Optimization>
       <WholeProgramOptimization Condition="'$(Configuration)|$(Platform)'=='Development|x64'">true</WholeProgramOptimization>
@@ -405,6 +406,7 @@ copy "$(windowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="application\GunTurret\GunTurret.h" />
     <ClInclude Include="application\GunTurret\TurretBullet.h" />
     <ClInclude Include="application\WaveTimer\WaveTimer.h" />
+    <ClInclude Include="application\HipDropPowerBG\HipDropPowerBG.h" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="externals\imgui\LICENSE.txt" />

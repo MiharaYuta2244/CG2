@@ -1,11 +1,18 @@
 #pragma once
 #include "Matrix4x4.h"
+#include "Vector2.h"
 #include "Vector3.h"
 #include "Vector4.h"
 #include <numbers>
 class MathUtility {
 public:
 	MathUtility();
+
+	static Vector2 Add(const Vector2& v1, const Vector2& v2);
+
+	static Vector2 Subtract(const Vector2& v1, const Vector2& v2);
+
+	static Vector2 Multiply(float scalar, const Vector2& v);
 
 	/// <summary>
 	/// ベクトルの加算

@@ -15,6 +15,7 @@
 #include "XAudio.h"
 #include "GunTurret/GunTurret.h"
 #include "WaveTimer/WaveTimer.h"
+#include "HipDropPowerBG/HipDropPowerBG.h"
 #include <array>
 #include <memory>
 #include <vector>
@@ -232,4 +233,7 @@ private:
 
 	// ヒップドロップパワースプライトのカラーアニメーション
 	AnimationBundle<Vector4> hipDropPowerSpriteAnimation_;
+
+	// プレイヤーの攻撃力背景スプライト
+	std::unique_ptr<HipDropPowerBG> hipDropPowerBG_;
 };

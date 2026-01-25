@@ -101,6 +101,10 @@ void GamePlayScene::Initialize(EngineContext* ctx, DirectInput* keyboard, GamePa
 	waveTimer_ = std::make_unique<WaveTimer>();
 	waveTimer_->Initialize(60.0f, engineContext_);
 
+	// プレイヤーの攻撃力背景スプライト
+	hipDropPowerBG_ = std::make_unique<HipDropPowerBG>();
+	hipDropPowerBG_->Initialize(ctx);
+
 	// タイトルシーンのライト初期設定
 	engineContext_->object3dCommon->SetDirectionalLightIntensity(0.5f);
 }
@@ -181,6 +185,9 @@ void GamePlayScene::Update() {
 	// 画面両端の幕
 	rightCurtain_->Update();
 	leftCurtain_->Update();
+
+	// プレイヤーの攻撃力背景スプライト
+	hipDropPowerBG_->Update(timeManager_->GetDeltaTime());
 
 	// ウェーブタイマー更新
 	waveTimer_->Update(timeManager_->GetDeltaTime());
@@ -265,6 +272,9 @@ void GamePlayScene::Draw() {
 	// 画面両端の幕
 	rightCurtain_->Draw();
 	leftCurtain_->Draw();
+
+	// プレイヤーの攻撃力背景スプライト
+	hipDropPowerBG_->Draw();
 
 	// ヒップドロップダメージの描画
 	for (auto& sprite : hipDropDamageSprites_) {
@@ -596,7 +606,7 @@ void GamePlayScene::UpdateHipDropDamageDisplay() {
 	}
 
 	hipDropDamageSprites_[1]->SetTexture("resources/" + std::to_string(digit1) + ".png");
-	hipDropDamageSprites_[1]->SetPosition({1180.0f, 100.0f}); // 位置調整
+	hipDropDamageSprites_[1]->SetPosition({1190.0f, 100.0f}); // 位置調整
 	hipDropDamageSprites_[1]->Update();
 }
 

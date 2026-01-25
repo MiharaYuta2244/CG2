@@ -466,8 +466,8 @@ void TitleScene::UpdateEasing() {
 		// 進行度を0～1で計算
 		float progress = std::clamp(easingMoves_[i].elapsed / easingMoves_[i].duration, 0.0f, 1.0f);
 
-		// イージング関数を適用（easeOutCubicを使用）
-		float easeProgress = Easing::EaseOutCubic(progress);
+		// イージング関数を適用
+		float easeProgress = Easing::EaseOutBack(progress);
 
 		// 補間計算
 		Vector3 easedPosition = MathUtility::Lerp(easingMoves_[i].start, easingMoves_[i].target, easeProgress);

@@ -4,6 +4,27 @@
 
 MathUtility::MathUtility() {}
 
+Vector2 MathUtility::Add(const Vector2& v1, const Vector2& v2) {
+	Vector2 result;
+	result.x = v1.x + v2.x;
+	result.y = v1.y + v2.y;
+	return result;
+}
+
+Vector2 MathUtility::Subtract(const Vector2& v1, const Vector2& v2) {
+	Vector2 result;
+	result.x = v1.x - v2.x;
+	result.y = v1.y - v2.y;
+	return result;
+}
+
+Vector2 MathUtility::Multiply(float scalar, const Vector2& v) {
+	Vector2 result;
+	result.x = v.x * scalar;
+	result.y = v.y * scalar;
+	return result;
+}
+
 Vector3 MathUtility::Add(const Vector3& v1, const Vector3& v2) {
 	Vector3 result;
 	result.x = v1.x + v2.x;

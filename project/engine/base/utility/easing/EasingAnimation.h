@@ -2,6 +2,7 @@
 #include "EaseType.h"
 #include "Easing.h"
 #include "MathOperator.h"
+#include "Vector2.h"
 #include "Vector3.h"
 #include <algorithm>
 

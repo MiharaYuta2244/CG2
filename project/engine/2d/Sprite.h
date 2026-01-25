@@ -63,6 +63,18 @@ public:
 	void SetShineColor(const Vector4& shineColor) { materialData_->shineColor = shineColor; }
 	void SetShineParams(const Vector4& shineParams) { materialData_->shineParams = shineParams; }
 
+	// 頂点ごとのオフセットを設定
+	void SetVertexOffset(uint32_t index, const Vector2& offset) {
+		if (index < 4)
+			vertexOffsets_[index] = offset;
+	}
+
+	// オフセットをまとめてセットする
+	void SetVertexOffsets(const Vector2 offsets[4]) {
+		for (int i = 0; i < 4; ++i)
+			vertexOffsets_[i] = offsets[i];
+	}
+
 private:
 	struct VertexData {
 		Vector4 position;
@@ -160,4 +172,12 @@ private:
 
 	// 発光処理タイマー
 	float shineTimer_ = 0.0f;
+
+	// 頂点オフセット
+	Vector2 vertexOffsets_[4] = {
+	    {0.0f, 0.0f},
+        {0.0f, 0.0f},
+        {0.0f, 0.0f},
+        {0.0f, 0.0f}
+    };
 };
