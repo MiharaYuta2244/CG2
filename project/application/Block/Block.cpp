@@ -15,7 +15,7 @@ void Block::Initialize(EngineContext* ctx) {
 	transform_.scale = {1.0f, 1.0f, 1.0f};
 
 	// アニメーションの初期設定
-	upMoveAnimation_.anim = {transform_.translate.y, 5.0f, 5.0f, EaseType::EASEOUTBOUNCE};
+	upMoveAnimation_.anim = {transform_.translate.y, 5.0f, 3.0f, EaseType::EASEOUTBOUNCE};
 	upMoveAnimation_.temp = transform_.translate.y;
 }
 

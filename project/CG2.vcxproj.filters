@@ -282,13 +282,16 @@
     <ClCompile Include="application\GunTurret\TurretBullet.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
-    <ClCompile Include="application\WaveTimer\WaveTimer.cpp">
-      <Filter>ソース ファイル</Filter>
-    </ClCompile>
     <ClCompile Include="application\HipDropPowerBG\HipDropPowerBG.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
     <ClCompile Include="application\HPGauge\PlayerHPGauge.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="application\CrossEffect\CrossEffect.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="engine\base\utility\screenSpaceUtility\ScreenSpaceUtility.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
   </ItemGroup>
@@ -613,9 +616,6 @@
     <ClInclude Include="engine\base\utility\easing\AnimationBundle.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
-    <ClInclude Include="application\WaveTimer\WaveTimer.h">
-      <Filter>ヘッダー ファイル</Filter>
-    </ClInclude>
     <ClInclude Include="application\HipDropPowerBG\HipDropPowerBG.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
@@ -626,6 +626,12 @@
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
     <ClInclude Include="application\HPGauge\PlayerHPGauge.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="application\CrossEffect\CrossEffect.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="engine\base\utility\screenSpaceUtility\ScreenSpaceUtility.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
   </ItemGroup>

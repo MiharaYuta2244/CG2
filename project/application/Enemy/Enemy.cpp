@@ -145,7 +145,7 @@ void Enemy::FrameCountIsInvincible() {
 
 void Enemy::SettingDamageAnimation() {
 	damageAnimation_.anim = { 
-		object3d_->GetScale(), {1.0f, 1.0f, 1.0f},
+		object3d_->GetScale(), {2.0f, 1.0f, 2.0f},
          1.0f, EaseType::EASEOUTELASTIC
     };
 }

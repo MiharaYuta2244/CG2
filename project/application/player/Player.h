@@ -6,6 +6,7 @@
 #include "EngineContext.h"
 #include "HPGauge/PlayerHPGauge.h"
 #include "Sprite.h"
+#include "ScreenSpaceUtility.h"
 #include <array>
 
 class GamePad;
@@ -147,8 +148,8 @@ private:
 	bool isPowerUp_ = false;
 
 	// スプライトとプレイヤーの距離
-	Vector2 spriteHPGaugeMargin_ = {-2.5f, 3.0f}; // HPゲージとプレイヤー
-	Vector2 spriteLevelUpMargin_ = {2.0f, 0.0f};  // レベルアップとプレイヤー
+	Vector2 spriteHPGaugeMargin_ = {-2.5f, -2.0f}; // HPゲージとプレイヤー
+	Vector2 spriteLevelUpMargin_ = {0.0f, 3.0f};  // レベルアップとプレイヤー
 
 	// コンテキスト構造体
 	EngineContext* ctx_;
@@ -195,12 +196,9 @@ private:
 	// レベルアップアニメーション
 	AnimationBundle<Vector2> levelUpAnimation_;
 
-	// フルーツ取得時の十字エフェクト
-	std::unique_ptr<Sprite> crossSprite_;
-
-	// 十字エフェクトアニメーション
-	AnimationBundle<float> crossRotateAnimation_;
-
 	// HPゲージ
 	std::unique_ptr<PlayerHPGauge> hpGauge_;
+
+	// 座標変換便利クラス
+	std::unique_ptr<ScreenSpaceUtility> screenSpaceUtility_;
 };

@@ -97,10 +97,6 @@ void GamePlayScene::Initialize(EngineContext* ctx, DirectInput* keyboard, GamePa
 	gunTurret_ = std::make_unique<GunTurret>();
 	gunTurret_->Initialize(engineContext_);
 
-	// ウェーブタイマーの生成&初期化
-	waveTimer_ = std::make_unique<WaveTimer>();
-	waveTimer_->Initialize(60.0f, engineContext_);
-
 	// プレイヤーの攻撃力背景スプライト
 	hipDropPowerBG_ = std::make_unique<HipDropPowerBG>();
 	hipDropPowerBG_->Initialize(ctx);
@@ -189,9 +185,6 @@ void GamePlayScene::Update() {
 	// プレイヤーの攻撃力背景スプライト
 	hipDropPowerBG_->Update(timeManager_->GetDeltaTime());
 
-	// ウェーブタイマー更新
-	waveTimer_->Update(timeManager_->GetDeltaTime());
-
 	// ヒップドロップダメージ表示の更新
 	UpdateHipDropDamageDisplay();
 
@@ -199,8 +192,15 @@ void GamePlayScene::Update() {
 	EndGameCheck();
 
 	// ヒップドロップパワースプライト更新
-	ChangingColorHipDropPowerSprite(); // カラーアニメーション
 	hipDropPowerSprite_->Update();
+
+	// 十字エフェクト
+	for (auto& effect : crossEffects_) {
+		effect->Update(timeManager_->GetDeltaTime(), engineContext_->object3dCommon->GetDefaultCamera());
+	}
+
+	// アニメーションが終わっていれば十字エフェクトを削除
+	std::erase_if(crossEffects_, [&](auto& effect) { return !effect->GetIsAnimation(); });
 
 #ifdef USE_IMGUI
 	// ImGuiデバッグ表示
@@ -263,6 +263,11 @@ void GamePlayScene::Draw() {
 	particleDustPlayer_->Draw();
 	particleDustEnemy_->Draw();
 
+	// 十字エフェクト
+	for (auto& effect : crossEffects_) {
+		effect->Draw();
+	}
+
 	// 目標フルーツ背景スプライトの描画
 	targetFruitBG_->Draw();
 
@@ -283,9 +288,6 @@ void GamePlayScene::Draw() {
 
 	// ヒップドロップパワースプライト描画
 	hipDropPowerSprite_->Draw();
-
-	// ウェーブタイマー描画
-	waveTimer_->Draw();
 }
 
 void GamePlayScene::Finalize() {
@@ -336,24 +338,6 @@ void GamePlayScene::SpawnObjectsByMapChip(Vector2 leftTop) {
 				block->SetModel("Box.obj");
 				blocks_.push_back(std::move(block));
 			}
-		}
-	}
-}
-
-void GamePlayScene::ChangingColorHipDropPowerSprite() {
-	if (!hipDropPowerSpriteAnimation_.anim.GetIsActive()) {
-		hipDropPowerSpriteAnimation_.anim = {
-		    hipDropPowerSprite_->GetColor(), {1.0f, 0.0f, 0.0f, 1.0f},
-             1.0f, EaseType::EASEOUTCUBIC
-        };
-	} else {
-		bool playing = hipDropPowerSpriteAnimation_.anim.Update(timeManager_->GetDeltaTime(), hipDropPowerSpriteAnimation_.temp);
-
-		// 色の適用
-		if (!playing) {
-			hipDropPowerSprite_->SetColor(hipDropPowerSpriteAnimation_.temp);
-		} else {
-			hipDropPowerSprite_->SetColor({1.0f, 1.0f, 1.0f, 1.0f});
 		}
 	}
 }
@@ -430,6 +414,11 @@ template<typename FruitType> void GamePlayScene::HandleFruitCollision(std::vecto
 			        // フルーツ取得時プレイヤーのスケールアニメーションフラグをたてる
 			        player_->SetIsGetFruit(true);
 			        player_->SetFruitGetAnimation(); // アニメーションの初期設定
+
+			        // 十字エフェクトの生成&初期化
+			        auto crossEffect = std::make_unique<CrossEffect>();
+			        crossEffect->Initialize(engineContext_, player_->GetTranslate());
+			        crossEffects_.push_back(std::move(crossEffect));
 
 			        return true;
 		        }

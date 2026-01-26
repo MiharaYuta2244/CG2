@@ -14,8 +14,8 @@
 #include "Cloud/Cloud.h"
 #include "XAudio.h"
 #include "GunTurret/GunTurret.h"
-#include "WaveTimer/WaveTimer.h"
 #include "HipDropPowerBG/HipDropPowerBG.h"
+#include "CrossEffect/CrossEffect.h"
 #include <array>
 #include <memory>
 #include <vector>
@@ -86,9 +86,6 @@ private:
 	void UpdateHipDropDamageDisplay();
 
 	template<typename FruitType> void HandleFruitCollision(std::vector<std::unique_ptr<FruitType>>& fruits, const std::string& fruitName);
-
-	// ヒップドロップパワースプライトの色の切り替え
-	void ChangingColorHipDropPowerSprite();
 
 #ifdef USE_IMGUI
 	// フレームレートの表示
@@ -228,12 +225,9 @@ private:
 	// 砲台
 	std::unique_ptr<GunTurret> gunTurret_;
 
-	// ウェーブタイマー
-	std::unique_ptr<WaveTimer> waveTimer_;
-
-	// ヒップドロップパワースプライトのカラーアニメーション
-	AnimationBundle<Vector4> hipDropPowerSpriteAnimation_;
-
 	// プレイヤーの攻撃力背景スプライト
 	std::unique_ptr<HipDropPowerBG> hipDropPowerBG_;
+
+	// 十字エフェクト
+	std::vector<std::unique_ptr<CrossEffect>> crossEffects_;
 };

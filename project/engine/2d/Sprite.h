@@ -46,6 +46,7 @@ public:
 	bool& GetIsFlipY() { return isFlipY_; }
 	Vector2& GetTextureLeftTop() { return textureLeftTop_; }
 	Vector2& GetTextureSize() { return textureSize_; }
+	float& GetZDepth() { return zDepth_; }
 
 	// setter
 	void SetPosition(const Vector2& position) { position_ = position; }
@@ -62,6 +63,7 @@ public:
 	void SetEnableShine(const uint32_t& enableShine) { materialData_->enableShine = enableShine; }
 	void SetShineColor(const Vector4& shineColor) { materialData_->shineColor = shineColor; }
 	void SetShineParams(const Vector4& shineParams) { materialData_->shineParams = shineParams; }
+	void SetZDepth(float zDepth) { zDepth_ = zDepth; }
 
 	// 頂点ごとのオフセットを設定
 	void SetVertexOffset(uint32_t index, const Vector2& offset) {
@@ -180,4 +182,7 @@ private:
         {0.0f, 0.0f},
         {0.0f, 0.0f}
     };
+
+	// 深度値
+	float zDepth_ = 0.0f;
 };

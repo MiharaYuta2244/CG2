@@ -143,7 +143,6 @@ void SpriteCommon::CreateGraphicsPipeline()
 	graphicsPipelineStateDesc.PrimitiveTopologyType = D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE;
 	// どのように画面に色を打ち込むのかの設定(気にしなくていい)
 	graphicsPipelineStateDesc.SampleDesc.Count = 1;
-	/*graphicsPipelineStateDesc.SampleDesc.Quality = 0;*/
 	graphicsPipelineStateDesc.SampleMask = D3D12_DEFAULT_SAMPLE_MASK;
 	// DepthStencilの設定
 	graphicsPipelineStateDesc.DepthStencilState = depthStencilDesc;

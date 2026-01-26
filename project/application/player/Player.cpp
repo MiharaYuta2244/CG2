@@ -36,32 +36,25 @@ void Player::Initialize(EngineContext* ctx, DirectInput* input, GamePad* gamePad
 	levelUpSprite_ = std::make_unique<Sprite>();
 	levelUpSprite_->Initialize(ctx, "resources/LEVEL_UP.png");
 	levelUpSprite_->SetPosition({640.0f, 360.0f});
+	levelUpSprite_->SetAnchorPoint({0.5f, 0.5f});
 	levelUpSprite_->SetSize({64.0f, 14.0f});
 	levelUpSprite_->SetEnableShine(true);
 	levelUpSprite_->SetShineParams({0.0f, 0.5f, 0.5f, 1.0f});
 
-	// 十字エフェクトスプライト
-	crossSprite_ = std::make_unique<Sprite>();
-	crossSprite_->Initialize(ctx, "resources/Cross.png");
-	crossSprite_->SetPosition({0.0f, 0.0f});
-	crossSprite_->SetSize({1920.0f, 1920.0f});
-	crossSprite_->SetAnchorPoint({0.5f, 0.5f});
-	crossSprite_->SetColor({0.6f, 0.6f, 0.6f, 1.0f});
-	crossSprite_->SetEnableShine(true);
-	crossSprite_->SetShineParams({0.0f, 0.8f, 1.0f, 1.0f});
-	crossSprite_->SetShineColor({1.0f, 1.0f, 1.0f, 1.0f});
-
-	// 十字エフェクトアニメーション
-	crossRotateAnimation_.anim = {0.0f, std::numbers::pi_v<float> * 2, 0.5f, EaseType::EASEOUTCUBIC};
-
 	// HPゲージ
 	hpGauge_ = std::make_unique<PlayerHPGauge>();
 	hpGauge_->Initialize(ctx);
+
+	// 座標変換便利クラス
+	screenSpaceUtility_=std::make_unique<ScreenSpaceUtility>();
 }
 
 void Player::Update(float deltaTime) {
 	// 経過時間
 	deltaTime_ = deltaTime;
+
+	// カメラをセット
+	screenSpaceUtility_->SetCamera(ctx_->object3dCommon->GetDefaultCamera());
 
 	// 重力
 	if (!isRotate_) {
@@ -117,7 +110,7 @@ void Player::Update(float deltaTime) {
 	UpdateCollisionPos();
 
 	// HPゲージスプライト
-	hpGauge_->SetPosition(ScreenToWorldPoint({transform_.translate.x, transform_.translate.y, transform_.translate.z}, spriteHPGaugeMargin_));
+	hpGauge_->SetPosition(screenSpaceUtility_->WorldToScreen({transform_.translate.x, transform_.translate.y, transform_.translate.z}, spriteHPGaugeMargin_));
 	hpGauge_->HPBarSpriteApply(hp_, kMaxHP);
 	hpGauge_->Update(deltaTime);
 
@@ -131,20 +124,9 @@ void Player::Update(float deltaTime) {
 			levelUpSprite_->SetSize({64.0f, 14.0f});
 		}
 
-		levelUpSprite_->SetPosition(ScreenToWorldPoint({transform_.translate.x, transform_.translate.y, transform_.translate.z}, spriteLevelUpMargin_));
+		levelUpSprite_->SetPosition(screenSpaceUtility_->WorldToScreen({transform_.translate.x, transform_.translate.y, transform_.translate.z}, spriteLevelUpMargin_));
 		levelUpSprite_->Update();
 	}
-
-	// 十字エフェクト
-	bool playing = crossRotateAnimation_.anim.Update(deltaTime, crossRotateAnimation_.temp);
-
-	if (!playing) {
-		crossRotateAnimation_.anim = {0.0f, std::numbers::pi_v<float> * 2, 0.5f, EaseType::EASEOUTCUBIC};
-	}
-
-	crossSprite_->SetRotation(crossRotateAnimation_.temp);
-	crossSprite_->SetPosition(ScreenToWorldPoint({transform_.translate.x, transform_.translate.y, transform_.translate.z}, {0.0f, 0.0f}));
-	crossSprite_->Update();
 
 	// 位置の更新
 	object3d_->SetTransform(transform_);
@@ -164,9 +146,6 @@ void Player::Draw() {
 
 	// HPゲージスプライト
 	hpGauge_->Draw();
-
-	// 十字エフェクト
-	// crossSprite_->Draw();
 
 	// レベルアップスプライト
 	if (isLevelUp_) {
