@@ -43,6 +43,12 @@ void Player::Initialize(EngineContext* ctx, DirectInput* input, GamePad* gamePad
 		spriteHPGauge_[i]->SetSize({24.0f, 32.0f});
 		spriteHPGauge_[i]->SetColor({0.0f, 1.0f, 0.0f, 1.0f});
 	}
+
+	// レベルアップスプライト
+	levelUpSprite_ = std::make_unique<Sprite>();
+	levelUpSprite_->Initialize(ctx, "resources/LEVEL_UP.png");
+	levelUpSprite_->SetPosition({640.0f, 360.0f});
+	levelUpSprite_->SetSize({64.0f, 14.0f});
 }
 
 void Player::Update(float deltaTime) {
@@ -112,6 +118,20 @@ void Player::Update(float deltaTime) {
 		hpGauge->Update();
 	}
 
+	// レベルアップスプライト
+	if (isLevelUp_) {
+		bool playing = levelUpAnimation_.anim.Update(deltaTime, levelUpAnimation_.temp);
+		levelUpSprite_->SetSize(levelUpAnimation_.temp);
+
+		if (!playing) {
+			isLevelUp_ = false; // レベルアップフラグをおろす
+			levelUpSprite_->SetSize({64.0f,14.0f});
+		}
+
+		levelUpSprite_->SetPosition(ScreenToWorldPoint({transform_.translate.x, transform_.translate.y, transform_.translate.z}, spriteMargin_));
+		levelUpSprite_->Update();
+	}
+
 	// 位置の更新
 	object3d_->SetTransform(transform_);
 
@@ -131,6 +151,11 @@ void Player::Draw() {
 	// HPゲージスプライト
 	for (auto& hpGauge : spriteHPGauge_) {
 		hpGauge->Draw();
+	}
+
+	// レベルアップスプライト
+	if (isLevelUp_) {
+		levelUpSprite_->Draw();
 	}
 }
 
@@ -287,7 +312,16 @@ void Player::AfterHipDrop() {
 	}
 }
 
-void Player::IncrementHipDropPowerLevel() { hipDropPowerLevel_ += 1; }
+void Player::IncrementHipDropPowerLevel() {
+	hipDropPowerLevel_ += 1; // 攻撃力を増やす
+	isLevelUp_ = true;       // レベルアップフラグを立てる
+
+	// レベルアップアニメーション初期設定
+	levelUpAnimation_.anim = {
+	    levelUpSprite_->GetSize(), {128.0f, 28.0f},
+         1.0f, EaseType::EASEOUTBOUNCE
+    };
+}
 
 void Player::SetFruitGetAnimation() {
 	fruitGetAnim_.anim = {
@@ -295,7 +329,7 @@ void Player::SetFruitGetAnimation() {
          0.3f, EaseType::EASEOUTCUBIC
     };
 
-	if (afterFruitGetAnim_.anim.GetIsActive()){
+	if (afterFruitGetAnim_.anim.GetIsActive()) {
 		afterFruitGetAnim_.anim.Reset();
 	}
 }

@@ -13,9 +13,16 @@ void Block::Initialize(EngineContext* ctx) {
 	transform_.translate = {0.0f, 0.0f, 0.0f};
 	transform_.rotate = {0.0f, 0.0f, 0.0f};
 	transform_.scale = {1.0f, 1.0f, 1.0f};
+
+	// アニメーションの初期設定
+	upMoveAnimation_.anim = {transform_.translate.y, 5.0f, 5.0f, EaseType::EASEOUTBOUNCE};
+	upMoveAnimation_.temp = transform_.translate.y;
 }
 
-void Block::Update() {
+void Block::Update(float deltaTime) {
+	// 上昇アニメーション
+	//UpMoveAnimation(deltaTime);
+
 	object3d_->SetTransform(transform_);
 	object3d_->Update();
 }
@@ -23,3 +30,10 @@ void Block::Update() {
 void Block::Draw() { object3d_->Draw(); }
 
 void Block::Spawn(Vector3 pos) { transform_.translate = pos; }
+
+void Block::UpMoveAnimation(float deltaTime) {
+	if (upMoveAnimation_.anim.GetIsActive()) {
+		upMoveAnimation_.anim.Update(deltaTime, upMoveAnimation_.temp);
+		transform_.translate.y = upMoveAnimation_.temp;
+	}
+}

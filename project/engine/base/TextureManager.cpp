@@ -59,6 +59,7 @@ void TextureManager::Initialize(DirectXCommon* directXCommon, SrvManager* srvMan
 	LoadTexture("resources/stage3.png");
 	LoadTexture("resources/player.png");
 	LoadTexture("resources/back.png");
+	LoadTexture("resources/LEVEL_UP.png");
 }
 
 void TextureManager::LoadTexture(const std::string& filePath) {

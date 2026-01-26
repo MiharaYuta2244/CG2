@@ -137,7 +137,7 @@ void GamePlayScene::Update() {
 
 	// ブロック更新
 	for (auto& block : blocks_) {
-		block->Update();
+		block->Update(timeManager_->GetDeltaTime());
 	}
 
 	// 砲台の更新

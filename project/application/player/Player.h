@@ -185,4 +185,13 @@ private:
 
 	// フルーツをゲットしたかどうか
 	bool isGetFruit_ = false;
+
+	// レベルアップスプライト
+	std::unique_ptr<Sprite> levelUpSprite_;
+
+	// レベルアップしたかどうか
+	bool isLevelUp_ = false;
+
+	// レベルアップアニメーション
+	AnimationBundle<Vector2> levelUpAnimation_;
 };

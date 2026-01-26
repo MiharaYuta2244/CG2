@@ -89,7 +89,7 @@ void GunTurret::Hide() {
 void GunTurret::Appear() {
 	// 開始位置と生成位置を保存
 	if (!isStartPosSaved_) {
-		startPos_ = gunTurretModel_->GetTranslate();                             // 開始位置保存
+		startPos_ = gunTurretModel_->GetTranslate(); // 開始位置保存
 		isStartPosSaved_ = true;
 	}
 
@@ -115,11 +115,11 @@ void GunTurret::AimAtTarget() {
 	// 弾の発射方向を設定
 	bulletDirection_ = direction;
 
-	// Y軸の回転角度を計算
-	float rotateY = std::atan2(direction.x, direction.z);
+	// Z軸の回転角度を計算
+	float rotateZ = std::atan2(direction.x, direction.y);
 
 	// 砲台のモデルの回転を設定
-	gunTurretModel_->SetRotate({0.0f, rotateY, 0.0f});
+	gunTurretModel_->SetRotate({0.0f, 0.0f, rotateZ});
 
 	if (timer_ >= kAimDuration) {
 		state_ = State::CHARGING; // 状態遷移
