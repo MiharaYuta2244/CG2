@@ -165,7 +165,7 @@ copy "$(windowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="application\Block\Block.cpp" />
     <ClCompile Include="application\Enemy\Enemy.cpp" />
     <ClCompile Include="engine\Collision\Collision.cpp" />
-    <ClCompile Include="application\Enemy\EnemyHPGauge.cpp" />
+    <ClCompile Include="application\HPGauge\EnemyHPGauge.cpp" />
     <ClCompile Include="application\BothCurtain\BothCurtain.cpp" />
     <ClCompile Include="application\EndModel\EndModel.cpp" />
     <ClCompile Include="application\Cloud\Cloud.cpp" />
@@ -251,6 +251,7 @@ copy "$(windowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="application\Scene\Stage3.cpp" />
     <ClCompile Include="application\GunTurret\TurretBullet.cpp" />
     <ClCompile Include="application\WaveTimer\WaveTimer.cpp" />
+    <ClCompile Include="application\HPGauge\PlayerHPGauge.cpp" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="resources\shaders\Object3d.PS.hlsl">
@@ -334,7 +335,7 @@ copy "$(windowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="application\Block\Block.h" />
     <ClInclude Include="application\Enemy\Enemy.h" />
     <ClInclude Include="engine\Collision\Collision.h" />
-    <ClInclude Include="application\Enemy\EnemyHPGauge.h" />
+    <ClInclude Include="application\HPGauge\EnemyHPGauge.h" />
     <ClInclude Include="engine\scene\SceneManager.h" />
     <ClInclude Include="engine\base\SpotLight.h" />
     <ClInclude Include="engine\base\utility\easing\Easing.h" />
@@ -424,6 +425,8 @@ copy "$(windowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="application\GunTurret\TurretBullet.h" />
     <ClInclude Include="application\WaveTimer\WaveTimer.h" />
     <ClInclude Include="application\HipDropPowerBG\HipDropPowerBG.h" />
+    <ClInclude Include="application\HPGauge\IHPGauge.h" />
+    <ClInclude Include="application\HPGauge\PlayerHPGauge.h" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="externals\imgui\LICENSE.txt" />

@@ -11,8 +11,6 @@ void TitleMenuModel::Initialize(EngineContext* ctx, Vector3 pos) {
 	stageModel_->SetScale(baseScale_);
 	stageModel_->SetRotate({0.0f, std::numbers::pi_v<float>, 0.0f});
 	stageModel_->SetColor(notSelectColor_);
-	stageModel_->SetEnableLighting(true);
-	stageModel_->GetMaterial().shininess = 64.0f;
 }
 
 void TitleMenuModel::Update(float deltaTime) {

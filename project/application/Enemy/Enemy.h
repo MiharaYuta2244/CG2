@@ -1,6 +1,6 @@
 #pragma once
 #include "Actor.h"
-#include "EnemyHPGauge.h"
+#include "HPGauge/EnemyHPGauge.h"
 #include "EngineContext.h"
 #include "AnimationBundle.h"
 
@@ -90,7 +90,7 @@ private:
 	AABB collisionLeftSide_;
 
 	// HPゲージスプライト管理クラス
-	std::unique_ptr<EnemyHPGauge> hpGauge_ = std::make_unique<EnemyHPGauge>();
+	std::unique_ptr<EnemyHPGauge> hpGauge_;
 
 	// コンテキスト構造体
 	EngineContext* ctx_;

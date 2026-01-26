@@ -30,19 +30,7 @@ void Player::Initialize(EngineContext* ctx, DirectInput* input, GamePad* gamePad
 	gamePad_ = gamePad;
 
 	// HP
-	hp_ = 5;
-
-	// HPゲージスプライトサイズ設定
-	spriteHPGauge_.resize(hp_);
-
-	// HPゲージスプライト
-	for (int i = 0; i < spriteHPGauge_.size(); ++i) {
-		spriteHPGauge_[i] = std::make_unique<Sprite>();
-		spriteHPGauge_[i]->Initialize(ctx_, "resources/white.png");
-		spriteHPGauge_[i]->SetPosition({70.0f * i + 32.0f, 32.0f});
-		spriteHPGauge_[i]->SetSize({24.0f, 32.0f});
-		spriteHPGauge_[i]->SetColor({0.0f, 1.0f, 0.0f, 1.0f});
-	}
+	hp_ = kMaxHP;
 
 	// レベルアップスプライト
 	levelUpSprite_ = std::make_unique<Sprite>();
@@ -58,13 +46,17 @@ void Player::Initialize(EngineContext* ctx, DirectInput* input, GamePad* gamePad
 	crossSprite_->SetPosition({0.0f, 0.0f});
 	crossSprite_->SetSize({1920.0f, 1920.0f});
 	crossSprite_->SetAnchorPoint({0.5f, 0.5f});
-	crossSprite_->SetColor({0.6f,0.6f,0.6f,1.0f});
+	crossSprite_->SetColor({0.6f, 0.6f, 0.6f, 1.0f});
 	crossSprite_->SetEnableShine(true);
 	crossSprite_->SetShineParams({0.0f, 0.8f, 1.0f, 1.0f});
 	crossSprite_->SetShineColor({1.0f, 1.0f, 1.0f, 1.0f});
 
 	// 十字エフェクトアニメーション
 	crossRotateAnimation_.anim = {0.0f, std::numbers::pi_v<float> * 2, 0.5f, EaseType::EASEOUTCUBIC};
+
+	// HPゲージ
+	hpGauge_ = std::make_unique<PlayerHPGauge>();
+	hpGauge_->Initialize(ctx);
 }
 
 void Player::Update(float deltaTime) {
@@ -124,15 +116,10 @@ void Player::Update(float deltaTime) {
 	// 当たり判定位置更新
 	UpdateCollisionPos();
 
-	// スプライトに変換した座標をセットする
-	for (int i = 0; i < spriteHPGauge_.size(); ++i) {
-		spriteHPGauge_[i]->SetPosition(ScreenToWorldPoint({transform_.translate.x + i * 1.0f, transform_.translate.y, transform_.translate.z}, spriteHPGaugeMargin_));
-	}
-
 	// HPゲージスプライト
-	for (auto& hpGauge : spriteHPGauge_) {
-		hpGauge->Update();
-	}
+	hpGauge_->SetPosition(ScreenToWorldPoint({transform_.translate.x, transform_.translate.y, transform_.translate.z}, spriteHPGaugeMargin_));
+	hpGauge_->HPBarSpriteApply(hp_, kMaxHP);
+	hpGauge_->Update(deltaTime);
 
 	// レベルアップスプライト
 	if (isLevelUp_) {
@@ -176,12 +163,10 @@ void Player::Draw() {
 	}
 
 	// HPゲージスプライト
-	for (auto& hpGauge : spriteHPGauge_) {
-		hpGauge->Draw();
-	}
+	hpGauge_->Draw();
 
 	// 十字エフェクト
-	crossSprite_->Draw();
+	// crossSprite_->Draw();
 
 	// レベルアップスプライト
 	if (isLevelUp_) {
@@ -300,9 +285,6 @@ void Player::HitEnemy() {
 		// HP減算
 		SubHP();
 
-		// HPゲージスプライトのサイズ変更
-		spriteHPGauge_.resize(hp_);
-
 		// 無敵フラグを立てる
 		isInvincible_ = true;
 
@@ -372,7 +354,7 @@ Vector2 Player::ScreenToWorldPoint(Vector3 worldPosition, Vector2 margin) {
 	Matrix4x4 matVPV = MathUtility::Multiply(ctx_->object3dCommon->GetDefaultCamera()->GetViewProjectionMatrix(), viewportMatrix);
 
 	// プレイヤーのワールド座標をスクリーン座標に変換
-	Vector3 worldPos = {worldPosition.x + spriteHPGaugeMargin_.x, worldPosition.y + spriteHPGaugeMargin_.y, worldPosition.z};
+	Vector3 worldPos = {worldPosition.x + margin.x, worldPosition.y + margin.y, worldPosition.z};
 	Vector3 screenPos = MathUtility::Transform(worldPos, matVPV);
 
 	return {screenPos.x, screenPos.y};

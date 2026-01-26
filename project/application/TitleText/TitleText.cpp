@@ -10,8 +10,6 @@ void TitleText::Initialize(EngineContext* ctx) {
 	textModel_->SetTranslate({21.68f, 13.39f, 12.76f});
 	textModel_->SetRotate({-0.72f, 2.612f, 0.2f});
 	textModel_->SetScale({15.0f, 15.0f, 6.0f});
-	textModel_->SetEnableLighting(true);
-	textModel_->GetMaterial().shininess = 64.0f;
 	textModel_->SetColor({1.0f, 0.7f, 0.0f, 1.0f});
 }
 

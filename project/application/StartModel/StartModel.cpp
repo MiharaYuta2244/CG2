@@ -10,7 +10,6 @@ void StartModel::Initialize(EngineContext* ctx) {
 	startModel_->SetTranslate({32.0f, 3.35f, 0.0f});
 	startModel_->SetScale(baseScale_);
 	startModel_->SetRotate({0.0f, 3.6f, 0.0f});
-	startModel_->SetEnableLighting(true);
 }
 
 void StartModel::Update(float deltaTime) {

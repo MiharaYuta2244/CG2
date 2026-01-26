@@ -4,6 +4,7 @@
 #include "DirectInput.h"
 #include "EasingAnimation.h"
 #include "EngineContext.h"
+#include "HPGauge/PlayerHPGauge.h"
 #include "Sprite.h"
 #include <array>
 
@@ -125,6 +126,7 @@ private:
 
 	// HP
 	int hp_;
+	const int kMaxHP = 5;
 
 	// 敵に当たった時に立つフラグ
 	bool isHitEnemy_ = false;
@@ -138,9 +140,6 @@ private:
 	// 無敵時間上限
 	const int kInvincibleFrame_ = 60;
 
-	// HPゲージスプライト
-	std::vector<std::unique_ptr<Sprite>> spriteHPGauge_;
-
 	// 敵にヒップドロップを当てた時に立つフラグ
 	bool isHitEnemyHipDrop_ = false;
 
@@ -149,7 +148,7 @@ private:
 
 	// スプライトとプレイヤーの距離
 	Vector2 spriteHPGaugeMargin_ = {-2.5f, 3.0f}; // HPゲージとプレイヤー
-	Vector2 spriteLevelUpMargin_ = {1.0f, 2.0f}; // レベルアップとプレイヤー
+	Vector2 spriteLevelUpMargin_ = {2.0f, 0.0f};  // レベルアップとプレイヤー
 
 	// コンテキスト構造体
 	EngineContext* ctx_;
@@ -201,4 +200,7 @@ private:
 
 	// 十字エフェクトアニメーション
 	AnimationBundle<float> crossRotateAnimation_;
+
+	// HPゲージ
+	std::unique_ptr<PlayerHPGauge> hpGauge_;
 };

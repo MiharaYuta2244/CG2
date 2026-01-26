@@ -5,6 +5,15 @@
 void EnemyHPGauge::Initialize(EngineContext* ctx) {
 	ctx_ = ctx;
 
+	// HPバーのサイズX
+	maxSpriteHPBarSizeX = 600.0f;
+	spriteHPBarSizeX_ = maxSpriteHPBarSizeX;
+	spriteHPBarAfterSizeX_ = maxSpriteHPBarSizeX;
+
+	// 残像の更新遅延フレーム数
+	afterImageDelayFrames = 0.5f;
+	afterImageDelayCounter_ = 0.0f;
+
 	// HPゲージスプライトの初期化
 	spriteHPBar_ = std::make_unique<Sprite>();
 	spriteHPBar_->Initialize(ctx_, "resources/white.png");
@@ -33,22 +42,8 @@ void EnemyHPGauge::Initialize(EngineContext* ctx) {
 void EnemyHPGauge::Update(float deltaTime) {
 	spriteHPBar_->SetSize({spriteHPBarSizeX_, 32.0f});
 
-	// 遅延カウンターがアクティブなら減少
-	if (afterImageDelayCounter_ > 0.0f) {
-		afterImageDelayCounter_ -= deltaTime;
-	} else if (spriteHPBarAfterSizeX_ > spriteHPBarSizeX_) {
-		if (!afterAnimation_.anim.GetIsActive()) {
-			// 残像アニメーション初期設定
-			afterAnimation_.anim = {spriteHPBarAfterSizeX_, spriteHPBarSizeX_, 1.0f, EaseType::EASEINCUBIC};
-		} else {
-			bool playing = afterAnimation_.anim.Update(deltaTime, afterAnimation_.temp);
-			spriteHPBarAfterSizeX_ = afterAnimation_.temp; // サイズの更新
-
-			if (!playing) {
-				afterImageDelayCounter_ = kAfterImageDelayFrames; // 遅延時間のリセット
-			}
-		}
-	}
+	// HPゲージアニメーション
+	AnimationHPGauge(deltaTime);
 
 	// サイズの適用
 	spriteHPBarAfter_->SetSize({spriteHPBarAfterSizeX_, 32.0f});
@@ -73,5 +68,24 @@ void EnemyHPGauge::HPBarSpriteApply(int hp, int maxHP) {
 	float rate = static_cast<float>(hp) / static_cast<float>(maxHP);
 
 	// HP量に応じてスプライトのサイズ変更
-	spriteHPBarSizeX_ = kMaxSpriteHPBarSizeX * rate;
+	spriteHPBarSizeX_ = maxSpriteHPBarSizeX * rate;
+}
+
+void EnemyHPGauge::AnimationHPGauge(float deltaTime) {
+	// 残像が前面スプライトより大きいとき
+	if (spriteHPBarAfterSizeX_ > spriteHPBarSizeX_) {
+		afterImageDelayCounter_ += deltaTime;
+		if (!afterAnimation_.anim.GetIsActive()) {
+			if (afterImageDelayCounter_ >= afterImageDelayFrames) {
+				afterAnimation_.anim = {spriteHPBarAfterSizeX_, spriteHPBarSizeX_, 1.0f, EaseType::EASEOUTCUBIC};// 残像アニメーション初期設定
+			}
+		} else {
+			bool playing = afterAnimation_.anim.Update(deltaTime, afterAnimation_.temp);
+			spriteHPBarAfterSizeX_ = afterAnimation_.temp; // サイズの更新
+
+			if (!playing) {
+				afterImageDelayCounter_ = 0.0f; // 遅延時間のリセット
+			}
+		}
+	}
 }

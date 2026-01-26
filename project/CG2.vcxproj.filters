@@ -198,7 +198,7 @@
     <ClCompile Include="engine\base\utility\random\Random.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
-    <ClCompile Include="application\Enemy\EnemyHPGauge.cpp">
+    <ClCompile Include="application\HPGauge\EnemyHPGauge.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
     <ClCompile Include="engine\3d\modules\ShockWaveModule.cpp">
@@ -286,6 +286,9 @@
       <Filter>ソース ファイル</Filter>
     </ClCompile>
     <ClCompile Include="application\HipDropPowerBG\HipDropPowerBG.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="application\HPGauge\PlayerHPGauge.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
   </ItemGroup>
@@ -499,7 +502,7 @@
     <ClInclude Include="engine\base\ParticleForGPU.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
-    <ClInclude Include="application\Enemy\EnemyHPGauge.h">
+    <ClInclude Include="application\HPGauge\EnemyHPGauge.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
     <ClInclude Include="engine\base\EngineContext.h">
@@ -617,6 +620,12 @@
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
     <ClInclude Include="engine\base\Outline.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="application\HPGauge\IHPGauge.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="application\HPGauge\PlayerHPGauge.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
   </ItemGroup>

@@ -25,6 +25,7 @@ void Enemy::Initialize(EngineContext* ctx) {
 	UpdateCollisionPos();
 
 	// HPゲージスプライト管理クラス
+	hpGauge_ = std::make_unique<EnemyHPGauge>();
 	hpGauge_->Initialize(ctx_);
 }
 

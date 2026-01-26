@@ -10,7 +10,6 @@ void EndModel::Initialize(EngineContext* ctx) {
 	endModel_->SetTranslate({32.0f, -1.5f, 0.0f});
 	endModel_->SetScale(baseScale_);
 	endModel_->SetRotate({0.0f, 3.6f, 0.0f});
-	endModel_->SetEnableLighting(true);
 }
 
 void EndModel::Update(float deltaTime) {
