@@ -121,7 +121,7 @@ private:
 	TimeParam timeParam_;
 	Outline outline_ = {
 	    {0.0f, 0.0f, 0.0f, 1.0f},
-        0.01f
+        0.005f
     };
 
 	// 3Dオブジェクト自体とカメラの座標変換行列の元となるTransform
