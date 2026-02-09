@@ -16,7 +16,7 @@ void ResultScene::Initialize(EngineContext* ctx, DirectInput* keyboard, GamePad*
 	audio_->LoadWave("BGM_Result", "resources/ResultScene.mp3");
 	audio_->LoadWave("SE_Decied", "resources/Decied.mp3");
 	audio_->LoadWave("SE_Select", "resources/Select.mp3");
-	audio_->PlayBGM("BGM_Result",0.2f);
+	audio_->PlayBGM("BGM_Result", 0.2f);
 
 	// カメラの設定
 	debugCamera_->SetTranslation({19.45f, 28.0f, -75.0f});
@@ -119,7 +119,9 @@ void ResultScene::Finalize() {
 	restartModel_.reset();
 	toTitleModel_.reset();
 
-	audio_->StopBGM();
+	if (audio_) {
+		audio_->StopBGM();
+	}
 }
 
 std::string ResultScene::LoadResultStatus() {

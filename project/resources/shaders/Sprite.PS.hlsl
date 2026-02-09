@@ -10,7 +10,11 @@ struct Material
     // w: 未使用
     float4 shineParams;
     float4 shineColor;
+    float4 gradientTopColor; // 上端の色
+    float4 gradientBottomColor; // 下端の色
     int enableShine;
+    int enableGradient; // グラデーション有効フラグ
+    float2 padding; // パディング
 };
 
 struct PixelShaderOutput
@@ -34,41 +38,51 @@ PixelShaderOutput main(VertexShaderOutput input)
         discard;
     }
     
+    float4 finalColor = gMaterial.color * textureColor; // ベースの色
+
+    if (gMaterial.enableGradient)
+    {
+        // UVのY座標に基づいて色を補間する (0.0が上、1.0が下)
+        // input.texcoord (UV) を使うことで、テクスチャの切り出し範囲に関わらず
+        // スプライト全体に対してグラデーションがかかるようになります。
+        // もし「切り出した画像の中でのグラデーション」にしたい場合は transformedUV.y を使ってください。
+        // ここでは一般的な「スプライトの上から下へのグラデーション」として input.texcoord.y を使用します。
+        float4 gradColor = lerp(gMaterial.gradientTopColor, gMaterial.gradientBottomColor, input.texcoord.y);
+        
+        // 元の色に乗算合成
+        finalColor *= gradColor;
+    }
+
     // パラメータ展開
     float shineTime = gMaterial.shineParams.x;
     float shineWidth = gMaterial.shineParams.y;
     float shineIntensity = gMaterial.shineParams.z;
 
     // 斜めのラインを作るための座標計算
-    // これで左上から右下への斜めのグラデーション座標ができます
     float sheenPos = input.texcoord.x + input.texcoord.y;
-
     // 時間経過による光の位置計算
-    // shineTimeをマッピングして、画面外から画面外へ移動させる
     float currentPos = (shineTime * 3.0f) - 0.5f;
-
     // 現在位置とラインの距離を計算
     float dist = abs(sheenPos - currentPos);
-
     // 距離に基づいて光の強さを計算
-    // smoothstepで、距離0のとき1.0、距離widthで0.0になる
     float shineFactor = smoothstep(shineWidth, 0.0f, dist);
-    
     // 光の色を加算
-    // 元の色に足し合わせる
     float3 shineColor = float3(gMaterial.shineColor.x, gMaterial.shineColor.y, gMaterial.shineColor.z) * shineFactor * shineIntensity;
 
     PixelShaderOutput output;
+    
+    // Shineの合成
     if (gMaterial.enableShine)
     {
-        // 元の色に乗算色を掛け、その上に光沢色を足す
-        output.color.rgb = (gMaterial.color.rgb * textureColor.rgb) + shineColor;
+        // 計算済みの色に光沢色を足す
+        output.color.rgb = finalColor.rgb + shineColor;
     }
     else
     {
-        output.color.rgb = (gMaterial.color.rgb * textureColor.rgb);
+        output.color.rgb = finalColor.rgb;
     }
-    output.color.a = gMaterial.color.a * textureColor.a;
+    
+    output.color.a = finalColor.a;
 
     // 最終的なアルファチェック
     if (output.color.a == 0.0)

@@ -152,6 +152,9 @@ void Sprite::CreateMaterialData() {
 	material_.shineParams = {0.0f, 0.5f, 1.0f, 1.0f};
 	material_.shineColor = {1.0f, 1.0f, 1.0f, 1.0f};
 	material_.enableShine = false;
+	material_.gradientTopColor = {1.0f, 1.0f, 1.0f, 1.0f};
+	material_.gradientBottomColor = {1.0f, 1.0f, 1.0f, 1.0f};
+	material_.enableGradient = false;
 	*materialData_ = material_;
 }
 

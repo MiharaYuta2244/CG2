@@ -105,6 +105,21 @@ void TitleScene::Initialize(EngineContext* ctx, DirectInput* keyboard, GamePad* 
 
 	// タイトルシーンのライト初期設定
 	engineContext_->object3dCommon->SetDirectionalLightIntensity(2.0f);
+
+	// オーディオスペクトラム用スプライトのリサイズ
+	//audioSpectrumSprite_.resize(64);
+
+	// オーディオスペクトラム用スプライト
+	for (int i = 0; i < audio_->GetSpectrum().size(); ++i) {
+		std::unique_ptr<Sprite> sprite = std::make_unique<Sprite>();
+		sprite->Initialize(engineContext_, "resources/white.png");
+		sprite->SetEnableGradient(true);
+		Vector4 topColor = {0.37f, 0.28f, 0.58f, 1.0f};
+		Vector4 bottomColor = {0.49f, 0.06f, 0.51f, 1.0f};
+		sprite->SetGradientColor(topColor, bottomColor);
+		sprite->SetZDepth(100.0f);
+		audioSpectrumSprite_.push_back(std::move(sprite));
+	}
 }
 
 void TitleScene::Update() {
@@ -122,6 +137,9 @@ void TitleScene::Update() {
 
 	// タイトルの状態切り替え
 	StateChange();
+
+	// オーディオ更新
+	audio_->Update();
 
 	// モデルの更新　タイトル1
 	Title1Update();
@@ -146,9 +164,6 @@ void TitleScene::Update() {
 
 	// タイトル番号の記録
 	prevTitleNumber_ = titleNumber_;
-
-	// オーディオ更新
-	audio_->Update();
 
 #ifdef USE_IMGUI
 	ImGui::Begin("Title");
@@ -202,7 +217,11 @@ void TitleScene::Finalize() {
 	startModel_.reset();
 	endModel_.reset();
 
-	audio_->StopBGM();
+	if (audio_) {
+		audio_->StopBGM();
+	}
+
+	audioSpectrumSprite_.clear();
 }
 
 void TitleScene::ChangeScene() {
@@ -407,6 +426,13 @@ void TitleScene::Title1Update() {
 		endModel_->Update(timeManager_->GetDeltaTime());
 		ruleSprite1_->Update();
 		ruleSprite2_->Update();
+
+		// オーディオスペクトラム用スプライト
+		for (int i = 0; i < audioSpectrumSprite_.size(); ++i) {
+			audioSpectrumSprite_[i]->SetPosition({170.0f + i * 40.0f, 600.0f});
+			audioSpectrumSprite_[i]->SetSize({32.0f, -audio_->GetSpectrum()[i] * 160.0f});
+			audioSpectrumSprite_[i]->Update();
+		}
 	}
 }
 
@@ -439,6 +465,11 @@ void TitleScene::Title1Draw() {
 		endModel_->Draw();
 		ruleSprite1_->Draw();
 		ruleSprite2_->Draw();
+
+		// オーディオスペクトラム用スプライト
+		for (auto& sprite : audioSpectrumSprite_) {
+			sprite->Draw();
+		}
 	}
 }
 

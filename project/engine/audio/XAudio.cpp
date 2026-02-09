@@ -34,6 +34,8 @@ XAudio::~XAudio() {
 		SoundUnLoad(&pair.second);
 	}
 	soundData_.clear();
+
+	spectrum_.clear();
 }
 
 void XAudio::Initialize() {
@@ -50,6 +52,12 @@ void XAudio::Initialize() {
 	// Windows Media Foundation初期化
 	result = MFStartup(MF_VERSION, MFSTARTUP_NOSOCKET);
 	assert(SUCCEEDED(result));
+
+	// FFT
+	fft_ = std::make_unique<FFT>();
+
+	// スペクトラムのリサイズ
+	spectrum_.resize(64);
 }
 
 void XAudio::Update() {
@@ -64,6 +72,9 @@ void XAudio::Update() {
 		}
 		return false; // リストに残す
 	});
+
+	// FFT
+	fft_->GetSpectrum(spectrum_, *bgmVoice_, currentBgmTag_, soundData_);
 }
 
 void XAudio::LoadWave(const std::string& tag, const std::string& filename) {
@@ -143,6 +154,9 @@ void XAudio::PlayBGM(const std::string& tag, float volume) {
 	// 既に再生中のBGMがあれば停止・破棄
 	StopBGM();
 
+	// 現在のタグを保存
+	currentBgmTag_ = tag;
+
 	HRESULT result;
 	SoundData& data = soundData_[tag];
 
@@ -173,6 +187,9 @@ void XAudio::StopBGM() {
 		bgmVoice_->DestroyVoice();
 		bgmVoice_ = nullptr;
 	}
+
+	// タグ情報をクリア
+	currentBgmTag_.clear();
 }
 
 void XAudio::PlaySE(const std::string& tag, float volume) {

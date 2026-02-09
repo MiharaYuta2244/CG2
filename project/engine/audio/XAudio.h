@@ -2,12 +2,13 @@
 #include <array>
 #include <assert.h>
 #include <fstream>
-#include <list> 
+#include <list>
 #include <string>
 #include <unordered_map>
 #include <vector>
 #include <wrl.h>
 #include <xaudio2.h>
+#include "FFT.h"
 
 #pragma comment(lib, "xaudio2.lib")
 
@@ -39,6 +40,9 @@ public:
 	// SE再生
 	void PlaySE(const std::string& tag, float volume = 0.1f);
 
+	// スペクトラムのGetter
+	std::vector<float> GetSpectrum() const { return spectrum_; }
+
 private:
 	// 内部的な解放処理
 	void SoundUnLoad(SoundData* soundData);
@@ -54,4 +58,13 @@ private:
 
 	// 再生中のSEボイスリスト
 	std::list<IXAudio2SourceVoice*> seVoices_;
+
+	// 現在再生中のBGMのタグ
+	std::string currentBgmTag_;
+
+	// FFT
+	std::unique_ptr<FFT> fft_;
+
+	// スペクトラム
+	std::vector<float> spectrum_;
 };

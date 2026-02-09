@@ -215,6 +215,7 @@ copy "$(windowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="application\GunTurret\GunTurret.cpp" />
     <ClCompile Include="application\HipDropPowerBG\HipDropPowerBG.cpp" />
     <ClCompile Include="application\LaunchPad\LaunchPad.cpp" />
+    <ClCompile Include="engine\audio\FFT.cpp" />
     <ClCompile Include="main.cpp">
       <Optimization Condition="'$(Configuration)|$(Platform)'=='Development|x64'">MaxSpeed</Optimization>
       <WholeProgramOptimization Condition="'$(Configuration)|$(Platform)'=='Development|x64'">true</WholeProgramOptimization>
@@ -432,6 +433,7 @@ copy "$(windowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="application\LaunchPad\LaunchPad.h" />
     <ClInclude Include="application\Meteorite\Meteorite.h" />
     <ClInclude Include="application\Meteorite\MeteoriteGenerator.h" />
+    <ClInclude Include="engine\audio\FFT.h" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="externals\imgui\LICENSE.txt" />

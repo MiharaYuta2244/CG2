@@ -1,4 +1,5 @@
 #pragma once
+#include "AnimationBundle.h"
 #include "BaseScene.h"
 #include "BothCurtain/BothCurtain.h"
 #include "EndModel/EndModel.h"
@@ -8,7 +9,6 @@
 #include "TitleMenuModel/TitleMenuModel.h"
 #include "TitleText/TitleText.h"
 #include "XAudio.h"
-#include "AnimationBundle.h"
 #include <array>
 #include <memory>
 
@@ -191,4 +191,7 @@ private:
 
 	// 遷移時のタイトルアニメーション
 	AnimationBundle<Vector3> animationTitle_;
+
+	// オーディオスペクトラム用スプライト
+	std::vector<std::unique_ptr<Sprite>> audioSpectrumSprite_;
 };

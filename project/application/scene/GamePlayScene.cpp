@@ -122,11 +122,11 @@ void GamePlayScene::Initialize(EngineContext* ctx, DirectInput* keyboard, GamePa
 	screenSpaceUtility_ = std::make_unique<ScreenSpaceUtility>();
 
 	// 操作説明スプライト
-	moveSprite_=std::make_unique<Sprite>();
+	moveSprite_ = std::make_unique<Sprite>();
 	moveSprite_->Initialize(ctx, "resources/move.png");
-	moveSprite_->SetPosition({10.0f,5.0f});
+	moveSprite_->SetPosition({10.0f, 5.0f});
 
-	aButtonSprite_=std::make_unique<Sprite>();
+	aButtonSprite_ = std::make_unique<Sprite>();
 	aButtonSprite_->Initialize(ctx, "resources/AButton.png");
 	aButtonSprite_->SetPosition({758.0f, 5.0f});
 
@@ -352,8 +352,9 @@ void GamePlayScene::Finalize() {
 	for (auto& tree : treeModels_) {
 		tree.reset();
 	}
-
-	audio_->StopBGM();
+	if (audio_) {
+		audio_->StopBGM();
+	}
 }
 
 void GamePlayScene::StartGameScene() {
@@ -482,7 +483,7 @@ template<typename FruitType> void GamePlayScene::HandleFruitCollision(std::vecto
 			        crossEffect->Initialize(engineContext_, player_->GetTranslate());
 			        crossEffects_.push_back(std::move(crossEffect));
 
-					// SE再生
+			        // SE再生
 			        audio_->PlaySE("SE_Eat", 0.4f);
 
 			        return true;
@@ -623,13 +624,13 @@ void GamePlayScene::EndGameCheck() {
 		}
 
 		// 死亡時カメラアニメーション
-		//CameraAnimation();
+		// CameraAnimation();
 
 		// カメラアニメーションが終わったら
-		//if (isAnimationEnd_) {
-			// 結果文字列をファイルに保存
-			SaveResultStatus(resultStatus);
-			RequestSceneChange("Result");
+		// if (isAnimationEnd_) {
+		// 結果文字列をファイルに保存
+		SaveResultStatus(resultStatus);
+		RequestSceneChange("Result");
 		//}
 	}
 }

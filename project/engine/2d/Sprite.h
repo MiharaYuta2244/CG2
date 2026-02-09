@@ -77,6 +77,21 @@ public:
 			vertexOffsets_[i] = offsets[i];
 	}
 
+	/// <summary>
+	/// グラデーションの有効無効設定
+	/// </summary>
+	void SetEnableGradient(bool enableGradient) { materialData_->enableGradient = enableGradient; }
+
+	/// <summary>
+	/// グラデーションの色設定
+	/// </summary>
+	/// <param name="topColor">上の色</param>
+	/// <param name="bottomColor">下の色</param>
+	void SetGradientColor(const Vector4& topColor, const Vector4& bottomColor) {
+		materialData_->gradientTopColor = topColor;
+		materialData_->gradientBottomColor = bottomColor;
+	}
+
 private:
 	struct VertexData {
 		Vector4 position;
@@ -92,7 +107,11 @@ private:
 		Matrix4x4 uvTransform;
 		Vector4 shineParams;
 		Vector4 shineColor;
+		Vector4 gradientTopColor;    // 上端の色
+		Vector4 gradientBottomColor; // 下端の色
 		int32_t enableShine;
+		int32_t enableGradient; // グラデーション有効フラグ
+		float padding[2];
 	};
 
 private:
