@@ -10,11 +10,18 @@ struct Material
     // w: 未使用
     float4 shineParams;
     float4 shineColor;
-    float4 gradientTopColor; // 上端の色
-    float4 gradientBottomColor; // 下端の色
+    float4 gradientTopColor;
+    float4 gradientBottomColor;
+    // x: scale (密度)
+    // y: speed (変動速度)
+    // z: intensity (強さ)
+    // w: time (経過時間)
+    float4 voronoiParams;
+    float4 voronoiColor;
     int enableShine;
-    int enableGradient; // グラデーション有効フラグ
-    float2 padding; // パディング
+    int enableGradient;
+    int enableVoronoi;
+    float padding;
 };
 
 struct PixelShaderOutput
@@ -25,6 +32,41 @@ struct PixelShaderOutput
 ConstantBuffer<Material> gMaterial : register(b0);
 Texture2D<float4> gTexture : register(t0);
 SamplerState gSampler : register(s0);
+
+// 乱数生成用関数
+float2 random2(float2 p)
+{
+    return frac(sin(float2(dot(p, float2(127.1, 311.7)), dot(p, float2(269.5, 183.3)))) * 43758.5453);
+}
+
+// ボロノイノイズ生成関数
+float voronoi(float2 uv, float time)
+{
+    float2 i = floor(uv);
+    float2 f = frac(uv);
+    float minDist = 1.0;
+
+    // 近傍3x3のグリッドを探索
+    for (int y = -1; y <= 1; y++)
+    {
+        for (int x = -1; x <= 1; x++)
+        {
+            float2 neighbor = float2(float(x), float(y));
+            // ランダムな特徴点の位置を取得
+            float2 randomPoint = random2(i + neighbor);
+            
+            // 時間経過で特徴点を動かす
+            randomPoint = 0.5 + 0.5 * sin(time + 6.2831 * randomPoint);
+            
+            float2 diff = neighbor + randomPoint
+            -f;
+            float dist = length(diff);
+
+            minDist = min(minDist, dist);
+        }
+    }
+    return minDist;
+}
 
 PixelShaderOutput main(VertexShaderOutput input)
 {
@@ -38,43 +80,47 @@ PixelShaderOutput main(VertexShaderOutput input)
         discard;
     }
     
-    float4 finalColor = gMaterial.color * textureColor; // ベースの色
+    float4 finalColor = gMaterial.color * textureColor;
 
+    // グラデーション
     if (gMaterial.enableGradient)
     {
-        // UVのY座標に基づいて色を補間する (0.0が上、1.0が下)
-        // input.texcoord (UV) を使うことで、テクスチャの切り出し範囲に関わらず
-        // スプライト全体に対してグラデーションがかかるようになります。
-        // もし「切り出した画像の中でのグラデーション」にしたい場合は transformedUV.y を使ってください。
-        // ここでは一般的な「スプライトの上から下へのグラデーション」として input.texcoord.y を使用します。
         float4 gradColor = lerp(gMaterial.gradientTopColor, gMaterial.gradientBottomColor, input.texcoord.y);
-        
-        // 元の色に乗算合成
         finalColor *= gradColor;
     }
 
-    // パラメータ展開
+    // ボロノイノイズ処理
+    if (gMaterial.enableVoronoi)
+    {
+        float scale = gMaterial.voronoiParams.x;
+        float time = gMaterial.voronoiParams.w * gMaterial.voronoiParams.y;
+        float intensity = gMaterial.voronoiParams.z;
+
+        // ボロノイパターン計算 
+        float noise = 1.0 - voronoi(input.texcoord * scale, time);
+        // コントラストを少し強める
+        noise = pow(noise, 2.0);
+
+        // ノイズ色を計算 (元の色に加算合成する形)
+        float3 voronoiEffect = gMaterial.voronoiColor.rgb * noise * intensity;
+        
+        finalColor.rgb += voronoiEffect;
+    }
+
+    // Shine処理
     float shineTime = gMaterial.shineParams.x;
     float shineWidth = gMaterial.shineParams.y;
     float shineIntensity = gMaterial.shineParams.z;
-
-    // 斜めのラインを作るための座標計算
     float sheenPos = input.texcoord.x + input.texcoord.y;
-    // 時間経過による光の位置計算
     float currentPos = (shineTime * 3.0f) - 0.5f;
-    // 現在位置とラインの距離を計算
     float dist = abs(sheenPos - currentPos);
-    // 距離に基づいて光の強さを計算
     float shineFactor = smoothstep(shineWidth, 0.0f, dist);
-    // 光の色を加算
     float3 shineColor = float3(gMaterial.shineColor.x, gMaterial.shineColor.y, gMaterial.shineColor.z) * shineFactor * shineIntensity;
 
     PixelShaderOutput output;
     
-    // Shineの合成
     if (gMaterial.enableShine)
     {
-        // 計算済みの色に光沢色を足す
         output.color.rgb = finalColor.rgb + shineColor;
     }
     else
@@ -84,7 +130,6 @@ PixelShaderOutput main(VertexShaderOutput input)
     
     output.color.a = finalColor.a;
 
-    // 最終的なアルファチェック
     if (output.color.a == 0.0)
     {
         discard;

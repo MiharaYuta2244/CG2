@@ -134,10 +134,6 @@ void GamePlayScene::Initialize(EngineContext* ctx, DirectInput* keyboard, GamePa
 	aButtonSprite_ = std::make_unique<Sprite>();
 	aButtonSprite_->Initialize(ctx, "resources/AButton.png");
 	aButtonSprite_->SetPosition({758.0f, 5.0f});
-
-	// 隕石のジェネレーター
-	// meteoriteGenerator_=std::make_unique<MeteoriteGenerator>();
-	// meteoriteGenerator_->Initialize(ctx);
 }
 
 void GamePlayScene::Update() {
@@ -245,9 +241,6 @@ void GamePlayScene::Update() {
 	// オーディオ更新
 	audio_->Update();
 
-	// 隕石のジェネレーター
-	// meteoriteGenerator_->Update(timeManager_->GetDeltaTime());
-
 	moveSprite_->Update();
 	aButtonSprite_->Update();
 
@@ -307,9 +300,6 @@ void GamePlayScene::Draw() {
 	for (auto& tree : treeModels_) {
 		tree->Draw();
 	}
-
-	// 隕石のジェネレーター
-	// meteoriteGenerator_->Draw();
 
 	// Particle
 	particleDustPlayer_->Draw();
@@ -635,15 +625,9 @@ void GamePlayScene::EndGameCheck() {
 			cameraTargetPos_ = enemy_->GetTranslate(); // カメラの目標ポジションを設定
 		}
 
-		// 死亡時カメラアニメーション
-		// CameraAnimation();
-
-		// カメラアニメーションが終わったら
-		// if (isAnimationEnd_) {
 		// 結果文字列をファイルに保存
 		SaveResultStatus(resultStatus);
 		RequestSceneChange("Result");
-		//}
 	}
 }
 

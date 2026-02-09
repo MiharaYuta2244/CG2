@@ -151,6 +151,9 @@ void Sprite::CreateMaterialData() {
 	material_.uvTransform = MathUtility::MakeIdentity4x4();
 	material_.shineParams = {0.0f, 0.5f, 1.0f, 1.0f};
 	material_.shineColor = {1.0f, 1.0f, 1.0f, 1.0f};
+	material_.voronoiParams = {10.0f, 2.0f, 1.0f, 0.0f}; // scale, speed, intensity, time
+	material_.voronoiColor = {1.0f, 1.0f, 1.0f, 1.0f};
+	material_.enableVoronoi = false;
 	material_.enableShine = false;
 	material_.gradientTopColor = {1.0f, 1.0f, 1.0f, 1.0f};
 	material_.gradientBottomColor = {1.0f, 1.0f, 1.0f, 1.0f};

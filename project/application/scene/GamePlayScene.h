@@ -11,12 +11,12 @@
 #include "GunTurret/GunTurret.h"
 #include "HipDropPowerBG/HipDropPowerBG.h"
 #include "Map/Map.h"
+#include "Meteorite/MeteoriteGenerator.h"
 #include "Object3d.h"
 #include "Particle.h"
 #include "Player/Player.h"
 #include "Sprite.h"
 #include "XAudio.h"
-#include "Meteorite/MeteoriteGenerator.h"
 #include <array>
 #include <memory>
 #include <vector>
@@ -251,7 +251,7 @@ private:
 	bool isAnimationEnd_ = false;
 
 	// ダメージ数エフェクトスプライト
-	std::array<std::unique_ptr<Sprite>,2> damageEffectSprite_;
+	std::array<std::unique_ptr<Sprite>, 2> damageEffectSprite_;
 
 	// ダメージエフェクトアニメーション
 	AnimationBundle<Vector2> animationDamageEffect_;

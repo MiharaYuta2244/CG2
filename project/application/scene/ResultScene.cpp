@@ -45,6 +45,18 @@ void ResultScene::Initialize(EngineContext* ctx, DirectInput* keyboard, GamePad*
 
 	// タイトルシーンのライト初期設定
 	engineContext_->object3dCommon->SetDirectionalLightIntensity(2.0f);
+
+	// 背景スプライト
+	spriteBG_ = std::make_unique<Sprite>();
+	spriteBG_->Initialize(engineContext_, "resources/white.png");
+	spriteBG_->SetSize({1280.0f, 720.0f});
+	spriteBG_->SetColor({0.0f, 0.0f, 0.0f, 1.0f});
+	spriteBG_->SetEnableVoronoi(true);
+	spriteBG_->SetVoronoiColor({1.0f, 0.2f, 0.1f, 1.0f});
+	spriteBG_->SetZDepth(100.0f);
+
+	// ボロノイノイズパラメータ
+	params_ = {5.0f, 2.0f, 1.5f};
 }
 
 void ResultScene::Update() {
@@ -95,6 +107,17 @@ void ResultScene::Update() {
 	audio_->Update();
 
 #ifdef USE_IMGUI
+	ImGui::Begin("Voronoi");
+	ImGui::DragFloat3("params", &params_.x, 0.01f);
+	ImGui::End();
+#endif
+
+	// 背景スプライト
+	voronoiTimer_ += timeManager_->GetDeltaTime();
+	spriteBG_->SetVoronoiParams(params_.x, params_.y, params_.z, voronoiTimer_);
+	spriteBG_->Update();
+
+#ifdef USE_IMGUI
 	ImGui::Begin("Result");
 	ImGui::TextWrapped("Result Scene");
 	ImGui::TextWrapped("Press Space or GamePad A to Return to Title");
@@ -105,6 +128,9 @@ void ResultScene::Update() {
 }
 
 void ResultScene::Draw() {
+	// 背景スプライト
+	spriteBG_->Draw();
+
 	restartModel_->Draw();
 	toTitleModel_->Draw();
 

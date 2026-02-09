@@ -37,4 +37,13 @@ private:
 	std::unique_ptr<ResultModel> resultModel_;
 
 	std::unique_ptr<XAudio> audio_;
+
+	// 背景スプライト
+	std::unique_ptr<Sprite> spriteBG_;
+
+	// ボロノイノイズ用タイマー
+	float voronoiTimer_ = 0.0f;
+
+	// ボロノイノイズ用パラメータ
+	Vector3 params_{};
 };

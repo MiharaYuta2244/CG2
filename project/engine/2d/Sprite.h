@@ -91,6 +91,24 @@ public:
 		materialData_->gradientTopColor = topColor;
 		materialData_->gradientBottomColor = bottomColor;
 	}
+	/// <summary>
+	/// ボロノイノイズの有効無効設定
+	/// </summary>
+	void SetEnableVoronoi(bool enableVoronoi) { materialData_->enableVoronoi = enableVoronoi; }
+
+	/// <summary>
+	/// ボロノイノイズのパラメータ設定
+	/// </summary>
+	/// <param name="scale">密度</param>
+	/// <param name="speed">アニメーション速度</param>
+	/// <param name="intensity">強さ</param>
+	/// <param name="time">経過時間</param>
+	void SetVoronoiParams(float scale, float speed, float intensity, float time) { materialData_->voronoiParams = {scale, speed, intensity, time}; }
+
+	/// <summary>
+	/// ボロノイノイズの色設定
+	/// </summary>
+	void SetVoronoiColor(const Vector4& color) { materialData_->voronoiColor = color; }
 
 private:
 	struct VertexData {
@@ -107,11 +125,14 @@ private:
 		Matrix4x4 uvTransform;
 		Vector4 shineParams;
 		Vector4 shineColor;
-		Vector4 gradientTopColor;    // 上端の色
-		Vector4 gradientBottomColor; // 下端の色
+		Vector4 gradientTopColor;
+		Vector4 gradientBottomColor;
+		Vector4 voronoiParams; // x:scale, y:speed, z:intensity, w:time
+		Vector4 voronoiColor;
 		int32_t enableShine;
-		int32_t enableGradient; // グラデーション有効フラグ
-		float padding[2];
+		int32_t enableGradient;
+		int32_t enableVoronoi;
+		float padding[1];
 	};
 
 private:
