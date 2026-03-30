@@ -28,7 +28,7 @@ private:
 
 	// フェード管理
 	FadeState fadeState_ = FadeState::None;
-	float fadeDuration_ = 1.0f; // フェード時間（秒）
+	float fadeDuration_ = 1.0f; // フェード時間
 	float fadeTimer_ = 0.0f;
 
 	// シーンマネージャー

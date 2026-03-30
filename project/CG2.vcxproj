@@ -161,16 +161,7 @@ copy "$(windowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="application\Fruit\Apple\Apple.cpp" />
-    <ClCompile Include="application\Block\Block.cpp" />
-    <ClCompile Include="application\Enemy\Enemy.cpp" />
-    <ClCompile Include="application\CrossEffect\CrossEffect.cpp" />
-    <ClCompile Include="application\Fruit\IFruit.cpp" />
     <ClCompile Include="engine\Collision\Collision.cpp" />
-    <ClCompile Include="application\HPGauge\EnemyHPGauge.cpp" />
-    <ClCompile Include="application\BothCurtain\BothCurtain.cpp" />
-    <ClCompile Include="application\EndModel\EndModel.cpp" />
-    <ClCompile Include="application\Cloud\Cloud.cpp" />
     <ClCompile Include="engine\scene\BaseScene.cpp" />
     <ClCompile Include="engine\scene\SceneManager.cpp" />
     <ClCompile Include="engine\base\utility\easing\Easing.cpp" />
@@ -211,10 +202,6 @@ copy "$(windowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="engine\input\GamePad.cpp" />
     <ClCompile Include="engine\Framework\Framework.cpp" />
     <ClCompile Include="application\Scene\GamePlayScene.cpp" />
-    <ClCompile Include="application\Fruit\Grape\Grape.cpp" />
-    <ClCompile Include="application\GunTurret\GunTurret.cpp" />
-    <ClCompile Include="application\HipDropPowerBG\HipDropPowerBG.cpp" />
-    <ClCompile Include="application\LaunchPad\LaunchPad.cpp" />
     <ClCompile Include="engine\audio\FFT.cpp" />
     <ClCompile Include="main.cpp">
       <Optimization Condition="'$(Configuration)|$(Platform)'=='Development|x64'">MaxSpeed</Optimization>
@@ -234,28 +221,13 @@ copy "$(windowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="engine\base\TextureManager.cpp" />
     <ClCompile Include="engine\base\WinApp.cpp" />
     <ClCompile Include="engine\audio\XAudio.cpp" />
-    <ClCompile Include="application\player\Player.cpp" />
-    <ClCompile Include="application\Map\Map.cpp" />
     <ClCompile Include="engine\base\SrvManager.cpp" />
     <ClCompile Include="engine\3d\Particle.cpp" />
     <ClCompile Include="engine\3d\ParticleCommon.cpp" />
     <ClCompile Include="engine\base\utility\random\Random.cpp" />
     <ClCompile Include="engine\3d\modules\RisingModule.cpp" />
     <ClCompile Include="engine\3d\modules\RadialRingModule.cpp" />
-    <ClCompile Include="application\Scene\ResultScene.cpp" />
-    <ClCompile Include="application\Scene\TitleScene.cpp" />
-    <ClCompile Include="application\TitleText\TitleText.cpp" />
-    <ClCompile Include="application\StartModel\StartModel.cpp" />
-    <ClCompile Include="application\Fruit\Orange\Orange.cpp" />
-    <ClCompile Include="application\TitleMenuModel\TitleMenuModel.cpp" />
-    <ClCompile Include="application\ReStartModel\ReStartModel.cpp" />
-    <ClCompile Include="application\ToTitleModel\ToTitleModel.cpp" />
-    <ClCompile Include="application\ResultModel\ResultModel.cpp" />
-    <ClCompile Include="application\GunTurret\TurretBullet.cpp" />
-    <ClCompile Include="application\HPGauge\PlayerHPGauge.cpp" />
     <ClCompile Include="engine\base\utility\screenSpaceUtility\ScreenSpaceUtility.cpp" />
-    <ClCompile Include="application\Meteorite\Meteorite.cpp" />
-    <ClCompile Include="application\Meteorite\MeteoriteGenerator.cpp" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="resources\shaders\Object3d.PS.hlsl">
@@ -324,23 +296,13 @@ copy "$(windowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     </FxCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="application\Fruit\Apple\Apple.h" />
-    <ClInclude Include="application\Actor.h" />
-    <ClInclude Include="application\BothCurtain\BothCurtain.h" />
-    <ClInclude Include="application\EndModel\EndModel.h" />
-    <ClInclude Include="application\Fruit\IFruit.h" />
-    <ClInclude Include="application\Cloud\Cloud.h" />
-    <ClInclude Include="application\CrossEffect\CrossEffect.h" />
     <ClInclude Include="engine\base\Outline.h" />
     <ClInclude Include="engine\base\utility\easing\EaseType.h" />
     <ClInclude Include="engine\base\utility\easing\EasingAnimation.h" />
     <ClInclude Include="engine\base\Node.h" />
     <ClInclude Include="engine\base\utility\easing\AnimationBundle.h" />
     <ClInclude Include="engine\scene\BaseScene.h" />
-    <ClInclude Include="application\Block\Block.h" />
-    <ClInclude Include="application\Enemy\Enemy.h" />
     <ClInclude Include="engine\Collision\Collision.h" />
-    <ClInclude Include="application\HPGauge\EnemyHPGauge.h" />
     <ClInclude Include="engine\scene\SceneManager.h" />
     <ClInclude Include="engine\base\SpotLight.h" />
     <ClInclude Include="engine\base\utility\easing\Easing.h" />
@@ -403,9 +365,7 @@ copy "$(windowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="engine\base\WinApp.h" />
     <ClInclude Include="engine\audio\XAudio.h" />
     <ClInclude Include="application\Game\Game.h" />
-    <ClInclude Include="application\player\Player.h" />
     <ClInclude Include="engine\input\GamePad.h" />
-    <ClInclude Include="application\Map\Map.h" />
     <ClInclude Include="engine\base\SrvManager.h" />
     <ClInclude Include="engine\3d\Particle.h" />
     <ClInclude Include="engine\3d\ParticleCommon.h" />
@@ -414,25 +374,7 @@ copy "$(windowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="engine\3d\modules\RadialRingModule.h" />
     <ClInclude Include="engine\Framework\Framework.h" />
     <ClInclude Include="application\Scene\GamePlayScene.h" />
-    <ClInclude Include="application\Scene\ResultScene.h" />
-    <ClInclude Include="application\Scene\TitleScene.h" />
-    <ClInclude Include="application\TitleText\TitleText.h" />
-    <ClInclude Include="application\StartModel\StartModel.h" />
-    <ClInclude Include="application\Fruit\Grape\Grape.h" />
-    <ClInclude Include="application\Fruit\Orange\Orange.h" />
-    <ClInclude Include="application\TitleMenuModel\TitleMenuModel.h" />
-    <ClInclude Include="application\ReStartModel\ReStartModel.h" />
-    <ClInclude Include="application\ToTitleModel\ToTitleModel.h" />
-    <ClInclude Include="application\ResultModel\ResultModel.h" />
-    <ClInclude Include="application\GunTurret\GunTurret.h" />
-    <ClInclude Include="application\GunTurret\TurretBullet.h" />
-    <ClInclude Include="application\HipDropPowerBG\HipDropPowerBG.h" />
-    <ClInclude Include="application\HPGauge\IHPGauge.h" />
-    <ClInclude Include="application\HPGauge\PlayerHPGauge.h" />
     <ClInclude Include="engine\base\utility\screenSpaceUtility\ScreenSpaceUtility.h" />
-    <ClInclude Include="application\LaunchPad\LaunchPad.h" />
-    <ClInclude Include="application\Meteorite\Meteorite.h" />
-    <ClInclude Include="application\Meteorite\MeteoriteGenerator.h" />
     <ClInclude Include="engine\audio\FFT.h" />
   </ItemGroup>
   <ItemGroup>

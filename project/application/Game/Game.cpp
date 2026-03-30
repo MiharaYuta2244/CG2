@@ -1,7 +1,5 @@
 #include "Game.h"
 #include "Scene/GamePlayScene.h"
-#include "Scene/ResultScene.h"
-#include "Scene/TitleScene.h"
 #include <algorithm>
 #include <numbers>
 
@@ -13,9 +11,7 @@ void Game::Initialize() {
 	sceneManager_->Initialize(&GetEngineContext(), GetKeyboard(), GetGamePad(), GetDebugCamera(), GetTimeManager());
 
 	// シーン追加
-	sceneManager_->AddScene("Title", std::make_unique<TitleScene>());
 	sceneManager_->AddScene("GamePlay", std::make_unique<GamePlayScene>());
-	sceneManager_->AddScene("Result", std::make_unique<ResultScene>());
 
 	// 最初のシーンを初期化
 	sceneManager_->ChangeScene("Title");

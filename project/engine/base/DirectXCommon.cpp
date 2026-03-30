@@ -72,7 +72,7 @@ void DirectXCommon::BeginFrame() {
 	D3D12_CPU_DESCRIPTOR_HANDLE dsvHandle = dsvDescriptorHeap_->GetCPUDescriptorHandleForHeapStart();
 	commandList_->OMSetRenderTargets(1, &rtvHandles_[backBufferIndex_], false, &dsvHandle);
 	// 指定した色で画面全体をクリアする
-	float clearColor[] = {0.89f, 0.80f, 0.58f, 1.0f}; // 黒色。RGBAの順
+	float clearColor[] = {0.0f, 0.0f, 0.0f, 1.0f}; // 黒色
 	commandList_->ClearRenderTargetView(rtvHandles_[backBufferIndex_], clearColor, 0, nullptr);
 	// 指定した深度で画面全体をクリアする
 	commandList_->ClearDepthStencilView(dsvHandle, D3D12_CLEAR_FLAG_DEPTH, 1.0f, 0, 0, nullptr);
