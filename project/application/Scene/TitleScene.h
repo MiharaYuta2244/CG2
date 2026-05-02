@@ -1,5 +1,7 @@
 #pragma once
+#pragma once
 #include "BaseScene.h"
+#include "Menu/MenuList.h"
 
 class TitleScene : public BaseScene{
 public:
@@ -12,5 +14,6 @@ public:
 	void Finalize() override;
 
 private:
-
+	// メニュー
+	std::unique_ptr<MenuList> menu_;
 };

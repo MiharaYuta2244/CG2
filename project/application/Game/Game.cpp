@@ -20,7 +20,7 @@ void Game::Initialize() {
 	sceneManager_->AddScene("EasingEditorScene", std::make_unique<EasingEditorScene>());
 
 	// 最初のシーンを初期化
-	sceneManager_->ChangeScene("GamePlay");
+	sceneManager_->ChangeScene("Title");
 
 	// フェードマネージャーの生成&初期化
 	fadeManager_ = std::make_unique<FadeManager>();

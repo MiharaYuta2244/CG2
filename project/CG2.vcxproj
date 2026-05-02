@@ -249,6 +249,7 @@ copy "$(windowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="application\GameObjects\Wall\Wall.cpp" />
     <ClCompile Include="application\GameObjects\Wall\WallManager.cpp" />
     <ClCompile Include="application\GameObjects\Player\PlayerHPGauge.cpp" />
+    <ClCompile Include="application\Menu\MenuList.cpp" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="resources\shaders\Object3d.PS.hlsl">
@@ -421,6 +422,7 @@ copy "$(windowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="application\GameObjects\Goal\Goal.h" />
     <ClInclude Include="application\GameObjects\Player\PlayerHPGauge.h" />
     <ClInclude Include="engine\tool\json\JsonManager.h" />
+    <ClInclude Include="application\Menu\MenuList.h" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="externals\imgui\LICENSE.txt" />
