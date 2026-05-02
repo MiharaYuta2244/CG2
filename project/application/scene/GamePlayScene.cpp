@@ -49,17 +49,27 @@ void GamePlayScene::Initialize(EngineContext* ctx, DirectInput* keyboard, GamePa
 
 	// イージングエディターの生成
 	easingEditor_ = std::make_unique<EasingEditor>();
+
+	// フラッシュエフェクトの生成&初期化
+	flashEffect_ = std::make_unique<FlashEffect>();
+	flashEffect_->Initialize(engineContext_);
+
+	// レターボックスの生成&初期化
+	letterBox_ = std::make_unique<LetterBox>();
+	letterBox_->Initialize(engineContext_);
 }
 
 void GamePlayScene::Update() {
+	float deltaTime = timeManager_->GetDeltaTime();
+
 	// プレイヤーの更新処理
-	player_->Update(timeManager_->GetDeltaTime(), keyboard_, enemyManager_.get());
+	player_->Update(deltaTime, keyboard_, enemyManager_.get());
 
 	// 敵の更新処理
-	enemyManager_->Update(timeManager_->GetDeltaTime(), player_.get(), enemyBulletManager_.get(), wallManager_.get());
+	enemyManager_->Update(deltaTime, player_.get(), enemyBulletManager_.get(), wallManager_.get());
 
 	// 敵の弾の更新処理
-	enemyBulletManager_->Update(timeManager_->GetDeltaTime());
+	enemyBulletManager_->Update(deltaTime);
 
 	// 壁の管理インスタンス更新
 	wallManager_->Update();
@@ -79,8 +89,18 @@ void GamePlayScene::Update() {
 		RequestSceneChange("Title");
 	}
 
-	// ゴールしていたらシーン遷移
+	// ゴールしていたらフラッシュ開始
 	if (goal_->GetGoal()) {
+		flashEffect_->Trigger();
+	}
+
+	// フラッシュの演出が終わったらレターボックスの出現
+	if (flashEffect_->Finish()) {
+		letterBox_->Trigger();
+	}
+
+	// レターボックスの演出が終わったらシーン遷移
+	if (!letterBox_->GetIsActive()) {
 		RequestSceneChange("Title");
 	}
 
@@ -101,7 +121,7 @@ void GamePlayScene::Update() {
 
 	// プレイヤーのHPゲージ更新
 	playerHPGauge_->HPBarSpriteApply(static_cast<int>(player_->GetCurrentHP()), static_cast<int>(player_->GetMaxHP()));
-	playerHPGauge_->Update(timeManager_->GetDeltaTime());
+	playerHPGauge_->Update(deltaTime);
 
 	// パーティクルの更新
 	for (auto& particle : enemyDeathParticle_) {
@@ -113,12 +133,18 @@ void GamePlayScene::Update() {
 	});
 
 	// カメラのシェイク更新
-	mainCamera_->ShakeCamera(timeManager_->GetDeltaTime());
+	mainCamera_->ShakeCamera(deltaTime);
 
 	debugCamera_->Update(*keyboard_, *gamePad_);
 
 	// イージングエディター更新処理
-	easingEditor_->DrawWindow(timeManager_->GetDeltaTime());
+	easingEditor_->DrawWindow(deltaTime);
+
+	// フラッシュエフェクト更新
+	flashEffect_->Update(deltaTime);
+
+	// レターボックス更新
+	letterBox_->Update(deltaTime);
 
 #ifdef USE_IMGUI
 	Vector3 rot = mainCamera_->GetEuler();
@@ -162,6 +188,12 @@ void GamePlayScene::Draw() {
 
 	// プレイヤーのHPゲージ描画
 	playerHPGauge_->Draw();
+
+	// フラッシュエフェクト描画
+	flashEffect_->Draw();
+
+	// レターボックス描画
+	letterBox_->Draw();
 }
 
 void GamePlayScene::Finalize() {}

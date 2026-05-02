@@ -216,6 +216,8 @@ copy "$(windowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="engine\base\utility\gameTimer\GameTimer.cpp" />
     <ClCompile Include="application\GameObjects\Goal\Goal.cpp" />
     <ClCompile Include="engine\tool\json\JsonManager.cpp" />
+    <ClCompile Include="application\GameObjects\Effect\FlashEffect.cpp" />
+    <ClCompile Include="application\GameObjects\Effect\LetterBox.cpp" />
     <ClCompile Include="main.cpp">
       <Optimization Condition="'$(Configuration)|$(Platform)'=='Development|x64'">MaxSpeed</Optimization>
       <WholeProgramOptimization Condition="'$(Configuration)|$(Platform)'=='Development|x64'">true</WholeProgramOptimization>
@@ -423,6 +425,8 @@ copy "$(windowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="application\GameObjects\Player\PlayerHPGauge.h" />
     <ClInclude Include="engine\tool\json\JsonManager.h" />
     <ClInclude Include="application\Menu\MenuList.h" />
+    <ClInclude Include="application\GameObjects\Effect\FlashEffect.h" />
+    <ClInclude Include="application\GameObjects\Effect\LetterBox.h" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="externals\imgui\LICENSE.txt" />

@@ -11,6 +11,8 @@
 #include "GameObjects/Goal/Goal.h"
 #include "GameObjects/Enemy/EnemyManager.h"
 #include "GameObjects/Player/PlayerHPGauge.h"
+#include "GameObjects/Effect/FlashEffect.h"
+#include "GameObjects/Effect/LetterBox.h"
 #include "EasingEditor.h"
 #include <array>
 #include <memory>
@@ -72,4 +74,10 @@ private:
 
 	// イージングエディター
 	std::unique_ptr<EasingEditor> easingEditor_;
+
+	// フラッシュエフェクト
+	std::unique_ptr<FlashEffect> flashEffect_;
+
+	// レターボックス
+	std::unique_ptr<LetterBox> letterBox_;
 };
