@@ -37,7 +37,8 @@ void GamePlayScene::Initialize(EngineContext* ctx, DirectInput* keyboard, GamePa
 	goal_->Initialize(ctx);
 
 	// カメラの初期位置
-	mainCamera_->SetTranslation({1.3f, 60.0f, -4.0f});
+	mainCamera_->SetTranslation({0.0f, 60.0f, 0.0f});
+	mainCamera_->SetPivot(player_->GetPosition());
 	mainCamera_->SetEuler({std::numbers::pi_v<float> / 2.0f, 0.0f, 0.0f});
 
 	// プレイヤーのHPゲージ生成&初期化
