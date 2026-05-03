@@ -57,6 +57,10 @@ void GamePlayScene::Initialize(EngineContext* ctx, DirectInput* keyboard, GamePa
 	// レターボックスの生成&初期化
 	letterBox_ = std::make_unique<LetterBox>();
 	letterBox_->Initialize(engineContext_);
+
+	// 地面の生成&初期化
+	ground_=std::make_unique<Ground>();
+	ground_->Initialize(ctx);
 }
 
 void GamePlayScene::Update() {
@@ -146,6 +150,9 @@ void GamePlayScene::Update() {
 	// レターボックス更新
 	letterBox_->Update(deltaTime);
 
+	// 地面の更新
+	ground_->Update();
+
 #ifdef USE_IMGUI
 	Vector3 rot = mainCamera_->GetEuler();
 
@@ -194,6 +201,9 @@ void GamePlayScene::Draw() {
 
 	// レターボックス描画
 	letterBox_->Draw();
+
+	// 地面の描画
+	ground_->Draw();
 }
 
 void GamePlayScene::Finalize() {}

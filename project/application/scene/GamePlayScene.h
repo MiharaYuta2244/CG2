@@ -13,6 +13,7 @@
 #include "GameObjects/Player/PlayerHPGauge.h"
 #include "GameObjects/Effect/FlashEffect.h"
 #include "GameObjects/Effect/LetterBox.h"
+#include "GameObjects/Ground/Ground.h"
 #include "EasingEditor.h"
 #include <array>
 #include <memory>
@@ -80,4 +81,7 @@ private:
 
 	// レターボックス
 	std::unique_ptr<LetterBox> letterBox_;
+
+	// 地面
+	std::unique_ptr<Ground> ground_;
 };
