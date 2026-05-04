@@ -5,7 +5,7 @@
 
 class TitleScene : public BaseScene{
 public:
-	void Initialize(EngineContext* ctx, DirectInput* keyboard, GamePad* gamePad, Camera* debugCamera, TimeManager* timeManager, SceneManager* sceneManager) override;
+	void Initialize(const SceneContext& ctx) override;
 
 	void Update() override;
 

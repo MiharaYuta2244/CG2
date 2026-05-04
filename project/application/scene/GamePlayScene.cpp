@@ -5,45 +5,49 @@
 
 using namespace TinyEngine;
 
-void GamePlayScene::Initialize(EngineContext* ctx, DirectInput* keyboard, GamePad* gamePad, Camera* mainCamera, TimeManager* timeManager, SceneManager* sceneManager) {
-	engineContext_ = ctx;
-	keyboard_ = keyboard;
-	gamePad_ = gamePad;
-	mainCamera_ = mainCamera;
-	timeManager_ = timeManager;
-	sceneManager_ = sceneManager;
+void GamePlayScene::Initialize(const SceneContext& ctx) {
+	ctx_ = ctx;
 
 	// デバッグカメラ
 	debugCamera_ = std::make_unique<Camera>();
 	debugCamera_->Initialize();
 
-	// プレイヤーの生成&初期化
+	// プレイヤーの生成
 	player_ = std::make_unique<Player>();
-	player_->Initialize(ctx);
+
+	// メインカメラ
+	mainCamera_ = std::make_unique<Camera>();
+	mainCamera_->Initialize();
+	mainCamera_->SetTranslation({0.0f, 60.0f, 0.0f});
+	mainCamera_->SetPivot(player_->GetPosition());
+	mainCamera_->SetEuler({std::numbers::pi_v<float> / 2.0f, 0.0f, 0.0f});
+
+	// カメラの設定
+	ctx_.currentCamera = mainCamera_.get();
+	ctx_.engineContext->object3dCommon->SetDefaultCamera(ctx_.currentCamera);
+	ctx_.engineContext->particleCommon->SetDefaultCamera(ctx_.currentCamera);
+
+	// プレイヤーの初期化
+	player_->Initialize(ctx_.engineContext);
 
 	// 敵の生成&初期化
 	enemyManager_ = std::make_unique<EnemyManager>();
-	enemyManager_->Initialize(ctx);
+	enemyManager_->Initialize(ctx_.engineContext);
 
 	// 敵の弾管理インスタンス生成
 	enemyBulletManager_ = std::make_unique<EnemyBulletManager>();
 
 	// 壁の管理インスタンス生成&初期化
 	wallManager_ = std::make_unique<WallManager>();
-	wallManager_->Initialize(ctx);
+	wallManager_->Initialize(ctx_.engineContext);
 
 	// ゴール判定インスタンス生成&初期化
 	goal_ = std::make_unique<Goal>();
-	goal_->Initialize(ctx);
-
-	// カメラの初期位置
-	mainCamera_->SetTranslation({0.0f, 60.0f, 0.0f});
-	mainCamera_->SetPivot(player_->GetPosition());
-	mainCamera_->SetEuler({std::numbers::pi_v<float> / 2.0f, 0.0f, 0.0f});
+	goal_->Initialize(ctx_.engineContext);
 
 	// プレイヤーのHPゲージ生成&初期化
 	playerHPGauge_ = std::make_unique<PlayerHPGauge>();
-	playerHPGauge_->Initialize(ctx);
+	playerHPGauge_->Initialize(ctx_.engineContext);
 	playerHPGauge_->HPBarSpriteApply(static_cast<int>(player_->GetCurrentHP()), static_cast<int>(player_->GetMaxHP()));
 
 	// objects_.push_back(player_->GetObject3d());
@@ -53,22 +57,22 @@ void GamePlayScene::Initialize(EngineContext* ctx, DirectInput* keyboard, GamePa
 
 	// フラッシュエフェクトの生成&初期化
 	flashEffect_ = std::make_unique<FlashEffect>();
-	flashEffect_->Initialize(engineContext_);
+	flashEffect_->Initialize(ctx_.engineContext);
 
 	// レターボックスの生成&初期化
 	letterBox_ = std::make_unique<LetterBox>();
-	letterBox_->Initialize(engineContext_);
+	letterBox_->Initialize(ctx_.engineContext);
 
 	// 地面の生成&初期化
-	ground_=std::make_unique<Ground>();
-	ground_->Initialize(ctx);
+	ground_ = std::make_unique<Ground>();
+	ground_->Initialize(ctx_.engineContext);
 }
 
 void GamePlayScene::Update() {
-	float deltaTime = timeManager_->GetDeltaTime();
+	float deltaTime = ctx_.timeManager->GetDeltaTime();
 
 	// プレイヤーの更新処理
-	player_->Update(deltaTime, keyboard_, enemyManager_.get());
+	player_->Update(deltaTime, ctx_.keyboard, enemyManager_.get());
 
 	// 敵の更新処理
 	enemyManager_->Update(deltaTime, player_.get(), enemyBulletManager_.get(), wallManager_.get());
@@ -121,9 +125,6 @@ void GamePlayScene::Update() {
 	// ギズモ用ImGui更新
 	UpdateImGui();
 
-	// カメラの追従
-	mainCamera_->SetPivot(player_->GetPosition());
-
 	// プレイヤーのHPゲージ更新
 	playerHPGauge_->HPBarSpriteApply(static_cast<int>(player_->GetCurrentHP()), static_cast<int>(player_->GetMaxHP()));
 	playerHPGauge_->Update(deltaTime);
@@ -133,14 +134,20 @@ void GamePlayScene::Update() {
 		particle->Update();
 	}
 	std::erase_if(enemyDeathParticle_, [this](const std::unique_ptr<TinyEngine::Particle>& p) {
-		mainCamera_->StartShake(0.2f, 0.2f);
+		ctx_.currentCamera->StartShake(0.2f, 0.2f);
 		return p->IsFinished();
 	});
 
-	// カメラのシェイク更新
-	mainCamera_->ShakeCamera(deltaTime);
+	// カメラの追従
+	if (!isDebugCameraActive_) {
+		ctx_.currentCamera->SetPivot(player_->GetPosition());
+	}
 
-	debugCamera_->Update(*keyboard_, *gamePad_);
+	// カメラのシェイク更新
+	ctx_.currentCamera->ShakeCamera(deltaTime);
+
+	// カメラの更新
+	ctx_.currentCamera->Update(*ctx_.keyboard, *ctx_.gamePad);
 
 	// イージングエディター更新処理
 	easingEditor_->DrawWindow(deltaTime);
@@ -155,20 +162,27 @@ void GamePlayScene::Update() {
 	ground_->Update();
 
 #ifdef USE_IMGUI
-	Vector3 rot = mainCamera_->GetEuler();
+	Vector3 rot = ctx_.currentCamera->GetEuler();
 
 	ImGui::Begin("Camera");
 	ImGui::DragFloat("Pitch", &rot.x, 0.01f);
 	ImGui::DragFloat("Yaw", &rot.y, 0.01f);
-	ImGui::DragFloat3("Translate", &mainCamera_->GetTranslation().x, 0.01f);
+	ImGui::DragFloat3("Translate", &ctx_.currentCamera->GetTranslation().x, 0.01f);
 	ImGui::End();
 
-	mainCamera_->SetEuler(rot);
+	ctx_.currentCamera->SetEuler(rot);
 #endif // USE_IMGUI
 
 #ifdef _DEBUG
-	if (keyboard_->KeyTriggered(DIK_F1)) {
-		sceneManager_->ChangeScene("EasingEditorScene");
+	if (ctx_.keyboard->KeyTriggered(DIK_F1)) {
+		ctx_.sceneManager->ChangeScene("EasingEditorScene");
+	}
+
+	if (ctx_.keyboard->KeyTriggered(DIK_F2)) {
+		ctx_.currentCamera = debugCamera_.get();
+		ctx_.engineContext->object3dCommon->SetDefaultCamera(ctx_.currentCamera);
+		ctx_.engineContext->particleCommon->SetDefaultCamera(ctx_.currentCamera);
+		isDebugCameraActive_ = true;
 	}
 #endif // _DEBUG
 }
@@ -223,7 +237,7 @@ void GamePlayScene::CollisionGameObjects() {
 			player_->Damage(1.0f);
 
 			// カメラシェイク開始
-			mainCamera_->StartShake(0.2f, 0.2f);
+			ctx_.currentCamera->StartShake(0.2f, 0.2f);
 		}
 	}
 
@@ -315,7 +329,7 @@ void GamePlayScene::CollisionGameObjects() {
 
 					// パーティクルの生成
 					auto particle = std::make_unique<Particle>();
-					particle->Initialize(engineContext_, enemy->GetPos(), "white.png", std::make_unique<ShockWaveModule>());
+					particle->Initialize(ctx_.engineContext, enemy->GetPos(), "white.png", std::make_unique<ShockWaveModule>());
 					particle->SetEmitMode(false, 0.1f);
 					particle->SetEmitterParam(20, 0.05f);
 					enemyDeathParticle_.push_back(std::move(particle));
@@ -395,7 +409,7 @@ void GamePlayScene::CollisionGameObjects() {
 
 					// パーティクルの生成
 					auto particle = std::make_unique<Particle>();
-					particle->Initialize(engineContext_, a->GetPos(), "white.png", std::make_unique<ShockWaveModule>());
+					particle->Initialize(ctx_.engineContext, a->GetPos(), "white.png", std::make_unique<ShockWaveModule>());
 					particle->SetEmitMode(false, 0.1f);
 					particle->SetEmitterParam(20, 0.05f);
 					enemyDeathParticle_.push_back(std::move(particle));
@@ -462,7 +476,7 @@ void GamePlayScene::UpdateImGui() {
 		ImGuizmo::SetRect(ImGui::GetWindowPos().x, ImGui::GetWindowPos().y, windowWidth, windowHeight);
 
 		// 選択中オブジェクトのギズモを描画
-		selectedObject_->DrawGizmo(mainCamera_->GetViewMatrix(), mainCamera_->GetProjection(), currentGizmoOperation_, ImGuizmo::LOCAL);
+		selectedObject_->DrawGizmo(ctx_.currentCamera->GetViewMatrix(), ctx_.currentCamera->GetProjection(), currentGizmoOperation_, ImGuizmo::LOCAL);
 
 		ImGui::End();
 		ImGui::PopStyleColor();

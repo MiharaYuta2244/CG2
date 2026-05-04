@@ -1,11 +1,5 @@
 #pragma once
-#include "DebugCamera.h"
-#include "TimeManager.h"
-#include "DirectInput.h"
-#include "EngineContext.h"
-#include "GamePad.h"
-
-class SceneManager;
+#include "SceneContext.h"
 
 /// <summary>
 /// シーンの基底クラス
@@ -15,7 +9,7 @@ public:
 	virtual ~BaseScene() = default;
 
 	// シーン初期化
-	virtual void Initialize(EngineContext* ctx, DirectInput* keyboard, GamePad* gamePad, Camera* debugCamera, TimeManager* timeManager, SceneManager* sceneManager) = 0;
+	virtual void Initialize(const SceneContext& ctx) = 0;
 
 	// シーン更新
 	virtual void Update() = 0;
@@ -29,10 +23,5 @@ public:
 	virtual void RequestSceneChange(const std::string& sceneName);
 
 protected:
-	EngineContext* engineContext_ = nullptr;
-	DirectInput* keyboard_ = nullptr;
-	GamePad* gamePad_ = nullptr;
-	Camera* mainCamera_ = nullptr;
-	TimeManager* timeManager_ = nullptr;
-	SceneManager* sceneManager_ = nullptr;
+	SceneContext ctx_;
 };

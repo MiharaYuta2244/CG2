@@ -1,27 +1,23 @@
 #pragma once
 #include "BaseScene.h"
-#include "Object3d.h"
-#include "Particle.h"
-#include "Sprite.h"
-#include "AudioManager.h"
-#include "GameObjects/Player/Player.h"
-#include "GameObjects/Enemy/Enemy.h"
-#include "GameObjects/Enemy/EnemyBulletManager.h"
-#include "GameObjects/Wall/WallManager.h"
-#include "GameObjects/Goal/Goal.h"
-#include "GameObjects/Enemy/EnemyManager.h"
-#include "GameObjects/Player/PlayerHPGauge.h"
+#include "EasingEditor.h"
 #include "GameObjects/Effect/FlashEffect.h"
 #include "GameObjects/Effect/LetterBox.h"
+#include "GameObjects/Enemy/EnemyBulletManager.h"
+#include "GameObjects/Enemy/EnemyManager.h"
+#include "GameObjects/Goal/Goal.h"
 #include "GameObjects/Ground/Ground.h"
-#include "EasingEditor.h"
-#include <array>
+#include "GameObjects/Player/Player.h"
+#include "GameObjects/Player/PlayerHPGauge.h"
+#include "GameObjects/Wall/WallManager.h"
+#include "Object3d.h"
+#include "Particle.h"
 #include <memory>
 #include <vector>
 
 class GamePlayScene : public BaseScene {
 public:
-	void Initialize(EngineContext* ctx, DirectInput* keyboard, GamePad* gamePad, Camera* mainCamera, TimeManager* timeManager, SceneManager* sceneManager) override;
+	void Initialize(const SceneContext& ctx) override;
 
 	void Update() override;
 
@@ -58,9 +54,6 @@ private:
 	// プレイヤーのHPゲージ
 	std::unique_ptr<PlayerHPGauge> playerHPGauge_;
 
-	// デバッグカメラ
-	std::unique_ptr<Camera> debugCamera_;
-
 	// オブジェクトのリスト
 	std::vector<TinyEngine::Object3d*> objects_;
 
@@ -69,7 +62,7 @@ private:
 
 	// SRTの内扱うパラメータ
 	ImGuizmo::OPERATION currentGizmoOperation_ = ImGuizmo::TRANSLATE;
-	
+
 	// 座標系の設定
 	ImGuizmo::MODE currentGizmoMode_ = ImGuizmo::LOCAL;
 
@@ -84,4 +77,9 @@ private:
 
 	// 地面
 	std::unique_ptr<Ground> ground_;
+
+	// カメラ関連
+	std::unique_ptr<Camera> mainCamera_;  // メインカメラ
+	std::unique_ptr<Camera> debugCamera_; // デバッグカメラ
+	bool isDebugCameraActive_ = false;    // カメラの切り替えフラグ
 };

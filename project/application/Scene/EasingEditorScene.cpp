@@ -3,31 +3,26 @@
 
 using namespace TinyEngine;
 
-void EasingEditorScene::Initialize(EngineContext* ctx, DirectInput* keyboard, GamePad* gamePad, Camera* debugCamera, TimeManager* timeManager, SceneManager* sceneManager) {
-	engineContext_ = ctx;
-	keyboard_ = keyboard;
-	gamePad_ = gamePad;
-	mainCamera_ = debugCamera;
-	timeManager_ = timeManager;
-	sceneManager_ = sceneManager;
+void EasingEditorScene::Initialize(const SceneContext& ctx) {
+	ctx_ = ctx;
 
 	// イージングエディターの生成
 	easingEditor_ = std::make_unique<EasingEditor>();
 
 	// オブジェクトの生成&初期化
 	object_ = std::make_unique<Object3d>();
-	object_->Initialize(ctx, "PreviewModel");
+	object_->Initialize(ctx_.engineContext, "PreviewModel");
 	object_->SetModel("suzanne.obj");
 }
 
 void EasingEditorScene::Update() {
 	// シーン切り替え
-	if (keyboard_->KeyTriggered(DIK_SPACE)) {
-		sceneManager_->ChangeScene("GamePlay");
+	if (ctx_.keyboard->KeyTriggered(DIK_SPACE)) {
+		ctx_.sceneManager->ChangeScene("GamePlay");
 	}
 
 	// イージングエディターの更新処理
-	easingEditor_->DrawWindow(timeManager_->GetDeltaTime());
+	easingEditor_->DrawWindow(ctx_.timeManager->GetDeltaTime());
 
 	// アニメーション中に値をObject3dに適用
 	if (easingEditor_->IsPlaying()) {

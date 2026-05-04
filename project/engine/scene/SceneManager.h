@@ -1,6 +1,5 @@
 #pragma once
 #include "BaseScene.h"
-#include <functional>
 #include <memory>
 #include <unordered_map>
 

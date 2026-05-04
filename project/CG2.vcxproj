@@ -328,6 +328,7 @@ copy "$(windowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="application\GameObjects\Enemy\EnemyManager.h" />
     <ClInclude Include="application\GameObjects\Player\IHPGauge.h" />
     <ClInclude Include="application\Scene\EasingEditorScene.h" />
+    <ClInclude Include="engine\base\SceneContext.h" />
     <ClInclude Include="engine\base\utility\easing\EasingEditor.h" />
     <ClInclude Include="engine\math\mathLib\Rect.h" />
     <ClInclude Include="engine\utility\DirectXUtils.h" />

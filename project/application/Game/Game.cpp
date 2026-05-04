@@ -2,8 +2,6 @@
 #include "Scene/GamePlayScene.h"
 #include "Scene/TitleScene.h"
 #include "Scene/EasingEditorScene.h"
-#include <algorithm>
-#include <numbers>
 
 using namespace TinyEngine;
 
@@ -11,7 +9,8 @@ void Game::Initialize() {
 	// 基底クラスの初期化処理
 	Framework::Initialize();
 
-	// シーンマネージャー初期化
+	// シーンマネージャーの生成&初期化
+	sceneManager_ = std::make_unique<SceneManager>();
 	sceneManager_->Initialize(&GetEngineContext(), GetKeyboard(), GetGamePad(), GetDebugCamera(), GetTimeManager());
 
 	// シーン追加

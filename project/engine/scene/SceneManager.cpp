@@ -40,8 +40,17 @@ void SceneManager::Update() {
 		currentSceneName_ = nextSceneName_;
 		currentScene_ = scenes_[currentSceneName_].get();
 
+		// シーンに必要なデータをまとめて渡す
+		SceneContext ctx;
+		ctx.engineContext = engineContext_;
+		ctx.keyboard = keyboard_;
+		ctx.gamePad = gamePad_;
+		ctx.currentCamera = debugCamera_;
+		ctx.timeManager = timeManager_;
+		ctx.sceneManager = this;
+
 		// 新しいシーンを初期化
-		currentScene_->Initialize(engineContext_, keyboard_, gamePad_, debugCamera_, timeManager_, this);
+		currentScene_->Initialize(ctx);
 
 		isChangingScene_ = false;
 	}
