@@ -13,71 +13,76 @@ void SceneManager::AddScene(const std::string& sceneName, std::unique_ptr<BaseSc
 }
 
 void SceneManager::ChangeScene(const std::string& sceneName) {
-	// シーンが存在するか確認
-	if (scenes_.find(sceneName) == scenes_.end()) {
+	if (scenes_.find(sceneName) == scenes_.end() || requestedTransition_ != SceneTransition::None)
 		return;
-	}
-
-	// 既に切り替え中なら無視
-	if (isChangingScene_) {
-		return;
-	}
-
-	// シーン切り替え要求を記録
 	nextSceneName_ = sceneName;
-	isChangingScene_ = true;
+	requestedTransition_ = SceneTransition::Change;
 }
 
+void SceneManager::PushScene(const std::string& sceneName) {
+	if (scenes_.find(sceneName) == scenes_.end() || requestedTransition_ != SceneTransition::None)
+		return;
+	nextSceneName_ = sceneName;
+	requestedTransition_ = SceneTransition::Push;
+}
+
+void SceneManager::PopScene() {
+	if (sceneStack_.size() <= 1 || requestedTransition_ != SceneTransition::None)
+		return;
+	requestedTransition_ = SceneTransition::Pop;
+}
+
+BaseScene* SceneManager::GetCurrentScene() const { return sceneStack_.empty() ? nullptr : sceneStack_.back(); }
+
 void SceneManager::Update() {
-	// シーン切り替え処理
-	if (isChangingScene_ && nextSceneName_ != currentSceneName_) {
-		// 現在のシーンを終了
-		if (currentScene_) {
-			currentScene_->Finalize();
+	// シーン遷移処理
+	if (requestedTransition_ != SceneTransition::None) {
+		if (requestedTransition_ == SceneTransition::Change) {
+			// 全てのシーンを終了してクリア
+			for (auto it = sceneStack_.rbegin(); it != sceneStack_.rend(); ++it) {
+				(*it)->Finalize();
+			}
+			sceneStack_.clear();
+
+			// 新しいシーンを追加
+			BaseScene* next = scenes_[nextSceneName_].get();
+			SceneContext ctx = {engineContext_, keyboard_, gamePad_, debugCamera_, timeManager_, this};
+			next->Initialize(ctx);
+			sceneStack_.push_back(next);
+
+		} else if (requestedTransition_ == SceneTransition::Push) {
+			// 現在のシーンは終了せずに、新しいシーンを上に重ねる
+			BaseScene* next = scenes_[nextSceneName_].get();
+			SceneContext ctx = {engineContext_, keyboard_, gamePad_, debugCamera_, timeManager_, this};
+			next->Initialize(ctx);
+			sceneStack_.push_back(next);
+
+		} else if (requestedTransition_ == SceneTransition::Pop) {
+			// 一番上のシーンだけ終了して取り除く
+			sceneStack_.back()->Finalize();
+			sceneStack_.pop_back();
 		}
-
-		// シーン切り替え
-		currentSceneName_ = nextSceneName_;
-		currentScene_ = scenes_[currentSceneName_].get();
-
-		// シーンに必要なデータをまとめて渡す
-		SceneContext ctx;
-		ctx.engineContext = engineContext_;
-		ctx.keyboard = keyboard_;
-		ctx.gamePad = gamePad_;
-		ctx.currentCamera = debugCamera_;
-		ctx.timeManager = timeManager_;
-		ctx.sceneManager = this;
-
-		// 新しいシーンを初期化
-		currentScene_->Initialize(ctx);
-
-		isChangingScene_ = false;
+		requestedTransition_ = SceneTransition::None;
 	}
 
-	// 現在のシーンを更新
-	if (currentScene_) {
-		currentScene_->Update();
+	// 現在アクティブのシーンだけ更新する
+	if (!sceneStack_.empty()) {
+		sceneStack_.back()->Update();
 	}
 }
 
 void SceneManager::Draw() {
-	if (currentScene_) {
-		currentScene_->Draw();
+	for (BaseScene* scene : sceneStack_) {
+		if (scene) {
+			scene->Draw();
+		}
 	}
 }
 
 void SceneManager::Finalize() {
-	if (currentScene_) {
-		currentScene_->Finalize();
+	for (auto it = sceneStack_.rbegin(); it != sceneStack_.rend(); ++it) {
+		(*it)->Finalize();
 	}
-
-	for (auto& scene : scenes_) {
-		if (scene.second) {
-			scene.second->Finalize();
-		}
-	}
-
+	sceneStack_.clear();
 	scenes_.clear();
-	currentScene_ = nullptr;
 }

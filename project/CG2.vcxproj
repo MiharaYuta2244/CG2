@@ -253,6 +253,7 @@ copy "$(windowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="application\GameObjects\Wall\WallManager.cpp" />
     <ClCompile Include="application\GameObjects\Player\PlayerHPGauge.cpp" />
     <ClCompile Include="application\Menu\MenuList.cpp" />
+    <ClCompile Include="application\Scene\PauseScene.cpp" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="resources\shaders\Object3d.PS.hlsl">
@@ -430,6 +431,7 @@ copy "$(windowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="application\GameObjects\Effect\FlashEffect.h" />
     <ClInclude Include="application\GameObjects\Effect\LetterBox.h" />
     <ClInclude Include="application\GameObjects\Ground\Ground.h" />
+    <ClInclude Include="application\Scene\PauseScene.h" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="externals\imgui\LICENSE.txt" />

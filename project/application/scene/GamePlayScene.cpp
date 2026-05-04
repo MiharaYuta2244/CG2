@@ -74,6 +74,12 @@ void GamePlayScene::Initialize(const SceneContext& ctx) {
 void GamePlayScene::Update() {
 	float deltaTime = ctx_.timeManager->GetDeltaTime();
 
+	// ポーズ画面
+	if (ctx_.keyboard->KeyTriggered(DIK_TAB)) {
+		RequestScenePush("Pause");
+		return;
+	}
+
 	// プレイヤーの更新処理
 	player_->Update(deltaTime, ctx_.keyboard, enemyManager_.get());
 

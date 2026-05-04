@@ -2,6 +2,10 @@
 #include "BaseScene.h"
 #include <memory>
 #include <unordered_map>
+#include <vector>
+
+// 遷移の種類
+enum class SceneTransition { None, Change, Push, Pop };
 
 /// <summary>
 /// シーンマネージャークラス
@@ -19,17 +23,26 @@ public:
 
 	// シーン切り替え要求
 	void ChangeScene(const std::string& sceneName);
+	void PushScene(const std::string& sceneName);
+	void PopScene();
 
 	// 現在のシーンを取得
-	BaseScene* GetCurrentScene() const { return currentScene_; }
+	BaseScene* GetCurrentScene() const;
 
 	// 要求されているシーン名を取得
 	std::string GetRequestedSceneName() const { return requestedSceneName_; }
 
+	// 要求されているシーン名を設定
 	void SetRequestedSceneName(const std::string& sceneName) { requestedSceneName_ = sceneName; }
 
-	// 現在のシーン名を取得
-	const std::string& GetCurrentSceneName() const { return currentSceneName_; }
+	// 要求されている遷移の種類を取得
+	SceneTransition GetRequestedTransition() const { return requestedTransition_; }
+
+	// 要求されている遷移の種類をクリア
+	void ClearRequest() {
+		requestedSceneName_ = "";
+		requestedTransition_ = SceneTransition::None;
+	}
 
 	// シーン更新
 	void Update();
@@ -44,20 +57,12 @@ private:
 	// シーンマップ
 	std::unordered_map<std::string, std::unique_ptr<BaseScene>> scenes_;
 
-	// 現在のシーン
-	BaseScene* currentScene_ = nullptr;
-
-	// 現在のシーン名
-	std::string currentSceneName_;
-
-	// リクエストされたシーン名
+	std::vector<BaseScene*> sceneStack_;
 	std::string requestedSceneName_;
-
-	// 次のシーン名（遅延切り替え用）
 	std::string nextSceneName_;
 
-	// シーン切り替え中フラグ
-	bool isChangingScene_ = false;
+	// 切り替えフラグ
+	SceneTransition requestedTransition_ = SceneTransition::None;
 
 	// 共通リソースへのポインタ
 	EngineContext* engineContext_ = nullptr;

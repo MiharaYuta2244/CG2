@@ -1,7 +1,8 @@
 #include "Game.h"
+#include "Scene/EasingEditorScene.h"
 #include "Scene/GamePlayScene.h"
 #include "Scene/TitleScene.h"
-#include "Scene/EasingEditorScene.h"
+#include "Scene/PauseScene.h"
 
 using namespace TinyEngine;
 
@@ -17,9 +18,10 @@ void Game::Initialize() {
 	sceneManager_->AddScene("GamePlay", std::make_unique<GamePlayScene>());
 	sceneManager_->AddScene("Title", std::make_unique<TitleScene>());
 	sceneManager_->AddScene("EasingEditorScene", std::make_unique<EasingEditorScene>());
+	sceneManager_->AddScene("Pause", std::make_unique<PauseScene>());
 
 	// 最初のシーンを初期化
-	sceneManager_->ChangeScene("Title");
+	sceneManager_->ChangeScene("GamePlay");
 
 	// フェードマネージャーの生成&初期化
 	fadeManager_ = std::make_unique<FadeManager>();
@@ -31,9 +33,9 @@ void Game::Update() {
 	Framework::Update();
 
 	// シーン切り替えの要求があればフェードアウト開始
-	if (sceneManager_->GetRequestedSceneName() != "") {
+	if (sceneManager_->GetRequestedSceneName() != "" && sceneManager_->GetRequestedTransition() == SceneTransition::Change) {
 		fadeManager_->FadeOutTo(sceneManager_->GetRequestedSceneName());
-		sceneManager_->SetRequestedSceneName("");
+		sceneManager_->ClearRequest();
 	}
 
 	// フェードの更新処理
@@ -41,7 +43,7 @@ void Game::Update() {
 	fadeManager_->Update(dt);
 
 	// 画面が完全に暗くなったらシーンを切り替える
-	if(fadeManager_->IsWaitingForSceneShange()){
+	if (fadeManager_->IsWaitingForSceneShange()) {
 		sceneManager_->ChangeScene(fadeManager_->GetRequestedSceneName());
 		fadeManager_->NotifySceneChanged();
 	}
