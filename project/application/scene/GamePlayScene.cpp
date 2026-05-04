@@ -66,6 +66,9 @@ void GamePlayScene::Initialize(const SceneContext& ctx) {
 	// 地面の生成&初期化
 	ground_ = std::make_unique<Ground>();
 	ground_->Initialize(ctx_.engineContext);
+
+	// シーン遷移要求制御変数
+	isTransitionRequested_ = false;
 }
 
 void GamePlayScene::Update() {
@@ -93,11 +96,6 @@ void GamePlayScene::Update() {
 	player_->PostUpdate();
 	enemyManager_->PostUpdate();
 
-	// プレイヤーが死亡したらシーン遷移
-	if (player_->IsDead()) {
-		RequestSceneChange("Title");
-	}
-
 	// ゴールしていたらフラッシュ開始
 	if (goal_->GetGoal()) {
 		flashEffect_->Trigger();
@@ -110,7 +108,18 @@ void GamePlayScene::Update() {
 
 	// レターボックスの演出が終わったらシーン遷移
 	if (!letterBox_->GetIsActive()) {
-		RequestSceneChange("Title");
+		if (!isTransitionRequested_) {
+			RequestSceneChange("Title");
+			isTransitionRequested_ = true;
+		}
+	}
+
+	// プレイヤーが死亡したらシーン遷移
+	if (player_->IsDead()) {
+		if (!isTransitionRequested_) {
+			RequestSceneChange("Title");
+			isTransitionRequested_ = true;
+		}
 	}
 
 	// 壁の管理インスタンスImGui
@@ -203,16 +212,16 @@ void GamePlayScene::Draw() {
 	// ゴール判定インスタンス描画
 	goal_->Draw();
 
-	// パーティクルの描画
-	for (auto& particle : enemyDeathParticle_) {
-		particle->Draw();
-	}
-
 	// プレイヤーのHPゲージ描画
 	playerHPGauge_->Draw();
 
 	// 地面の描画
 	ground_->Draw();
+
+	// パーティクルの描画
+	for (auto& particle : enemyDeathParticle_) {
+		particle->Draw();
+	}
 
 	// フラッシュエフェクト描画
 	flashEffect_->Draw();

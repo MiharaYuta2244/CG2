@@ -82,4 +82,7 @@ private:
 	std::unique_ptr<Camera> mainCamera_;  // メインカメラ
 	std::unique_ptr<Camera> debugCamera_; // デバッグカメラ
 	bool isDebugCameraActive_ = false;    // カメラの切り替えフラグ
+
+	// シーン遷移の要求を1回だけ通るようにするためのフラグ
+	bool isTransitionRequested_ = false;
 };

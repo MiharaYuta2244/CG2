@@ -13,6 +13,7 @@ public:
 /// フェードアウト中
 /// </summary>
 class FadeStateFadeOut : public IFadeState{
+public:
 	void Enter(FadeManager* manager)override;
 	void Update(FadeManager* manager, float deltaTime) override;
 };
@@ -21,14 +22,16 @@ class FadeStateFadeOut : public IFadeState{
 /// シーンの切り替え待ち
 /// </summary>
 class FadeStateWaiting : public IFadeState{
+public:
 	void Enter(FadeManager* manager) override;
-	void Update(FadeManager* manager, float deltaTime) override {}
+	void Update(FadeManager* manager, float deltaTime) override{}
 };
 
 /// <summary>
 /// フェードイン中
 /// </summary>
 class FadeStateFadeIn : public IFadeState{
+public:
 	void Enter(FadeManager* manager) override;
 	void Update(FadeManager* manager, float deltaTime) override;
 };

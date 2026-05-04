@@ -5,6 +5,9 @@
 #include <memory>
 #include <string>
 
+/// <summary>
+/// フェード管理クラス
+/// </summary>
 class FadeManager {
 public:
 	/// <summary>
