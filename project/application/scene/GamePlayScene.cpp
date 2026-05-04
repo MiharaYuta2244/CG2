@@ -211,14 +211,14 @@ void GamePlayScene::Draw() {
 	// プレイヤーのHPゲージ描画
 	playerHPGauge_->Draw();
 
+	// 地面の描画
+	ground_->Draw();
+
 	// フラッシュエフェクト描画
 	flashEffect_->Draw();
 
 	// レターボックス描画
 	letterBox_->Draw();
-
-	// 地面の描画
-	ground_->Draw();
 }
 
 void GamePlayScene::Finalize() {}

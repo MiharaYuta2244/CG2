@@ -82,5 +82,5 @@ private:
 	float shakeDuration_;
 	float shakeTimer_ = 0;
 	float magnitude_;
-	Vector3 originalPos_;
+	Vector3 shakeOffset_ = {0.0f, 0.0f, 0.0f};
 };
