@@ -256,9 +256,11 @@ copy "$(windowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="application\Scene\PauseScene.cpp" />
     <ClCompile Include="application\Scene\ResultScene.cpp" />
     <ClCompile Include="application\GameObjects\ResultUI\ResultUIManager.cpp" />
-    <ClCompile Include="application\GameObjects\ResultUI\ResultScoreText.cpp" />
-    <ClCompile Include="application\GameObjects\ResultUI\ResultTimerText.cpp" />
-    <ClCompile Include="application\GameObjects\ResultUI\SpriteScaleWipeAnimator.cpp" />
+    <ClCompile Include="application\GameObjects\ResultUI\Text\ResultScoreText.cpp" />
+    <ClCompile Include="application\GameObjects\ResultUI\Text\ResultTimerText.cpp" />
+    <ClCompile Include="application\GameObjects\ResultUI\Animation\SpriteScaleWipeAnimator.cpp" />
+    <ClCompile Include="application\GameObjects\ResultUI\Button\RetryButton.cpp" />
+    <ClCompile Include="application\GameObjects\ResultUI\Button\ToTitleButton.cpp" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="resources\shaders\Object3d.PS.hlsl">
@@ -439,9 +441,11 @@ copy "$(windowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="application\Scene\PauseScene.h" />
     <ClInclude Include="application\Scene\ResultScene.h" />
     <ClInclude Include="application\GameObjects\ResultUI\ResultUIManager.h" />
-    <ClInclude Include="application\GameObjects\ResultUI\ResultScoreText.h" />
-    <ClInclude Include="application\GameObjects\ResultUI\ResultTimerText.h" />
-    <ClInclude Include="application\GameObjects\ResultUI\SpriteScaleWipeAnimator.h" />
+    <ClInclude Include="application\GameObjects\ResultUI\Text\ResultScoreText.h" />
+    <ClInclude Include="application\GameObjects\ResultUI\Text\ResultTimerText.h" />
+    <ClInclude Include="application\GameObjects\ResultUI\Animation\SpriteScaleWipeAnimator.h" />
+    <ClInclude Include="application\GameObjects\ResultUI\Button\RetryButton.h" />
+    <ClInclude Include="application\GameObjects\ResultUI\Button\ToTitleButton.h" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="externals\imgui\LICENSE.txt" />

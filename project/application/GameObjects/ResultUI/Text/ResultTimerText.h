@@ -1,6 +1,6 @@
 #pragma once
 #include "Sprite.h"
-#include "GameObjects/ResultUI/SpriteScaleWipeAnimator.h"
+#include "GameObjects/ResultUI/Animation/SpriteScaleWipeAnimator.h"
 
 /// <summary>
 /// リザルトシーンでクリアタイマーを表すテキスト

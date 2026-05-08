@@ -306,13 +306,19 @@
     <ClCompile Include="application\GameObjects\ResultUI\ResultUIManager.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
-    <ClCompile Include="application\GameObjects\ResultUI\ResultScoreText.cpp">
+    <ClCompile Include="application\GameObjects\ResultUI\Text\ResultScoreText.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
-    <ClCompile Include="application\GameObjects\ResultUI\ResultTimerText.cpp">
+    <ClCompile Include="application\GameObjects\ResultUI\Text\ResultTimerText.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
-    <ClCompile Include="application\GameObjects\ResultUI\SpriteScaleWipeAnimator.cpp">
+    <ClCompile Include="application\GameObjects\ResultUI\Animation\SpriteScaleWipeAnimator.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="application\GameObjects\ResultUI\Button\RetryButton.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="application\GameObjects\ResultUI\Button\ToTitleButton.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
   </ItemGroup>
@@ -679,13 +685,19 @@
     <ClInclude Include="application\GameObjects\ResultUI\ResultUIManager.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
-    <ClInclude Include="application\GameObjects\ResultUI\ResultScoreText.h">
+    <ClInclude Include="application\GameObjects\ResultUI\Text\ResultScoreText.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
-    <ClInclude Include="application\GameObjects\ResultUI\ResultTimerText.h">
+    <ClInclude Include="application\GameObjects\ResultUI\Text\ResultTimerText.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
-    <ClInclude Include="application\GameObjects\ResultUI\SpriteScaleWipeAnimator.h">
+    <ClInclude Include="application\GameObjects\ResultUI\Animation\SpriteScaleWipeAnimator.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="application\GameObjects\ResultUI\Button\RetryButton.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="application\GameObjects\ResultUI\Button\ToTitleButton.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
   </ItemGroup>

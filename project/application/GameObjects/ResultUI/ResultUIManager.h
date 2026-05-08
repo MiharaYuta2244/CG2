@@ -1,6 +1,6 @@
 #pragma once 
-#include "ResultScoreText.h"
-#include "ResultTimerText.h"
+#include "Text/ResultScoreText.h"
+#include "Text/ResultTimerText.h"
 
 /// <summary>
 /// リザルトシーンのUI管理クラス

@@ -2,11 +2,11 @@
 
 void ResultUIManager::Initialize(EngineContext* ctx) {
 	// スコアテキスト生成&初期化
-	scoreText_=std::make_unique<ResultScoreText>();
+	scoreText_ = std::make_unique<ResultScoreText>();
 	scoreText_->Initialize(ctx);
 
 	// タイマーテキスト生成&初期化
-	timerText_=std::make_unique<ResultTimerText>();
+	timerText_ = std::make_unique<ResultTimerText>();
 	timerText_->Initialize(ctx);
 }
 

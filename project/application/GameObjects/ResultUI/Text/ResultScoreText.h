@@ -1,7 +1,7 @@
 #pragma once
 #include "AnimationBundle.h"
 #include "Sprite.h"
-#include "GameObjects/ResultUI/SpriteScaleWipeAnimator.h"
+#include "GameObjects/ResultUI/Animation/SpriteScaleWipeAnimator.h"
 
 /// <summary>
 /// リザルトシーンで倒した敵の数を表すテキスト
