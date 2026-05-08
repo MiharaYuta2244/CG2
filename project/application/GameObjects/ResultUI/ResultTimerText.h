@@ -19,4 +19,10 @@ public:
 private:
 	// アニメーション用のスプライト
 	std::unique_ptr<SpriteScaleWipeAnimator> animSprite_;
+
+	// スコアテキスト
+	std::unique_ptr<TinyEngine::Sprite> text_;
+
+	Vector2 basePos_ = {300.0f, 200.0f};
+	Vector2 baseSize_ = {400.0f, 100.0f};
 };

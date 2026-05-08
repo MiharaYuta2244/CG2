@@ -16,6 +16,12 @@ public:
 	// アニメーション開始
 	void StartAnimation();
 
+	// 座標のGetter
+	Vector2 GetPos() const { return basePos_; }
+
+	// アニメーション終了フラグGetter
+	bool GetBeforeAnimationFinished() const { return isBeforeAnimFinished_; }
+
 private:
 	// スプライト
 	std::unique_ptr<TinyEngine::Sprite> sprite_;
@@ -35,4 +41,7 @@ private:
 	// == アニメーション関連 ==
 	AnimationBundle<float> scaleBeforeAnim_; // 行き
 	AnimationBundle<float> scaleAfterAnim_;  // 戻り
+
+	// アニメーション終了フラグ
+	bool isBeforeAnimFinished_ = false;
 };

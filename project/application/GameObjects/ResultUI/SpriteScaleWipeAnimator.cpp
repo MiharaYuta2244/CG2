@@ -34,6 +34,7 @@ void SpriteScaleWipeAnimator::Update(float deltaTime) {
 	// 行きのアニメーションが終わったら戻りのアニメーションを開始
 	if (wasPlayingBefore && !playingBefore) {
 		scaleAfterAnim_.anim.Start(baseSize_.x, 0.0f, 0.2f, EaseType::EASEOUTCUBIC);
+		isBeforeAnimFinished_ = true;
 	}
 
 	// == アニメーションの更新 ==
@@ -46,9 +47,9 @@ void SpriteScaleWipeAnimator::Update(float deltaTime) {
 		spritePos_.x = rightFixed - spriteSize_.x;
 	}
 
+	// == 座標等の設定&更新 ==
 	spritePos_.y = basePos_.y;
 	spriteSize_.y = baseSize_.y;
-
 	sprite_->SetPosition(spritePos_);
 	sprite_->SetSize(spriteSize_);
 	sprite_->Update();

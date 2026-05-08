@@ -3,9 +3,14 @@
 using namespace TinyEngine;
 
 void ResultTimerText::Initialize(EngineContext* ctx) {
+	// テキスト生成&初期化
+	text_ = std::make_unique<Sprite>();
+	text_->Initialize(ctx, "Title_Play.png");
+	text_->SetPosition(basePos_);
+
 	// アニメーションスプライトの生成&初期化
 	animSprite_ = std::make_unique<SpriteScaleWipeAnimator>();
-	animSprite_->Initialize(ctx, {300.0f, 200.0f}, {400.0f, 100.0f});
+	animSprite_->Initialize(ctx, basePos_, baseSize_);
 }
 
 void ResultTimerText::Update(float deltaTime, DirectInput* input) {
@@ -16,6 +21,18 @@ void ResultTimerText::Update(float deltaTime, DirectInput* input) {
 
 	// アニメーションスプライトの更新
 	animSprite_->Update(deltaTime);
+
+	// テキストの更新
+	text_->SetPosition(animSprite_->GetPos());
+	text_->Update();
 }
 
-void ResultTimerText::Draw() { animSprite_->Draw(); }
+void ResultTimerText::Draw() {
+	// テキストの描画
+	if (animSprite_->GetBeforeAnimationFinished()) {
+		text_->Draw();
+	}
+
+	// アニメーションスプライトの描画
+	animSprite_->Draw();
+}
