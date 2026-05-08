@@ -115,7 +115,7 @@ void GamePlayScene::Update() {
 	// レターボックスの演出が終わったらシーン遷移
 	if (!letterBox_->GetIsActive()) {
 		if (!isTransitionRequested_) {
-			RequestSceneChange("Title");
+			RequestSceneChange("Result");
 			isTransitionRequested_ = true;
 		}
 	}
@@ -123,7 +123,7 @@ void GamePlayScene::Update() {
 	// プレイヤーが死亡したらシーン遷移
 	if (player_->IsDead()) {
 		if (!isTransitionRequested_) {
-			RequestSceneChange("Title");
+			RequestSceneChange("Result");
 			isTransitionRequested_ = true;
 		}
 	}
@@ -139,6 +139,9 @@ void GamePlayScene::Update() {
 
 	// ギズモ用ImGui更新
 	UpdateImGui();
+
+	// デバッグ用のImGui更新
+	UpdateDebugImGui();
 
 	// プレイヤーのHPゲージ更新
 	playerHPGauge_->HPBarSpriteApply(static_cast<int>(player_->GetCurrentHP()), static_cast<int>(player_->GetMaxHP()));
@@ -497,4 +500,14 @@ void GamePlayScene::UpdateImGui() {
 		ImGui::PopStyleColor();
 	}
 #endif // USE_IMGUI
+}
+
+void GamePlayScene::UpdateDebugImGui() {
+#ifdef USE_IMGUI
+	ImGui::Begin("Debug List");
+	if (ImGui::Button("Kill Player")) {
+		player_->Damage(1000.0f);
+	}
+	ImGui::End();
+#endif
 }

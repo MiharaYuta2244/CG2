@@ -15,6 +15,9 @@
 #include <memory>
 #include <vector>
 
+/// <summary>
+/// ゲームシーン
+/// </summary>
 class GamePlayScene : public BaseScene {
 public:
 	void Initialize(const SceneContext& ctx) override;
@@ -31,6 +34,9 @@ private:
 
 	// ギズモ用ImGuiの更新
 	void UpdateImGui();
+
+	// デバッグ用のImGui更新
+	void UpdateDebugImGui();
 
 private:
 	// プレイヤー

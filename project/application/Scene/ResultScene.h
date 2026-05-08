@@ -1,10 +1,11 @@
 #pragma once
 #include "BaseScene.h"
+#include "GameObjects/ResultUI/ResultUIManager.h"
 
 /// <summary>
-/// ポーズシーン
+/// リザルトシーン
 /// </summary>
-class PauseScene : public BaseScene{
+class ResultScene : public BaseScene {
 public:
 	void Initialize(const SceneContext& ctx) override;
 
@@ -13,4 +14,8 @@ public:
 	void Draw() override;
 
 	void Finalize() override;
+
+private:
+	// UI管理インスタンス
+	std::unique_ptr<ResultUIManager> uiManager_;
 };

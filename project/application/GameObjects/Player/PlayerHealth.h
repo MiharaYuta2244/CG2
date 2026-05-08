@@ -33,6 +33,7 @@ public:
 private:
 	float maxHP_ = 3.0f; // 最大HP
 	float hp_ = maxHP_;  // 現在のHP
+	float preHP_ = hp_;  // 前フレームのHP
 
 	// 無敵状態フラグ
 	bool isInvincible_ = false;
