@@ -20,12 +20,6 @@ void ResultScene::Update() {
 
 	// UI管理クラス更新
 	uiManager_->Update(deltaTime, ctx_.keyboard);
-
-#ifdef USE_IMGUI
-	ImGui::Begin("Result");
-
-	ImGui::End();
-#endif
 }
 
 void ResultScene::Draw() {

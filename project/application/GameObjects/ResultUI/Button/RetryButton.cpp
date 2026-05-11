@@ -5,6 +5,7 @@ void RetryButton::Initialize(EngineContext* ctx) {
 
 	// 個別のスプライト設定
 	sprite_->SetTexture("Title_Play.png");
+	// sprite_->SetPosition({});
 }
 
 void RetryButton::Update(bool isSelect) { IButton::Update(isSelect); }
