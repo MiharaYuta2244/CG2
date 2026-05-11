@@ -174,7 +174,7 @@ void Sprite::CreateTransformationData() {
 void Sprite::SetSrvHandle(D3D12_GPU_DESCRIPTOR_HANDLE srvHandle) { srvHandle_ = srvHandle; }
 
 void Sprite::SetTexture(const std::string& texturePath) {
-	textureFilePath_ = texturePath;
+	textureFilePath_ = "resources/textures/" + texturePath;
 	textureIndex_ = ctx_->textureManager->GetSrvIndex(texturePath);
 }
 

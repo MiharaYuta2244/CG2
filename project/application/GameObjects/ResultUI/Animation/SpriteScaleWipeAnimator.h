@@ -2,6 +2,9 @@
 #include "AnimationBundle.h"
 #include "Sprite.h"
 
+/// <summary>
+/// リザルトで表示するアニメーション用クラス
+/// </summary>
 class SpriteScaleWipeAnimator {
 public:
 	// 初期化

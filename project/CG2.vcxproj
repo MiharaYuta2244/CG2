@@ -166,6 +166,7 @@ copy "$(windowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="application\GameObjects\Enemy\EnemyBullet.cpp" />
     <ClCompile Include="application\GameObjects\Enemy\EnemyBulletManager.cpp" />
     <ClCompile Include="application\GameObjects\Enemy\EnemyManager.cpp" />
+    <ClCompile Include="application\GameObjects\ResultUI\Button\IButton.cpp" />
     <ClCompile Include="application\Scene\EasingEditorScene.cpp" />
     <ClCompile Include="engine\base\utility\easing\EasingEditor.cpp" />
     <ClCompile Include="engine\utility\DirectXUtils.cpp" />
@@ -335,6 +336,7 @@ copy "$(windowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="application\GameObjects\Enemy\EnemyBulletManager.h" />
     <ClInclude Include="application\GameObjects\Enemy\EnemyManager.h" />
     <ClInclude Include="application\GameObjects\Player\IHPGauge.h" />
+    <ClInclude Include="application\GameObjects\ResultUI\Button\IButton.h" />
     <ClInclude Include="application\Scene\EasingEditorScene.h" />
     <ClInclude Include="engine\base\SceneContext.h" />
     <ClInclude Include="engine\base\utility\easing\EasingEditor.h" />

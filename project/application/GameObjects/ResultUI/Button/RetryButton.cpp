@@ -1,1 +1,28 @@
 #include "RetryButton.h"
+
+void RetryButton::Initialize(EngineContext* ctx) {
+	IButton::Initialize(ctx);
+
+	// 個別のスプライト設定
+	sprite_->SetTexture("Title_Play.png");
+}
+
+void RetryButton::Update(bool isSelect) { IButton::Update(isSelect); }
+
+void RetryButton::Draw() { IButton::Draw(); }
+
+const ButtonStyle& RetryButton::GetNormalStyle() const {
+	static ButtonStyle style = {
+	    {1, 1, 1, 1}, // 白
+	    {176, 80}  // 通常サイズ
+	};
+	return style;
+}
+
+const ButtonStyle& RetryButton::GetSelectedStyle() const {
+	static ButtonStyle style = {
+	    {1, 1, 0, 1}, // 黄色
+	    {176 * 1.2f, 80 * 1.2f}  // 拡大
+	};
+	return style;
+}
