@@ -80,7 +80,7 @@
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
       <TreatWarningAsError>true</TreatWarningAsError>
-      <AdditionalIncludeDirectories>$(ProjectDir)externals;$(ProjectDir)externals\imguizmo;$(ProjectDir)externals\imgui;$(ProjectDir)externals\DirectXTex;$(ProjectDir)resources\shaders;$(ProjectDir)engine\math;$(ProjectDir)engine\input;$(ProjectDir)engine\base;$(ProjectDir)engine\audio;$(ProjectDir)engine\3d;$(ProjectDir)engine\2d;$(ProjectDir)engine;$(ProjectDir)engine\Collision;$(WindowsSdkDir)Include\10.0.26100.0\um;$(ProjectDir)engine\base\utility\easing;$(ProjectDir)engine\utility;$(ProjectDir)engine\base\utility\screenSpaceUtility;$(ProjectDir)engine\base\utility\gameTimer;$(ProjectDir)application;$(ProjectDir)engine\math\mathLib;$(ProjectDir)engine\base\imGuiManager;$(ProjectDir)engine\base\utility\deltaTime;$(ProjectDir)engine\3d\modules;$(ProjectDir)engine\Framework;$(ProjectDir)engine\base\utility\random;$(ProjectDir)engine\scene;$(ProjectDir)externals\assimp\include;$(ProjectDir)engine\tool\json;$(ProjectDir)engine\base\utility\timeManager</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)externals;$(ProjectDir)externals\imguizmo;$(ProjectDir)externals\imgui;$(ProjectDir)externals\DirectXTex;$(ProjectDir)resources\shaders;$(ProjectDir)engine\math;$(ProjectDir)engine\input;$(ProjectDir)engine\base;$(ProjectDir)engine\audio;$(ProjectDir)engine\3d;$(ProjectDir)engine\2d;$(ProjectDir)engine;$(ProjectDir)engine\Collision;$(WindowsSdkDir)Include\10.0.26100.0\um;$(ProjectDir)engine\base\utility\easing;$(ProjectDir)engine\utility;$(ProjectDir)engine\base\utility\screenSpaceUtility;$(ProjectDir)engine\base\utility\gameTimer;$(ProjectDir)application;$(ProjectDir)engine\math\mathLib;$(ProjectDir)engine\base\imGuiManager;$(ProjectDir)engine\base\utility\deltaTime;$(ProjectDir)engine\Framework;$(ProjectDir)engine\base\utility\random;$(ProjectDir)engine\scene;$(ProjectDir)externals\assimp\include;$(ProjectDir)engine\tool\json;$(ProjectDir)engine\base\utility\timeManager;$(ProjectDir)engine\3d\skybox;$(ProjectDir)engine\3d\object3d;$(ProjectDir)engine\3d\particle\modules;$(ProjectDir)engine\3d\particle</AdditionalIncludeDirectories>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <DisableLanguageExtensions>false</DisableLanguageExtensions>
     </ClCompile>
@@ -109,7 +109,7 @@ copy "$(windowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
       <AdditionalOptions>/utf-8 %(AdditionalOptions)</AdditionalOptions>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
-      <AdditionalIncludeDirectories>$(ProjectDir)externals\imguizmo;$(ProjectDir)externals\imgui;$(ProjectDir)externals\DirectXTex;$(ProjectDir)resources\shaders;$(ProjectDir)engine\math;$(ProjectDir)engine\input;$(ProjectDir)engine\base;$(ProjectDir)engine\audio;$(ProjectDir)engine\3d;$(ProjectDir)engine\2d;$(ProjectDir)engine;$(ProjectDir)engine\Collision;$(WindowsSdkDir)Include\10.0.26100.0\um;$(ProjectDir)engine\base\utility\easing;$(ProjectDir)engine\utility;$(ProjectDir)engine\base\utility\screenSpaceUtility;$(ProjectDir)engine\base\utility\gameTimer;$(ProjectDir)engine\math\mathLib;$(ProjectDir)engine\base\imGuiManager;$(ProjectDir)engine\base\utility\timeManager;$(ProjectDir)engine\3d\modules;$(ProjectDir)engine\Framework;$(ProjectDir)engine\base\utility\random;$(ProjectDir)engine\scene;$(ProjectDir)application;$(ProjectDir)externals\assimp\include;$(ProjectDir)externals;$(ProjectDir)engine\tool\json</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)externals\imguizmo;$(ProjectDir)externals\imgui;$(ProjectDir)externals\DirectXTex;$(ProjectDir)resources\shaders;$(ProjectDir)engine\math;$(ProjectDir)engine\input;$(ProjectDir)engine\base;$(ProjectDir)engine\audio;$(ProjectDir)engine\3d;$(ProjectDir)engine\2d;$(ProjectDir)engine;$(ProjectDir)engine\Collision;$(WindowsSdkDir)Include\10.0.26100.0\um;$(ProjectDir)engine\base\utility\easing;$(ProjectDir)engine\utility;$(ProjectDir)engine\base\utility\screenSpaceUtility;$(ProjectDir)engine\base\utility\gameTimer;$(ProjectDir)engine\math\mathLib;$(ProjectDir)engine\base\imGuiManager;$(ProjectDir)engine\base\utility\timeManager;$(ProjectDir)engine\Framework;$(ProjectDir)engine\base\utility\random;$(ProjectDir)engine\scene;$(ProjectDir)application;$(ProjectDir)externals\assimp\include;$(ProjectDir)externals;$(ProjectDir)engine\tool\json;$(ProjectDir)engine\3d\skybox;$(ProjectDir)engine\3d\object3d;$(ProjectDir)engine\3d\particle\modules;$(ProjectDir)engine\3d\particle</AdditionalIncludeDirectories>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <DisableLanguageExtensions>false</DisableLanguageExtensions>
       <TreatWarningAsError>true</TreatWarningAsError>
@@ -139,7 +139,7 @@ copy "$(windowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
       <AdditionalOptions>/utf-8 %(AdditionalOptions)</AdditionalOptions>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
-      <AdditionalIncludeDirectories>$(ProjectDir)externals\imguizmo;$(ProjectDir)externals\imgui;$(ProjectDir)externals\DirectXTex;$(ProjectDir)resources\shaders;$(ProjectDir)engine\math;$(ProjectDir)engine\input;$(ProjectDir)engine\base;$(ProjectDir)engine\audio;$(ProjectDir)engine\3d;$(ProjectDir)engine\2d;$(ProjectDir)engine;$(ProjectDir)engine\Collision;$(WindowsSdkDir)Include\10.0.26100.0\um;$(ProjectDir)engine\base\utility\easing;$(ProjectDir)engine\utility;$(ProjectDir)engine\base\utility\screenSpaceUtility;$(ProjectDir)engine\base\utility\gameTimer;$(ProjectDir)application;$(ProjectDir)engine\math\mathLib;$(ProjectDir)engine\base\imGuiManager;$(ProjectDir)engine\base\utility\timeManager;$(ProjectDir)engine\3d\modules;$(ProjectDir)engine\Framework;$(ProjectDir)engine\base\utility\random;$(ProjectDir)engine\scene;$(ProjectDir)externals\assimp\include;$(ProjectDir)externals;$(ProjectDir)engine\tool\json</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)externals\imguizmo;$(ProjectDir)externals\imgui;$(ProjectDir)externals\DirectXTex;$(ProjectDir)resources\shaders;$(ProjectDir)engine\math;$(ProjectDir)engine\input;$(ProjectDir)engine\base;$(ProjectDir)engine\audio;$(ProjectDir)engine\3d;$(ProjectDir)engine\2d;$(ProjectDir)engine;$(ProjectDir)engine\Collision;$(WindowsSdkDir)Include\10.0.26100.0\um;$(ProjectDir)engine\base\utility\easing;$(ProjectDir)engine\utility;$(ProjectDir)engine\base\utility\screenSpaceUtility;$(ProjectDir)engine\base\utility\gameTimer;$(ProjectDir)application;$(ProjectDir)engine\math\mathLib;$(ProjectDir)engine\base\imGuiManager;$(ProjectDir)engine\base\utility\timeManager;$(ProjectDir)engine\Framework;$(ProjectDir)engine\base\utility\random;$(ProjectDir)engine\scene;$(ProjectDir)externals\assimp\include;$(ProjectDir)externals;$(ProjectDir)engine\tool\json;$(ProjectDir)engine\3d\skybox;$(ProjectDir)engine\3d\object3d;$(ProjectDir)engine\3d\particle\modules;$(ProjectDir)engine\3d\particle</AdditionalIncludeDirectories>
       <Optimization>Disabled</Optimization>
       <WholeProgramOptimization>false</WholeProgramOptimization>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
@@ -174,8 +174,8 @@ copy "$(windowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="engine\scene\BaseScene.cpp" />
     <ClCompile Include="engine\scene\SceneManager.cpp" />
     <ClCompile Include="engine\base\utility\easing\Easing.cpp" />
-    <ClCompile Include="engine\3d\modules\DustModule.cpp" />
-    <ClCompile Include="engine\3d\modules\ShockWaveModule.cpp" />
+    <ClCompile Include="engine\3d\particle\modules\DustModule.cpp" />
+    <ClCompile Include="engine\3d\particle\modules\ShockWaveModule.cpp" />
     <ClCompile Include="engine\base\utility\timeManager\TimeManager.cpp" />
     <ClCompile Include="engine\base\D3DResourceLeakChecker.cpp" />
     <ClCompile Include="engine\base\DebugCamera.cpp" />
@@ -229,8 +229,8 @@ copy "$(windowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="engine\3d\Model.cpp" />
     <ClCompile Include="engine\3d\ModelCommon.cpp" />
     <ClCompile Include="engine\3d\ModelManager.cpp" />
-    <ClCompile Include="engine\3d\Object3d.cpp" />
-    <ClCompile Include="engine\3d\Object3dCommon.cpp" />
+    <ClCompile Include="engine\3d\object3d\Object3d.cpp" />
+    <ClCompile Include="engine\3d\object3d\Object3dCommon.cpp" />
     <ClCompile Include="engine\base\SphereMeshGenerator.cpp" />
     <ClCompile Include="engine\2d\Sprite.cpp" />
     <ClCompile Include="engine\2d\SpriteCommon.cpp" />
@@ -239,11 +239,11 @@ copy "$(windowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="engine\base\WinApp.cpp" />
     <ClCompile Include="engine\audio\AudioManager.cpp" />
     <ClCompile Include="engine\base\SrvManager.cpp" />
-    <ClCompile Include="engine\3d\Particle.cpp" />
-    <ClCompile Include="engine\3d\ParticleCommon.cpp" />
+    <ClCompile Include="engine\3d\particle\Particle.cpp" />
+    <ClCompile Include="engine\3d\particle\ParticleCommon.cpp" />
     <ClCompile Include="engine\base\utility\random\Random.cpp" />
-    <ClCompile Include="engine\3d\modules\RisingModule.cpp" />
-    <ClCompile Include="engine\3d\modules\RadialRingModule.cpp" />
+    <ClCompile Include="engine\3d\particle\modules\RisingModule.cpp" />
+    <ClCompile Include="engine\3d\particle\modules\RadialRingModule.cpp" />
     <ClCompile Include="engine\base\utility\screenSpaceUtility\ScreenSpaceUtility.cpp" />
     <ClCompile Include="application\Scene\TitleScene.cpp" />
     <ClCompile Include="application\GameObjects\Player\Player.cpp" />
@@ -262,6 +262,8 @@ copy "$(windowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="application\GameObjects\ResultUI\Animation\SpriteScaleWipeAnimator.cpp" />
     <ClCompile Include="application\GameObjects\ResultUI\Button\RetryButton.cpp" />
     <ClCompile Include="application\GameObjects\ResultUI\Button\ToTitleButton.cpp" />
+    <ClCompile Include="engine\3d\skybox\SkyboxCommon.cpp" />
+    <ClCompile Include="engine\3d\skybox\Skybox.cpp" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="resources\shaders\Object3d.PS.hlsl">
@@ -352,9 +354,9 @@ copy "$(windowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="engine\scene\SceneManager.h" />
     <ClInclude Include="engine\base\SpotLight.h" />
     <ClInclude Include="engine\base\utility\easing\Easing.h" />
-    <ClInclude Include="engine\3d\modules\DustModule.h" />
-    <ClInclude Include="engine\3d\modules\ShockWaveModule.h" />
-    <ClInclude Include="engine\3d\ParticleModule.h" />
+    <ClInclude Include="engine\3d\particle\modules\DustModule.h" />
+    <ClInclude Include="engine\3d\particle\modules\ShockWaveModule.h" />
+    <ClInclude Include="engine\3d\particle\ParticleModule.h" />
     <ClInclude Include="engine\base\EngineContext.h" />
     <ClInclude Include="engine\base\ParticleForGPU.h" />
     <ClInclude Include="engine\base\ParticleState.h" />
@@ -392,9 +394,8 @@ copy "$(windowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="engine\3d\ModelCommon.h" />
     <ClInclude Include="engine\3d\ModelData.h" />
     <ClInclude Include="engine\3d\ModelManager.h" />
-    <ClInclude Include="engine\3d\MouseState.h" />
-    <ClInclude Include="engine\3d\Object3d.h" />
-    <ClInclude Include="engine\3d\Object3dCommon.h" />
+    <ClInclude Include="engine\3d\object3d\Object3d.h" />
+    <ClInclude Include="engine\3d\object3d\Object3dCommon.h" />
     <ClInclude Include="engine\base\SphereMeshGenerator.h" />
     <ClInclude Include="engine\2d\Sprite.h" />
     <ClInclude Include="engine\2d\SpriteCommon.h" />
@@ -413,11 +414,11 @@ copy "$(windowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="application\Game\Game.h" />
     <ClInclude Include="engine\input\GamePad.h" />
     <ClInclude Include="engine\base\SrvManager.h" />
-    <ClInclude Include="engine\3d\Particle.h" />
-    <ClInclude Include="engine\3d\ParticleCommon.h" />
+    <ClInclude Include="engine\3d\particle\Particle.h" />
+    <ClInclude Include="engine\3d\particle\ParticleCommon.h" />
     <ClInclude Include="engine\base\utility\random\Random.h" />
-    <ClInclude Include="engine\3d\modules\RisingModule.h" />
-    <ClInclude Include="engine\3d\modules\RadialRingModule.h" />
+    <ClInclude Include="engine\3d\particle\modules\RisingModule.h" />
+    <ClInclude Include="engine\3d\particle\modules\RadialRingModule.h" />
     <ClInclude Include="engine\Framework\Framework.h" />
     <ClInclude Include="application\Scene\GamePlayScene.h" />
     <ClInclude Include="engine\base\utility\screenSpaceUtility\ScreenSpaceUtility.h" />
@@ -448,6 +449,8 @@ copy "$(windowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="application\GameObjects\ResultUI\Animation\SpriteScaleWipeAnimator.h" />
     <ClInclude Include="application\GameObjects\ResultUI\Button\RetryButton.h" />
     <ClInclude Include="application\GameObjects\ResultUI\Button\ToTitleButton.h" />
+    <ClInclude Include="engine\3d\skybox\SkyboxCommon.h" />
+    <ClInclude Include="engine\3d\skybox\Skybox.h" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="externals\imgui\LICENSE.txt" />

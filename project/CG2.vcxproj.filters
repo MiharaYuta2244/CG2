@@ -159,10 +159,10 @@
     <ClCompile Include="engine\3d\ModelManager.cpp">
       <Filter>ソース ファイル\engine\3d</Filter>
     </ClCompile>
-    <ClCompile Include="engine\3d\Object3d.cpp">
+    <ClCompile Include="engine\3d\object3d\Object3d.cpp">
       <Filter>ソース ファイル\engine\3d</Filter>
     </ClCompile>
-    <ClCompile Include="engine\3d\Object3dCommon.cpp">
+    <ClCompile Include="engine\3d\object3d\Object3dCommon.cpp">
       <Filter>ソース ファイル\engine\3d</Filter>
     </ClCompile>
     <ClCompile Include="application\Game\Game.cpp">
@@ -180,25 +180,25 @@
     <ClCompile Include="engine\Collision\Collision.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
-    <ClCompile Include="engine\3d\Particle.cpp">
+    <ClCompile Include="engine\3d\particle\Particle.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
-    <ClCompile Include="engine\3d\ParticleCommon.cpp">
+    <ClCompile Include="engine\3d\particle\ParticleCommon.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
     <ClCompile Include="engine\base\utility\random\Random.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
-    <ClCompile Include="engine\3d\modules\ShockWaveModule.cpp">
+    <ClCompile Include="engine\3d\particle\modules\ShockWaveModule.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
-    <ClCompile Include="engine\3d\modules\DustModule.cpp">
+    <ClCompile Include="engine\3d\particle\modules\DustModule.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
-    <ClCompile Include="engine\3d\modules\RisingModule.cpp">
+    <ClCompile Include="engine\3d\particle\modules\RisingModule.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
-    <ClCompile Include="engine\3d\modules\RadialRingModule.cpp">
+    <ClCompile Include="engine\3d\particle\modules\RadialRingModule.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
     <ClCompile Include="engine\Framework\Framework.cpp">
@@ -322,6 +322,12 @@
       <Filter>ソース ファイル</Filter>
     </ClCompile>
     <ClCompile Include="application\GameObjects\ResultUI\Button\IButton.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="engine\3d\skybox\SkyboxCommon.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="engine\3d\skybox\Skybox.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
   </ItemGroup>
@@ -460,14 +466,11 @@
     <ClInclude Include="engine\3d\ModelManager.h">
       <Filter>ヘッダー ファイル\engine\3d</Filter>
     </ClInclude>
-    <ClInclude Include="engine\3d\Object3d.h">
+    <ClInclude Include="engine\3d\object3d\Object3d.h">
       <Filter>ヘッダー ファイル\engine\3d</Filter>
     </ClInclude>
-    <ClInclude Include="engine\3d\Object3dCommon.h">
+    <ClInclude Include="engine\3d\object3d\Object3dCommon.h">
       <Filter>ヘッダー ファイル\engine\3d</Filter>
-    </ClInclude>
-    <ClInclude Include="engine\3d\MouseState.h">
-      <Filter>ヘッダー ファイル\engine\base</Filter>
     </ClInclude>
     <ClInclude Include="engine\3d\ModelData.h">
       <Filter>ヘッダー ファイル\engine\base</Filter>
@@ -517,10 +520,10 @@
     <ClInclude Include="engine\math\mathLib\Sphere.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
-    <ClInclude Include="engine\3d\Particle.h">
+    <ClInclude Include="engine\3d\particle\Particle.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
-    <ClInclude Include="engine\3d\ParticleCommon.h">
+    <ClInclude Include="engine\3d\particle\ParticleCommon.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
     <ClInclude Include="engine\base\ParticleState.h">
@@ -535,19 +538,19 @@
     <ClInclude Include="engine\base\EngineContext.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
-    <ClInclude Include="engine\3d\modules\ShockWaveModule.h">
+    <ClInclude Include="engine\3d\particle\modules\ShockWaveModule.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
-    <ClInclude Include="engine\3d\ParticleModule.h">
+    <ClInclude Include="engine\3d\particle\ParticleModule.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
-    <ClInclude Include="engine\3d\modules\DustModule.h">
+    <ClInclude Include="engine\3d\particle\modules\DustModule.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
-    <ClInclude Include="engine\3d\modules\RisingModule.h">
+    <ClInclude Include="engine\3d\particle\modules\RisingModule.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
-    <ClInclude Include="engine\3d\modules\RadialRingModule.h">
+    <ClInclude Include="engine\3d\particle\modules\RadialRingModule.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
     <ClInclude Include="engine\Framework\Framework.h">
@@ -704,6 +707,12 @@
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
     <ClInclude Include="application\GameObjects\ResultUI\Button\IButton.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="engine\3d\skybox\SkyboxCommon.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="engine\3d\skybox\Skybox.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
   </ItemGroup>

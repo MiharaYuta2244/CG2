@@ -76,45 +76,48 @@ private:
 	D3DResourceLeakChecker leakCheck_;
 
 	// ウィンドウ作成
-	std::shared_ptr<WinApp> winApp_ = std::make_shared<WinApp>();
+	std::shared_ptr<WinApp> winApp_;
 
 	// DirectX12 デバイス初期化
-	std::shared_ptr<DirectXCommon> dxCommon_ = std::make_unique<DirectXCommon>();
+	std::shared_ptr<DirectXCommon> dxCommon_;
 
 	// SRVManager
-	std::unique_ptr<SrvManager> srvManager_ = std::make_unique<SrvManager>();
+	std::unique_ptr<SrvManager> srvManager_;
 
 #ifdef USE_IMGUI
 	// ImGuiManager
-	std::unique_ptr<ImGuiManager> imGuiManager_ = std::make_unique<ImGuiManager>();
+	std::unique_ptr<ImGuiManager> imGuiManager_;
 #endif
 
 	// テクスチャマネージャー
-	std::unique_ptr<TextureManager> textureManager_ = std::make_unique<TextureManager>();
+	std::unique_ptr<TextureManager> textureManager_;
 
 	// Object3dCommon
-	std::unique_ptr<Object3dCommon> object3dCommon_ = std::make_unique<Object3dCommon>();
+	std::unique_ptr<Object3dCommon> object3dCommon_;
 
 	// ModelManager
-	std::unique_ptr<ModelManager> modelManager_ = std::make_unique<ModelManager>();
+	std::unique_ptr<ModelManager> modelManager_;
 
 	// Sprite共通部
-	std::unique_ptr<SpriteCommon> spriteCommon_ = std::make_unique<SpriteCommon>();
+	std::unique_ptr<SpriteCommon> spriteCommon_;
 
 	// 経過時間
-	std::unique_ptr<TimeManager> timeManager_ = std::make_unique<TimeManager>();
+	std::unique_ptr<TimeManager> timeManager_;
 
 	// パーティクルコモン
-	std::unique_ptr<ParticleCommon> particleCommon_ = std::make_unique<ParticleCommon>();
+	std::unique_ptr<ParticleCommon> particleCommon_;
 
 	// DirectInput
-	std::unique_ptr<DirectInput> input_ = std::make_unique<DirectInput>();
+	std::unique_ptr<DirectInput> input_;
 
 	// GamePad
-	std::unique_ptr<GamePad> gamePad_ = std::make_unique<GamePad>();
+	std::unique_ptr<GamePad> gamePad_;
 
 	// DebugCamera
-	std::unique_ptr<Camera> debugCamera_ = std::make_unique<Camera>();
+	std::unique_ptr<Camera> debugCamera_;
+
+	// SkyboxCommon
+	std::unique_ptr<SkyboxCommon> skyboxCommon_;
 
 	// コンテキスト構造体
 	EngineContext engineContext_;

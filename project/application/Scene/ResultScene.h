@@ -1,6 +1,7 @@
 #pragma once
 #include "BaseScene.h"
 #include "GameObjects/ResultUI/ResultUIManager.h"
+#include "Skybox.h"
 
 /// <summary>
 /// リザルトシーン
@@ -18,4 +19,10 @@ public:
 private:
 	// UI管理インスタンス
 	std::unique_ptr<ResultUIManager> uiManager_;
+
+	// スカイボックス
+	std::unique_ptr<TinyEngine::Skybox> skybox_;
+
+	// メインカメラ
+	std::unique_ptr<Camera> mainCamera_;
 };

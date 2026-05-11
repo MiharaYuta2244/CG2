@@ -1,7 +1,7 @@
 #include "Wall.h"
 
 void Wall::Initialize(EngineContext* ctx, WallStatus wallStatus) {
-	transform_.scale = {wallStatus.width, 100.0f, wallStatus.depth};
+	transform_.scale = {wallStatus.width, 1.0f, wallStatus.depth};
 	transform_.rotate = {0.0f, 0.0f, 0.0f};
 	transform_.translate = {wallStatus.centerX, 0.0f, wallStatus.centerZ};
 	wallStatus_ = wallStatus;

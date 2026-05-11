@@ -3,6 +3,7 @@
 #include "Object3dCommon.h"
 #include "ParticleCommon.h"
 #include "SpriteCommon.h"
+#include "SkyBoxCommon.h"
 #include "SrvManager.h"
 #include "TextureManager.h"
 
@@ -16,4 +17,5 @@ struct EngineContext {
 	ModelManager* modelManager = nullptr;
 	ParticleCommon* particleCommon = nullptr;
 	SrvManager* srvManager = nullptr;
+	SkyboxCommon* skyboxCommon = nullptr;
 };

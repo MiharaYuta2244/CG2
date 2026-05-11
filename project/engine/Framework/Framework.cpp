@@ -3,6 +3,50 @@
 void Framework::Initialize() {
 	CoInitializeEx(0, COINIT_MULTITHREADED);
 
+	// ウィンドウ作成
+	winApp_ = std::make_shared<WinApp>();
+
+	// DirectX12 デバイス初期化
+	dxCommon_ = std::make_unique<DirectXCommon>();
+
+	// SRVManager
+	srvManager_ = std::make_unique<SrvManager>();
+
+#ifdef USE_IMGUI
+	// ImGuiManager
+	imGuiManager_ = std::make_unique<ImGuiManager>();
+#endif
+
+	// テクスチャマネージャー
+	textureManager_ = std::make_unique<TextureManager>();
+
+	// Object3dCommon
+	object3dCommon_ = std::make_unique<Object3dCommon>();
+
+	// ModelManager
+	modelManager_ = std::make_unique<ModelManager>();
+
+	// Sprite共通部
+	spriteCommon_ = std::make_unique<SpriteCommon>();
+
+	// 経過時間
+	timeManager_ = std::make_unique<TimeManager>();
+
+	// パーティクルコモン
+	particleCommon_ = std::make_unique<ParticleCommon>();
+
+	// DirectInput
+	input_ = std::make_unique<DirectInput>();
+
+	// GamePad
+	gamePad_ = std::make_unique<GamePad>();
+
+	// DebugCamera
+	debugCamera_ = std::make_unique<Camera>();
+
+	// SkyboxCommon
+	skyboxCommon_ = std::make_unique<SkyboxCommon>();
+
 	// DirectX12 デバイス初期化
 	dxCommon_->Initialize(winApp_);
 
@@ -35,6 +79,9 @@ void Framework::Initialize() {
 	// ParticleCommon
 	particleCommon_->Initialize(dxCommon_.get());
 
+	// SkyboxCommon
+	skyboxCommon_->Initialize(dxCommon_.get());
+
 	// DebugCamera
 	debugCamera_->Initialize();
 	debugCamera_->SetTranslation({0.0f, 0.0f, -75.0f});
@@ -48,6 +95,7 @@ void Framework::Initialize() {
 	engineContext_.textureManager = textureManager_.get();
 	engineContext_.particleCommon = particleCommon_.get();
 	engineContext_.srvManager = srvManager_.get();
+	engineContext_.skyboxCommon = skyboxCommon_.get();
 
 	// DirectInput
 	input_->Initialize(winApp_.get());

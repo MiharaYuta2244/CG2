@@ -12,6 +12,7 @@
 #include "GameObjects/Wall/WallManager.h"
 #include "Object3d.h"
 #include "Particle.h"
+#include "Skybox.h"
 #include <memory>
 #include <vector>
 
@@ -83,6 +84,9 @@ private:
 
 	// 地面
 	std::unique_ptr<Ground> ground_;
+
+	// スカイボックス
+	std::unique_ptr<TinyEngine::Skybox> skybox_;
 
 	// カメラ関連
 	std::unique_ptr<Camera> mainCamera_;  // メインカメラ

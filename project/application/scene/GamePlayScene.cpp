@@ -69,6 +69,10 @@ void GamePlayScene::Initialize(const SceneContext& ctx) {
 
 	// シーン遷移要求制御変数
 	isTransitionRequested_ = false;
+
+	// スカイボックスの生成&初期化
+	skybox_ = std::make_unique<Skybox>();
+	skybox_->Initialize(ctx_.engineContext, "rostock_laage_airport_4k.dds");
 }
 
 void GamePlayScene::Update() {
@@ -94,6 +98,9 @@ void GamePlayScene::Update() {
 
 	// ゴール判定インスタンス更新
 	goal_->Update();
+
+	// スカイボックス更新
+	skybox_->Update(mainCamera_->GetViewMatrix(), mainCamera_->GetProjection());
 
 	// 当たり判定
 	CollisionGameObjects();
@@ -189,6 +196,17 @@ void GamePlayScene::Update() {
 	ImGui::End();
 
 	ctx_.currentCamera->SetEuler(rot);
+
+	Vector3 position = skybox_->GetPosition();
+	Vector3 scale = skybox_->GetScale();
+
+	ImGui::Begin("Skybox");
+	ImGui::DragFloat3("Position", &position.x, 0.01f);
+	ImGui::DragFloat3("Scale", &scale.x, 0.01f);
+	ImGui::End();
+
+	skybox_->SetPosition(position);
+	skybox_->SetScale(scale);
 #endif // USE_IMGUI
 
 #ifdef _DEBUG
@@ -206,6 +224,9 @@ void GamePlayScene::Update() {
 }
 
 void GamePlayScene::Draw() {
+	// スカイボックス描画
+	skybox_->Draw();
+
 	// プレイヤーの描画処理
 	player_->Draw();
 
@@ -225,7 +246,7 @@ void GamePlayScene::Draw() {
 	playerHPGauge_->Draw();
 
 	// 地面の描画
-	ground_->Draw();
+	// ground_->Draw();
 
 	// パーティクルの描画
 	for (auto& particle : enemyDeathParticle_) {
