@@ -49,6 +49,7 @@ public:
 	void SetModel(const std::string& filePath);
 	void SetEnableFoging(const bool enableFoging) { material_.enableFoging = enableFoging; }
 	void SetEnableLighting(const bool enableLighting) { material_.enableLighting = enableLighting; }
+	void SetEnvScale(float envScale) { material_.envScale = envScale; }
 	void SetColor(Vector4 color);
 	void SetModel(Model* model) { model_ = model; }
 	void SetScale(const Vector3& scale) { transform_.scale = scale; }

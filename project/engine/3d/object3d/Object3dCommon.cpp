@@ -1,15 +1,13 @@
 #include "Object3dCommon.h"
 #include "DirectXCommon.h"
-#include "StringUtility.h"
 #include "DirectXUtils.h"
 #include <DirectXMath.h>
 #include <d3dx12.h>
-#include <format>
 
 using namespace Microsoft::WRL;
 using namespace DirectX;
 
-void Object3dCommon::DrawSettingCommon() {
+void Object3dCommon::DrawSettingCommon(TextureManager* textureManager) {
 	// RootSignatureを設定。PSOに設定しているけど別途設定が必要
 	dxCommon_->GetCommandList()->SetGraphicsRootSignature(rootSignature_.Get());
 	dxCommon_->GetCommandList()->SetPipelineState(graphicsPipelineState_.Get()); // PSOを設定
@@ -22,6 +20,8 @@ void Object3dCommon::DrawSettingCommon() {
 	dxCommon_->GetCommandList()->SetGraphicsRootConstantBufferView(7, globalPointLightResource_->GetGPUVirtualAddress());
 	// スポットライトCBufferの場所を指定
 	dxCommon_->GetCommandList()->SetGraphicsRootConstantBufferView(8, globalSpotLightResource_->GetGPUVirtualAddress());
+	// 環境マップ
+	dxCommon_->GetCommandList()->SetGraphicsRootDescriptorTable(10, textureManager->GetSrvHandleGPU("resources/textures/rostock_laage_airport_4k.dds"));
 }
 
 void Object3dCommon::DrawSettingOutline() {
@@ -83,46 +83,58 @@ void Object3dCommon::DrawImGuiLighting() {
 void Object3dCommon::CreateRootSignature() {
 	HRESULT hr;
 
-	D3D12_DESCRIPTOR_RANGE descriptorRange[1] = {};
-	descriptorRange[0].BaseShaderRegister = 0;                                                   // 0から始まる
-	descriptorRange[0].NumDescriptors = 1;                                                       // 数は1つ
-	descriptorRange[0].RangeType = D3D12_DESCRIPTOR_RANGE_TYPE_SRV;                              // SRVを使う
-	descriptorRange[0].OffsetInDescriptorsFromTableStart = D3D12_DESCRIPTOR_RANGE_OFFSET_APPEND; // Offsetを自動計算
+	D3D12_DESCRIPTOR_RANGE descriptorRange[2] = {};
+
+	// t0 モデルの2Dテクスチャ
+	descriptorRange[0].BaseShaderRegister = 0;
+	descriptorRange[0].NumDescriptors = 1;
+	descriptorRange[0].RangeType = D3D12_DESCRIPTOR_RANGE_TYPE_SRV;
+	descriptorRange[0].OffsetInDescriptorsFromTableStart = D3D12_DESCRIPTOR_RANGE_OFFSET_APPEND;
+
+	// t1 環境マップ
+	descriptorRange[1].BaseShaderRegister = 1;
+	descriptorRange[1].NumDescriptors = 1;
+	descriptorRange[1].RangeType = D3D12_DESCRIPTOR_RANGE_TYPE_SRV;
+	descriptorRange[1].OffsetInDescriptorsFromTableStart = D3D12_DESCRIPTOR_RANGE_OFFSET_APPEND;
 
 	// RootParameter作成。複数設定できるので配列。
-	D3D12_ROOT_PARAMETER rootParameters[10] = {};
-	rootParameters[0].ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV;                   // CBVを使う
-	rootParameters[0].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;                // PixelShaderで使う
-	rootParameters[0].Descriptor.ShaderRegister = 0;                                   // レジスタ番号0とバインド
-	rootParameters[1].ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV;                   // CBVを使う
-	rootParameters[1].ShaderVisibility = D3D12_SHADER_VISIBILITY_VERTEX;               // VertexShaderで使う
-	rootParameters[1].Descriptor.ShaderRegister = 0;                                   // レジスタ番号0を使う
-	rootParameters[2].ParameterType = D3D12_ROOT_PARAMETER_TYPE_DESCRIPTOR_TABLE;      // DescriptorTableを使う
-	rootParameters[2].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;                // PixelShaderで使う
-	rootParameters[2].DescriptorTable.pDescriptorRanges = descriptorRange;             // Tableの中身の配列を指定
-	rootParameters[2].DescriptorTable.NumDescriptorRanges = _countof(descriptorRange); // Tableで利用する数
-	rootParameters[3].ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV;                   // CBVを使う
-	rootParameters[3].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;                // PixelShaderで使う
-	rootParameters[3].Descriptor.ShaderRegister = 1;                                   // レジスタ番号1を使う
-	rootParameters[4].ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV;                   // CBVを使う
-	rootParameters[4].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;                // PixelShaderで使う
-	rootParameters[4].Descriptor.ShaderRegister = 2;                                   // レジスタ番号2を使う
-	rootParameters[5].ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV;                   // CBVを使う
-	rootParameters[5].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;                // PixelShaderで使う
-	rootParameters[5].Descriptor.ShaderRegister = 3;                                   // レジスタ番号3を使う
-	rootParameters[6].ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV;                   // CBVを使う
-	rootParameters[6].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;                // PixelShaderで使う
-	rootParameters[6].Descriptor.ShaderRegister = 4;                                   // レジスタ番号4を使う
-	rootParameters[7].ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV;                   // CBVを使う
-	rootParameters[7].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;                // PixelShaderで使う
-	rootParameters[7].Descriptor.ShaderRegister = 5;                                   // レジスタ番号5を使う（PointLight）
-	rootParameters[8].ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV;                   // CBVを使う
-	rootParameters[8].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;                // PixelShaderで使う
-	rootParameters[8].Descriptor.ShaderRegister = 6;                                   // レジスタ番号6を使う（SpotLight）
-	rootParameters[9].ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV;                   // 定数バッファ
-	rootParameters[9].Descriptor.ShaderRegister = 7;                                   // レジスタ番号7を使う（Outline）
-	rootParameters[9].Descriptor.RegisterSpace = 0;                                    // space0
-	rootParameters[9].ShaderVisibility = D3D12_SHADER_VISIBILITY_ALL;                  // どちらからも見えるようにする
+	D3D12_ROOT_PARAMETER rootParameters[11] = {};
+	rootParameters[0].ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV;              // CBVを使う
+	rootParameters[0].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;           // PixelShaderで使う
+	rootParameters[0].Descriptor.ShaderRegister = 0;                              // レジスタ番号0とバインド
+	rootParameters[1].ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV;              // CBVを使う
+	rootParameters[1].ShaderVisibility = D3D12_SHADER_VISIBILITY_VERTEX;          // VertexShaderで使う
+	rootParameters[1].Descriptor.ShaderRegister = 0;                              // レジスタ番号0を使う
+	rootParameters[2].ParameterType = D3D12_ROOT_PARAMETER_TYPE_DESCRIPTOR_TABLE; // DescriptorTableを使う
+	rootParameters[2].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;           // PixelShaderで使う
+	rootParameters[2].DescriptorTable.pDescriptorRanges = &descriptorRange[0];    // Tableの中身の配列を指定
+	rootParameters[2].DescriptorTable.NumDescriptorRanges = 1;                    // Tableで利用する数
+	rootParameters[3].ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV;              // CBVを使う
+	rootParameters[3].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;           // PixelShaderで使う
+	rootParameters[3].Descriptor.ShaderRegister = 1;                              // レジスタ番号1を使う
+	rootParameters[4].ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV;              // CBVを使う
+	rootParameters[4].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;           // PixelShaderで使う
+	rootParameters[4].Descriptor.ShaderRegister = 2;                              // レジスタ番号2を使う
+	rootParameters[5].ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV;              // CBVを使う
+	rootParameters[5].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;           // PixelShaderで使う
+	rootParameters[5].Descriptor.ShaderRegister = 3;                              // レジスタ番号3を使う
+	rootParameters[6].ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV;              // CBVを使う
+	rootParameters[6].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;           // PixelShaderで使う
+	rootParameters[6].Descriptor.ShaderRegister = 4;                              // レジスタ番号4を使う
+	rootParameters[7].ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV;              // CBVを使う
+	rootParameters[7].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;           // PixelShaderで使う
+	rootParameters[7].Descriptor.ShaderRegister = 5;                              // レジスタ番号5を使う（PointLight）
+	rootParameters[8].ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV;              // CBVを使う
+	rootParameters[8].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;           // PixelShaderで使う
+	rootParameters[8].Descriptor.ShaderRegister = 6;                              // レジスタ番号6を使う（SpotLight）
+	rootParameters[9].ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV;              // 定数バッファ
+	rootParameters[9].Descriptor.ShaderRegister = 7;                              // レジスタ番号7を使う（Outline）
+	rootParameters[9].Descriptor.RegisterSpace = 0;                               // space0
+	rootParameters[9].ShaderVisibility = D3D12_SHADER_VISIBILITY_ALL;             // どちらからも見えるようにする
+	rootParameters[10].ParameterType = D3D12_ROOT_PARAMETER_TYPE_DESCRIPTOR_TABLE;
+	rootParameters[10].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;
+	rootParameters[10].DescriptorTable.pDescriptorRanges = &descriptorRange[1];
+	rootParameters[10].DescriptorTable.NumDescriptorRanges = 1;
 
 	D3D12_STATIC_SAMPLER_DESC staticSamplers[1] = {};
 	staticSamplers[0].Filter = D3D12_FILTER_MIN_MAG_MIP_LINEAR;   // バイリニアフィルタ

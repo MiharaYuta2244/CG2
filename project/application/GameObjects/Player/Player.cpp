@@ -15,6 +15,7 @@ void Player::Initialize(EngineContext* ctx) {
 	render_->Initialize(ctx, "suzanne.obj");
 	render_->SetColor({1.0f, 1.0f, 1.0f, 1.0f});
 	render_->SetTransform(transform_);
+	render_->SetEnvScale(envScale_);
 
 	// 移動用インスタンス生成
 	move_ = std::make_unique<PlayerMove>();
@@ -113,7 +114,9 @@ void Player::Update(float deltaTime, DirectInput* input, EnemyManager* enemyMana
 	ImGui::DragFloat3("Scale", &transform_.scale.x, 0.01f);
 	ImGui::DragFloat3("Rotate", &transform_.rotate.x, 0.01f);
 	ImGui::DragFloat3("Translate", &transform_.translate.x, 0.01f);
+	ImGui::SliderFloat("EnvScale", &envScale_, 0.0f, 1.0f);
 	ImGui::End();
+	render_->SetEnvScale(envScale_);
 #endif // USE_IMGUI
 }
 

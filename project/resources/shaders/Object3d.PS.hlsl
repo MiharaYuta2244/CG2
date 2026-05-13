@@ -3,10 +3,11 @@
 struct Material
 {
     float4 color;
-    int enableLighting;
     float4x4 uvTransform;
-    float shininess;
+    int enableLighting;
     int enableFoging;
+    float shininess;
+    float envScale;
 };
 
 struct DirectionalLight
@@ -61,6 +62,7 @@ struct SpotLight
 
 ConstantBuffer<Material> gMaterial : register(b0);
 Texture2D<float4> gTexture : register(t0);
+TextureCube<float4> gEnviromentTexture : register(t1);
 SamplerState gSampler : register(s0);
 ConstantBuffer<DirectionalLight> gDirectionalLight : register(b1);
 ConstantBuffer<Camera> gCamera : register(b2);
@@ -169,6 +171,14 @@ PixelShaderOutput main(VertexShaderOutput input)
     {
         output.color = gMaterial.color * textureColor;
     }
+    
+    // 環境マップ
+    float3 cameraToPosition = normalize(input.worldPosition - gCamera.worldPosition);
+    float3 reflectedVector = reflect(cameraToPosition, normalize(input.normal));
+    float4 enviromentColor = gEnviromentTexture.Sample(gSampler, reflectedVector);
+    
+    // 環境光の追加
+    output.color.rgb += enviromentColor.rgb * gMaterial.envScale;
     
     return output;
 }

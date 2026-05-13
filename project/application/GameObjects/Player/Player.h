@@ -83,4 +83,6 @@ private:
 	std::unique_ptr<ObjectRender> render_; // 描画用インスタンス
 	std::unique_ptr<PlayerMove> move_;     // 移動用インスタンス
 	std::unique_ptr<PlayerHealth> hp_;     // HP管理用インスタンス
+
+	float envScale_ = 1.0f;
 };

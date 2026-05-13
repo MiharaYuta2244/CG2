@@ -4,6 +4,7 @@
 #include "DirectionalLight.h"
 #include "PointLight.h"
 #include "SpotLight.h"
+#include "TextureManager.h"
 
 /// <summary>
 /// 3Dオブジェクトの共通クラス
@@ -13,7 +14,7 @@ public:
 	/// <summary>
 	/// 共通描画設定
 	/// </summary>
-	void DrawSettingCommon();
+	void DrawSettingCommon(TextureManager* textureManager);
 
 	/// <summary>
 	/// アウトライン用の設定を適用するメソッド

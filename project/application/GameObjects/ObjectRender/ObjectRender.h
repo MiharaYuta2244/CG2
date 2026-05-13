@@ -21,6 +21,9 @@ public:
 	// TransformのSetter
 	void SetTransform(Transform transform) { object3d_->SetTransform(transform); }
 
+	// 環境マップにかけるスケールの設定
+	void SetEnvScale(float envScale) { object3d_->SetEnvScale(envScale); }
+
 	// 描画用オブジェクトを返すGetter
 	TinyEngine::Object3d* GetObject3d() { return object3d_.get(); }
 

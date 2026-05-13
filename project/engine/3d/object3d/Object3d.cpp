@@ -144,7 +144,7 @@ void Object3d::Draw() {
 	}
 
 	// 3Dオブジェクト描画準備。3Dオブジェクトの描画に共通のグラフィックスコマンドを積む
-	ctx_->object3dCommon->DrawSettingCommon();
+	ctx_->object3dCommon->DrawSettingCommon(ctx_->textureManager);
 
 	// wvp用のBufferの場所を設定
 	commandList->SetGraphicsRootConstantBufferView(1, wvpResource_->GetGPUVirtualAddress());
@@ -260,6 +260,7 @@ void Object3d::CreateMaterialData() {
 	material_.enableFoging = false;
 	material_.uvTransform = MathUtility::MakeIdentity4x4();
 	material_.shininess = 64.0f;
+	material_.envScale = 0.0f;
 	// GPUへ書き込み
 	*materialData_ = material_;
 }

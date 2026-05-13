@@ -8,9 +8,9 @@
 /// </summary>
 struct Material {
 	Vector4 color;
-	int32_t enableLighting;
-	float padding[3];
 	Matrix4x4 uvTransform;
-	float shininess;
+	int32_t enableLighting;
 	int32_t enableFoging;
+	float shininess;
+	float envScale;
 };
