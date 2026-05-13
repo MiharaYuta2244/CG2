@@ -487,3 +487,29 @@ void DirectXCommon::UpdateFixFPS() {
 	// 現在の時間を記録する
 	reference_ = std::chrono::steady_clock::now();
 }
+
+// 追加実装
+void DirectXCommon::ExecuteCommandListAndWait() {
+	HRESULT hr;
+
+	// コマンドリストをクローズして実行
+	hr = commandList_->Close();
+	assert(SUCCEEDED(hr));
+
+	ID3D12CommandList* commandLists[] = {commandList_.Get()};
+	commandQueue_->ExecuteCommandLists(1, commandLists);
+
+	// Fenceで待機
+	fenceValue_++;
+	commandQueue_->Signal(fence_.Get(), fenceValue_);
+	if (fence_->GetCompletedValue() < fenceValue_) {
+		fence_->SetEventOnCompletion(fenceValue_, fenceEvent_);
+		WaitForSingleObject(fenceEvent_, INFINITE);
+	}
+
+	// コマンドアロケータ/コマンドリストをリセットして次に備える
+	hr = commandAllocator_->Reset();
+	assert(SUCCEEDED(hr));
+	hr = commandList_->Reset(commandAllocator_.Get(), nullptr);
+	assert(SUCCEEDED(hr));
+}

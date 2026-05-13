@@ -153,4 +153,8 @@ private:
 #ifdef _DEBUG
 	void SetupDebugLayer();
 #endif
+
+	// 追加: コマンドリストを実行して完了まで待つユーティリティ
+public:
+	void ExecuteCommandListAndWait();
 };

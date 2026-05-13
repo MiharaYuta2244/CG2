@@ -1,5 +1,6 @@
 #include "TextureManager.h"
 #include "DirectXCommon.h"
+#include "DirectXUtils.h"
 #include "SrvManager.h"
 #include "StringUtility.h"
 #include "d3dx12.h"
@@ -89,7 +90,10 @@ void TextureManager::LoadTexture(const std::string& filePath) {
 	textureData.srvHandleGPU = directXCommon_->GetSRVGPUDescriptorHandle(textureData.srvIndex);
 
 	// 実データをGPUに書き込む
-	UploadTextureData(textureData.resource, mipImages);
+	ComPtr<ID3D12Resource> intermediateResource = UploadTextureData(textureData.resource, mipImages, directXCommon_->GetDevice(), directXCommon_->GetCommandList());
+
+	// コマンドを実行して完了を待つ
+	directXCommon_->ExecuteCommandListAndWait();
 }
 
 void TextureManager::AllTextureLoad() {
@@ -136,41 +140,52 @@ ComPtr<ID3D12Resource> TextureManager::CreateTextureResource(const DirectX::TexM
 	resourceDesc.Format = metadata.format;                                 // TextureのFormat
 	resourceDesc.SampleDesc.Count = 1;                                     // サンプリングカウント。1固定
 	resourceDesc.Dimension = D3D12_RESOURCE_DIMENSION(metadata.dimension); // Textureの次元数。普段使っているのは2次元
+	resourceDesc.Layout = D3D12_TEXTURE_LAYOUT_UNKNOWN;
+	resourceDesc.Flags = D3D12_RESOURCE_FLAG_NONE;
 
-	// 利用するHeapの設定。非常に特殊な運用。02_04exで一般的なケースがある
+	// 利用するHeapの設定
 	D3D12_HEAP_PROPERTIES heapProperties{};
-	heapProperties.Type = D3D12_HEAP_TYPE_CUSTOM;                        // 細かい設定を行う
-	heapProperties.CPUPageProperty = D3D12_CPU_PAGE_PROPERTY_WRITE_BACK; // WriteBackポリシーでCPUにアクセス可能
-	heapProperties.MemoryPoolPreference = D3D12_MEMORY_POOL_L0;          // プロセッサの近くに配置
+	heapProperties.Type = D3D12_HEAP_TYPE_DEFAULT;
+	// 非カスタムヒープでは以下を UNKNOWN にする必要がある
+	heapProperties.CPUPageProperty = D3D12_CPU_PAGE_PROPERTY_UNKNOWN;
+	heapProperties.MemoryPoolPreference = D3D12_MEMORY_POOL_UNKNOWN;
+	heapProperties.CreationNodeMask = 1;
+	heapProperties.VisibleNodeMask = 1;
 
 	// Resourceの生成
 	ComPtr<ID3D12Resource> resource = nullptr;
 	HRESULT hr = directXCommon_->GetDevice()->CreateCommittedResource(
-	    &heapProperties,                   // Heapの設定
-	    D3D12_HEAP_FLAG_NONE,              // Heapの特殊な設定。特になし。
-	    &resourceDesc,                     // Resourceの設定
-	    D3D12_RESOURCE_STATE_GENERIC_READ, // 初回のResourceState。Textureは基本読むだけ
-	    nullptr,                           // Clear最速値。使わないのでnullptr
-	    IID_PPV_ARGS(&resource));          // 作成するResourceポインタへのポインタ
+	    &heapProperties,                // Heapの設定
+	    D3D12_HEAP_FLAG_NONE,           // Heapの特殊な設定。特になし。
+	    &resourceDesc,                  // Resourceの設定
+	    D3D12_RESOURCE_STATE_COPY_DEST, // 初回のResourceState。Textureは基本読むだけ
+	    nullptr,                        // Clear最速値。使わないのでnullptr
+	    IID_PPV_ARGS(&resource));       // 作成するResourceポインタへのポインタ
 	assert(SUCCEEDED(hr));
 	return resource;
 }
 
-void TextureManager::UploadTextureData(ComPtr<ID3D12Resource> texture, const DirectX::ScratchImage& mipImages) {
-	// Meta情報を取得
-	const DirectX::TexMetadata& metaData = mipImages.GetMetadata();
-	// 全MipMapについて
-	for (size_t mipLevel = 0; mipLevel < metaData.mipLevels; ++mipLevel) {
-		// MipMapLevelを取得して各Imageを取得
-		const DirectX::Image* img = mipImages.GetImage(mipLevel, 0, 0);
-		// Textureに転送
-		HRESULT hr = texture->WriteToSubresource(
-		    UINT(mipLevel),
-		    nullptr,              // 全領域へコピー
-		    img->pixels,          // 元データアドレス
-		    UINT(img->rowPitch),  // 1ラインサイズ
-		    UINT(img->slicePitch) // 1枚サイズ
-		);
-		assert(SUCCEEDED(hr));
-	}
+[[nodiscard]]
+ComPtr<ID3D12Resource>
+    TextureManager::UploadTextureData(ComPtr<ID3D12Resource> texture, const DirectX::ScratchImage& mipImages, ComPtr<ID3D12Device> device, ComPtr<ID3D12GraphicsCommandList> commandList) {
+	std::vector<D3D12_SUBRESOURCE_DATA> subresources;
+	DirectX::PrepareUpload(device.Get(), mipImages.GetImages(), mipImages.GetImageCount(), mipImages.GetMetadata(), subresources);
+
+	uint64_t intermediateSize = GetRequiredIntermediateSize(texture.Get(), 0, UINT(subresources.size()));
+
+	ComPtr<ID3D12Resource> intermediateResource = DirectXUtils::CreateBufferResource(device, intermediateSize);
+
+	UpdateSubresources(commandList.Get(), texture.Get(), intermediateResource.Get(), 0, 0, UINT(subresources.size()), subresources.data());
+
+	D3D12_RESOURCE_BARRIER barrier{};
+	barrier.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
+	barrier.Flags = D3D12_RESOURCE_BARRIER_FLAG_NONE;
+	barrier.Transition.pResource = texture.Get();
+	barrier.Transition.Subresource = D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES;
+	barrier.Transition.StateBefore = D3D12_RESOURCE_STATE_COPY_DEST;
+	barrier.Transition.StateAfter = D3D12_RESOURCE_STATE_GENERIC_READ;
+
+	commandList->ResourceBarrier(1, &barrier);
+
+	return intermediateResource;
 }

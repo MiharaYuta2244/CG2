@@ -1,12 +1,10 @@
 #pragma once
-#include "DirectXTex.h"
-#include "MaterialData.h"
-#include <wrl.h>
 #include <d3d12.h>
-#include <string>
-#include <vector>
-#include <unordered_map>
+#include "DirectXTex.h"
 #include "TextureData.h"
+#include <string>
+#include <unordered_map>
+#include <wrl.h>
 
 class DirectXCommon;
 class SrvManager;
@@ -44,11 +42,13 @@ public:
 
 private:
 	Microsoft::WRL::ComPtr<ID3D12Resource> CreateTextureResource(const DirectX::TexMetadata& metadata);
-	void UploadTextureData(Microsoft::WRL::ComPtr<ID3D12Resource> texture, const DirectX::ScratchImage& mipImages);
+	Microsoft::WRL::ComPtr<ID3D12Resource> UploadTextureData(
+	    Microsoft::WRL::ComPtr<ID3D12Resource> texture, const DirectX::ScratchImage& mipImages, Microsoft::WRL::ComPtr<ID3D12Device> device,
+	    Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList> commandList);
 
 private:
 	// テクスチャデータ
-	std::unordered_map<std::string,TextureData> textureDatas_;
+	std::unordered_map<std::string, TextureData> textureDatas_;
 	DirectXCommon* directXCommon_;
 
 	// srvManager
