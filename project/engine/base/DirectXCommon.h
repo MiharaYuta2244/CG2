@@ -1,5 +1,6 @@
 #pragma once
 class WinApp; // 前方宣言
+class SrvManager;
 #include <chrono>
 #include "WinApp.h"
 #include "Logger.h"
@@ -10,6 +11,7 @@ class WinApp; // 前方宣言
 #include <wrl.h>
 #pragma comment(lib, "dxguid.lib")
 #include <dxcapi.h>
+#include <Vector4.h>
 
 /// <summary>
 /// DirectXの共通処理を管理するクラス
@@ -55,6 +57,17 @@ public:
 	D3D12_GPU_DESCRIPTOR_HANDLE GetGPUDescriptorHandle(Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> descriptorHeap, uint32_t descriptorSize, uint32_t index);
 
 	Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> CreateDescripterHeap(Microsoft::WRL::ComPtr<ID3D12Device> device, D3D12_DESCRIPTOR_HEAP_TYPE heapType, UINT numDescriptors, bool shaderVisible);
+	Microsoft::WRL::ComPtr<ID3D12Resource> CreateRenderTextureResource(Microsoft::WRL::ComPtr<ID3D12Device> device, uint32_t width, uint32_t height, DXGI_FORMAT format, const Vector4& clearColor);
+	Microsoft::WRL::ComPtr<ID3D12Resource> CreateDepthStencilTextureResource(Microsoft::WRL::ComPtr<ID3D12Device> device, int32_t width, int32_t height);
+
+	// RTVの作成(RenderTexture用)
+	D3D12_CPU_DESCRIPTOR_HANDLE CreateRTV(ID3D12Resource* resource);
+
+	// DSVの作成(RenderTexture用)
+	D3D12_CPU_DESCRIPTOR_HANDLE CreateDSV(ID3D12Resource* resource);
+
+	D3D12_VIEWPORT CreateViewport();
+	D3D12_RECT CreateScissor();
 
 public:
 	// 最大SRV数(最大テクスチャ枚数)
@@ -68,8 +81,6 @@ private:
 	void CreateRTV();
 	void InitializeShaderCompiler();
 	void CreateDSV();
-	void CreateViewport();
-	void CreateScissor();
 	void CreateFence();
 
 	IDxcBlob* CompileShader(
@@ -79,8 +90,6 @@ private:
 	    const wchar_t* profile,
 	    // 初期化で生成したものを3つ
 	    IDxcUtils* dxcUtils, IDxcCompiler3* dxcCompiler, IDxcIncludeHandler* includeHandler);
-
-	Microsoft::WRL::ComPtr<ID3D12Resource> CreateDepthStencilTextureResource(Microsoft::WRL::ComPtr<ID3D12Device> device, int32_t width, int32_t height);
 
 	// FPS固定初期化
 	void InitializeFixFPS();

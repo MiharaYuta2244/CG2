@@ -14,6 +14,8 @@
 #include "DebugCamera.h"
 #include "DirectInput.h"
 #include "GamePad.h"
+#include "RenderTexture.h"
+#include "CopyImage.h"
 #pragma comment(lib, "d3d12.lib")
 #pragma comment(lib, "dxgi.lib")
 #include <dxgidebug.h>
@@ -44,6 +46,12 @@ public:
 
 	// 描画後処理
 	void PostDraw();
+
+	void SRVManagerPreDraw();
+
+	void BeginRender();
+
+	void EndRender();
 
 	// 終了チェック
 	virtual bool IsEndRequest() { return endRequest_; }
@@ -118,6 +126,12 @@ private:
 
 	// SkyboxCommon
 	std::unique_ptr<SkyboxCommon> skyboxCommon_;
+
+	// RenderTexture
+	std::unique_ptr<RenderTexture> renderTexture_;
+
+	// CopyImage
+	std::unique_ptr<TinyEngine::CopyImage> copyImage_;
 
 	// コンテキスト構造体
 	EngineContext engineContext_;

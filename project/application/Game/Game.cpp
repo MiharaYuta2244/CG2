@@ -55,14 +55,20 @@ void Game::Update() {
 }
 
 void Game::Draw() {
-	// 描画前処理
-	Framework::PreDraw();
+	Framework::BeginRender();
+
+	Framework::SRVManagerPreDraw();
 
 	// シーン描画
 	sceneManager_->Draw();
 
 	// フェードスプライトを上書きで描画
 	fadeManager_->Draw();
+
+	Framework::EndRender();
+
+	// 描画前処理
+	Framework::PreDraw();
 
 	// 描画後処理
 	Framework::PostDraw();

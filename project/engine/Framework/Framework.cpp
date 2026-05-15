@@ -47,11 +47,21 @@ void Framework::Initialize() {
 	// SkyboxCommon
 	skyboxCommon_ = std::make_unique<SkyboxCommon>();
 
+	// RenderTexture
+	renderTexture_ = std::make_unique<RenderTexture>();
+
 	// DirectX12 デバイス初期化
 	dxCommon_->Initialize(winApp_);
 
 	// SrvManager
 	srvManager_->Initialize(dxCommon_.get());
+
+	// RenderTexture
+	renderTexture_->Initialize(dxCommon_.get(), srvManager_.get(), WinApp::kClientWidth, WinApp::kClientHeight);
+
+	// CopyImage
+	copyImage_ = std::make_unique<TinyEngine::CopyImage>();
+	copyImage_->Initialize(dxCommon_.get());
 
 #ifdef USE_IMGUI
 	// ImGuiManager
@@ -161,11 +171,15 @@ void Framework::Run() {
 void Framework::PreDraw() {
 	// 描画開始
 	dxCommon_->BeginFrame();
-
-	srvManager_->PreDraw();
 }
 
 void Framework::PostDraw() {
+	// SRVヒープをコマンドリストにセットするための前処理
+	SRVManagerPreDraw();
+
+	// RenderTextureからSwapChainへコピー
+	copyImage_->Draw(dxCommon_.get(), srvManager_.get(), renderTexture_->GetSRVIndexColor());
+
 	// ImGuiの内部コマンドを生成する
 #ifdef USE_IMGUI
 	imGuiManager_->Render(dxCommon_->GetCommandList());
@@ -174,3 +188,9 @@ void Framework::PostDraw() {
 	// 描画終了
 	dxCommon_->EndFrame();
 }
+
+void Framework::SRVManagerPreDraw() { srvManager_->PreDraw(); }
+
+void Framework::BeginRender() { renderTexture_->BeginRender(dxCommon_.get()); }
+
+void Framework::EndRender() { renderTexture_->EndRender(dxCommon_.get()); }

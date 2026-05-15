@@ -225,7 +225,7 @@ void GamePlayScene::Update() {
 
 void GamePlayScene::Draw() {
 	// スカイボックス描画
-	skybox_->Draw();
+	//skybox_->Draw();
 
 	// プレイヤーの描画処理
 	player_->Draw();

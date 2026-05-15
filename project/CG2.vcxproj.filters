@@ -330,6 +330,12 @@
     <ClCompile Include="engine\3d\skybox\Skybox.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
+    <ClCompile Include="engine\base\RenderTexture.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="engine\base\CopyImage.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="resources\shaders\Object3d.PS.hlsl">
@@ -715,6 +721,12 @@
     <ClInclude Include="engine\3d\skybox\Skybox.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
+    <ClInclude Include="engine\base\RenderTexture.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="engine\base\CopyImage.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Text Include="externals\imgui\LICENSE.txt">
@@ -731,5 +743,6 @@
     <None Include="resources\shaders\Sprite.hlsli">
       <Filter>リソース ファイル\shaders</Filter>
     </None>
+    <None Include="resources\shaders\CopyImage.hlsli" />
   </ItemGroup>
 </Project>

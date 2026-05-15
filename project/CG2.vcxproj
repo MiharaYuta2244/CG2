@@ -168,6 +168,7 @@ copy "$(windowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="application\GameObjects\Enemy\EnemyManager.cpp" />
     <ClCompile Include="application\GameObjects\ResultUI\Button\IButton.cpp" />
     <ClCompile Include="application\Scene\EasingEditorScene.cpp" />
+    <ClCompile Include="engine\base\CopyImage.cpp" />
     <ClCompile Include="engine\base\utility\easing\EasingEditor.cpp" />
     <ClCompile Include="engine\utility\DirectXUtils.cpp" />
     <ClCompile Include="engine\Collision\Collision.cpp" />
@@ -264,6 +265,7 @@ copy "$(windowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="application\GameObjects\ResultUI\Button\ToTitleButton.cpp" />
     <ClCompile Include="engine\3d\skybox\SkyboxCommon.cpp" />
     <ClCompile Include="engine\3d\skybox\Skybox.cpp" />
+    <ClCompile Include="engine\base\RenderTexture.cpp" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="resources\shaders\Object3d.PS.hlsl">
@@ -340,6 +342,7 @@ copy "$(windowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="application\GameObjects\Player\IHPGauge.h" />
     <ClInclude Include="application\GameObjects\ResultUI\Button\IButton.h" />
     <ClInclude Include="application\Scene\EasingEditorScene.h" />
+    <ClInclude Include="engine\base\CopyImage.h" />
     <ClInclude Include="engine\base\SceneContext.h" />
     <ClInclude Include="engine\base\utility\easing\EasingEditor.h" />
     <ClInclude Include="engine\math\mathLib\Rect.h" />
@@ -451,6 +454,7 @@ copy "$(windowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="application\GameObjects\ResultUI\Button\ToTitleButton.h" />
     <ClInclude Include="engine\3d\skybox\SkyboxCommon.h" />
     <ClInclude Include="engine\3d\skybox\Skybox.h" />
+    <ClInclude Include="engine\base\RenderTexture.h" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="externals\imgui\LICENSE.txt" />
@@ -461,6 +465,7 @@ copy "$(windowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
+    <None Include="resources\shaders\CopyImage.hlsli" />
     <None Include="resources\shaders\Object3d.hlsli" />
     <None Include="resources\shaders\Sprite.hlsli" />
     <None Include="resources\shaders\Particle.hlsli" />
