@@ -37,6 +37,11 @@ void Enemy::Update(float deltaTime, Player* player, EnemyBulletManager* enemyBul
 
 	// 当たり判定更新　衝突判定用
 	UpdateCollision();
+
+#ifdef _DEBUG
+	// 状態遷移確認用
+	render_->SetColor(ai_->GetColor());
+#endif
 }
 
 void Enemy::PostUpdate() {

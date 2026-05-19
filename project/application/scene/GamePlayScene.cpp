@@ -246,7 +246,7 @@ void GamePlayScene::Draw() {
 	playerHPGauge_->Draw();
 
 	// 地面の描画
-	// ground_->Draw();
+	ground_->Draw();
 
 	// パーティクルの描画
 	for (auto& particle : enemyDeathParticle_) {
