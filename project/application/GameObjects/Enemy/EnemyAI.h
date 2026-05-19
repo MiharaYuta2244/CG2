@@ -26,9 +26,7 @@ public:
 	// 更新処理
 	void Update(float deltaTime, Player* player, EnemyBulletManager* enemyBulletManager, WallManager* wallManager);
 
-#ifdef _DEBUG
 	Vector4 GetColor() const { return color_; }
-#endif
 
 private:
 	// 前方の索敵用AABBを生成する
@@ -67,8 +65,6 @@ private:
 	float pathRecalculateTimer_ = 0.0f;    // 経路再計算用タイマー
 	float pathRecalculateInterval_ = 0.2f; // 再計算の間隔
 
-#ifdef _DEBUG
 	// 状態遷移確認用カラー
 	Vector4 color_ = {1.0f, 1.0f, 1.0f, 1.0f};
-#endif
 };
