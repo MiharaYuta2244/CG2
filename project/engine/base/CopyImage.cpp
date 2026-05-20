@@ -74,7 +74,7 @@ void CopyImage::CreateGraphicsPipeline(DirectXCommon* dx) {
 	// シェーダーコンパイル
 	IDxcBlob* vsBlob = DirectXUtils::CompileShader(L"resources/shaders/FullScreen.VS.hlsl", L"vs_6_0", dxcUtils_.Get(), dxcCompiler_.Get(), includeHandler_.Get());
 	assert(vsBlob != nullptr);
-	IDxcBlob* psBlob = DirectXUtils::CompileShader(L"resources/shaders/FullScreen.PS.hlsl", L"ps_6_0", dxcUtils_.Get(), dxcCompiler_.Get(), includeHandler_.Get());
+	IDxcBlob* psBlob = DirectXUtils::CompileShader(L"resources/shaders/BoxFilter.PS.hlsl", L"ps_6_0", dxcUtils_.Get(), dxcCompiler_.Get(), includeHandler_.Get());
 	assert(psBlob != nullptr);
 
 	// ルートシグネチャを作成

@@ -300,6 +300,57 @@ Matrix4x4 MathUtility::MakeAffineMatrix(const Vector3& scale, const Vector3& rot
 	return result;
 }
 
+Matrix4x4 MathUtility::MakeAffineMatrix(const Vector3& s, const Quaternion& q, const Vector3& t) {
+	// --- Quaternion → Rotation Matrix ---
+	float xx = q.x * q.x;
+	float yy = q.y * q.y;
+	float zz = q.z * q.z;
+	float xy = q.x * q.y;
+	float xz = q.x * q.z;
+	float yz = q.y * q.z;
+	float wx = q.w * q.x;
+	float wy = q.w * q.y;
+	float wz = q.w * q.z;
+
+	Matrix4x4 result = {};
+
+	// 回転成分
+	result.m[0][0] = 1.0f - 2.0f * (yy + zz);
+	result.m[0][1] = 2.0f * (xy + wz);
+	result.m[0][2] = 2.0f * (xz - wy);
+
+	result.m[1][0] = 2.0f * (xy - wz);
+	result.m[1][1] = 1.0f - 2.0f * (xx + zz);
+	result.m[1][2] = 2.0f * (yz + wx);
+
+	result.m[2][0] = 2.0f * (xz + wy);
+	result.m[2][1] = 2.0f * (yz - wx);
+	result.m[2][2] = 1.0f - 2.0f * (xx + yy);
+
+	// --- Scale を掛ける ---
+	result.m[0][0] *= s.x;
+	result.m[0][1] *= s.x;
+	result.m[0][2] *= s.x;
+
+	result.m[1][0] *= s.y;
+	result.m[1][1] *= s.y;
+	result.m[1][2] *= s.y;
+
+	result.m[2][0] *= s.z;
+	result.m[2][1] *= s.z;
+	result.m[2][2] *= s.z;
+
+	// --- Translation ---
+	result.m[3][0] = t.x;
+	result.m[3][1] = t.y;
+	result.m[3][2] = t.z;
+
+	result.m[3][3] = 1.0f;
+
+	return result;
+}
+
+
 Matrix4x4 MathUtility::Inverse(const Matrix4x4& matrix) {
 	float a = {
 	    1 / ((matrix.m[0][0] * matrix.m[1][1] * matrix.m[2][2] * matrix.m[3][3]) + (matrix.m[0][0] * matrix.m[1][2] * matrix.m[2][3] * matrix.m[3][1]) +
@@ -522,6 +573,28 @@ Vector3 MathUtility::Lerp(const Vector3& start, const Vector3& end, float t) {
 	result.z = start.z + (end.z - start.z) * t;
 	return result;
 }
+
+Quaternion MathUtility::Lerp(const Quaternion& start, const Quaternion& end, float t) {
+	Quaternion result;
+
+	result.x = start.x + (end.x - start.x) * t;
+	result.y = start.y + (end.y - start.y) * t;
+	result.z = start.z + (end.z - start.z) * t;
+	result.w = start.w + (end.w - start.w) * t;
+
+	// 正規化
+	float len = std::sqrt(result.x * result.x + result.y * result.y + result.z * result.z + result.w * result.w);
+
+	if (len > 0.0f) {
+		result.x /= len;
+		result.y /= len;
+		result.z /= len;
+		result.w /= len;
+	}
+
+	return result;
+}
+
 
 float MathUtility::DegreeToRadian(const float& degree) { 
 	return degree * std::numbers::pi_v<float> / 180.0f;

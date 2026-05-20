@@ -23,6 +23,10 @@ void ResultScene::Initialize(const SceneContext& ctx) {
 	// メインカメラ
 	mainCamera_ = std::make_unique<Camera>();
 	mainCamera_->Initialize();
+
+	// AnimationCube
+	animationCube_=std::make_unique<Object3d>();
+	animationCube_->Initialize(ctx.engineContext);
 }
 
 void ResultScene::Update() {

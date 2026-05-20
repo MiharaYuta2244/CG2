@@ -3,6 +3,7 @@
 #include "Vector2.h"
 #include "Vector3.h"
 #include "Vector4.h"
+#include "Quaternion.h"
 #include <numbers>
 
 /// <summary>
@@ -140,6 +141,15 @@ public:
 	static Matrix4x4 MakeAffineMatrix(const Vector3& scale, const Vector3& rotate, const Vector3& translate);
 
 	/// <summary>
+	/// アフィン行列の作成(クォータニオン対応)
+	/// </summary>
+	/// <param name="s">スケール</param>
+	/// <param name="q">クォータニオン</param>
+	/// <param name="t">トランスレート</param>
+	/// <returns>アフィン行列</returns>
+	static Matrix4x4 MakeAffineMatrix(const Vector3& s, const Quaternion& q, const Vector3& t);
+
+	/// <summary>
 	/// 逆行列
 	/// </summary>
 	/// <param name="matrix">行列</param>
@@ -195,6 +205,8 @@ public:
 	static Matrix4x4 Orthonormalize(const Matrix4x4& m);
 
 	static Vector3 Lerp(const Vector3& start, const Vector3& end, float t);
+
+	static Quaternion Lerp(const Quaternion& start, const Quaternion& end, float t);
 
 	static float DegreeToRadian(const float& degree);
 
