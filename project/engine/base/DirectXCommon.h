@@ -69,6 +69,9 @@ public:
 	D3D12_VIEWPORT CreateViewport();
 	D3D12_RECT CreateScissor();
 
+	uint32_t GetBackBufferWidth() const { return backBufferWidth_; }
+	uint32_t GetBackBufferHeight() const { return backBufferHeight_; }
+
 public:
 	// 最大SRV数(最大テクスチャ枚数)
 	static const uint32_t kMaxSRVCount;
@@ -158,6 +161,9 @@ private:
 
 	// Debug
 	Microsoft::WRL::ComPtr<ID3D12Debug1> debugController_;
+
+	uint32_t backBufferWidth_;
+	uint32_t backBufferHeight_;
 
 #ifdef _DEBUG
 	void SetupDebugLayer();

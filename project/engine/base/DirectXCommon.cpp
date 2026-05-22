@@ -48,6 +48,9 @@ void DirectXCommon::Initialize(std::shared_ptr<WinApp> winApp) {
 	CreateViewport();
 	CreateScissor();
 	CreateFence();
+
+	backBufferWidth_ = swapChainDesc_.Width;
+	backBufferHeight_ = swapChainDesc_.Height;
 }
 
 void DirectXCommon::BeginFrame() {

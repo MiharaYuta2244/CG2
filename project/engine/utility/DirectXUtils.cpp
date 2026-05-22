@@ -59,7 +59,7 @@ IDxcBlob* DirectXUtils::CompileShader(const std::wstring& filePath, const wchar_
 	IDxcBlobUtf8* shaderError = nullptr;
 	shaderResult->GetOutput(DXC_OUT_ERRORS, IID_PPV_ARGS(&shaderError), nullptr);
 	if (shaderError != nullptr && shaderError->GetStringLength() != 0) {
-		Logger::Log(shaderError->GetStringPointer(), LogLevel::Info);
+		Logger::Log(shaderError->GetStringPointer(), LogLevel::Error);
 		// 警告・エラーダメゼッタイ
 		assert(false);
 	}

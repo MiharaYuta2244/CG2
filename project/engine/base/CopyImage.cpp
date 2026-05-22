@@ -70,8 +70,10 @@ void CopyImage::CreateGraphicsPipeline(DirectXCommon* dx) {
 	}
 	hr = device->CreateRootSignature(0, signatureBlob->GetBufferPointer(), signatureBlob->GetBufferSize(), IID_PPV_ARGS(&rootSignature_));
 	assert(SUCCEEDED(hr));
-	if (signatureBlob) signatureBlob->Release();
-	if (errorBlob) errorBlob->Release();
+	if (signatureBlob)
+		signatureBlob->Release();
+	if (errorBlob)
+		errorBlob->Release();
 
 	// PSO設定
 	D3D12_GRAPHICS_PIPELINE_STATE_DESC psoDesc{};
@@ -105,14 +107,33 @@ void CopyImage::CreateGraphicsPipeline(DirectXCommon* dx) {
 	assert(SUCCEEDED(hr));
 }
 
-void TinyEngine::CopyImage::CreateVignetteCB() {
-	// ヴィネット用のリソース作成
-	vignetteCB_ = DirectXUtils::CreateBufferResource(dxCommon_->GetDevice(), sizeof(VignetteParam));
-	// 書き込むためのアドレスを取得
-	vignetteCB_->Map(0, nullptr, reinterpret_cast<void**>(&vignetteData_));
-	vignetteCB_->Unmap(0, nullptr);
-	// 書き込み
-	*vignetteData_ = vignetteParam_;
+void TinyEngine::CopyImage::CreateCB() {
+	size_t size = cbSizeMap_[postEffectType_];
+	if (size == 0)
+		return; // パラメータ不要のエフェクト
+
+	cbResource_ = DirectXUtils::CreateBufferResource(dxCommon_->GetDevice(), size);
+	cbResource_->Map(0, nullptr, reinterpret_cast<void**>(&cbData_));
+	memcpy(cbData_, paramPtrMap_[postEffectType_], size);
+	cbResource_->Unmap(0, nullptr);
+}
+
+void TinyEngine::CopyImage::AllParamSetting() {
+	// ヴィネット
+	vignetteParam_.color = {0.0f, 0.0f, 0.0f, 1.0f};
+	vignetteParam_.intensity = 1.0f;
+
+	// グレースケール
+	grayscaleParam_.intensity = 1.0f;
+
+	// セピア
+	sepiaParam_.intenisity = 1.0f;
+
+	// スムージング
+	smoothingParam_.radius = 2;
+	smoothingParam_.intensity = 1.0f;
+	smoothingParam_.texelSize[0] = 1.0f / dxCommon_->GetBackBufferWidth();
+	smoothingParam_.texelSize[1] = 1.0f / dxCommon_->GetBackBufferHeight();
 }
 
 void CopyImage::Initialize(DirectXCommon* dx, PostEffectType type) {
@@ -121,8 +142,11 @@ void CopyImage::Initialize(DirectXCommon* dx, PostEffectType type) {
 	// 適用するポストエフェクトのタイプを設定
 	postEffectType_ = type;
 
+	// 各種パラメータの初期設定
+	AllParamSetting();
+
 	// リソース作成
-	CreateVignetteCB();
+	CreateCB();
 
 	// シェーダコンパイラ初期化
 	InitializeShaderCompiler();
@@ -147,7 +171,9 @@ void CopyImage::Draw(DirectXCommon* dx, SrvManager* srv, uint32_t srvIndex) {
 	cmd->SetGraphicsRootDescriptorTable(0, srv->GetGPUDescriptorHandle(srvIndex));
 
 	// CBV
-	cmd->SetGraphicsRootConstantBufferView(1, vignetteCB_->GetGPUVirtualAddress());
+	if (cbResource_) {
+		cmd->SetGraphicsRootConstantBufferView(1, cbResource_->GetGPUVirtualAddress());
+	}
 
 	// IA
 	cmd->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);

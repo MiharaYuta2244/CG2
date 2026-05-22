@@ -16,14 +16,14 @@ void Game::Initialize() {
 	sceneManager_->Initialize(&GetEngineContext(), GetKeyboard(), GetGamePad(), GetDebugCamera(), GetTimeManager());
 
 	// シーン追加
-	sceneManager_->AddScene("GamePlay", std::make_unique<GamePlayScene>());
 	sceneManager_->AddScene("Title", std::make_unique<TitleScene>());
+	sceneManager_->AddScene("GamePlay", std::make_unique<GamePlayScene>());
 	sceneManager_->AddScene("EasingEditorScene", std::make_unique<EasingEditorScene>());
 	sceneManager_->AddScene("Pause", std::make_unique<PauseScene>());
 	sceneManager_->AddScene("Result", std::make_unique<ResultScene>());
 
 	// 最初のシーンを初期化
-	sceneManager_->ChangeScene("GamePlay");
+	sceneManager_->ChangeScene("Title");
 
 	// フェードマネージャーの生成&初期化
 	fadeManager_ = std::make_unique<FadeManager>();

@@ -3,7 +3,7 @@
 void RenderTexture::Initialize(DirectXCommon* dx, SrvManager* srv, uint32_t width, uint32_t height) {
 	auto device = dx->GetDevice();
 
-	resourceColor_ = dx->CreateRenderTextureResource(dx->GetDevice(), width, height, DXGI_FORMAT_R8G8B8A8_UNORM_SRGB, {1, 0, 0, 1});
+	resourceColor_ = dx->CreateRenderTextureResource(dx->GetDevice(), width, height, DXGI_FORMAT_R8G8B8A8_UNORM_SRGB, {0.2f, 0.2f, 0.2f, 1.0f});
 
 	resourceDepth_ = dx->CreateDepthStencilTextureResource(device, width, height);
 
@@ -41,7 +41,7 @@ void RenderTexture::BeginRender(DirectXCommon* dx) {
 	cmd->OMSetRenderTargets(1, &rtvHandle_, false, &dsvHandle_);
 
 	// Color Clear
-	float clearColor[4] = {1, 0, 0, 1};
+	float clearColor[4] = {0.2f, 0.2f, 0.2f, 1.0f};
 	cmd->ClearRenderTargetView(rtvHandle_, clearColor, 0, nullptr);
 
 	// Depth Clear

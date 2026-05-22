@@ -10,16 +10,6 @@ void IButton::Initialize(EngineContext* ctx) {
 }
 
 void IButton::Update(bool isSelect) {
-#ifdef USE_IMGUI
-	ImGui::Begin("Button");
-
-	ImGui::PushID(this);
-	ImGui::DragFloat2("Pos", &pos_.x, 1.0f);
-	ImGui::PopID();
-
-	ImGui::End();
-#endif
-
 	// 選択状況を受け取る
 	isSelect_ = isSelect;
 
@@ -27,7 +17,6 @@ void IButton::Update(bool isSelect) {
 	const ButtonStyle& style = isSelect_ ? GetSelectedStyle() : GetNormalStyle();
 	sprite_->SetColor(style.color);
 	sprite_->SetSize(style.size);
-	sprite_->SetPosition(pos_);
 
 	// 更新
 	sprite_->Update();

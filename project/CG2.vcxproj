@@ -345,6 +345,7 @@ copy "$(windowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="application\GameObjects\ResultUI\Button\IButton.h" />
     <ClInclude Include="application\Scene\EasingEditorScene.h" />
     <ClInclude Include="engine\base\CopyImage.h" />
+    <ClInclude Include="engine\base\PostEffectTypes.h" />
     <ClInclude Include="engine\base\SceneContext.h" />
     <ClInclude Include="engine\base\utility\easing\EasingEditor.h" />
     <ClInclude Include="engine\math\mathLib\Quaternion.h" />
