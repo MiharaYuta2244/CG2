@@ -61,7 +61,7 @@ void Framework::Initialize() {
 
 	// CopyImage
 	copyImage_ = std::make_unique<TinyEngine::CopyImage>();
-	copyImage_->Initialize(dxCommon_.get(), PostEffectType::Grayscale);
+	copyImage_->Initialize(dxCommon_.get(), PostEffectType::Gaussian);
 
 #ifdef USE_IMGUI
 	// ImGuiManager

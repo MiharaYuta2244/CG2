@@ -64,16 +64,16 @@ private:
 
 	// シェーダーのマップ
 	std::unordered_map<PostEffectType, std::wstring> shaderMap_ = {
-	    {PostEffectType::FullScreen, L"Fullscreen"},
-        {PostEffectType::Grayscale,  L"Grayscale" },
-        {PostEffectType::Sepia,      L"Sepia"     },
-        {PostEffectType::Vignette,   L"Vignette"  },
-	    {PostEffectType::Smoothing,  L"BoxFilter" },
-        {PostEffectType::Gaussian,   L"Gaussian"  },
-        {PostEffectType::Outline,    L"Outline"   },
-        {PostEffectType::RadialBlur, L"RadialBlur"},
-	    {PostEffectType::Dissolve,   L"Dissolve"  },
-        {PostEffectType::Random,     L"Random"    },
+	    {PostEffectType::FullScreen, L"Fullscreen"    },
+        {PostEffectType::Grayscale,  L"Grayscale"     },
+        {PostEffectType::Sepia,      L"Sepia"         },
+        {PostEffectType::Vignette,   L"Vignette"      },
+	    {PostEffectType::Smoothing,  L"BoxFilter"     },
+        {PostEffectType::Gaussian,   L"GaussianFilter"},
+        {PostEffectType::Outline,    L"Outline"       },
+        {PostEffectType::RadialBlur, L"RadialBlur"    },
+	    {PostEffectType::Dissolve,   L"Dissolve"      },
+        {PostEffectType::Random,     L"Random"        },
 	};
 
 	// 各種パラメータ
@@ -81,6 +81,7 @@ private:
 	GrayscaleParam grayscaleParam_;
 	SepiaParam sepiaParam_;
 	SmoothingParam smoothingParam_;
+	GaussianParam gaussianParam_;
 
 	// CB Size Map
 	std::unordered_map<PostEffectType, size_t> cbSizeMap_ = {
@@ -89,7 +90,7 @@ private:
 	    {PostEffectType::Grayscale,  sizeof(GrayscaleParam)},
 	    {PostEffectType::Sepia,      sizeof(SepiaParam)    },
 	    {PostEffectType::Smoothing,  sizeof(SmoothingParam)},
-	    //{PostEffectType::Gaussian,   sizeof(GaussianParam)  },
+	    {PostEffectType::Gaussian,   sizeof(GaussianParam) },
 	    //{PostEffectType::Outline,    sizeof(OutlineParam)   },
 	    //{PostEffectType::RadialBlur, sizeof(RadialBlurParam)},
 	    //{PostEffectType::Dissolve,   sizeof(DissolveParam)  },
@@ -101,12 +102,12 @@ private:
 	    {PostEffectType::Vignette,  &vignetteParam_ },
         {PostEffectType::Grayscale, &grayscaleParam_},
         {PostEffectType::Sepia,     &sepiaParam_    },
-        {PostEffectType::Smoothing, &smoothingParam_},
-	    /*{PostEffectType::Gaussian,   &gaussianParam_  },
-	    {PostEffectType::Outline,    &outlineParam_   },
-	    {PostEffectType::RadialBlur, &radialBlurParam_},
-	    {PostEffectType::Dissolve,   &dissolveParam_  },
-	    {PostEffectType::Random,     &randomParam_    },*/
+	    {PostEffectType::Smoothing, &smoothingParam_},
+        {PostEffectType::Gaussian,  &gaussianParam_ },
+	    //{PostEffectType::Outline,    &outlineParam_   },
+	    //{PostEffectType::RadialBlur, &radialBlurParam_},
+	    //{PostEffectType::Dissolve,   &dissolveParam_  },
+	    //{PostEffectType::Random,     &randomParam_    },
 	};
 
 	// CB

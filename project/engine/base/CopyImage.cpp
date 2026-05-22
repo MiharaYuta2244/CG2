@@ -124,6 +124,10 @@ void TinyEngine::CopyImage::AllParamSetting() {
 	smoothingParam_.intensity = 1.0f;
 	smoothingParam_.texelSize[0] = 1.0f / dxCommon_->GetBackBufferWidth();
 	smoothingParam_.texelSize[1] = 1.0f / dxCommon_->GetBackBufferHeight();
+
+	// ガウシアンフィルタ
+	gaussianParam_.texelSize[0] = 1.0f / dxCommon_->GetBackBufferWidth();
+	gaussianParam_.texelSize[1] = 1.0f / dxCommon_->GetBackBufferHeight();
 }
 
 void CopyImage::Initialize(DirectXCommon* dx, PostEffectType type) {
@@ -176,6 +180,25 @@ void TinyEngine::CopyImage::DrawImGui() {
 #ifdef USE_IMGUI
 	ImGui::Begin("PostEffect");
 
+	{
+		static const char* effectNames[] = {"FullScreen", "Grayscale", "Sepia", "Vignette", "Smoothing", "Gaussian", "Outline", "RadialBlur", "Dissolve", "Random"};
+
+		int current = static_cast<int>(postEffectType_);
+		if (ImGui::Combo("Effect Type", &current, effectNames, IM_ARRAYSIZE(effectNames))) {
+
+			// 変更されたら反映
+			postEffectType_ = static_cast<PostEffectType>(current);
+
+			// CB再作成
+			CreateCB();
+
+			// PSO再作成
+			CreateGraphicsPipeline(dxCommon_);
+		}
+	}
+
+	ImGui::Separator();
+
 	switch (postEffectType_) {
 
 	case PostEffectType::Grayscale: {
@@ -210,6 +233,15 @@ void TinyEngine::CopyImage::DrawImGui() {
 		ImGui::Text("Smoothing");
 		ImGui::SliderInt("Radius", &p.radius, 1, 10);
 		ImGui::SliderFloat("Intensity", &p.intensity, 0.0f, 2.0f);
+		break;
+	}
+
+	case PostEffectType::Gaussian: {
+		auto& p = gaussianParam_;
+		ImGui::Text("Gaussian");
+		ImGui::SliderInt("Radius", &p.radius, 1, 10);
+		ImGui::SliderFloat("Intensity", &p.intensity, 0.0f, 2.0f);
+		ImGui::DragFloat("Sigma", &p.sigma, 0.01f);
 		break;
 	}
 
