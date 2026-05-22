@@ -31,6 +31,9 @@ public:
 	// 描画
 	void Draw(DirectXCommon* dx, SrvManager* srv, uint32_t srvIndex);
 
+	// ImGui
+	void DrawImGui();
+
 private:
 	// シェーダコンパイラの初期化
 	void InitializeShaderCompiler();

@@ -119,16 +119,6 @@ void TinyEngine::CopyImage::CreateCB() {
 }
 
 void TinyEngine::CopyImage::AllParamSetting() {
-	// ヴィネット
-	vignetteParam_.color = {0.0f, 0.0f, 0.0f, 1.0f};
-	vignetteParam_.intensity = 1.0f;
-
-	// グレースケール
-	grayscaleParam_.intensity = 1.0f;
-
-	// セピア
-	sepiaParam_.intenisity = 1.0f;
-
 	// スムージング
 	smoothingParam_.radius = 2;
 	smoothingParam_.intensity = 1.0f;
@@ -180,4 +170,60 @@ void CopyImage::Draw(DirectXCommon* dx, SrvManager* srv, uint32_t srvIndex) {
 
 	// 描画
 	cmd->DrawInstanced(3, 1, 0, 0);
+}
+
+void TinyEngine::CopyImage::DrawImGui() {
+#ifdef USE_IMGUI
+	ImGui::Begin("PostEffect");
+
+	switch (postEffectType_) {
+
+	case PostEffectType::Grayscale: {
+		auto& p = grayscaleParam_;
+		ImGui::Text("Grayscale");
+		ImGui::SliderFloat("Intensity", &p.intensity, 0.0f, 1.0f);
+		ImGui::DragFloat3("LuminanceWeight", &p.luminanceWeight.x, 0.01f);
+		ImGui::ColorEdit3("BlendColor", &p.blendColor.x);
+		ImGui::SliderFloat("BlendStrength", &p.blendStrength, 0.0f, 1.0f);
+		break;
+	}
+
+	case PostEffectType::Sepia: {
+		auto& p = sepiaParam_;
+		ImGui::Text("Sepia");
+		ImGui::SliderFloat("Intensity", &p.intensity, 0.0f, 1.0f);
+		ImGui::ColorEdit3("SepiaColor", &p.sepiaColor.x);
+		ImGui::SliderFloat("ToneStrength", &p.toneStrength, 0.0f, 2.0f);
+		break;
+	}
+
+	case PostEffectType::Vignette: {
+		auto& p = vignetteParam_;
+		ImGui::Text("Vignette");
+		ImGui::ColorEdit4("Color", &p.color.x);
+		ImGui::SliderFloat("Intensity", &p.intensity, 0.0f, 3.0f);
+		break;
+	}
+
+	case PostEffectType::Smoothing: {
+		auto& p = smoothingParam_;
+		ImGui::Text("Smoothing");
+		ImGui::SliderInt("Radius", &p.radius, 1, 10);
+		ImGui::SliderFloat("Intensity", &p.intensity, 0.0f, 2.0f);
+		break;
+	}
+
+	default:
+		ImGui::Text("No parameters for this effect.");
+		break;
+	}
+
+	// CB更新
+	size_t size = cbSizeMap_[postEffectType_];
+	if (size > 0 && cbResource_) {
+		memcpy(cbData_, paramPtrMap_[postEffectType_], size);
+	}
+
+	ImGui::End();
+#endif
 }

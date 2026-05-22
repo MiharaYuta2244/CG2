@@ -61,7 +61,7 @@ void Framework::Initialize() {
 
 	// CopyImage
 	copyImage_ = std::make_unique<TinyEngine::CopyImage>();
-	copyImage_->Initialize(dxCommon_.get(), PostEffectType::Smoothing);
+	copyImage_->Initialize(dxCommon_.get(), PostEffectType::Grayscale);
 
 #ifdef USE_IMGUI
 	// ImGuiManager
@@ -123,6 +123,9 @@ void Framework::Update() {
 #ifdef USE_IMGUI
 	// ImGui前処理
 	imGuiManager_->BeginFrame();
+
+	// ポストエフェクトのパラメータ調整用
+	copyImage_->DrawImGui();
 #endif
 
 	// デバッグカメラ更新
