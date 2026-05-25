@@ -254,18 +254,18 @@ ParticleState Particle::MakeParticle(const Emitter& emitter, Vector3 translate) 
 	Vector3 extent = emitter.transform.scale;
 
 	// ランダムオフセットを作る（ボックス内）
-	Vector3 randomOffset = {RandomUtils::RangeFloat(-extent.x, extent.x), RandomUtils::RangeFloat(-extent.y, extent.y), RandomUtils::RangeFloat(-extent.z, extent.z)};
+	//Vector3 randomOffset = {RandomUtils::RangeFloat(-extent.x, extent.x), RandomUtils::RangeFloat(-extent.y, extent.y), RandomUtils::RangeFloat(-extent.z, extent.z)};
 
 	// モジュールがある場合はモジュール側で初期化をまかせる
 	if (module_) {
 		module_->Initialize(particle, ctx_);
 		// モジュールはtranslateを書き換えない想定だが、発生位置はエミッタ内ランダム位置へ設定する
-		particle.transform.translate = translate + randomOffset;
+		particle.transform.translate = translate;
 		return particle;
 	}
 
 	// 基準位置を指定してランダムな範囲にパーティクルを生成する（既存ロジックをエミッタスケールに対応）
-	particle.transform.translate = translate + randomOffset;
+	particle.transform.translate = translate;
 
 	particle.velocity = {RandomUtils::RangeFloat(-1, 1), RandomUtils::RangeFloat(-1, 1), RandomUtils::RangeFloat(-1, 1)};
 	particle.color = {1.0f, 1.0f, 1.0f, 1.0f};
@@ -304,10 +304,18 @@ void Particle::CoordinateTransformation(std::list<ParticleState>::iterator parti
 	// ビルボードマトリックスの作成
 	Matrix4x4 billboardmatrix = CreateBillboardMatrix();
 
-	// ビルボード用
+	// スケール・回転・平行移動の行列を作成
 	Matrix4x4 scaleMatrix = MathUtility::MakeScaleMatrix((*particleIterator).transform.scale);
+
+	Matrix4x4 rotateMatrix = MathUtility::Multiply(
+	    MathUtility::MakePitchRotateMatrix((*particleIterator).transform.rotate.x),
+	    MathUtility::Multiply(MathUtility::MakeYawRotateMatrix((*particleIterator).transform.rotate.y), MathUtility::MakeRollRotateMatrix((*particleIterator).transform.rotate.z)));
+
 	Matrix4x4 translateMatrix = MathUtility::MakeTranslateMatrix((*particleIterator).transform.translate);
-	worldMatrix_ = MathUtility::Multiply(MathUtility::Multiply(scaleMatrix, billboardmatrix), translateMatrix);
+
+	// 行列の乗算（スケール * 回転 * ビルボード * 平行移動）
+	Matrix4x4 srMatrix = MathUtility::Multiply(scaleMatrix, rotateMatrix);
+	worldMatrix_ = MathUtility::Multiply(MathUtility::Multiply(srMatrix, billboardmatrix), translateMatrix);
 
 	if (camera_) {
 		const Matrix4x4& viewProjectionMatrix = camera_->GetViewProjectionMatrix();
