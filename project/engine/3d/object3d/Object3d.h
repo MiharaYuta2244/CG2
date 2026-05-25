@@ -10,6 +10,7 @@
 #include "TimeParam.h"
 #include "Transform.h"
 #include "TransformationMatrix.h"
+#include "KeyframeAnimation.h"
 #include <ImGuizmo.h>
 #include <d3d12.h>
 #include <string>
@@ -165,5 +166,9 @@ private:
 
 	// 全Object3dで共有する次に割り当てるID
 	static uint32_t s_nextID_;
+
+	// キーフレームアニメーション
+	std::unique_ptr<KeyframeAnimation> keyframeAnimation_;
+	KeyframeAnimation::Animation animation_;
 };
 } // namespace TinyEngine

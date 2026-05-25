@@ -4,7 +4,7 @@ using namespace TinyEngine;
 
 void ObjectRender::Initialize(EngineContext* ctx, const std::string& filepath) {
 	object3d_ = std::make_unique<Object3d>();
-	object3d_->Initialize(ctx);
+	object3d_->Initialize(ctx, filepath);
 	object3d_->SetModel(filepath);
 }
 

@@ -1,8 +1,8 @@
 #include "Object3d.h"
+#include "DirectXUtils.h"
 #include "MathOperator.h"
 #include "MathUtility.h"
 #include "Model.h"
-#include "DirectXUtils.h"
 
 using namespace Microsoft::WRL;
 using namespace DirectX;
@@ -18,10 +18,10 @@ void Object3d::Initialize(EngineContext* ctx, const std::string& name) {
 	id_ = ++s_nextID_;
 
 	// 名前の設定
-	if(name.empty() || name == "Object"){
-		name_="Object_"+std::to_string(id_);
-	}else {
-		name_=name;
+	if (name.empty() || name == "Object") {
+		name_ = "Object_" + std::to_string(id_);
+	} else {
+		name_ = name;
 	}
 
 	// 座標変換行列データ作成
@@ -53,6 +53,10 @@ void Object3d::Initialize(EngineContext* ctx, const std::string& name) {
 
 	// カメラをセットする
 	camera_ = ctx_->object3dCommon->GetDefaultCamera();
+
+	// キーフレームアニメーション
+	keyframeAnimation_ = std::make_unique<KeyframeAnimation>();
+	animation_ = keyframeAnimation_->LoadAnimationFile("AnimatedCube.gltf");
 }
 
 void Object3d::Update() {
@@ -72,8 +76,18 @@ void Object3d::Update() {
 		worldViewProjectionMatrix_ = worldMatrix_;
 	}
 
-	transformMatrixData_->WVP = modelData_.rootNode.localMatrix * worldViewProjectionMatrix_;
-	transformMatrixData_->World = modelData_.rootNode.localMatrix * worldMatrix_;
+	if (name_ == "AnimatedCube.gltf") {
+		// アニメーションモデル
+		Matrix4x4 localMatrix{};
+		localMatrix = keyframeAnimation_->UpdateAnimation(totalTime, &animation_, &modelData_);
+
+		transformMatrixData_->WVP = localMatrix * worldViewProjectionMatrix_;
+		transformMatrixData_->World = localMatrix * worldMatrix_;
+	} else {
+		// 非アニメーションモデル
+		transformMatrixData_->WVP = modelData_.rootNode.localMatrix * worldViewProjectionMatrix_;
+		transformMatrixData_->World = modelData_.rootNode.localMatrix * worldMatrix_;
+	}
 
 	// 非均一スケールに対応した逆転置行列の計算
 	// 3x3部分を抽出して逆行列を計算し、転置する
@@ -269,5 +283,5 @@ void Object3d::CreateOutlineData() {
 	// アウトライン用のリソースを作成
 	outlineResource_ = DirectXUtils::CreateBufferResource(ctx_->object3dCommon->GetDxCommon()->GetDevice(), sizeof(Outline));
 	outlineResource_->Map(0, nullptr, reinterpret_cast<void**>(&outlineData_));
-	*outlineData_ = outline_;                                                                                           
+	*outlineData_ = outline_;
 }
