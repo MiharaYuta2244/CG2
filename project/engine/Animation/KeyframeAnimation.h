@@ -45,7 +45,7 @@ private:
 	template<typename tValue, typename keyframeType> 
 	tValue CalculateValue(const std::vector<keyframeType>& keyframes, float time) {
 		assert(!keyframes.empty()); 
-		if (!keyframes.size() == 1 || time <= keyframes[0].time) { return keyframes[0].value; }
+		if (keyframes.size() == 1 || time <= keyframes[0].time) { return keyframes[0].value; }
 
 		for (size_t index = 0; index < keyframes.size() - 1; ++index) {
 			size_t nextIndex = index + 1;
