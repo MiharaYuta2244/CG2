@@ -13,4 +13,8 @@ void ObjectRender::Update(Transform transform) {
 	object3d_->Update();
 }
 
+void ObjectRender::Update() {
+	object3d_->Update();
+}
+
 void ObjectRender::Draw() { object3d_->Draw(); }

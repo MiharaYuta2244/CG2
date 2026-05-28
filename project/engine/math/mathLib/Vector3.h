@@ -23,7 +23,10 @@ inline void to_json(Json& j, const Vector3& v) {
 
 // ロード用 Json -> Vector3への変換ルール
 inline void from_json(const Json& j, Vector3& v) {
-	v.x = j.value("x", 0.0f);
-	v.y = j.value("y", 0.0f);
-	v.z = j.value("z", 0.0f);
+	// JSONデータが配列の場合 [x, y, z]
+	if (j.is_array() && j.size() >= 3) {
+		v.x = j[0].get<float>();
+		v.y = j[2].get<float>();
+		v.z = j[1].get<float>();
+	}
 }

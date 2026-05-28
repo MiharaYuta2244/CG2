@@ -210,6 +210,8 @@ public:
 
 	static float DegreeToRadian(const float& degree);
 
+	static Vector3 DegreeToRadian(const Vector3& degrees);
+
 public:
 	static constexpr float pi_ = static_cast<float>(std::numbers::pi);
 };

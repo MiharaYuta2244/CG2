@@ -29,6 +29,11 @@
 #include <wrl.h>
 
 namespace TinyEngine {
+enum class ParticleMeshType {
+	Square, // 従来の矩形
+	Ring    // リング
+};
+
 /// <summary>
 /// パーティクルクラス
 /// </summary>
@@ -56,7 +61,9 @@ public:
 	/// <param name="texturePath">テクスチャのパス</param>
 	/// <param name="module">適用する挙動モジュール（nullptrでデフォルト）</param>
 	/// <param name="customEmitter">カスタムエミッタ設定（nullptrでデフォルト）</param>
-	void Initialize(EngineContext* ctx, Vector3 emitterPos, const std::string& texturePath, std::unique_ptr<ParticleModule> module = nullptr, const Emitter* customEmitter = nullptr);
+	void Initialize(
+	    EngineContext* ctx, Vector3 emitterPos, const std::string& texturePath, std::unique_ptr<ParticleModule> module = nullptr, const Emitter* customEmitter = nullptr,
+	    ParticleMeshType meshType = ParticleMeshType::Ring);
 
 	/// <summary>
 	/// 更新関数
@@ -98,6 +105,9 @@ public:
 private:
 	// 四角形の作成
 	ModelData CreatePrimitive(const std::string& texturePath);
+
+	// リング状モデルの作成
+	ModelData CreateRingPrimitive(const std::string& texturePath, float innerRadius = 0.2f, float outerRadius = 1.0f, uint32_t segments = 32);
 
 	// 頂点データの初期化
 	void CreateVertexData();

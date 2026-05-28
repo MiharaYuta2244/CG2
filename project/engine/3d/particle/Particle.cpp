@@ -20,7 +20,9 @@ using namespace Microsoft::WRL;
 using namespace DirectX;
 using namespace TinyEngine;
 
-void Particle::Initialize(EngineContext* ctx, Vector3 emitterPos, const std::string& texturePath, std::unique_ptr<ParticleModule> module, const Emitter* customEmitter) {
+void Particle::Initialize(
+    EngineContext* ctx, Vector3 emitterPos, const std::string& texturePath, std::unique_ptr<ParticleModule> module, const Emitter* customEmitter,
+    ParticleMeshType meshType) {
 	ctx_ = ctx;
 
 	// モジュールのセット
@@ -32,8 +34,12 @@ void Particle::Initialize(EngineContext* ctx, Vector3 emitterPos, const std::str
 	// SRVの作成（インスタンシング用）
 	CreateInstancingSRV(ctx->srvManager->Allocate());
 
-	// プリミティブモデルの作成
-	modelData_ = CreatePrimitive(texturePath);
+	// 指定されたメッシュタイプに応じてモデルデータを作成
+	if (meshType == ParticleMeshType::Ring) {
+		modelData_ = CreateRingPrimitive(texturePath);
+	} else {
+		modelData_ = CreatePrimitive(texturePath);
+	}
 
 	// 頂点データの初期化
 	CreateVertexData();
@@ -186,6 +192,53 @@ ModelData Particle::CreatePrimitive(const std::string& texturePath) {
           .texcoord = {1.0f, 1.0f},
           .normal = {0.0f, 0.0f, 1.0f}
     }); // 右下
+
+	modelData.material.textureFilePath = "resources/textures/" + texturePath;
+
+	return modelData;
+}
+
+ModelData TinyEngine::Particle::CreateRingPrimitive(const std::string& texturePath, float innerRadius, float outerRadius, uint32_t segments) { 
+	ModelData modelData;
+
+	// 円周の分割角度
+	float angleStep = 2.0f * std::numbers::pi_v<float> / static_cast<float>(segments);
+	Vector3 normal = {0.0f, 0.0f, 1.0f};
+
+	for (uint32_t i = 0; i < segments; ++i) {
+		// 現在のステップと次のステップの角度
+		float alpha1 = static_cast<float>(i) * angleStep;
+		float alpha2 = static_cast<float>(i + 1) * angleStep;
+
+		float cos1 = std::cos(alpha1);
+		float sin1 = std::sin(alpha1);
+		float cos2 = std::cos(alpha2);
+		float sin2 = std::sin(alpha2);
+
+		// 扇形の外側と内側の4頂点の座標を計算
+		Vector4 pOut1 = {outerRadius * cos1, outerRadius * sin1, 0.0f, 1.0f};
+		Vector4 pIn1 = {innerRadius * cos1, innerRadius * sin1, 0.0f, 1.0f};
+		Vector4 pOut2 = {outerRadius * cos2, outerRadius * sin2, 0.0f, 1.0f};
+		Vector4 pIn2 = {innerRadius * cos2, innerRadius * sin2, 0.0f, 1.0f};
+
+		// UV座標の計算
+		auto calcUV = [outerRadius](const Vector4& p) -> Vector2 { return {p.x / (2.0f * outerRadius) + 0.5f, -p.y / (2.0f * outerRadius) + 0.5f}; };
+
+		Vector2 uvOut1 = calcUV(pOut1);
+		Vector2 uvIn1 = calcUV(pIn1);
+		Vector2 uvOut2 = calcUV(pOut2);
+		Vector2 uvIn2 = calcUV(pIn2);
+
+		// 三角形1
+		modelData.vertices.push_back({.position = pOut1, .texcoord = uvOut1, .normal = normal});
+		modelData.vertices.push_back({.position = pIn1, .texcoord = uvIn1, .normal = normal});
+		modelData.vertices.push_back({.position = pIn2, .texcoord = uvIn2, .normal = normal});
+
+		// 三角形2
+		modelData.vertices.push_back({.position = pOut1, .texcoord = uvOut1, .normal = normal});
+		modelData.vertices.push_back({.position = pIn2, .texcoord = uvIn2, .normal = normal});
+		modelData.vertices.push_back({.position = pOut2, .texcoord = uvOut2, .normal = normal});
+	}
 
 	modelData.material.textureFilePath = "resources/textures/" + texturePath;
 

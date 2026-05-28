@@ -382,7 +382,7 @@ void GamePlayScene::CollisionGameObjects() {
 
 					// パーティクルの生成
 					auto particle = std::make_unique<Particle>();
-					particle->Initialize(ctx_.engineContext, enemy->GetPos(), "white.png", std::make_unique<ShockWaveModule>());
+					particle->Initialize(ctx_.engineContext, enemy->GetPos(), "gradationLine.png", std::make_unique<ShockWaveModule>());
 					particle->SetEmitMode(false, 0.1f);
 					particle->SetEmitterParam(20, 0.05f);
 					enemyDeathParticle_.push_back(std::move(particle));
@@ -462,7 +462,7 @@ void GamePlayScene::CollisionGameObjects() {
 
 					// パーティクルの生成
 					auto particle = std::make_unique<Particle>();
-					particle->Initialize(ctx_.engineContext, a->GetPos(), "white.png", std::make_unique<ShockWaveModule>());
+					particle->Initialize(ctx_.engineContext, a->GetPos(), "gradationLine.png", std::make_unique<ShockWaveModule>());
 					particle->SetEmitMode(false, 0.1f);
 					particle->SetEmitterParam(20, 0.05f);
 					enemyDeathParticle_.push_back(std::move(particle));

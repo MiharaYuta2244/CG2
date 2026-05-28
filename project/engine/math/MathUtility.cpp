@@ -350,7 +350,6 @@ Matrix4x4 MathUtility::MakeAffineMatrix(const Vector3& s, const Quaternion& q, c
 	return result;
 }
 
-
 Matrix4x4 MathUtility::Inverse(const Matrix4x4& matrix) {
 	float a = {
 	    1 / ((matrix.m[0][0] * matrix.m[1][1] * matrix.m[2][2] * matrix.m[3][3]) + (matrix.m[0][0] * matrix.m[1][2] * matrix.m[2][3] * matrix.m[3][1]) +
@@ -566,7 +565,7 @@ Matrix4x4 MathUtility::Orthonormalize(const Matrix4x4& m) {
 	return result;
 }
 
-Vector3 MathUtility::Lerp(const Vector3& start, const Vector3& end, float t) { 
+Vector3 MathUtility::Lerp(const Vector3& start, const Vector3& end, float t) {
 	Vector3 result;
 	result.x = start.x + (end.x - start.x) * t;
 	result.y = start.y + (end.y - start.y) * t;
@@ -595,7 +594,12 @@ Quaternion MathUtility::Lerp(const Quaternion& start, const Quaternion& end, flo
 	return result;
 }
 
+float MathUtility::DegreeToRadian(const float& degree) { return degree * std::numbers::pi_v<float> / 180.0f; }
 
-float MathUtility::DegreeToRadian(const float& degree) { 
-	return degree * std::numbers::pi_v<float> / 180.0f;
+Vector3 MathUtility::DegreeToRadian(const Vector3& degrees) {
+	Vector3 result{};
+	result.x = degrees.x * std::numbers::pi_v<float> / 180.0f;
+	result.y = degrees.y * std::numbers::pi_v<float> / 180.0f;
+	result.z = degrees.z * std::numbers::pi_v<float> / 180.0f;
+	return result;
 }

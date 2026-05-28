@@ -11,6 +11,7 @@ public:
 
 	// 更新処理
 	void Update(Transform transform);
+	void Update();
 
 	// 描画処理
 	void Draw();

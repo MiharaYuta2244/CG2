@@ -61,7 +61,7 @@ void Framework::Initialize() {
 
 	// CopyImage
 	copyImage_ = std::make_unique<TinyEngine::CopyImage>();
-	copyImage_->Initialize(dxCommon_.get(), PostEffectType::Smoothing);
+	copyImage_->Initialize(dxCommon_.get(), PostEffectType::FullScreen);
 
 #ifdef USE_IMGUI
 	// ImGuiManager
