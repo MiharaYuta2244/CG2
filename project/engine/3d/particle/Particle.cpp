@@ -355,7 +355,7 @@ std::list<ParticleState> Particle::Emit(const Emitter& emitter, Vector3 translat
 
 void Particle::CoordinateTransformation(std::list<ParticleState>::iterator particleIterator) {
 	// ビルボードマトリックスの作成
-	Matrix4x4 billboardmatrix = CreateBillboardMatrix();
+	Matrix4x4 billboardmatrix = MathUtility::MakeIdentity4x4();
 
 	// スケール・回転・平行移動の行列を作成
 	Matrix4x4 scaleMatrix = MathUtility::MakeScaleMatrix((*particleIterator).transform.scale);

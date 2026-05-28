@@ -6,7 +6,7 @@
 /// </summary>
 class ShockWaveModule : public ParticleModule {
 public:
-    ShockWaveModule(float life = 10.0f, float startScale = 2.0f, float endScale = 4.0f)
+    ShockWaveModule(float life = 0.4f, float startScale = 0.8f, float endScale = 2.0f)
         : life_(life), startScale_(startScale), endScale_(endScale) {}
 
     void Initialize(ParticleState& particle, EngineContext* ctx) override;
