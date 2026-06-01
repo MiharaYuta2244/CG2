@@ -73,14 +73,6 @@ void GamePlayScene::Initialize(const SceneContext& ctx) {
 	// スカイボックスの生成&初期化
 	skybox_ = std::make_unique<Skybox>();
 	skybox_->Initialize(ctx_.engineContext, "rostock_laage_airport_4k.dds");
-
-	// アニメーションキューブ
-	animeCube_ = std::make_unique<ObjectRender>();
-	animeCube_->Initialize(ctx_.engineContext, "AnimatedCube.gltf");
-
-	animeTransform_.scale = {1, 1, 1};
-	animeTransform_.rotate = {0, 0, 0};
-	animeTransform_.translate = player_->GetPosition();
 }
 
 void GamePlayScene::Update() {
@@ -191,9 +183,6 @@ void GamePlayScene::Update() {
 	// レターボックス更新
 	letterBox_->Update(deltaTime);
 
-	// アニメーションキューブ
-	animeCube_->Update(animeTransform_);
-
 	// 地面の更新
 	ground_->Update();
 
@@ -237,9 +226,6 @@ void GamePlayScene::Update() {
 void GamePlayScene::Draw() {
 	// スカイボックス描画
 	// skybox_->Draw();
-
-	// アニメーションキューブ
-	animeCube_->Draw();
 
 	// プレイヤーの描画処理
 	player_->Draw();

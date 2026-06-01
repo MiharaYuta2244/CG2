@@ -95,8 +95,4 @@ private:
 
 	// シーン遷移の要求を1回だけ通るようにするためのフラグ
 	bool isTransitionRequested_ = false;
-
-	// アニメーションキューブ
-	std::unique_ptr<ObjectRender> animeCube_;
-	Transform animeTransform_;
 };

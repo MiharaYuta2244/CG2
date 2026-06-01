@@ -5,7 +5,6 @@
 #include "ModelData.h"
 #include "ModelCommon.h"
 #include "MeshData.h"
-#include "IMeshGenerator.h"
 #include "Node.h"
 #include <d3d12.h>
 #include <string>

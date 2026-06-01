@@ -3,15 +3,11 @@
 #include "MathUtility.h"
 #include "MathOperator.h"
 #include "ModelCommon.h"
-#include "SphereMeshGenerator.h"
 #include "TextureManager.h"
-#include "TransformationMatrix.h"
-#include <Transform.h>
 #include <assert.h>
 #include <assimp/Importer.hpp>
 #include <assimp/postprocess.h>
 #include <assimp/scene.h>
-#include <cmath>
 #include <fstream>
 #include <sstream>
 
@@ -27,6 +23,9 @@ void Model::Initialize(ModelCommon* modelCommon, TextureManager* textureManager,
 
 	// 頂点データの初期化
 	CreateVertexData();
+
+	// インデックスデータの初期化
+	CreateIndexData();
 
 	// テクスチャ読み込み
 	textureManager_->LoadTexture(modelData_.material.textureFilePath);
@@ -92,10 +91,15 @@ void Model::Draw() {
 
 	// VertexBufferViewを設定
 	commandList->IASetVertexBuffers(0, 1, &vertexBufferView_); // VBVを設定
+
+	// IndexBufferViewを設定
+	commandList->IASetIndexBuffer(&indexBufferView_);
+
 	// SRVのDescriptorTableの先頭を設定。2はrootParameter[2]（Pixel用テクスチャ）である。
 	commandList->SetGraphicsRootDescriptorTable(2, textureManager_->GetSrvHandleGPU(modelData_.material.textureFilePath));
+
 	// 描画!(DrawCall/ドローコール)。
-	commandList->DrawInstanced(UINT(modelData_.vertices.size()), 1, 0, 0);
+	commandList->DrawIndexedInstanced(indexCount_, 1, 0, 0, 0);
 }
 
 ModelData Model::LoadModelFile(const std::string& filename) {
@@ -110,74 +114,50 @@ ModelData Model::LoadModelFile(const std::string& filename) {
 
 	Assimp::Importer importer;
 	std::string filePath = "resources/models/" + filename;
-	// 三角形化とUV/向きの調整を入れておく（法線やUVがない場合も後処理で対応）
-	const aiScene* scene = importer.ReadFile(filePath.c_str(), aiProcess_Triangulate | aiProcess_FlipWindingOrder | aiProcess_FlipUVs);
+	// 三角形化とUV/向きの調整に加えて、法線がない場合の自動生成フラグ（aiProcess_GenNormals）を追加
+	const aiScene* scene = importer.ReadFile(filePath.c_str(), aiProcess_Triangulate | aiProcess_FlipWindingOrder | aiProcess_FlipUVs | aiProcess_GenNormals);
 	assert(scene && scene->HasMeshes()); // シーン・メッシュがないのは対応しない
 
 	for (uint32_t meshIndex = 0; meshIndex < scene->mNumMeshes; ++meshIndex) {
 		aiMesh* mesh = scene->mMeshes[meshIndex];
 
-		// メッシュが法線・UVを持っていない場合に備えてフラグを用意
-		const bool hasNormals = mesh->HasNormals();
 		const bool hasTexcoords = mesh->HasTextureCoords(0);
 
-		// Meshの中身(Face)の解析を行っていく
-		for (uint32_t faceIndex = 0; faceIndex < mesh->mNumFaces; ++faceIndex) {
-			aiFace& face = mesh->mFaces[faceIndex];
-			assert(face.mNumIndices == 3); // 三角形のみサポート（Triangulateを指定しているので通常成立）
+		// 複数メッシュが含まれる場合、インデックスがずれないように現在の頂点数をオフセットとして保持
+		uint32_t vertexOffset = static_cast<uint32_t>(modelData.vertices.size());
 
-			// 三角形頂点の位置を先に取得しておく（法線生成に利用）
-			aiVector3D v0 = mesh->mVertices[face.mIndices[0]];
-			aiVector3D v1 = mesh->mVertices[face.mIndices[1]];
-			aiVector3D v2 = mesh->mVertices[face.mIndices[2]];
+		// 頂点の解析
+		for (uint32_t vertexIndex = 0; vertexIndex < mesh->mNumVertices; ++vertexIndex) {
+			aiVector3D& position = mesh->mVertices[vertexIndex];
+			aiVector3D& normal = mesh->mNormals[vertexIndex];
 
-			// face法線（メッシュに法線が無い場合に使用する平面法線を計算）
-			aiVector3D computedFaceNormal(0.0f, 0.0f, 0.0f);
-			if (!hasNormals) {
-				aiVector3D e1 = v1 - v0;
-				aiVector3D e2 = v2 - v0;
-				// クロス積
-				computedFaceNormal.x = e1.y * e2.z - e1.z * e2.y;
-				computedFaceNormal.y = e1.z * e2.x - e1.x * e2.z;
-				computedFaceNormal.z = e1.x * e2.y - e1.y * e2.x;
-				// 正規化
-				float len = std::sqrt(computedFaceNormal.x * computedFaceNormal.x + computedFaceNormal.y * computedFaceNormal.y + computedFaceNormal.z * computedFaceNormal.z);
-				if (len > 0.0f) {
-					computedFaceNormal.x /= len;
-					computedFaceNormal.y /= len;
-					computedFaceNormal.z /= len;
-				}
+			aiVector3D texcoord;
+			if (hasTexcoords) {
+				texcoord = mesh->mTextureCoords[0][vertexIndex];
+			} else {
+				texcoord = aiVector3D(0.0f, 0.0f, 0.0f);
 			}
 
-			// Faceの中身(Vertex)の解析を行っていく
+			VertexData vertex;
+			vertex.position = {position.x, position.y, position.z, 1.0f};
+			vertex.normal = {normal.x, normal.y, normal.z};
+			vertex.texcoord = {texcoord.x, texcoord.y};
+
+			// aiProcess_MaskLeftHandedはz*=-1で、右手->左手に変換するので手動で対処
+			vertex.position.x *= -1.0f;
+			vertex.normal.x *= -1.0f;
+
+			modelData.vertices.push_back(vertex);
+		}
+
+		// インデックスの解析
+		for (uint32_t faceIndex = 0; faceIndex < mesh->mNumFaces; ++faceIndex) {
+			aiFace& face = mesh->mFaces[faceIndex];
+			assert(face.mNumIndices == 3); // 三角形のみサポート
+
 			for (uint32_t element = 0; element < face.mNumIndices; ++element) {
-				uint32_t vertexIndex = face.mIndices[element];
-				aiVector3D& position = mesh->mVertices[vertexIndex];
-
-				aiVector3D normal;
-				if (hasNormals) {
-					normal = mesh->mNormals[vertexIndex];
-				} else {
-					normal = computedFaceNormal; // 法線が無ければface法線を割り当て（flat shading）
-				}
-
-				aiVector3D texcoord;
-				if (hasTexcoords) {
-					texcoord = mesh->mTextureCoords[0][vertexIndex];
-				} else {
-					// UVが無ければ(0,0)を割り当て
-					texcoord = aiVector3D(0.0f, 0.0f, 0.0f);
-				}
-
-				VertexData vertex;
-				vertex.position = {position.x, position.y, position.z, 1.0f};
-				vertex.normal = {normal.x, normal.y, normal.z};
-				vertex.texcoord = {texcoord.x, texcoord.y};
-
-				// aiProcess_MaskLeftHandedはz*=-1で、右手->左手に変換するので手動で対処
-				vertex.position.x *= -1.0f;
-				vertex.normal.x *= -1.0f;
-				modelData.vertices.push_back(vertex);
+				// インデックスに頂点オフセットを加算して追加
+				modelData.indices.push_back(face.mIndices[element] + vertexOffset);
 			}
 		}
 	}
@@ -279,23 +259,22 @@ void Model::CreateVertexData() {
 }
 
 void Model::CreateIndexData() {
-	// 球のメッシュを生成
-	SphereMeshGenerator sphereMesh(16);
-	meshData_ = sphereMesh.GenerateMeshData();
-
-	indexCount_ = static_cast<uint32_t>(meshData_.indices.size());
+	// modelData_に格納されたインデックス配列のサイズを取得
+	indexCount_ = static_cast<uint32_t>(modelData_.indices.size());
 
 	// インデックスリソースの作成
 	indexResource_ = DirectXUtils::CreateBufferResource(modelCommon_->GetDxCommon()->GetDevice(), sizeof(uint32_t) * indexCount_);
+
 	// リソースの先頭のアドレスから使う
 	indexBufferView_.BufferLocation = indexResource_->GetGPUVirtualAddress();
-	// 使用するリソースのサイズは頂点6つ分のサイズ
+	// 使用するリソースのサイズ
 	indexBufferView_.SizeInBytes = sizeof(uint32_t) * indexCount_;
-	// 1頂点あたりのサイズ
+	// フォーマット
 	indexBufferView_.Format = DXGI_FORMAT_R32_UINT;
+
 	// 書き込むためのアドレスを取得
 	indexResource_->Map(0, nullptr, reinterpret_cast<void**>(&indexData_));
-	std::memcpy(indexData_, meshData_.vertices.data(), sizeof(uint32_t) * indexCount_);
+	std::memcpy(indexData_, modelData_.indices.data(), sizeof(uint32_t) * indexCount_);
 	indexResource_->Unmap(0, nullptr);
 }
 
