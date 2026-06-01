@@ -170,5 +170,7 @@ private:
 	// キーフレームアニメーション
 	std::unique_ptr<KeyframeAnimation> keyframeAnimation_;
 	KeyframeAnimation::Animation animation_;
+
+	Skeleton skeleton_;
 };
 } // namespace TinyEngine

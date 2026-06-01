@@ -1,6 +1,7 @@
 #include "Model.h"
 #include "DirectXUtils.h"
 #include "MathUtility.h"
+#include "MathOperator.h"
 #include "ModelCommon.h"
 #include "SphereMeshGenerator.h"
 #include "TextureManager.h"
@@ -35,6 +36,56 @@ void Model::Initialize(ModelCommon* modelCommon, TextureManager* textureManager,
 }
 
 void Model::Update() {}
+
+Skeleton Model::CreateSkeleton(const Node& rootNode) {
+	Skeleton skeleton;
+	skeleton.root = CreateJoint(rootNode, {}, skeleton.joints);
+
+	// 名前とindexのマッピングを行いアクセスしやすくする
+	for (const Joint& joint : skeleton.joints) {
+		skeleton.jointMap.emplace(joint.name, joint.index);
+	}
+
+	return skeleton;
+}
+
+int32_t Model::CreateJoint(const Node& node, const std::optional<int32_t>& parent, std::vector<Joint>& joints) {
+	Joint joint;
+	joint.name = node.name;
+	joint.localMatrix = node.localMatrix;
+	joint.skeletonSpaceMatrix = MathUtility::MakeIdentity4x4();
+	joint.transform = node.transform;
+	joint.index = int32_t(joints.size()); // 現在登録されてる数をIndexに
+	joint.parent = parent;
+
+	joints.push_back(joint); // SkeletonのJoint列に追加
+
+	for (const Node& child : node.children) {
+		// 子Jointを作成し、そのIndexを登録
+		int32_t childIndex = CreateJoint(child, joint.index, joints);
+
+		// joints.push_backによるメモリ再確保で参照が切れるのを防ぐため、
+		// 毎回現在のjoints[joint.index]からchildrenにアクセスして追加する
+		joints[joint.index].children.push_back(childIndex);
+	}
+
+	// 自身のIndexを返す
+	return joint.index;
+}
+
+void Model::UpdateSkeleton(Skeleton& skeleton) {
+	for (Joint& joint : skeleton.joints) {
+		// 現在のTransformからローカル行列を計算
+		joint.localMatrix = MathUtility::MakeAffineMatrix(joint.transform.scale, joint.transform.rotate, joint.transform.translate);
+
+		// 親がある場合は親の行列を掛け合わせ、無い場合は自身のローカル行列をそのまま代入
+		if (joint.parent) {
+			joint.skeletonSpaceMatrix = joint.localMatrix * skeleton.joints[*joint.parent].skeletonSpaceMatrix;
+		} else {
+			joint.skeletonSpaceMatrix = joint.localMatrix;
+		}
+	}
+}
 
 void Model::Draw() {
 	auto commandList = modelCommon_->GetDxCommon()->GetCommandList();
@@ -250,19 +301,30 @@ void Model::CreateIndexData() {
 
 Node Model::ReadNode(aiNode* node) {
 	Node result;
-	aiMatrix4x4 aiLocalMatrix = node->mTransformation; // nodeのlocalMatrixを取得
-	aiLocalMatrix.Transpose();                         // 別ベクトル形式を行ベクトル形式に転置
 
-	for (int row = 0; row < 4; ++row) {
-		for (int col = 0; col < 4; ++col) {
-			result.localMatrix.m[row][col] = aiLocalMatrix[row][col];
-		}
-	}
+	// Assimp行列を取得
+	aiMatrix4x4 aiLocalMatrix = node->mTransformation;
 
-	result.name = node->mName.C_Str();          // Node名を格納
-	result.children.resize(node->mNumChildren); // 子供の数だけ確保
+	// SRT分解
+	aiVector3D scale, translate;
+	aiQuaternion rotate;
+	aiLocalMatrix.Decompose(scale, rotate, translate);
+
+	// 座標系変換 右手→左手
+	result.transform.scale = {scale.x, scale.y, scale.z};
+
+	result.transform.rotate = {-rotate.x, -rotate.y, rotate.z, rotate.w};
+
+	result.transform.translate = {translate.x, translate.y, -translate.z};
+
+	// ローカル行列を再構築
+	result.localMatrix = MathUtility::MakeAffineMatrix(result.transform.scale, result.transform.rotate, result.transform.translate);
+
+	// 名前と子ノード
+	result.name = node->mName.C_Str();
+	result.children.resize(node->mNumChildren);
+
 	for (uint32_t childIndex = 0; childIndex < node->mNumChildren; ++childIndex) {
-		// 再帰的に読んで階層構造を作っていく
 		result.children[childIndex] = ReadNode(node->mChildren[childIndex]);
 	}
 

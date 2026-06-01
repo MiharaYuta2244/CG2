@@ -89,6 +89,10 @@ void Object3d::Update() {
 		transformMatrixData_->World = modelData_.rootNode.localMatrix * worldMatrix_;
 	}
 
+	if (model_) {
+		model_->UpdateSkeleton(skeleton_);
+	}
+
 	// 非均一スケールに対応した逆転置行列の計算
 	// 3x3部分を抽出して逆行列を計算し、転置する
 	Matrix4x4 worldInverseTranspose = MathUtility::MakeIdentity4x4();
@@ -206,6 +210,8 @@ void Object3d::SetModel(const std::string& filePath) {
 	// モデルが正常に読み込まれた場合、modelDataをコピー
 	if (model_) {
 		modelData_ = model_->GetModelData();
+
+		skeleton_ = model_->CreateSkeleton(modelData_.rootNode);
 	}
 }
 

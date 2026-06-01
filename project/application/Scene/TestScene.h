@@ -21,4 +21,10 @@ private:
 	std::vector<std::unique_ptr<ObjectRender>> sceneObjects;
 
 	std::unique_ptr<ObjectRender> plane_;
+
+	std::unique_ptr<ObjectRender> walk_;
+	std::unique_ptr<ObjectRender> sneakWalk_;
+
+	Transform walkTransform_{};
+	Transform sneakWalkTransform_{};
 };

@@ -14,6 +14,22 @@
 
 class TextureManager;
 
+struct Joint {
+    QuaternionTransform transform;
+    Matrix4x4 localMatrix;
+    Matrix4x4 skeletonSpaceMatrix; // 親の行列を乗算したグローバル行列
+    std::string name;
+    std::vector<int32_t> children;
+    int32_t index;
+    std::optional<int32_t> parent;
+};
+
+struct Skeleton {
+    int32_t root;
+    std::map<std::string, int32_t> jointMap; // 名前からインデックスを引くマップ
+    std::vector<Joint> joints;
+};
+
 /// <summary>
 /// モデルクラス
 /// </summary>
@@ -30,6 +46,12 @@ public:
 
 	// Getter
 	const ModelData& GetModelData() const { return modelData_; }
+
+	Skeleton CreateSkeleton(const Node& rootNode);
+
+	int32_t CreateJoint(const Node& node, const std::optional<int32_t>& parent, std::vector<Joint>& joints);
+
+	void UpdateSkeleton(Skeleton& skeleton);
 
 private:
 	/// <summary>
