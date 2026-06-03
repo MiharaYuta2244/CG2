@@ -13,11 +13,17 @@ void TestScene::Initialize(const SceneContext& ctx) {
 	plane_ = std::make_unique<ObjectRender>();
 	plane_->Initialize(ctx.engineContext, "plane.obj");
 
+	KeyframeAnimation keyframeAnimation;
+
 	walk_ = std::make_unique<ObjectRender>();
 	walk_->Initialize(ctx.engineContext, "walk.gltf");
+	Animation walkAnimation = keyframeAnimation.LoadAnimationFile("walk.gltf");
+	walk_->GetObject3d()->PlayAnimation(walkAnimation);
 
 	sneakWalk_ = std::make_unique<ObjectRender>();
 	sneakWalk_->Initialize(ctx.engineContext, "sneakWalk.gltf");
+	Animation sneakWalkAnimation = keyframeAnimation.LoadAnimationFile("sneakWalk.gltf");
+	sneakWalk_->GetObject3d()->PlayAnimation(sneakWalkAnimation);
 
 	walkTransform_.scale = {500, 500, 500};
 	walkTransform_.rotate = {std::numbers::pi_v<float> / 2.0f, std::numbers::pi_v<float>, 0};

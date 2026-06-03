@@ -90,6 +90,18 @@ void Object3d::Update() {
 	}
 
 	if (model_) {
+		// アニメーションが再生されている場合、時間を進めてスケルトンに適用する
+		if (isAnimating_) {
+			animationTimer_ += elapsedTime;
+
+			// アニメーションの最大時間を超えたら最初からループさせる
+			animationTimer_ = std::fmod(animationTimer_, animation_.duration);
+
+			// Skeletonの各JointのTransformをアニメーションの補間値で更新
+			model_->ApplyAnimation(skeleton_, animation_, animationTimer_);
+		}
+
+		// 上書きされたTransformを使って、各骨のローカル行列とグローバル行列を再計算
 		model_->UpdateSkeleton(skeleton_);
 	}
 
@@ -201,6 +213,12 @@ void TinyEngine::Object3d::DrawGizmo(const Matrix4x4& viewMatrix, const Matrix4x
 		transform_.scale = {scale[0], scale[1], scale[2]};
 	}
 #endif // USE_IMGUI
+}
+
+void TinyEngine::Object3d::PlayAnimation(const Animation& animation) {
+	animation_ = animation;
+	animationTimer_ = 0.0f;
+	isAnimating_ = true;
 }
 
 void Object3d::SetModel(const std::string& filePath) {

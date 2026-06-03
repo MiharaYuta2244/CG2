@@ -5,34 +5,33 @@
 #include <ModelData.h>
 #include <cassert>
 
+template<typename tValue> struct Keyframe {
+	float time;
+	tValue value;
+};
+
+using KeyframeVector3 = Keyframe<Vector3>;
+using KeyframeQuaternion = Keyframe<Quaternion>;
+
+struct NodeAnimation {
+	std::vector<KeyframeVector3> translate;
+	std::vector<KeyframeQuaternion> rotate;
+	std::vector<KeyframeVector3> scale;
+};
+
+template<typename tValue> struct AnimationCurve {
+	std::vector<Keyframe<tValue>> keyframes;
+};
+
+struct Animation {
+	float duration;                                      // アニメーション全体の尺
+	std::map<std::string, NodeAnimation> nodeAnimations; // NodeAnimationの集合。Node名でひけるようにしておく
+};
+
 /// <summary>
 /// アニメーションクラス
 /// </summary>
 class KeyframeAnimation {
-public:
-	template<typename tValue> struct Keyframe {
-		float time;
-		tValue value;
-	};
-
-	using KeyframeVector3 = Keyframe<Vector3>;
-	using KeyframeQuaternion = Keyframe<Quaternion>;
-
-	struct NodeAnimation {
-		std::vector<KeyframeVector3> translate;
-		std::vector<KeyframeQuaternion> rotate;
-		std::vector<KeyframeVector3> scale;
-	};
-
-	template<typename tValue> struct AnimationCurve {
-		std::vector<Keyframe<tValue>> keyframes;
-	};
-
-	struct Animation {
-		float duration;                                      // アニメーション全体の尺
-		std::map<std::string, NodeAnimation> nodeAnimations; // NodeAnimationの集合。Node名でひけるようにしておく
-	};
-
 public:
 	// アニメーション解析
 	Animation LoadAnimationFile(const std::string& filename);
@@ -40,10 +39,10 @@ public:
 	// アニメーションの更新
 	Matrix4x4 UpdateAnimation(float deltaTime, Animation* animation, ModelData* modelData);
 
-private:
+public:
 	// 任意の時刻の値を取得する
 	template<typename tValue, typename keyframeType> 
-	tValue CalculateValue(const std::vector<keyframeType>& keyframes, float time) {
+	static tValue CalculateValue(const std::vector<keyframeType>& keyframes, float time) {
 		assert(!keyframes.empty()); 
 		if (keyframes.size() == 1 || time <= keyframes[0].time) { return keyframes[0].value; }
 

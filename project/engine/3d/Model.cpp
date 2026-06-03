@@ -86,6 +86,20 @@ void Model::UpdateSkeleton(Skeleton& skeleton) {
 	}
 }
 
+void Model::ApplyAnimation(Skeleton& skeleton, const Animation& animation, float animationTime) {
+	for (Joint& joint : skeleton.joints) {
+		// アニメーションデータの中に、このJointの名前と一致するNodeAnimationがあるか探す
+		if (auto it = animation.nodeAnimations.find(joint.name); it != animation.nodeAnimations.end()) {
+			const NodeAnimation& rootNodeAnimation = it->second;
+
+			// Translate, Rotate, Scale の各キーフレームの補間値を計算して、JointのTransformを上書きする
+			joint.transform.translate = KeyframeAnimation::CalculateValue<Vector3, KeyframeVector3>(rootNodeAnimation.translate, animationTime);
+			joint.transform.rotate = KeyframeAnimation::CalculateValue<Quaternion, KeyframeQuaternion>(rootNodeAnimation.rotate, animationTime);
+			joint.transform.scale = KeyframeAnimation::CalculateValue<Vector3, KeyframeVector3>(rootNodeAnimation.scale, animationTime);
+		}
+	}
+}
+
 void Model::Draw() {
 	auto commandList = modelCommon_->GetDxCommon()->GetCommandList();
 

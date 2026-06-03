@@ -3,7 +3,7 @@
 #include <assimp/postprocess.h>
 #include <assimp/scene.h>
 
-KeyframeAnimation::Animation KeyframeAnimation::LoadAnimationFile(const std::string& filename) {
+Animation KeyframeAnimation::LoadAnimationFile(const std::string& filename) {
 	Animation animation;
 	Assimp::Importer importer;
 	std::string fullpath = "resources/models/" + filename;

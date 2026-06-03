@@ -6,6 +6,7 @@
 #include "ModelCommon.h"
 #include "MeshData.h"
 #include "Node.h"
+#include "KeyframeAnimation.h"
 #include <d3d12.h>
 #include <string>
 #include <vector>
@@ -51,6 +52,8 @@ public:
 	int32_t CreateJoint(const Node& node, const std::optional<int32_t>& parent, std::vector<Joint>& joints);
 
 	void UpdateSkeleton(Skeleton& skeleton);
+
+	void ApplyAnimation(Skeleton& skeleton, const Animation& animation, float animationTime);
 
 private:
 	/// <summary>

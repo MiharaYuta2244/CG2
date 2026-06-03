@@ -46,6 +46,12 @@ public:
 	/// <param name="mode">扱う座標系</param>
 	void DrawGizmo(const Matrix4x4& viewMatrix, const Matrix4x4& projectionMatrix, ImGuizmo::OPERATION operation, ImGuizmo::MODE mode);
 
+	/// <summary>
+	/// アニメーションをセットして再生を開始する関数
+	/// </summary>
+	/// <param name="animation">アニメーション</param>
+	void PlayAnimation(const Animation& animation);
+
 	// setter
 	void SetModel(const std::string& filePath);
 	void SetEnableFoging(const bool enableFoging) { material_.enableFoging = enableFoging; }
@@ -169,8 +175,10 @@ private:
 
 	// キーフレームアニメーション
 	std::unique_ptr<KeyframeAnimation> keyframeAnimation_;
-	KeyframeAnimation::Animation animation_;
 
-	Skeleton skeleton_;
+	Skeleton skeleton_;           // スケルトンデータ
+	Animation animation_;         // 再生中のアニメーションデータ
+	float animationTimer_ = 0.0f; // アニメーションの経過時間
+	bool isAnimating_ = false;    // 再生中フラグ
 };
 } // namespace TinyEngine
