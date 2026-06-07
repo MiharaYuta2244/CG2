@@ -216,6 +216,12 @@ void GamePlayScene::Update() {
 
 	if (ctx_.keyboard->KeyTriggered(DIK_F2)) {
 		isDebugCameraActive_ = !isDebugCameraActive_;
+
+		if (isDebugCameraActive_) {
+			ctx_.currentCamera->SetTranslation({0.0f, 250.0f, 0.0f});
+		} else {
+			ctx_.currentCamera->SetTranslation({0.0f, 60.0f, 0.0f});
+		}
 	}
 #endif // _DEBUG
 }

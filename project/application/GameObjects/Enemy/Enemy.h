@@ -35,6 +35,12 @@ public:
 	// 敵の座標Setter
 	void SetPos(Vector3 pos) { transform_.translate = pos; }
 
+	// 敵の回転Getter
+	Vector3& GetRotate() { return transform_.rotate; }
+
+	// 敵の回転Setter
+	void SetRotate(Vector3 rot) { transform_.rotate = rot; }
+
 	void SetEnableMove(bool enableMove) { enableMove_ = enableMove; }
 
 	// ノックバックを始める

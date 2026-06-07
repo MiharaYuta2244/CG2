@@ -1,6 +1,7 @@
 #pragma once
 #include "Wall.h"
 #include <list>
+#include <string>
 
 /// <summary>
 /// 壁オブジェクト管理クラス
@@ -23,15 +24,15 @@ public:
 	const std::list<std::unique_ptr<Wall>>& GetWalls() const { return walls_; }
 
 private:
-	// CSV読み込み
-	void LoadFromCSV(const std::string& filepath);
+	// Json読み込み
+	void LoadFromJson(const std::string& filepath);
 
-	// CSV書き込み
-	void WriteToCSV(const std::string& filepath);
+	// Json書き込み
+	void SaveToJson(const std::string& filepath);
 
 private:
 	EngineContext* ctx_ = nullptr;
-	std::string csvPath_;
+	std::string jsonPath_;
 
 	// 壁オブジェクトのリスト
 	std::list<std::unique_ptr<Wall>> walls_;

@@ -1,7 +1,6 @@
 #include "EnemyManager.h"
-#include <fstream>
+#include "JsonManager.h"
 #include <iostream>
-#include <sstream>
 
 #ifdef USE_IMGUI
 #include "ImGuiManager.h"
@@ -10,9 +9,9 @@
 void EnemyManager::Initialize(EngineContext* ctx) {
 	ctx_ = ctx;
 
-	// CSV読み込み
-	csvPath_ = "resources/csv/Enemies.csv";
-	LoadFromCSV(csvPath_);
+	// JSON読み込み
+	jsonPath_ = "Enemies.json";
+	LoadFromJson(jsonPath_);
 }
 
 void EnemyManager::Update(float deltaTime, Player* player, EnemyBulletManager* enemyBulletManager, WallManager* wallManager) {
@@ -47,14 +46,14 @@ void EnemyManager::DrawImGui() {
 	if (ImGui::Button("Add Enemy")) {
 		auto newEnemy = std::make_unique<Enemy>();
 		newEnemy->Initialize(ctx_, {0.0f, 0.0f, 0.0f});
-		// デフォルト出現位置などを設定可能
 		newEnemy->SetPos({0.0f, 0.0f, 0.0f});
+		newEnemy->SetRotate({0.0f, 0.0f, 0.0f});
 		enemies_.push_back(std::move(newEnemy));
 	}
 
-	// CSV保存ボタン
-	if (ImGui::Button("Save CSV")) {
-		SaveToCSV(csvPath_);
+	// JSON保存ボタン
+	if (ImGui::Button("Save JSON")) {
+		SaveToJson(jsonPath_);
 	}
 
 	ImGui::Separator();
@@ -67,15 +66,22 @@ void EnemyManager::DrawImGui() {
 		std::string header = "Enemy " + std::to_string(index);
 
 		if (ImGui::CollapsingHeader(header.c_str(), ImGuiTreeNodeFlags_DefaultOpen)) {
-			// 座標の変更
+
+			// --- Position ---
 			Vector3& pos = enemy->GetPos();
 			ImGui::DragFloat3("Position", &pos.x, 0.1f);
+
+			// --- Rotation ---
+			Vector3 rot = enemy->GetRotate();
+			if (ImGui::DragFloat3("Rotation (deg)", &rot.x, 0.5f)) {
+				enemy->SetRotate(rot);
+			}
 
 			// 敵の削除ボタン
 			if (ImGui::Button("Delete")) {
 				it = enemies_.erase(it);
 				ImGui::PopID();
-				continue; // eraseした場合はイテレータが進むので次へ
+				continue;
 			}
 		}
 
@@ -88,61 +94,32 @@ void EnemyManager::DrawImGui() {
 #endif
 }
 
-void EnemyManager::LoadFromCSV(const std::string& filepath) {
-	std::ifstream file(filepath);
-	if (!file.is_open()) {
-		std::cerr << "Failed to open CSV: " << filepath << std::endl;
-		return;
-	}
-
+void EnemyManager::LoadFromJson(const std::string& filepath) {
 	enemies_.clear();
 
-	std::string line;
-	while (std::getline(file, line)) {
-		// コメント行 or 空行はスキップ
-		if (line.empty() || line[0] == '#')
-			continue;
-
-		std::stringstream ss(line);
-		std::string item;
-
-		float posX, posZ;
-
-		// posX
-		std::getline(ss, item, ',');
-		posX = std::stof(item);
-
-		// posZ
-		std::getline(ss, item, ',');
-		posZ = std::stof(item);
-
-		Vector3 pos = {posX, 0.0f, posZ};
-
-		// 敵生成
-		auto enemy = std::make_unique<Enemy>();
-		enemy->Initialize(ctx_, pos);
-
-		enemies_.push_back(std::move(enemy));
-	}
-
-	file.close();
-}
-
-void EnemyManager::SaveToCSV(const std::string& filepath) {
-	std::ofstream file(filepath);
-	if (!file.is_open()) {
-		std::cerr << "Failed to save CSV: " << filepath << std::endl;
+	std::vector<EnemyData> enemyDatas;
+	if (!JsonManager::Load(filepath, enemyDatas)) {
 		return;
 	}
 
-	// コメント行
-	file << "# posX, posZ\n";
+	for (const auto& data : enemyDatas) {
+		auto enemy = std::make_unique<Enemy>();
+		enemy->Initialize(ctx_, data.pos);
+		enemy->SetPos(data.pos);
+		enemy->SetRotate(data.rot);
+		enemies_.push_back(std::move(enemy));
+	}
+}
+
+void EnemyManager::SaveToJson(const std::string& filepath) {
+	std::vector<EnemyData> enemyDatas;
 
 	for (auto& enemy : enemies_) {
-		Vector3 pos = enemy->GetPos();
-		file << pos.x << "," << pos.z << "\n";
+		EnemyData data;
+		data.pos = enemy->GetPos();
+		data.rot = enemy->GetRotate();
+		enemyDatas.push_back(data);
 	}
 
-	file.close();
-	std::cout << "Saved Enemy CSV: " << filepath << std::endl;
+	JsonManager::Save(filepath, enemyDatas);
 }

@@ -1,14 +1,13 @@
 #include "WallManager.h"
-#include <fstream>
+#include "JsonManager.h"
 #include <iostream>
-#include <sstream>
 
 void WallManager::Initialize(EngineContext* ctx) {
 	ctx_ = ctx;
 
-	// CSV読み込み
-	csvPath_ = "resources/csv/Walls.csv";
-	LoadFromCSV(csvPath_);
+	// JSON読み込み
+	jsonPath_ = "Walls.json";
+	LoadFromJson(jsonPath_);
 }
 
 void WallManager::Update() {
@@ -71,79 +70,39 @@ void WallManager::DrawImGui() {
 		walls_.push_back(std::move(wall));
 	}
 
-	// CSV保存
-	if (ImGui::Button("Save CSV")) {
-		WriteToCSV(csvPath_);
+	// JSON保存ボタンに変更
+	if (ImGui::Button("Save JSON")) {
+		SaveToJson(jsonPath_);
 	}
 
 	ImGui::End();
 #endif
 }
 
-
-void WallManager::LoadFromCSV(const std::string& filepath) {
-	std::ifstream file(filepath);
-	if (!file.is_open()) {
-		std::cerr << "Failed to open CSV: " << filepath << std::endl;
-		return;
-	}
-
+void WallManager::LoadFromJson(const std::string& filepath) {
 	walls_.clear();
 
-	std::string line;
-	while (std::getline(file, line)) {
-		// コメント行 or 空行はスキップ
-		if (line.empty() || line[0] == '#')
-			continue;
-
-		std::stringstream ss(line);
-		std::string item;
-
-		float width, depth, centerX, centerZ;
-
-		// width
-		std::getline(ss, item, ',');
-		width = std::stof(item);
-
-		// depth
-		std::getline(ss, item, ',');
-		depth = std::stof(item);
-
-		// centerX
-		std::getline(ss, item, ',');
-		centerX = std::stof(item);
-
-		// centerZ
-		std::getline(ss, item, ',');
-		centerZ = std::stof(item);
-
-		WallStatus wallStatus = {width, depth, centerX, centerZ};
-
-		// Wall生成
-		auto wall = std::make_unique<Wall>();
-		wall->Initialize(ctx_, wallStatus);
-
-		walls_.push_back(std::move(wall));
-	}
-
-	file.close();
-}
-
-void WallManager::WriteToCSV(const std::string& filepath) {
-	std::ofstream file(filepath);
-	if (!file.is_open()) {
-		std::cerr << "Failed to write CSV: " << filepath << std::endl;
+	// JSONからWallStatusの配列として読み込む
+	std::vector<WallStatus> wallDataList;
+	if (!JsonManager::Load(filepath, wallDataList)) {
 		return;
 	}
 
-	// ヘッダー
-	file << "# width,depth,centerX,centerZ\n";
+	// 読み込んだステータスからWallを生成
+	for (const auto& s : wallDataList) {
+		auto wall = std::make_unique<Wall>();
+		wall->Initialize(ctx_, s);
+		walls_.push_back(std::move(wall));
+	}
+}
 
+void WallManager::SaveToJson(const std::string& filepath) {
+	// 現在ある壁のステータスリストを作成
+	std::vector<WallStatus> wallDataList;
 	for (auto& wall : walls_) {
-		const WallStatus& s = wall->GetWallStatus();
-
-		file << s.width << "," << s.depth << "," << s.centerX << "," << s.centerZ << "\n";
+		wallDataList.push_back(wall->GetWallStatus());
 	}
 
-	file.close();
+	// JSONファイルへ保存
+	JsonManager::Save(filepath, wallDataList);
 }
