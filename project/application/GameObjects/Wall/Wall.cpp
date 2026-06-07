@@ -10,6 +10,7 @@ void Wall::Initialize(EngineContext* ctx, WallStatus wallStatus) {
 	render_ = std::make_unique<ObjectRender>();
 	render_->Initialize(ctx, "Cube.obj");
 	render_->SetTransform(transform_);
+	render_->SetColor(color_);
 }
 
 void Wall::Update() {

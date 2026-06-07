@@ -212,6 +212,12 @@ public:
 
 	static Vector3 DegreeToRadian(const Vector3& degrees);
 
+	static float LerpAngle(float current, float target, float t);
+
+	static float LengthSquared(const Vector3& v);
+
+    static float LengthSquared(const Vector2& v);
+
 public:
 	static constexpr float pi_ = static_cast<float>(std::numbers::pi);
 };

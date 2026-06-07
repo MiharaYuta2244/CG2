@@ -36,6 +36,7 @@ private:
 	Transform transform_;
 	AABB collision_; // 当たり判定
 	WallStatus wallStatus_;
+	Vector4 color_ = {1, 1, 1, 1};
 
 	std::unique_ptr<ObjectRender> render_; // 描画用インスタンス
 };

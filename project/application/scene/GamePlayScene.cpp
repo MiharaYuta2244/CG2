@@ -215,18 +215,12 @@ void GamePlayScene::Update() {
 	}
 
 	if (ctx_.keyboard->KeyTriggered(DIK_F2)) {
-		ctx_.currentCamera = debugCamera_.get();
-		ctx_.engineContext->object3dCommon->SetDefaultCamera(ctx_.currentCamera);
-		ctx_.engineContext->particleCommon->SetDefaultCamera(ctx_.currentCamera);
-		isDebugCameraActive_ = true;
+		isDebugCameraActive_ = !isDebugCameraActive_;
 	}
 #endif // _DEBUG
 }
 
 void GamePlayScene::Draw() {
-	// スカイボックス描画
-	// skybox_->Draw();
-
 	// プレイヤーの描画処理
 	player_->Draw();
 

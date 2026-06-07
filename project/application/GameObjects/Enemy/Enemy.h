@@ -3,6 +3,7 @@
 #include "AnimationBundle.h"
 #include "EnemyAI.h"
 #include "GameObjects/ObjectRender/ObjectRender.h"
+#include "VisonCone.h"
 
 class EnemyBulletManager;
 class Player;
@@ -62,8 +63,9 @@ private:
 	// ノックバックの強さ
 	float knockBackPower_ = 10.0f;
 
-	std::unique_ptr<ObjectRender> render_;           // 描画用インスタンス
-	std::unique_ptr<EnemyAI> ai_;                    // AI
+	std::unique_ptr<ObjectRender> render_;  // 描画用インスタンス
+	std::unique_ptr<EnemyAI> ai_;           // AI
+	std::unique_ptr<TinyEngine::VisionCone> visionCone_; // 視界
 
 	EngineContext* ctx_ = nullptr;
 };

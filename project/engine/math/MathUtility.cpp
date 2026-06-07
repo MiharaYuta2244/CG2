@@ -603,3 +603,24 @@ Vector3 MathUtility::DegreeToRadian(const Vector3& degrees) {
 	result.z = degrees.z * std::numbers::pi_v<float> / 180.0f;
 	return result;
 }
+
+float MathUtility::LerpAngle(float current, float target, float t) {
+	float diff = target - current;
+
+	const float kPi = std::numbers::pi_v<float>;
+	const float kTwoPi = kPi * 2.0f;
+
+	while (diff < -kPi)
+		diff += kTwoPi;
+	while (diff > kPi)
+		diff -= kTwoPi;
+
+	// 補間
+	float result = current + diff * t;
+
+	return result;
+}
+
+float MathUtility::LengthSquared(const Vector3& v) { return v.x * v.x + v.y * v.y + v.z * v.z; }
+
+float MathUtility::LengthSquared(const Vector2& v) { return v.x * v.x + v.y * v.y; }

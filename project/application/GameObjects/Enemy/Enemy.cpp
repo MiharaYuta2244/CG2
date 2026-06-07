@@ -18,6 +18,11 @@ void Enemy::Initialize(EngineContext* ctx, Vector3 pos) {
 	// AIインスタンス生成&初期化
 	ai_ = std::make_unique<EnemyAI>();
 	ai_->Initialize(&transform_, ctx);
+
+	// 視界インスタンス生成&初期化
+	visionCone_ = std::make_unique<VisionCone>();
+	Visionparam param = ai_->GetVisionParam();
+	visionCone_->Initialize(ctx, param.radius, param.angle);
 }
 
 void Enemy::Update(float deltaTime, Player* player, EnemyBulletManager* enemyBulletManager, WallManager* wallManager) {
@@ -30,6 +35,20 @@ void Enemy::Update(float deltaTime, Player* player, EnemyBulletManager* enemyBul
 		ai_->Update(deltaTime, player, enemyBulletManager, wallManager);
 	}
 
+	// AIの状態を取得して色を変える
+	if (ai_->GetState() == EnemyAI::State::Vigilance) {
+		// 警戒状態なら赤色
+		visionCone_->SetColor({1.0f, 0.0f, 0.0f, 0.3f});
+	} else {
+		// 通常状態なら緑色
+		visionCone_->SetColor({0.0f, 1.0f, 0.0f, 0.3f});
+	}
+
+	// 視界
+	visionCone_->SetTranslate(transform_.translate);
+	visionCone_->SetRotate(transform_.rotate);
+	visionCone_->Update();
+
 	if (knockBackAnim_.anim.GetIsActive()) {
 		knockBackAnim_.anim.Update(deltaTime, knockBackAnim_.temp);
 		transform_.translate = knockBackAnim_.temp;
@@ -37,11 +56,6 @@ void Enemy::Update(float deltaTime, Player* player, EnemyBulletManager* enemyBul
 
 	// 当たり判定更新　衝突判定用
 	UpdateCollision();
-
-#ifdef _DEBUG
-	// 状態遷移確認用
-	render_->SetColor(ai_->GetColor());
-#endif
 }
 
 void Enemy::PostUpdate() {
@@ -56,6 +70,9 @@ void Enemy::Draw() {
 	if (!isDead_) {
 		// 描画
 		render_->Draw();
+
+		// 視界
+		visionCone_->Draw();
 	}
 }
 
