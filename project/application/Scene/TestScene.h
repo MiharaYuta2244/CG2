@@ -1,6 +1,7 @@
 #pragma once
 #include "BaseScene.h"
 #include "GameObjects/ObjectRender/ObjectRender.h"
+#include "Particle.h"
 
 class TestScene : public BaseScene {
 public:
@@ -27,4 +28,6 @@ private:
 
 	Transform walkTransform_{};
 	Transform sneakWalkTransform_{};
+
+	std::vector<std::unique_ptr<TinyEngine::Particle>> particles_;
 };

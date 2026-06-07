@@ -43,6 +43,38 @@ void TestScene::Update() {
 	walk_->Update(walkTransform_);
 	sneakWalk_->Update(sneakWalkTransform_);
 
+	if(ctx_.keyboard->KeyTriggered(DIK_SPACE)){
+		std::unique_ptr<TinyEngine::Particle> particle = std::make_unique<TinyEngine::Particle>();
+
+		// UVスクロール速度とエフェクトの色
+		Vector2 scrollSpeed = {1.0f, 0.0f};
+		Vector4 effectColor = {0.0f, 1.0f, 1.0f, 1.0f};
+
+		// モジュールの生成 (自分自身のポインタを渡す)
+		auto module = std::make_unique<UVScrollModule>(scrollSpeed, effectColor);
+
+		// 発生位置を設定
+		Vector3 spawnPos = {0.0f, 0.0f, 0.0f};
+
+		// 初期化にモジュールとカスタムエミッタを渡す
+		particle->Initialize(ctx_.engineContext, spawnPos, "gradationLine.png", std::move(module), nullptr, TinyEngine::ParticleMeshType::Cylinder);
+
+		particle->SetAlphaCutoff(0.5f);
+
+		// ループ発生を無効にする
+		particle->SetEmitMode(false);
+
+		particles_.push_back(std::move(particle));
+	}
+
+	for(auto& particle : particles_){
+		particle->Update();
+	}
+
+	std::erase_if(particles_, [this](const std::unique_ptr<TinyEngine::Particle>& p) {
+		return p->IsFinished();
+	});
+
 #ifdef USE_IMGUI
 	ImGui::Begin("transform");
 	ImGui::DragFloat3("walkScale", &walkTransform_.scale.x, 1.0f);
@@ -62,8 +94,12 @@ void TestScene::Draw() {
 	}*/
 
 	// plane_->Draw();
-	walk_->Draw();
-	sneakWalk_->Draw();
+	//walk_->Draw();
+	//sneakWalk_->Draw();
+
+	for (auto& particle : particles_) {
+		particle->Draw();
+	}
 }
 
 void TestScene::Finalize() {}

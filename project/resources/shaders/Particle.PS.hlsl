@@ -3,10 +3,9 @@
 struct Material
 {
     float4 color;
-    int enableLighting;
     float4x4 uvTransform;
-    float shininess;
-    int enableFoging;
+    float alphaCutoff;
+    float3 padding;
 };
 
 struct PixelShaderOutput
@@ -20,10 +19,15 @@ SamplerState gSampler : register(s0);
 
 PixelShaderOutput main(VertexShaderOutput input)
 {
-    float4 transformedUV = mul(float32_t4(input.texcoord, 0.0f, 1.0f), gMaterial.uvTransform);
+    float4 transformedUV = mul(float4(input.texcoord, 0.0f, 1.0f), gMaterial.uvTransform);
     float4 textureColor = gTexture.Sample(gSampler, transformedUV.xy);
     
-    PixelShaderOutput output;
+    if (textureColor.a <= gMaterial.alphaCutoff)
+    {
+        discard;
+    }
+    
+    PixelShaderOutput output;   
     output.color = gMaterial.color * textureColor * input.color;
     
     return output;

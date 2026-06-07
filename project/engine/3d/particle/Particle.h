@@ -1,37 +1,33 @@
 #pragma once
 #include "AABB.h"
-#include "CameraForGPU.h"
 #include "DebugCamera.h"
-#include "TimeManager.h"
-#include "DirectionalLight.h"
 #include "EngineContext.h"
-#include "FogParam.h"
-#include "Material.h"
-#include "MaterialData.h"
 #include "ModelData.h"
-#include "ModelManager.h"
 #include "ParticleForGPU.h"
 #include "ParticleModule.h"
 #include "ParticleState.h"
-#include "TimeParam.h"
+#include "TimeManager.h"
 #include "Transform.h"
-#include "TransformationMatrix.h"
 #include "VertexData.h"
-#include "modules/DustModule.h"
-#include "modules/RadialRingModule.h"
-#include "modules/RisingModule.h"
-#include "modules/ShockWaveModule.h"
+#include "modules/ParticleModuleHeader.h"
 #include <d3d12.h>
 #include <memory>
 #include <string>
 #include <unordered_map>
-#include <vector>
 #include <wrl.h>
+
+struct ParticleMaterial {
+	Vector4 color;
+	Matrix4x4 uvTransform;
+	float alphaCutoff;
+	float padding[3];
+};
 
 namespace TinyEngine {
 enum class ParticleMeshType {
-	Square, // 従来の矩形
-	Ring    // リング
+	Square,   // 従来の矩形
+	Ring,     // リング
+	Cylinder, // シリンダー
 };
 
 /// <summary>
@@ -76,7 +72,6 @@ public:
 	void Draw();
 
 	// setter
-	void SetModel(const std::string& filePath);
 	void SetColor(Vector4 color) { materialData_->color = color; }
 	void SetWorldMatrix(Matrix4x4 worldMatrix) { worldMatrix_ = worldMatrix; }
 	void SetCamera(Camera* camera) { camera_ = camera; }
@@ -96,10 +91,16 @@ public:
 	void SetEmitterForModule(const std::string& moduleName, const Emitter& emitter);
 	bool HasModuleEmitter(const std::string& moduleName) const;
 
+	// discard閾値設定
+	void SetAlphaCutoff(float cutoff) {
+		material_.alphaCutoff = cutoff;
+		materialData_->alphaCutoff = cutoff;
+	}
+
 	// getter
 	Vector4& GetColor() { return material_.color; }
 	Matrix4x4& GetWorldMatrix() { return worldMatrix_; }
-	Material& GetMaterial() { return material_; }
+	ParticleMaterial& GetMaterial() { return material_; }
 	bool IsFinished() const { return isFinished_; }
 
 private:
@@ -108,6 +109,9 @@ private:
 
 	// リング状モデルの作成
 	ModelData CreateRingPrimitive(const std::string& texturePath, float innerRadius = 0.2f, float outerRadius = 1.0f, uint32_t segments = 32);
+
+	// シリンダーモデルの作成
+	ModelData CreateCylinderPrimitive(const std::string& texturePath, float topRadius = 1.0f, float bottomRadius = 1.0f, float height = 3.0f, uint32_t segments = 32);
 
 	// 頂点データの初期化
 	void CreateVertexData();
@@ -160,7 +164,7 @@ private:
 	D3D12_INDEX_BUFFER_VIEW indexBufferView_;
 
 	// データ変更用の変数
-	Material material_;
+	ParticleMaterial material_;
 	Matrix4x4 worldMatrix_;
 
 	// 描画する数
@@ -187,7 +191,7 @@ private:
 
 	// Resourceにデータを書き込むためのポインタ
 	VertexData* vertexData_ = nullptr;
-	Material* materialData_ = nullptr;
+	ParticleMaterial* materialData_ = nullptr;
 	ParticleForGPU* instancingData_ = nullptr;
 
 	D3D12_CPU_DESCRIPTOR_HANDLE instancingSrvHandleCPU_;

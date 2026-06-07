@@ -269,6 +269,7 @@ copy "$(windowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="engine\3d\skybox\Skybox.cpp" />
     <ClCompile Include="engine\base\RenderTexture.cpp" />
     <ClCompile Include="application\Scene\TestScene.cpp" />
+    <ClCompile Include="engine\3d\particle\modules\UVScrollModule.cpp" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="resources\shaders\Object3d.PS.hlsl">
@@ -337,6 +338,7 @@ copy "$(windowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     </FxCompile>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="engine\3d\particle\modules\ParticleModuleHeader.h" />
     <ClInclude Include="engine\Animation\KeyframeAnimation.h" />
     <ClInclude Include="application\GameObjects\Enemy\Enemy.h" />
     <ClInclude Include="application\GameObjects\Enemy\EnemyAI.h" />
@@ -464,6 +466,7 @@ copy "$(windowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="engine\base\RenderTexture.h" />
     <ClInclude Include="engine\tool\LevelDataLoader\LevelDataLoader.h" />
     <ClInclude Include="application\Scene\TestScene.h" />
+    <ClInclude Include="engine\3d\particle\modules\UVScrollModule.h" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="externals\imgui\LICENSE.txt" />

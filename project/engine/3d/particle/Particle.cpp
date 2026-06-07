@@ -1,20 +1,13 @@
 #include "particle.h"
 #include "Collision.h"
 #include "DirectXUtils.h"
-#include "DustModule.h"
 #include "MathOperator.h"
 #include "MathUtility.h"
 #include "Model.h"
 #include "ParticleModule.h"
-#include "RadialRingModule.h"
 #include "Random.h"
-#include "RisingModule.h"
-#include "ShockWaveModule.h"
 #include "TextureManager.h"
 #include "particleCommon.h"
-#include <DirectXMath.h>
-#include <fstream>
-#include <sstream>
 
 using namespace Microsoft::WRL;
 using namespace DirectX;
@@ -35,10 +28,18 @@ void Particle::Initialize(
 	CreateInstancingSRV(ctx->srvManager->Allocate());
 
 	// 指定されたメッシュタイプに応じてモデルデータを作成
-	if (meshType == ParticleMeshType::Ring) {
-		modelData_ = CreateRingPrimitive(texturePath);
-	} else {
+	switch (meshType) {
+	case TinyEngine::ParticleMeshType::Square:
 		modelData_ = CreatePrimitive(texturePath);
+		break;
+	case TinyEngine::ParticleMeshType::Ring:
+		modelData_ = CreateRingPrimitive(texturePath);
+		break;
+	case TinyEngine::ParticleMeshType::Cylinder:
+		modelData_ = CreateCylinderPrimitive(texturePath);
+		break;
+	default:
+		break;
 	}
 
 	// 頂点データの初期化
@@ -245,6 +246,70 @@ ModelData TinyEngine::Particle::CreateRingPrimitive(const std::string& texturePa
 	return modelData;
 }
 
+ModelData TinyEngine::Particle::CreateCylinderPrimitive(const std::string& texturePath, float topRadius, float bottomRadius, float height, uint32_t segments) {
+	ModelData modelData;
+
+	// 円周の分割角度
+	float radianPerDivide = 2.0f * std::numbers::pi_v<float> / static_cast<float>(segments);
+
+	for (uint32_t index = 0; index < segments; ++index) {
+		float alpha = static_cast<float>(index) * radianPerDivide;
+		float alphaNext = static_cast<float>(index + 1) * radianPerDivide;
+
+		float sin = std::sin(alpha);
+		float cos = std::cos(alpha);
+		float sinNext = std::sin(alphaNext);
+		float cosNext = std::cos(alphaNext);
+
+		float u = static_cast<float>(index) / static_cast<float>(segments);
+		float uNext = static_cast<float>(index + 1) / static_cast<float>(segments);
+
+		// 上面、下面のY位置
+		float yTop = height;
+		float yBottom = 0.0f;
+
+		Vector3 normal = {-sin, 0.0f, cos};
+		Vector3 normalNext = {-sinNext, 0.0f, cosNext};
+
+		// 三角形1
+		modelData.vertices.push_back({
+		    .position = {-sin * topRadius, yTop, cos * topRadius, 1.0f},
+              .texcoord = {u, 1.0f},
+              .normal = normal
+        });
+		modelData.vertices.push_back({
+		    .position = {-sinNext * topRadius, yTop, cosNext * topRadius, 1.0f},
+              .texcoord = {uNext, 1.0f},
+              .normal = normalNext
+        });
+		modelData.vertices.push_back({
+		    .position = {-sin * bottomRadius, yBottom, cos * bottomRadius, 1.0f},
+              .texcoord = {u, 0.0f},
+              .normal = normal
+        });
+
+		// 三角形2
+		modelData.vertices.push_back({
+		    .position = {-sin * bottomRadius, yBottom, cos * bottomRadius, 1.0f},
+              .texcoord = {u, 0.0f},
+              .normal = normal
+        });
+		modelData.vertices.push_back({
+		    .position = {-sinNext * topRadius, yTop, cosNext * topRadius, 1.0f},
+              .texcoord = {uNext, 1.0f},
+              .normal = normalNext
+        });
+		modelData.vertices.push_back({
+		    .position = {-sinNext * bottomRadius, yBottom, cosNext * bottomRadius, 1.0f},
+              .texcoord = {uNext, 0.0f},
+              .normal = normalNext
+        });
+	}
+
+	modelData.material.textureFilePath = "resources/textures/" + texturePath;
+	return modelData;
+}
+
 void Particle::CreateVertexData() {
 	// 頂点リソースの作成
 	vertexResource_ = DirectXUtils::CreateBufferResource(ctx_->particleCommon->GetDxCommon()->GetDevice(), sizeof(VertexData) * modelData_.vertices.size());
@@ -268,12 +333,10 @@ void Particle::CreateMaterialData() {
 	materialResource_->Unmap(0, nullptr);
 	// 三角形の色
 	material_.color = {1.0f, 1.0f, 1.0f, 1.0f};
-	material_.enableLighting = true;
-	material_.enableFoging = false;
 	// uvTransformなどのデータを設定
 	material_.uvTransform = MathUtility::MakeIdentity4x4();
-	// 反射強度
-	material_.shininess = 1.0f;
+	// discard閾値設定
+	material_.alphaCutoff = 0.0f;
 	// materialDataに代入
 	*materialData_ = material_;
 }
@@ -417,6 +480,7 @@ void Particle::UpdateParticle(std::list<ParticleState>::iterator& itr) {
 
 	itr->transform.translate += itr->velocity * timeManager_->GetDeltaTime();
 	itr->currentTime += timeManager_->GetDeltaTime();
+	material_.uvTransform = MathUtility::MakeTranslateMatrix({itr->uvScroll.x, itr->uvScroll.y, 0.0f});
 
 	// モジュールの更新処理を追加
 	if (module_) {
