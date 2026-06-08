@@ -1,4 +1,5 @@
 #pragma once
+#include "AABB.h"
 #include "GameObjects/ObjectRender/ObjectRender.h"
 #include "Rect.h"
 
@@ -22,12 +23,22 @@ public:
 	// 座標のGetter
 	Vector3 GetPosition() const { return transform_.translate; }
 
+	// 当たり判定Getter
+	AABB GetCollision() const { return col_; }
+
 private:
 	Transform transform_;
 
 	// 描画用インスタンス
 	std::unique_ptr<ObjectRender> render_;
 
-	// 移動方向
+	// 方向
 	Vector2 direction_;
+
+	// AABB当たり判定
+	AABB col_;
+
+	// 生存時間管理用の変数
+	float deathTimer_ = 0.0f;      // 経過時間タイマー
+	const float kLifeTime_ = 0.5f; // 消滅までの時間
 };

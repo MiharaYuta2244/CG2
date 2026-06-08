@@ -35,6 +35,19 @@ void Enemy::Update(float deltaTime, Player* player, EnemyBulletManager* enemyBul
 		ai_->Update(deltaTime, player, enemyBulletManager, wallManager);
 	}
 
+	// プレイヤー発見時に「!」マークの生成
+	if (lastState != ai_->GetState() && ai_->GetState() == EnemyAI::State::Vigilance) {
+		GenerateExMark();
+	}
+
+	// 「!」マークのアニメーションが終了していれば「!」マークインスタンスを削除
+	if (exclamationMark_) {
+		if (!exclamationMark_->IsFinishedAnimation()) {
+			exclamationMark_.reset();
+			exclamationMark_ = nullptr;
+		}
+	}
+
 	// AIの状態を取得して色を変える
 	if (ai_->GetState() == EnemyAI::State::Vigilance) {
 		// 警戒状態なら赤色
@@ -54,8 +67,16 @@ void Enemy::Update(float deltaTime, Player* player, EnemyBulletManager* enemyBul
 		transform_.translate = knockBackAnim_.temp;
 	}
 
+	// 「!」マークの更新
+	if (exclamationMark_) {
+		exclamationMark_->Update(deltaTime, transform_.translate);
+	}
+
 	// 当たり判定更新　衝突判定用
 	UpdateCollision();
+
+	// 敵AIの状態を記録
+	lastState = ai_->GetState();
 }
 
 void Enemy::PostUpdate() {
@@ -73,6 +94,11 @@ void Enemy::Draw() {
 
 		// 視界
 		visionCone_->Draw();
+
+		// 「!」マークの描画
+		if (exclamationMark_) {
+			exclamationMark_->Draw();
+		}
 	}
 }
 
@@ -86,11 +112,7 @@ void Enemy::StartKnockBack(Vector3 dir) {
 		return;
 	}
 
-	Vector3 targetPos = {
-	    pos.x + dir.x * knockBackPower_,
-	    pos.y,
-	    pos.z + dir.z * knockBackPower_,
-	};
+	Vector3 targetPos = {pos.x + dir.x * knockBackPower_, pos.y, pos.z + dir.z * knockBackPower_};
 	knockBackAnim_.anim.Start(transform_.translate, targetPos, 0.5f, EaseType::EASEOUTCUBIC);
 }
 
@@ -105,4 +127,11 @@ void Enemy::UpdateCollision() {
 	Vector3 pos = transform_.translate;
 	bodyCol_.max = {pos.x + 0.5f, pos.y, pos.z + 0.5f};
 	bodyCol_.min = {pos.x - 0.5f, pos.y, pos.z - 0.5f};
+}
+
+void Enemy::GenerateExMark() {
+	// 「!」マークインスタンス生成&初期化
+	exclamationMark_ = std::make_unique<ExclamationMark>();
+	Vector3 pos = {transform_.translate.x, transform_.translate.y + 1.0f, transform_.translate.z};
+	exclamationMark_->Initialize(ctx_, transform_.translate);
 }

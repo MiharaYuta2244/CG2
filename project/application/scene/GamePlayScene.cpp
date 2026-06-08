@@ -266,12 +266,10 @@ void GamePlayScene::CollisionGameObjects() {
 	// ==========================================
 	// プレイヤーと敵の弾の当たり判定
 	// ==========================================
-	Sphere playerSphere = {player_->GetPosition(), 1.0f}; // プレイヤーの当たり判定形状（仮）
+	AABB playerCol = player_->GetBodyCol();
 	for (const auto& bullet : enemyBulletManager_->GetBullets()) {
-		Sphere bulletSphere = {bullet->GetPosition(), 0.5f}; // 弾の当たり判定形状（仮）
-
 		// 衝突判定
-		if (Collision::Intersect(playerSphere, bulletSphere)) {
+		if (Collision::Intersect(playerCol, bullet->GetCollision())) {
 			// プレイヤーにダメージを与える処理
 			player_->Damage(1.0f);
 

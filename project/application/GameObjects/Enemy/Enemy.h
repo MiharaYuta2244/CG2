@@ -4,6 +4,7 @@
 #include "EnemyAI.h"
 #include "GameObjects/ObjectRender/ObjectRender.h"
 #include "VisonCone.h"
+#include "ExclamationMark.h"
 
 class EnemyBulletManager;
 class Player;
@@ -59,6 +60,9 @@ private:
 	// 当たり判定の更新
 	void UpdateCollision();
 
+	// プレイヤー発見時「!」マークの生成
+	void GenerateExMark();
+
 private:
 	Transform transform_;
 	AABB bodyCol_; // 本体のAABB
@@ -72,6 +76,10 @@ private:
 	std::unique_ptr<ObjectRender> render_;  // 描画用インスタンス
 	std::unique_ptr<EnemyAI> ai_;           // AI
 	std::unique_ptr<TinyEngine::VisionCone> visionCone_; // 視界
+	std::unique_ptr<ExclamationMark> exclamationMark_; // 「!」マーク
 
 	EngineContext* ctx_ = nullptr;
+
+	// プレイヤーを発見したかどうか
+	EnemyAI::State lastState = EnemyAI::State::Normal;
 };

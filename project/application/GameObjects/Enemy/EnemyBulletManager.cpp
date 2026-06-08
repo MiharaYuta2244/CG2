@@ -7,12 +7,6 @@ void EnemyBulletManager::Update(float deltaTime) {
 
 	// 弾の削除
 	std::erase_if(bullets_, [this](const std::unique_ptr<EnemyBullet>& b) { return b->IsDead(bulletActiveArea_); });
-
-#ifdef USE_IMGUI
-	ImGui::Begin("bullet");
-	ImGui::DragFloat("speed", &bulletSpeed_, 0.01f);
-	ImGui::End();
-#endif
 }
 
 void EnemyBulletManager::Draw() {
