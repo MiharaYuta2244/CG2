@@ -5,7 +5,7 @@
 
 void Player::Initialize(EngineContext* ctx) {
 	transform_.scale = {1.0f, 1.0f, 1.0f};
-	transform_.rotate = {0.0f, 0.0f, 0.0f};
+	transform_.rotate = {0.0f, std::numbers::pi_v<float> / 2.0f, 0.0f};
 	transform_.translate = {0.0f, 0.0f, 0.0f};
 
 	JsonManager::Save("player_transform.json", transform_);
