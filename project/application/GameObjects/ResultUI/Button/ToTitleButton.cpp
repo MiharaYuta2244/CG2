@@ -4,7 +4,7 @@ void ToTitleButton::Initialize(EngineContext* ctx) {
 	IButton::Initialize(ctx);
 
 	// 個別のスプライト設定
-	sprite_->SetTexture("Title.png");
+	sprite_->Initialize(ctx, "Title.png");
 	sprite_->SetPosition({850.0f, 500.0f});
 }
 

@@ -4,7 +4,7 @@ void RetryButton::Initialize(EngineContext* ctx) {
 	IButton::Initialize(ctx);
 
 	// 個別のスプライト設定
-	sprite_->SetTexture("Retry.png");
+	sprite_->Initialize(ctx, "Retry.png");
 	sprite_->SetPosition({250.0f, 500.0f});
 }
 

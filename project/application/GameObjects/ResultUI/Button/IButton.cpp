@@ -6,7 +6,6 @@ using namespace TinyEngine;
 void IButton::Initialize(EngineContext* ctx) {
 	// スプライトの生成&初期化
 	sprite_ = std::make_unique<Sprite>();
-	sprite_->Initialize(ctx, "Retry.png");
 }
 
 void IButton::Update(bool isSelect) {
