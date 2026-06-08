@@ -61,6 +61,9 @@ void Player::Update(float deltaTime, DirectInput* input, GamePad* gamePad, Enemy
 	// 移動方向があれば記録
 	if (dir.x != 0.0f || dir.y != 0.0f) {
 		lastMoveDirection_ = MathUtility::Normalize(dir);
+		isMoving_ = true;
+	}else {
+		isMoving_ = false;
 	}
 
 	// 移動更新

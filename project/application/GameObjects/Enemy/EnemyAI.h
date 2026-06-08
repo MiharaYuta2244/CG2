@@ -36,7 +36,7 @@ public:
 
 private:
 	// プレーヤー方向に回転する
-	void LookatPlayer(float deltaTime, Vector3 playerPos, Vector3 enemyPos);
+	void LookatPlayer(float deltaTime, Vector3 playerPos, Vector3 enemyPos, float turnSpeed = 6.0f);
 
 	// 通常状態の更新処理
 	void UpdateNormal(float deltaTime, Player* player, WallManager* wallManager);
@@ -72,4 +72,14 @@ private:
 	std::vector<Vector3> currentPath_; // A*で計算した経路
 	int currentWaypointIndex_ = 0;     // 現在向かっている頂点
 	float pathUpdateTimer_ = 0.0f;     // 経路再計算タイマー
+
+	// 徘徊用パラメータ
+	bool isPatrolWaiting_ = true;            // 待機中かどうか
+	float patrolStateTimer_ = 0.0f;          // 待機・移動の残り時間
+	Vector3 patrolDir_ = {0.0f, 0.0f, 0.0f}; // 徘徊時の移動方向
+	const float patrolSpeed_ = 4.0f;         // 徘徊時の移動速度
+
+	// 聴覚用パラメータ
+	float hearingRadius_ = 10.0f; // 足音が聞こえる距離
+	float hearTurnSpeed_ = 8.0f; // 足音に反応して振り向く速度
 };

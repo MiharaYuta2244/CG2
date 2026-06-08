@@ -5,6 +5,7 @@
 #include "GameObjects/Wall/WallManager.h"
 #include "MathOperator.h"
 #include "MathUtility.h"
+#include "Random.h"
 #include <cmath>
 
 void EnemyAI::Initialize(Transform* transform, EngineContext* ctx) {
@@ -24,9 +25,8 @@ void EnemyAI::Update(float deltaTime, Player* player, EnemyBulletManager* enemyB
 	}
 }
 
-void EnemyAI::LookatPlayer(float deltaTime, Vector3 playerPos, Vector3 enemyPos) {
+void EnemyAI::LookatPlayer(float deltaTime, Vector3 playerPos, Vector3 enemyPos, float turnSpeed) {
 	Vector3 toPlayer = playerPos - enemyPos;
-
 	toPlayer.y = 0.0f;
 
 	if (MathUtility::LengthSquared(toPlayer) > 0.0001f) {
@@ -37,19 +37,98 @@ void EnemyAI::LookatPlayer(float deltaTime, Vector3 playerPos, Vector3 enemyPos)
 		float current = transform_->rotate.y;
 		float target = angleY;
 
-		float turnSpeed = 6.0f;
-
 		transform_->rotate.y = MathUtility::LerpAngle(current, target, deltaTime * turnSpeed);
 	}
 }
 
 void EnemyAI::UpdateNormal(float deltaTime, Player* player, WallManager* wallManager) {
-	// 通常状態の挙動
-	// 今はその場で待機
-
 	// 視界チェックを行い、見つけたら警戒状態へ遷移
 	if (CheckPlayerInVision(player, wallManager)) {
 		state_ = State::Vigilance;
+	}
+
+	// 聴覚チェック
+	Vector3 playerPos = player->GetPosition();
+	Vector3 enemyPos = transform_->translate;
+	Vector3 toPlayer = playerPos - enemyPos;
+	toPlayer.y = 0.0f;
+	float distSq = toPlayer.x * toPlayer.x + toPlayer.z * toPlayer.z;
+
+	// プレイヤーが移動しているかどうか
+	bool isPlayerMoving = player->IsMoving();
+
+	// プレイヤーが動いていて、かつ音が聞こえる範囲内にいる場合
+	if (isPlayerMoving && distSq <= hearingRadius_ * hearingRadius_) {
+		// 音のした方向へ素早く振り向く
+		LookatPlayer(deltaTime, playerPos, enemyPos, hearTurnSpeed_);
+
+		// 音に気を取られている演出として、徘徊状態を待機で上書きする
+		isPatrolWaiting_ = true;
+		patrolStateTimer_ = 0.5f; // 少しの間、音の方向を警戒して立ち止まる
+
+		return; // 音に反応している間は通常の徘徊移動を行わないようにする
+	}
+
+	// 徘徊処理
+	patrolStateTimer_ -= deltaTime;
+	if (isPatrolWaiting_) {
+		// 待機中
+		if (patrolStateTimer_ <= 0.0f) {
+
+			// 待機終了から移動開始
+			isPatrolWaiting_ = false;
+
+			// 次の移動時間
+			patrolStateTimer_ = RandomUtils::RangeFloat(2.0f, 4.0f);
+
+			// ランダム角度
+			float pi = std::numbers::pi_v<float>;
+			float randomAngle = RandomUtils::RangeFloat(0.0f, 360.0f) * (pi / (pi / 2.0f));
+
+			patrolDir_.x = std::sin(randomAngle);
+			patrolDir_.y = 0.0f;
+			patrolDir_.z = std::cos(randomAngle);
+		}
+
+	} else {
+		// 移動中
+		if (patrolStateTimer_ <= 0.0f) {
+
+			// 移動終了から待機開始
+			isPatrolWaiting_ = true;
+			patrolStateTimer_ = RandomUtils::RangeFloat(1.0f, 3.0f);
+
+		} else {
+
+			// 壁チェック
+			Vector3 checkPos = transform_->translate;
+			float checkDistance = 1.5f;
+			checkPos.x += patrolDir_.x * checkDistance;
+			checkPos.z += patrolDir_.z * checkDistance;
+
+			bool isHitWall = false;
+			const auto& walls = wallManager->GetWalls();
+			for (const auto& wall : walls) {
+				if (IsSegmentIntersectAABB(transform_->translate, checkPos, wall->GetCollision())) {
+					isHitWall = true;
+					break;
+				}
+			}
+
+			if (isHitWall) {
+				// 壁にぶつかりそうになったら短い待機へ
+				isPatrolWaiting_ = true;
+				patrolStateTimer_ = 0.5f;
+
+			} else {
+				// 壁が無ければ移動
+				transform_->translate.x += patrolDir_.x * patrolSpeed_ * deltaTime;
+				transform_->translate.z += patrolDir_.z * patrolSpeed_ * deltaTime;
+
+				// 進行方向へ体を向ける
+				LookatPlayer(deltaTime, transform_->translate + patrolDir_, transform_->translate);
+			}
+		}
 	}
 }
 

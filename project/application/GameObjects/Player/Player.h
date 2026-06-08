@@ -58,6 +58,9 @@ public:
 	// 描画用のオブジェクトを返すGetter
 	TinyEngine::Object3d* GetObject3d() { return render_->GetObject3d(); }
 
+	// プレイヤーが移動中かどうかを取得するGetter
+	bool IsMoving() const { return isMoving_; }
+
 private:
 	// 当たり判定の更新処理
 	void UpdateCollision();
@@ -85,4 +88,7 @@ private:
 	std::unique_ptr<PlayerHealth> hp_;     // HP管理用インスタンス
 
 	float envScale_ = 1.0f;
+
+	// 現在移動中かどうかを保持するフラグ
+	bool isMoving_ = false;
 };
