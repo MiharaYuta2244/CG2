@@ -31,16 +31,59 @@ void MenuList::AddItem(const std::string& label, const std::string& texturePath,
 	items_.push_back(std::move(item));
 }
 
-void MenuList::Update(DirectInput* input, float deltaTime) {
+void MenuList::Update(DirectInput* input, GamePad* gamePad, float deltaTime) {
 	int index = static_cast<int>(items_.size());
 
-	if (input->KeyTriggered(DIK_W) || input->KeyTriggered(DIK_UP)) {
+	// スティック制御用クールダウン
+	stickCooldown_ -= deltaTime;
+
+	// ボタンの選択
+	bool up = input->KeyTriggered(DIK_W);
+	bool down = input->KeyTriggered(DIK_S);
+	bool decide = input->KeyTriggered(DIK_SPACE);
+
+	// パッド入力
+	if (gamePad && gamePad->GetState().connected) {
+		const auto& pad = gamePad->GetState();
+
+		float ly = pad.axes.ly;
+
+		// スティックが一定以上倒されたら
+		if (!stickInUse_) {
+			if (ly < -0.9f) {
+				up = true;
+				stickInUse_ = true;
+			} else if (ly > 0.9f) {
+				down = true;
+				stickInUse_ = true;
+			}
+		}
+
+		// スティックがニュートラルに戻ったら再入力可能に
+		if (std::abs(ly) < 0.3f) {
+			stickInUse_ = false;
+		}
+
+		if (pad.buttonsPressed.a) {
+			decide = true;
+		}
+
+		if (pad.buttonsPressed.dpadUp) {
+			up = true;
+		}
+
+		if (pad.buttonsPressed.dpadDown) {
+			down = true;
+		}
+	}
+
+	if (up) {
 		currentIndex_ = (currentIndex_ - 1 + index) % index;
 	}
-	if (input->KeyTriggered(DIK_S) || input->KeyTriggered(DIK_DOWN)) {
+	if (down) {
 		currentIndex_ = (currentIndex_ + 1) % index;
 	}
-	if (input->KeyTriggered(DIK_SPACE) || input->KeyTriggered(DIK_Z)) {
+	if (decide) {
 		items_[currentIndex_].onSelect();
 	}
 

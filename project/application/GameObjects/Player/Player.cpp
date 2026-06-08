@@ -25,11 +25,26 @@ void Player::Initialize(EngineContext* ctx) {
 	hp_->Initialize(maxHP_);
 }
 
-void Player::Update(float deltaTime, DirectInput* input, EnemyManager* enemyManager) {
+void Player::Update(float deltaTime, DirectInput* input, GamePad* gamePad, EnemyManager* enemyManager) {
 	bool right = input->KeyDown(DIK_D);
 	bool left = input->KeyDown(DIK_A);
 	bool front = input->KeyDown(DIK_W);
 	bool back = input->KeyDown(DIK_S);
+
+	// ゲームパッドの入力を重ね合わせる
+	if (gamePad && gamePad->GetState().connected) {
+		const auto& padState = gamePad->GetState();
+
+		// 左スティックか十字キーで移動
+		if (padState.axes.lx > 0.3f || padState.buttons.dpadRight)
+			right = true;
+		if (padState.axes.lx < -0.3f || padState.buttons.dpadLeft)
+			left = true;
+		if (padState.axes.ly < -0.3f || padState.buttons.dpadUp)
+			front = true;
+		if (padState.axes.ly > 0.3f || padState.buttons.dpadDown)
+			back = true;
+	}
 
 	// 入力方向ベクトル
 	Vector2 dir = {0.0f, 0.0f};
@@ -80,8 +95,29 @@ void Player::Update(float deltaTime, DirectInput* input, EnemyManager* enemyMana
 		}
 	}
 
+	bool isGrabTriggered = input->KeyDown(DIK_J);
+	bool isGrabReleased = input->KeyReleased(DIK_J);
+	bool isAttackTriggered = input->KeyTriggered(DIK_K);
+
+	if (gamePad && gamePad->GetState().connected) {
+		const auto& padState = gamePad->GetState();
+
+		// Lトリガーで掴み
+		if (padState.axes.lt > 0.3f) {
+			isGrabTriggered = true;
+		}
+		// 放す
+		if (padState.buttonsReleased.x || padState.buttonsReleased.a) {
+			isGrabReleased = true;
+		}
+		// Rトリガーで突き飛ばし
+		if (padState.axes.rt > 0.3f) {
+			isAttackTriggered = true;
+		}
+	}
+
 	// 掴み・投げ処理の更新
-	if (enableAttack_ && input->KeyDown(DIK_J)) {
+	if (enableAttack_ && isGrabTriggered) {
 		if (!isHold_ && heldEnemy_ != nullptr) {
 			isHold_ = true;
 			heldEnemy_->SetEnableMove(false);
@@ -91,9 +127,7 @@ void Player::Update(float deltaTime, DirectInput* input, EnemyManager* enemyMana
 		if (isHold_ && heldEnemy_ != nullptr) {
 			heldEnemy_->SetPos(transform_.translate);
 		}
-	}
-
-	if (isHold_ && input->KeyReleased(DIK_J)) {
+	}else if (isHold_ && isGrabReleased) { // 手放す処理
 		isHold_ = false;
 		if (heldEnemy_) {
 			heldEnemy_->SetEnableMove(true);
@@ -101,7 +135,8 @@ void Player::Update(float deltaTime, DirectInput* input, EnemyManager* enemyMana
 		}
 	}
 
-	if (enableAttack_ && input->KeyTriggered(DIK_K) && heldEnemy_ != nullptr) {
+	// 投げる・攻撃処理
+	if (enableAttack_ && isAttackTriggered && heldEnemy_ != nullptr) {
 		isHold_ = false;
 		enableAttack_ = false;
 		heldEnemy_->SetEnableMove(true);

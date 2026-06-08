@@ -51,7 +51,7 @@ void ResultScene::Update() {
 	skybox_->Update(mainCamera_->GetViewMatrix(), mainCamera_->GetProjection());
 
 	// UI管理クラス更新
-	uiManager_->Update(deltaTime, ctx_.keyboard);
+	uiManager_->Update(deltaTime, ctx_.keyboard, ctx_.gamePad);
 }
 
 void ResultScene::Draw() {

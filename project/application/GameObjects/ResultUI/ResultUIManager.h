@@ -13,7 +13,7 @@ public:
 	void Initialize(EngineContext* ctx);
 
 	// 更新処理
-	void Update(float deltaTime, DirectInput* input);
+	void Update(float deltaTime, DirectInput* input, GamePad* gamePad);
 
 	// 描画処理
 	void Draw();
@@ -52,4 +52,8 @@ private:
 
 	// 選択されているインデックス
 	int selectedIndex_ = 0;
+
+	// スティックでの連続切り換え制御用変数
+	float stickCooldown_ = 0.0f;
+	bool stickInUse_ = false;
 };

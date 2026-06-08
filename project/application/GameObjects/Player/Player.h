@@ -17,7 +17,7 @@ public:
 	void Initialize(EngineContext* ctx);
 
 	// 更新処理
-	void Update(float deltaTime, DirectInput* input, EnemyManager* enemyManager);
+	void Update(float deltaTime, DirectInput* input, GamePad* gamePad, EnemyManager* enemyManager);
 
 	// 当たり判定などの解決後に行う最終更新処理
 	void PostUpdate();

@@ -14,7 +14,7 @@ void TitleScene::Initialize(const SceneContext& ctx) {
 
 void TitleScene::Update() {
 	// メニューの更新
-	menu_->Update(ctx_.keyboard, ctx_.timeManager->GetDeltaTime());
+	menu_->Update(ctx_.keyboard, ctx_.gamePad, ctx_.timeManager->GetDeltaTime());
 }
 
 void TitleScene::Draw() {

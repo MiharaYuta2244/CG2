@@ -18,24 +18,66 @@ void ResultUIManager::Initialize(EngineContext* ctx) {
 	toTitleButton_->Initialize(ctx);
 }
 
-void ResultUIManager::Update(float deltaTime, DirectInput* input) {
+void ResultUIManager::Update(float deltaTime, DirectInput* input, GamePad* gamePad) {
 	// スコアテキスト更新
 	scoreText_->Update(deltaTime, input);
 
 	// タイマーテキスト更新
 	timerText_->Update(deltaTime, input);
 
+	// スティック制御用クールダウン
+	stickCooldown_ -= deltaTime;
+
 	// ボタンの選択
+	bool right = input->KeyTriggered(DIK_D);
+	bool left = input->KeyTriggered(DIK_A);
+	bool decide = input->KeyTriggered(DIK_SPACE);
+
+	// パッド入力
+	if (gamePad && gamePad->GetState().connected) {
+		const auto& pad = gamePad->GetState();
+
+		float lx = pad.axes.lx;
+
+		// スティックが一定以上倒されたら
+		if (!stickInUse_) {
+			if (lx > 0.9f) {
+				right = true;
+				stickInUse_ = true;
+			} else if (lx < -0.9f) {
+				left = true;
+				stickInUse_ = true;
+			}
+		}
+
+		// スティックがニュートラルに戻ったら再入力可能に
+		if (std::abs(lx) < 0.3f) {
+			stickInUse_ = false;
+		}
+
+		if (pad.buttonsPressed.a) {
+			decide = true;
+		}
+
+		if (pad.buttonsPressed.dpadLeft) {
+			left = true;
+		}
+
+		if (pad.buttonsPressed.dpadRight) {
+			right = true;
+		}
+	}
+
 	int size = static_cast<int>(buttons_.size());
-	if (input->KeyTriggered(DIK_D)) {
+	if (right) {
 		selectedIndex_ = (selectedIndex_ + 1) % size;
 	}
-	if (input->KeyTriggered(DIK_A)) {
+	if (left) {
 		selectedIndex_ = (selectedIndex_ - 1 + size) % size;
 	}
 
 	// 決定ボタンを押したら
-	if (input->KeyTriggered(DIK_SPACE)) {
+	if (decide) {
 		OnDecide();
 	}
 

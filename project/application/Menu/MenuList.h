@@ -23,7 +23,7 @@ public:
 	void AddItem(const std::string& label, const std::string& texturePath, std::function<void()> onSelect);
 
 	// 更新処理
-	void Update(DirectInput* input, float deltaTime);
+	void Update(DirectInput* input, GamePad* gamePad, float deltaTime);
 
 	// 描画処理
 	void Draw();
@@ -54,4 +54,8 @@ private:
 	float voronoiTimer_ = 0.0f;                          // ボロノイノイズ用タイマー
 	Vector4 voronoiColor_ = {0.0f, 0.2f, 0.2f, 1.0f};    // ボロノイノイズの色
 	Vector4 backgroundColor_ = {0.0f, 0.0f, 0.0f, 1.0f}; // 背景色
+
+	// スティックでの連続切り換え制御用変数
+	float stickCooldown_ = 0.0f;
+	bool stickInUse_ = false;
 };
