@@ -35,9 +35,9 @@ void TestScene::Initialize(const SceneContext& ctx) {
 }
 
 void TestScene::Update() {
-	/*for (auto& object : sceneObjects) {
+	for (auto& object : sceneObjects) {
 	    object->Update();
-	}*/
+	}
 
 	// plane_->Update(transform_);
 	walk_->Update(walkTransform_);
@@ -89,9 +89,9 @@ void TestScene::Update() {
 }
 
 void TestScene::Draw() {
-	/*for (auto& object : sceneObjects) {
+	for (auto& object : sceneObjects) {
 	    object->Draw();
-	}*/
+	}
 
 	// plane_->Draw();
 	//walk_->Draw();
