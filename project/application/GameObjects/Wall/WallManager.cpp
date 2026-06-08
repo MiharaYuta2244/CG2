@@ -1,6 +1,5 @@
 #include "WallManager.h"
 #include "JsonManager.h"
-#include <iostream>
 
 void WallManager::Initialize(EngineContext* ctx) {
 	ctx_ = ctx;

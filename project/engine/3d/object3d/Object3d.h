@@ -68,6 +68,7 @@ public:
 	void SetOutlineColor(const Vector4& color) { outline_.color = color; }
 	void SetOutlineColor(float thickness) { outline_.thickness = thickness; }
 	void SetName(const std::string& name) { name_ = name; }
+	void SetTexture(const std::string& filePath);
 
 	// getter
 	Vector3& GetScale() { return transform_.scale; }
@@ -169,6 +170,9 @@ private:
 
 	// オブジェクト識別用の名前
 	std::string name_;
+
+	// オブジェクト個別のテクスチャパスを保持する変数
+	std::string textureFilePath_;
 
 	// 全Object3dで共有する次に割り当てるID
 	static uint32_t s_nextID_;

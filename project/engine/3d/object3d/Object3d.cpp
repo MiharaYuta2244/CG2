@@ -170,7 +170,7 @@ void Object3d::Draw() {
 	commandList->SetGraphicsRootConstantBufferView(9, outlineResource_->GetGPUVirtualAddress());
 
 	if (model_) {
-		model_->Draw(); // アウトライン描画
+		model_->Draw(textureFilePath_); // アウトライン描画
 	}
 
 	// 3Dオブジェクト描画準備。3Dオブジェクトの描画に共通のグラフィックスコマンドを積む
@@ -189,7 +189,7 @@ void Object3d::Draw() {
 
 	// 3Dモデルが割り当てられれば描画する
 	if (model_) {
-		model_->Draw();
+		model_->Draw(textureFilePath_);
 	}
 }
 
@@ -230,12 +230,24 @@ void Object3d::SetModel(const std::string& filePath) {
 		modelData_ = model_->GetModelData();
 
 		skeleton_ = model_->CreateSkeleton(modelData_.rootNode);
+
+		// モデルのデフォルトのテクスチャパスを記憶しておく
+		textureFilePath_ = modelData_.material.textureFilePath;
 	}
 }
 
 void Object3d::SetColor(Vector4 color) {
 	// モデル共有のmaterialを直接変更しない。インスタンス側のmaterial_を変更する
 	material_.color = color;
+}
+
+void TinyEngine::Object3d::SetTexture(const std::string& filePath) {
+	textureFilePath_ = "resources/textures/" + filePath;
+
+	// 指定されたテクスチャがまだ読み込まれていなければ、自動でロードする
+	if (ctx_ && ctx_->textureManager) {
+		ctx_->textureManager->LoadTexture(filePath);
+	}
 }
 
 void Object3d::CreateTransformationMatrixData() {

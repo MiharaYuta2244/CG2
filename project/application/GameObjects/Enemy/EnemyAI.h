@@ -65,7 +65,7 @@ private:
 
 	// 射撃用パラメータ
 	float shotTimer_ = 0.0f;                         // 射撃までの残り時間タイマー
-	float shotInterval_ = 1.0f;                      // 射撃間隔
+	float shotInterval_ = 2.0f;                      // 射撃間隔
 	float attackRange_ = visionParam_.radius / 2.0f; // 射撃を行う距離
 
 	// 経路探索用

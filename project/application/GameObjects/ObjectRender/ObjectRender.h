@@ -25,6 +25,9 @@ public:
 	// 環境マップにかけるスケールの設定
 	void SetEnvScale(float envScale) { object3d_->SetEnvScale(envScale); }
 
+	// TextureのSetter
+	void SetTexture(const std::string& filepath) { object3d_->SetTexture(filepath); }
+
 	// 描画用オブジェクトを返すGetter
 	TinyEngine::Object3d* GetObject3d() { return object3d_.get(); }
 

@@ -39,7 +39,7 @@ public:
 	void Initialize(ModelCommon* modelCommon, TextureManager* textureManager, const std::string& filename);
 
 	// 描画関数
-	void Draw();
+	void Draw(const std::string& textureFilePath = "");
 
 	// 更新関数
 	void Update();

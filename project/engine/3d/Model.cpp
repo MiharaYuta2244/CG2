@@ -100,7 +100,7 @@ void Model::ApplyAnimation(Skeleton& skeleton, const Animation& animation, float
 	}
 }
 
-void Model::Draw() {
+void Model::Draw(const std::string& textureFilePath) {
 	auto commandList = modelCommon_->GetDxCommon()->GetCommandList();
 
 	// VertexBufferViewを設定
@@ -109,8 +109,11 @@ void Model::Draw() {
 	// IndexBufferViewを設定
 	commandList->IASetIndexBuffer(&indexBufferView_);
 
+	// 使用するテクスチャパスを決定（引数が空ならモデル本来のデフォルトを使用）
+	std::string path = textureFilePath.empty() ? modelData_.material.textureFilePath : textureFilePath;
+
 	// SRVのDescriptorTableの先頭を設定。2はrootParameter[2]（Pixel用テクスチャ）である。
-	commandList->SetGraphicsRootDescriptorTable(2, textureManager_->GetSrvHandleGPU(modelData_.material.textureFilePath));
+	commandList->SetGraphicsRootDescriptorTable(2, textureManager_->GetSrvHandleGPU(path));
 
 	// 描画!(DrawCall/ドローコール)。
 	commandList->DrawIndexedInstanced(indexCount_, 1, 0, 0, 0);

@@ -1,6 +1,5 @@
 #include "EnemyManager.h"
 #include "JsonManager.h"
-#include <iostream>
 
 #ifdef USE_IMGUI
 #include "ImGuiManager.h"

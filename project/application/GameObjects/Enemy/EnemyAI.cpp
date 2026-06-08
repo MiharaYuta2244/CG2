@@ -86,8 +86,8 @@ void EnemyAI::UpdateVigilance(float deltaTime, Player* player, EnemyBulletManage
 
 	// 射撃は「今実際にプレイヤーが見えていて、かつ射程内」の時だけ行う
 	if (canSeePlayer && distSq <= attackRange_ * attackRange_) {
-		shotTimer_ -= deltaTime;
-		if (shotTimer_ <= 0.0f) {
+		shotTimer_ += deltaTime;
+		if (shotTimer_ >= shotInterval_) {
 			auto bullet = std::make_unique<EnemyBullet>();
 			Vector3 dir3D = MathUtility::Normalize(toTarget);
 			Vector2 dir2D = {dir3D.x, dir3D.z};
@@ -99,7 +99,7 @@ void EnemyAI::UpdateVigilance(float deltaTime, Player* player, EnemyBulletManage
 
 			bullet->Initialize(ctx_, dir2D, spawnPos);
 			enemyBulletManager->AddBullet(std::move(bullet));
-			shotTimer_ = shotInterval_;
+			shotTimer_ = 0.0f;
 		}
 	} else { // 射程外、あるいは壁の裏にいる場合はA*で回り込む
 		pathUpdateTimer_ -= deltaTime;
