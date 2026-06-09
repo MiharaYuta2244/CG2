@@ -162,6 +162,7 @@ copy "$(windowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="application\GameObjects\Enemy\AStarPathfinder.cpp" />
+    <ClCompile Include="application\GameObjects\GameUI\Controls.cpp" />
     <ClCompile Include="engine\Animation\KeyframeAnimation.cpp" />
     <ClCompile Include="application\GameObjects\Enemy\Enemy.cpp" />
     <ClCompile Include="application\GameObjects\Enemy\EnemyAI.cpp" />
@@ -342,6 +343,7 @@ copy "$(windowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="application\GameObjects\Enemy\AStarPathfinder.h" />
+    <ClInclude Include="application\GameObjects\GameUI\Controls.h" />
     <ClInclude Include="engine\3d\particle\modules\ParticleModuleHeader.h" />
     <ClInclude Include="engine\Animation\KeyframeAnimation.h" />
     <ClInclude Include="application\GameObjects\Enemy\Enemy.h" />

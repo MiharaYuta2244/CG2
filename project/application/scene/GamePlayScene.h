@@ -13,6 +13,7 @@
 #include "Object3d.h"
 #include "Particle.h"
 #include "Skybox.h"
+#include "GameObjects/GameUI/Controls.h"
 #include <memory>
 #include <vector>
 
@@ -95,4 +96,7 @@ private:
 
 	// シーン遷移の要求を1回だけ通るようにするためのフラグ
 	bool isTransitionRequested_ = false;
+
+	// 操作方法UI
+	std::unique_ptr<Controls> controls_;
 };

@@ -73,6 +73,9 @@ void GamePlayScene::Initialize(const SceneContext& ctx) {
 	// スカイボックスの生成&初期化
 	skybox_ = std::make_unique<Skybox>();
 	skybox_->Initialize(ctx_.engineContext, "rostock_laage_airport_4k.dds");
+
+	controls_ = std::make_unique<Controls>();
+	controls_->Initialize(ctx_.engineContext);
 }
 
 void GamePlayScene::Update() {
@@ -186,6 +189,8 @@ void GamePlayScene::Update() {
 	// 地面の更新
 	ground_->Update();
 
+	controls_->Update();
+
 #ifdef USE_IMGUI
 	Vector3 rot = ctx_.currentCamera->GetEuler();
 
@@ -258,6 +263,8 @@ void GamePlayScene::Draw() {
 
 	// レターボックス描画
 	letterBox_->Draw();
+
+	controls_->Draw();
 }
 
 void GamePlayScene::Finalize() {}
