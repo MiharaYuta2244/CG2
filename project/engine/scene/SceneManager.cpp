@@ -6,6 +6,8 @@ void SceneManager::Initialize(EngineContext* ctx, DirectInput* keyboard, GamePad
 	gamePad_ = gamePad;
 	debugCamera_ = debugCamera;
 	timeManager_ = timeManager;
+
+	commonData_ = {};
 }
 
 void SceneManager::AddScene(const std::string& sceneName, std::unique_ptr<BaseScene> scene) {

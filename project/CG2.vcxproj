@@ -344,6 +344,7 @@ copy "$(windowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
   <ItemGroup>
     <ClInclude Include="application\GameObjects\Enemy\AStarPathfinder.h" />
     <ClInclude Include="application\GameObjects\GameUI\Controls.h" />
+    <ClInclude Include="application\GameObjects\CommonData.h" />
     <ClInclude Include="engine\3d\particle\modules\ParticleModuleHeader.h" />
     <ClInclude Include="engine\Animation\KeyframeAnimation.h" />
     <ClInclude Include="application\GameObjects\Enemy\Enemy.h" />

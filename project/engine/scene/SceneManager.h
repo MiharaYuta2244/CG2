@@ -1,5 +1,6 @@
 #pragma once
 #include "BaseScene.h"
+#include "GameObjects/CommonData.h"
 #include <memory>
 #include <unordered_map>
 #include <vector>
@@ -70,4 +71,7 @@ private:
 	GamePad* gamePad_ = nullptr;
 	Camera* debugCamera_ = nullptr;
 	TimeManager* timeManager_ = nullptr;
+
+	// シーン間で共有するデータ
+	CommonData commonData_;
 };
