@@ -1,13 +1,15 @@
 #include "ResultScene.h"
+#include "SceneManager.h"
 
 using namespace TinyEngine;
 
 void ResultScene::Initialize(const SceneContext& ctx) {
 	ctx_ = ctx;
+	commonData_ = ctx_.sceneManager->GetCommonData();
 
 	// UI管理クラス生成&初期化
 	uiManager_ = std::make_unique<ResultUIManager>();
-	uiManager_->Initialize(ctx.engineContext);
+	uiManager_->Initialize(ctx.engineContext, commonData_);
 
 	// コールバック登録
 	uiManager_->GetRetryButton()->SetCallback([this]() { RequestSceneChange("GamePlay"); });

@@ -3,6 +3,9 @@
 
 void TitleScene::Initialize(const SceneContext& ctx) {
 	ctx_ = ctx;
+	commonData_ = ctx_.sceneManager->GetCommonData();
+	commonData_->killCount = 0;
+	commonData_->clearTime = 0.0f;
 
 	// メニューの生成&初期化
 	menu_ = std::make_unique<MenuList>();

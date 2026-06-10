@@ -1,5 +1,6 @@
 #pragma once
 #include "SceneContext.h"
+#include "GameObjects/CommonData.h"
 
 /// <summary>
 /// シーンの基底クラス
@@ -26,4 +27,5 @@ public:
 
 protected:
 	SceneContext ctx_;
+	CommonData* commonData_;
 };

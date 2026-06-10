@@ -163,6 +163,7 @@ copy "$(windowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
   <ItemGroup>
     <ClCompile Include="application\GameObjects\Enemy\AStarPathfinder.cpp" />
     <ClCompile Include="application\GameObjects\GameUI\Controls.cpp" />
+    <ClCompile Include="application\GameObjects\StageObjects\Door\Door.cpp" />
     <ClCompile Include="engine\Animation\KeyframeAnimation.cpp" />
     <ClCompile Include="application\GameObjects\Enemy\Enemy.cpp" />
     <ClCompile Include="application\GameObjects\Enemy\EnemyAI.cpp" />
@@ -220,11 +221,11 @@ copy "$(windowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="application\Fade\FadeStates.cpp" />
     <ClCompile Include="application\Fade\FadeManager.cpp" />
     <ClCompile Include="engine\base\utility\gameTimer\GameTimer.cpp" />
-    <ClCompile Include="application\GameObjects\Goal\Goal.cpp" />
+    <ClCompile Include="application\GameObjects\StageObjects\Goal\Goal.cpp" />
     <ClCompile Include="engine\tool\json\JsonManager.cpp" />
     <ClCompile Include="application\GameObjects\Effect\FlashEffect.cpp" />
     <ClCompile Include="application\GameObjects\Effect\LetterBox.cpp" />
-    <ClCompile Include="application\GameObjects\Ground\Ground.cpp" />
+    <ClCompile Include="application\GameObjects\StageObjects\Ground\Ground.cpp" />
     <ClCompile Include="engine\tool\LevelDataLoader\LevelDataLoader.cpp" />
     <ClCompile Include="main.cpp">
       <Optimization Condition="'$(Configuration)|$(Platform)'=='Development|x64'">MaxSpeed</Optimization>
@@ -256,8 +257,8 @@ copy "$(windowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="application\GameObjects\Player\PlayerMove.cpp" />
     <ClCompile Include="application\GameObjects\ObjectRender\ObjectRender.cpp" />
     <ClCompile Include="application\GameObjects\Player\PlayerHealth.cpp" />
-    <ClCompile Include="application\GameObjects\Wall\Wall.cpp" />
-    <ClCompile Include="application\GameObjects\Wall\WallManager.cpp" />
+    <ClCompile Include="application\GameObjects\StageObjects\Wall\Wall.cpp" />
+    <ClCompile Include="application\GameObjects\StageObjects\Wall\WallManager.cpp" />
     <ClCompile Include="application\GameObjects\Player\PlayerHPGauge.cpp" />
     <ClCompile Include="application\Menu\MenuList.cpp" />
     <ClCompile Include="application\Scene\PauseScene.cpp" />
@@ -345,6 +346,7 @@ copy "$(windowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="application\GameObjects\Enemy\AStarPathfinder.h" />
     <ClInclude Include="application\GameObjects\GameUI\Controls.h" />
     <ClInclude Include="application\GameObjects\CommonData.h" />
+    <ClInclude Include="application\GameObjects\StageObjects\Door\Door.h" />
     <ClInclude Include="engine\3d\particle\modules\ParticleModuleHeader.h" />
     <ClInclude Include="engine\Animation\KeyframeAnimation.h" />
     <ClInclude Include="application\GameObjects\Enemy\Enemy.h" />
@@ -452,15 +454,15 @@ copy "$(windowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="application\GameObjects\ObjectRender\ObjectRender.h" />
     <ClInclude Include="application\GameObjects\Player\PlayerHealth.h" />
     <ClInclude Include="engine\base\utility\gameTimer\GameTimer.h" />
-    <ClInclude Include="application\GameObjects\Wall\Wall.h" />
-    <ClInclude Include="application\GameObjects\Wall\WallManager.h" />
-    <ClInclude Include="application\GameObjects\Goal\Goal.h" />
+    <ClInclude Include="application\GameObjects\StageObjects\Wall\Wall.h" />
+    <ClInclude Include="application\GameObjects\StageObjects\Wall\WallManager.h" />
+    <ClInclude Include="application\GameObjects\StageObjects\Goal\Goal.h" />
     <ClInclude Include="application\GameObjects\Player\PlayerHPGauge.h" />
     <ClInclude Include="engine\tool\json\JsonManager.h" />
     <ClInclude Include="application\Menu\MenuList.h" />
     <ClInclude Include="application\GameObjects\Effect\FlashEffect.h" />
     <ClInclude Include="application\GameObjects\Effect\LetterBox.h" />
-    <ClInclude Include="application\GameObjects\Ground\Ground.h" />
+    <ClInclude Include="application\GameObjects\StageObjects\Ground\Ground.h" />
     <ClInclude Include="application\Scene\PauseScene.h" />
     <ClInclude Include="application\Scene\ResultScene.h" />
     <ClInclude Include="application\GameObjects\ResultUI\ResultUIManager.h" />

@@ -39,6 +39,9 @@ public:
 	// 要求されている遷移の種類を取得
 	SceneTransition GetRequestedTransition() const { return requestedTransition_; }
 
+	// 共通データへのポインタを取得
+	CommonData* GetCommonData() const { return commonData_.get(); }
+
 	// 要求されている遷移の種類をクリア
 	void ClearRequest() {
 		requestedSceneName_ = "";
@@ -73,5 +76,5 @@ private:
 	TimeManager* timeManager_ = nullptr;
 
 	// シーン間で共有するデータ
-	CommonData commonData_;
+	std::unique_ptr<CommonData> commonData_;
 };

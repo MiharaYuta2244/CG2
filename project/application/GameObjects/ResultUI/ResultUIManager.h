@@ -1,8 +1,9 @@
-#pragma once 
-#include "Text/ResultScoreText.h"
-#include "Text/ResultTimerText.h"
+#pragma once
 #include "Button/RetryButton.h"
 #include "Button/ToTitleButton.h"
+#include "GameObjects/CommonData.h"
+#include "Text/ResultScoreText.h"
+#include "Text/ResultTimerText.h"
 
 /// <summary>
 /// リザルトシーンのUI管理クラス
@@ -10,7 +11,7 @@
 class ResultUIManager {
 public:
 	// 初期化処理
-	void Initialize(EngineContext* ctx);
+	void Initialize(EngineContext* ctx, CommonData* commonData);
 
 	// 更新処理
 	void Update(float deltaTime, DirectInput* input, GamePad* gamePad);

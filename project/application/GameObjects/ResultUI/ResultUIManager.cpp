@@ -1,6 +1,6 @@
 #include "ResultUIManager.h"
 
-void ResultUIManager::Initialize(EngineContext* ctx) {
+void ResultUIManager::Initialize(EngineContext* ctx, CommonData* commonData) {
 	// スコアテキスト生成&初期化
 	scoreText_ = std::make_unique<ResultScoreText>();
 	scoreText_->Initialize(ctx);
@@ -16,6 +16,12 @@ void ResultUIManager::Initialize(EngineContext* ctx) {
 	// タイトルへ戻るボタン生成&初期化
 	toTitleButton_ = std::make_unique<ToTitleButton>();
 	toTitleButton_->Initialize(ctx);
+
+	// キル数の受け渡し
+	scoreText_->SetKillCount(commonData->killCount);
+
+	// クリア時間の受け渡し
+	timerText_->SetClearTime(commonData->clearTime);
 }
 
 void ResultUIManager::Update(float deltaTime, DirectInput* input, GamePad* gamePad) {

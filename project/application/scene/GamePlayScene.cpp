@@ -7,6 +7,11 @@ using namespace TinyEngine;
 
 void GamePlayScene::Initialize(const SceneContext& ctx) {
 	ctx_ = ctx;
+	commonData_ = ctx_.sceneManager->GetCommonData();
+
+	// 共通データをリセット
+	commonData_->killCount = 0;
+	commonData_->clearTime = 0.0f;
 
 	// デバッグカメラ
 	debugCamera_ = std::make_unique<Camera>();
@@ -85,6 +90,11 @@ void GamePlayScene::Update() {
 	if (ctx_.keyboard->KeyTriggered(DIK_TAB)) {
 		RequestScenePush("Pause");
 		return;
+	}
+
+	// ゴールしていなければクリアタイムを加算
+	if (!goal_->GetGoal() && !player_->IsDead()) {
+		commonData_->clearTime += deltaTime;
 	}
 
 	// プレイヤーの更新処理
@@ -370,6 +380,7 @@ void GamePlayScene::CollisionGameObjects() {
 				// ----------------------------------------
 				if (enemy->IsKnockBack()) {
 					enemy->Kill();
+					commonData_->killCount++;
 
 					// パーティクルの生成
 					auto particle = std::make_unique<Particle>();
@@ -450,6 +461,7 @@ void GamePlayScene::CollisionGameObjects() {
 				if (a->IsKnockBack() || b->IsKnockBack()) {
 					a->Kill();
 					b->Kill();
+					commonData_->killCount += 2;
 
 					// パーティクルの生成
 					auto particle = std::make_unique<Particle>();

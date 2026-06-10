@@ -261,13 +261,13 @@
     <ClCompile Include="application\GameObjects\Enemy\EnemyBulletManager.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
-    <ClCompile Include="application\GameObjects\Wall\Wall.cpp">
+    <ClCompile Include="application\GameObjects\StageObjects\Wall\Wall.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
-    <ClCompile Include="application\GameObjects\Wall\WallManager.cpp">
+    <ClCompile Include="application\GameObjects\StageObjects\Wall\WallManager.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
-    <ClCompile Include="application\GameObjects\Goal\Goal.cpp">
+    <ClCompile Include="application\GameObjects\StageObjects\Goal\Goal.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
     <ClCompile Include="application\GameObjects\Enemy\EnemyManager.cpp">
@@ -294,7 +294,7 @@
     <ClCompile Include="application\GameObjects\Effect\LetterBox.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
-    <ClCompile Include="application\GameObjects\Ground\Ground.cpp">
+    <ClCompile Include="application\GameObjects\StageObjects\Ground\Ground.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
     <ClCompile Include="application\Scene\PauseScene.cpp">
@@ -358,6 +358,9 @@
       <Filter>ソース ファイル</Filter>
     </ClCompile>
     <ClCompile Include="application\GameObjects\GameUI\Controls.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="application\GameObjects\StageObjects\Door\Door.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
   </ItemGroup>
@@ -670,13 +673,13 @@
     <ClInclude Include="application\GameObjects\Enemy\EnemyBulletManager.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
-    <ClInclude Include="application\GameObjects\Wall\Wall.h">
+    <ClInclude Include="application\GameObjects\StageObjects\Wall\Wall.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
-    <ClInclude Include="application\GameObjects\Wall\WallManager.h">
+    <ClInclude Include="application\GameObjects\StageObjects\Wall\WallManager.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
-    <ClInclude Include="application\GameObjects\Goal\Goal.h">
+    <ClInclude Include="application\GameObjects\StageObjects\Goal\Goal.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
     <ClInclude Include="application\GameObjects\Enemy\EnemyManager.h">
@@ -706,7 +709,7 @@
     <ClInclude Include="application\GameObjects\Effect\LetterBox.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
-    <ClInclude Include="application\GameObjects\Ground\Ground.h">
+    <ClInclude Include="application\GameObjects\StageObjects\Ground\Ground.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
     <ClInclude Include="engine\base\SceneContext.h">
@@ -788,6 +791,9 @@
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
     <ClInclude Include="application\GameObjects\CommonData.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="application\GameObjects\StageObjects\Door\Door.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
   </ItemGroup>
