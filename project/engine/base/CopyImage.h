@@ -64,16 +64,16 @@ private:
 
 	// シェーダーのマップ
 	std::unordered_map<PostEffectType, std::wstring> shaderMap_ = {
-	    {PostEffectType::FullScreen, L"Fullscreen"    },
-        {PostEffectType::Grayscale,  L"Grayscale"     },
-        {PostEffectType::Sepia,      L"Sepia"         },
-        {PostEffectType::Vignette,   L"Vignette"      },
-	    {PostEffectType::Smoothing,  L"BoxFilter"     },
-        {PostEffectType::Gaussian,   L"GaussianFilter"},
-        {PostEffectType::Outline,    L"Outline"       },
-        {PostEffectType::RadialBlur, L"RadialBlur"    },
-	    {PostEffectType::Dissolve,   L"Dissolve"      },
-        {PostEffectType::Random,     L"Random"        },
+	    {PostEffectType::FullScreen, L"Fullscreen"           },
+	    {PostEffectType::Grayscale,  L"Grayscale"            },
+	    {PostEffectType::Sepia,      L"Sepia"                },
+	    {PostEffectType::Vignette,   L"Vignette"             },
+	    {PostEffectType::Smoothing,  L"BoxFilter"            },
+	    {PostEffectType::Gaussian,   L"GaussianFilter"       },
+	    {PostEffectType::Outline,    L"LuminanceBasedOutline"},
+	    {PostEffectType::RadialBlur, L"RadialBlur"           },
+	    {PostEffectType::Dissolve,   L"Dissolve"             },
+	    {PostEffectType::Random,     L"Random"               },
 	};
 
 	// 各種パラメータ
@@ -91,7 +91,7 @@ private:
 	    {PostEffectType::Sepia,      sizeof(SepiaParam)    },
 	    {PostEffectType::Smoothing,  sizeof(SmoothingParam)},
 	    {PostEffectType::Gaussian,   sizeof(GaussianParam) },
-	    //{PostEffectType::Outline,    sizeof(OutlineParam)   },
+	    {PostEffectType::Outline,    0                     },
 	    //{PostEffectType::RadialBlur, sizeof(RadialBlurParam)},
 	    //{PostEffectType::Dissolve,   sizeof(DissolveParam)  },
 	    //{PostEffectType::Random,     sizeof(RandomParam)    },
