@@ -812,6 +812,6 @@
     <None Include="resources\shaders\Sprite.hlsli">
       <Filter>リソース ファイル\shaders</Filter>
     </None>
-    <None Include="resources\shaders\FullScreen.hlsli" />
+    <None Include="resources\shaders\PostEffect\FullScreen.hlsli" />
   </ItemGroup>
 </Project>

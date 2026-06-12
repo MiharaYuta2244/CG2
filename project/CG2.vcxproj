@@ -488,7 +488,7 @@ copy "$(windowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <None Include="resources\shaders\FullScreen.hlsli" />
+    <None Include="resources\shaders\PostEffect\FullScreen.hlsli" />
     <None Include="resources\shaders\Object3d.hlsli" />
     <None Include="resources\shaders\Sprite.hlsli" />
     <None Include="resources\shaders\Particle.hlsli" />

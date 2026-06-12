@@ -20,10 +20,10 @@ void CopyImage::CreateGraphicsPipeline(DirectXCommon* dx) {
 	assert(device);
 
 	// シェーダーコンパイル
-	IDxcBlob* vsBlob = DirectXUtils::CompileShader(L"resources/shaders/FullScreen.VS.hlsl", L"vs_6_0", dxcUtils_.Get(), dxcCompiler_.Get(), includeHandler_.Get());
+	IDxcBlob* vsBlob = DirectXUtils::CompileShader(L"resources/shaders/PostEffect/FullScreen.VS.hlsl", L"vs_6_0", dxcUtils_.Get(), dxcCompiler_.Get(), includeHandler_.Get());
 	assert(vsBlob != nullptr);
 	IDxcBlob* psBlob =
-	    DirectXUtils::CompileShader(L"resources/shaders/" + effectMetaMap_.at(postEffectType_).shaderName + L".PS.hlsl", L"ps_6_0", dxcUtils_.Get(), dxcCompiler_.Get(), includeHandler_.Get());
+	    DirectXUtils::CompileShader(L"resources/shaders/PostEffect/" + effectMetaMap_.at(postEffectType_).shaderName + L".PS.hlsl", L"ps_6_0", dxcUtils_.Get(), dxcCompiler_.Get(), includeHandler_.Get());
 	assert(psBlob != nullptr);
 
 	// ルートシグネチャを作成

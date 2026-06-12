@@ -88,6 +88,8 @@ void GamePlayScene::Initialize(const SceneContext& ctx) {
 
 void GamePlayScene::Update() {
 	float deltaTime = ctx_.timeManager->GetDeltaTime();
+	
+	// 経過時間の記録
 	elapsedTime_ += deltaTime;
 	ctx_.engineContext->copyImage->SetTime(elapsedTime_);
 
