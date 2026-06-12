@@ -9,6 +9,7 @@ public:
 	void EndRender(DirectXCommon* dx);
 
 	uint32_t GetSRVIndexColor() const { return srvIndexColor_; }
+	uint32_t GetSRVIndexDepth() const { return srvIndexDepth_; }
 
 private:
 	Microsoft::WRL::ComPtr<ID3D12Resource> resourceColor_;
@@ -18,6 +19,7 @@ private:
 	D3D12_CPU_DESCRIPTOR_HANDLE dsvHandle_;
 
 	uint32_t srvIndexColor_ = 0;
+	uint32_t srvIndexDepth_ = 0;
 
 	D3D12_VIEWPORT viewport_{};
 	D3D12_RECT scissorRect_{};

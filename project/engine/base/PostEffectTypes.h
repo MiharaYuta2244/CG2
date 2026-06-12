@@ -1,6 +1,7 @@
 #pragma once
 #include "Vector3.h"
 #include "Vector4.h"
+#include "Matrix4x4.h"
 
 struct GrayscaleParam {
 	float intensity = 1.0f;
@@ -33,4 +34,8 @@ struct GaussianParam {
 	float padding0;
 	float texelSize[2] = {0.0f, 0.0f};
 	float paddeing1[2];
+};
+
+struct DepthOutlineParam{
+	Matrix4x4 projectionInverse;
 };

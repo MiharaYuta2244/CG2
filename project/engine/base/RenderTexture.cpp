@@ -16,12 +16,22 @@ void RenderTexture::Initialize(DirectXCommon* dx, SrvManager* srv, uint32_t widt
 	// SRVを作成
 	srvIndexColor_ = srv->Allocate();
 	srv->CreateSRVforTexture2D(srvIndexColor_, resourceColor_.Get(), DXGI_FORMAT_R8G8B8A8_UNORM_SRGB, 1);
+
+	srvIndexDepth_ = srv->Allocate();
+	srv->CreateSRVforTexture2D(srvIndexDepth_, resourceDepth_.Get(), DXGI_FORMAT_R24_UNORM_X8_TYPELESS, 1);
+
+	D3D12_RESOURCE_BARRIER initBarrier{};
+	initBarrier.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
+	initBarrier.Transition.pResource = resourceDepth_.Get();
+	initBarrier.Transition.StateBefore = D3D12_RESOURCE_STATE_DEPTH_READ;
+	initBarrier.Transition.StateAfter = D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE;
+	dx->GetCommandList()->ResourceBarrier(1, &initBarrier);
 }
 
 void RenderTexture::BeginRender(DirectXCommon* dx) {
 	auto cmd = dx->GetCommandList();
 
-	// Color を RenderTarget に遷移
+	// Color
 	D3D12_RESOURCE_BARRIER barrierColor{};
 	barrierColor.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
 	barrierColor.Transition.pResource = resourceColor_.Get();
@@ -29,11 +39,11 @@ void RenderTexture::BeginRender(DirectXCommon* dx) {
 	barrierColor.Transition.StateAfter = D3D12_RESOURCE_STATE_RENDER_TARGET;
 	cmd->ResourceBarrier(1, &barrierColor);
 
-	// Depth を DepthWrite に遷移
+	// Depth
 	D3D12_RESOURCE_BARRIER barrierDepth{};
 	barrierDepth.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
 	barrierDepth.Transition.pResource = resourceDepth_.Get();
-	barrierDepth.Transition.StateBefore = D3D12_RESOURCE_STATE_DEPTH_READ;
+	barrierDepth.Transition.StateBefore = D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE;
 	barrierDepth.Transition.StateAfter = D3D12_RESOURCE_STATE_DEPTH_WRITE;
 	cmd->ResourceBarrier(1, &barrierDepth);
 
@@ -57,7 +67,7 @@ void RenderTexture::BeginRender(DirectXCommon* dx) {
 void RenderTexture::EndRender(DirectXCommon* dx) {
 	auto cmd = dx->GetCommandList();
 
-	// Color を ShaderResource に戻す
+	// Color
 	D3D12_RESOURCE_BARRIER barrierColor{};
 	barrierColor.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
 	barrierColor.Transition.pResource = resourceColor_.Get();
@@ -65,11 +75,11 @@ void RenderTexture::EndRender(DirectXCommon* dx) {
 	barrierColor.Transition.StateAfter = D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE;
 	cmd->ResourceBarrier(1, &barrierColor);
 
-	// Depth を DepthRead に戻す
+	// Depth
 	D3D12_RESOURCE_BARRIER barrierDepth{};
 	barrierDepth.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
 	barrierDepth.Transition.pResource = resourceDepth_.Get();
 	barrierDepth.Transition.StateBefore = D3D12_RESOURCE_STATE_DEPTH_WRITE;
-	barrierDepth.Transition.StateAfter = D3D12_RESOURCE_STATE_DEPTH_READ;
+	barrierDepth.Transition.StateAfter = D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE;
 	cmd->ResourceBarrier(1, &barrierDepth);
 }

@@ -1,5 +1,5 @@
 #include "AStarPathfinder.h"
-#include "GameObjects/Wall/WallManager.h"
+#include "GameObjects/StageObjects/Wall/WallManager.h"
 #include <algorithm>
 #include <cmath>
 

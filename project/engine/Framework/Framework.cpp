@@ -61,7 +61,7 @@ void Framework::Initialize() {
 
 	// CopyImage
 	copyImage_ = std::make_unique<TinyEngine::CopyImage>();
-	copyImage_->Initialize(dxCommon_.get(), PostEffectType::FullScreen);
+	copyImage_->Initialize(dxCommon_.get(), PostEffectType::DepthOutline);
 
 #ifdef USE_IMGUI
 	// ImGuiManager
@@ -106,6 +106,7 @@ void Framework::Initialize() {
 	engineContext_.particleCommon = particleCommon_.get();
 	engineContext_.srvManager = srvManager_.get();
 	engineContext_.skyboxCommon = skyboxCommon_.get();
+	engineContext_.copyImage = copyImage_.get();
 
 	// DirectInput
 	input_->Initialize(winApp_.get());
@@ -181,7 +182,7 @@ void Framework::PostDraw() {
 	SRVManagerPreDraw();
 
 	// RenderTextureからSwapChainへコピー
-	copyImage_->Draw(dxCommon_.get(), srvManager_.get(), renderTexture_->GetSRVIndexColor());
+	copyImage_->Draw(dxCommon_.get(), srvManager_.get(), renderTexture_->GetSRVIndexColor(), renderTexture_->GetSRVIndexDepth());
 
 	// ImGuiの内部コマンドを生成する
 #ifdef USE_IMGUI

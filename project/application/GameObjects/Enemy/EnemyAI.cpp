@@ -2,7 +2,7 @@
 #include "AStarPathfinder.h"
 #include "EnemyBulletManager.h"
 #include "GameObjects/Player/Player.h"
-#include "GameObjects/Wall/WallManager.h"
+#include "GameObjects/StageObjects/Wall/WallManager.h"
 #include "MathOperator.h"
 #include "MathUtility.h"
 #include "Random.h"

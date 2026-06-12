@@ -16,7 +16,8 @@ enum class PostEffectType {
 	Vignette,
 	Smoothing,
 	Gaussian,
-	Outline,
+	LuminanceOutline,
+	DepthOutline,
 	RadialBlur,
 	Dissolve,
 	Random,
@@ -29,10 +30,16 @@ public:
 	void Initialize(DirectXCommon* dx, PostEffectType type);
 
 	// 描画
-	void Draw(DirectXCommon* dx, SrvManager* srv, uint32_t srvIndex);
+	void Draw(DirectXCommon* dx, SrvManager* srv, uint32_t srvIndex, uint32_t depthSrvIndex);
 
 	// ImGui
 	void DrawImGui();
+
+	// カメラのVP行列Setter
+	void SetProjectionInverse(const Matrix4x4& projInv) { depthOutlineParam_.projectionInverse = projInv; }
+
+	// VignetteのIntensityのSetter
+	void SetVignetteIntensity(float intensity) { vignetteParam_.intensity = intensity; }
 
 private:
 	// シェーダコンパイラの初期化
@@ -64,16 +71,17 @@ private:
 
 	// シェーダーのマップ
 	std::unordered_map<PostEffectType, std::wstring> shaderMap_ = {
-	    {PostEffectType::FullScreen, L"Fullscreen"           },
-	    {PostEffectType::Grayscale,  L"Grayscale"            },
-	    {PostEffectType::Sepia,      L"Sepia"                },
-	    {PostEffectType::Vignette,   L"Vignette"             },
-	    {PostEffectType::Smoothing,  L"BoxFilter"            },
-	    {PostEffectType::Gaussian,   L"GaussianFilter"       },
-	    {PostEffectType::Outline,    L"LuminanceBasedOutline"},
-	    {PostEffectType::RadialBlur, L"RadialBlur"           },
-	    {PostEffectType::Dissolve,   L"Dissolve"             },
-	    {PostEffectType::Random,     L"Random"               },
+	    {PostEffectType::FullScreen,       L"Fullscreen"           },
+	    {PostEffectType::Grayscale,        L"Grayscale"            },
+	    {PostEffectType::Sepia,            L"Sepia"                },
+	    {PostEffectType::Vignette,         L"Vignette"             },
+	    {PostEffectType::Smoothing,        L"BoxFilter"            },
+	    {PostEffectType::Gaussian,         L"GaussianFilter"       },
+	    {PostEffectType::LuminanceOutline, L"LuminanceBasedOutline"},
+	    {PostEffectType::DepthOutline,     L"DepthBasedOutline"    },
+	    {PostEffectType::RadialBlur,       L"RadialBlur"           },
+	    {PostEffectType::Dissolve,         L"Dissolve"             },
+	    {PostEffectType::Random,           L"Random"               },
 	};
 
 	// 各種パラメータ
@@ -82,16 +90,18 @@ private:
 	SepiaParam sepiaParam_;
 	SmoothingParam smoothingParam_;
 	GaussianParam gaussianParam_;
+	DepthOutlineParam depthOutlineParam_;
 
 	// CB Size Map
 	std::unordered_map<PostEffectType, size_t> cbSizeMap_ = {
-	    {PostEffectType::FullScreen, 0                     }, // パラメータ不要
-	    {PostEffectType::Vignette,   sizeof(VignetteParam) },
-	    {PostEffectType::Grayscale,  sizeof(GrayscaleParam)},
-	    {PostEffectType::Sepia,      sizeof(SepiaParam)    },
-	    {PostEffectType::Smoothing,  sizeof(SmoothingParam)},
-	    {PostEffectType::Gaussian,   sizeof(GaussianParam) },
-	    {PostEffectType::Outline,    0                     },
+	    {PostEffectType::FullScreen,       0                        }, // パラメータ不要
+	    {PostEffectType::Vignette,         sizeof(VignetteParam)    },
+	    {PostEffectType::Grayscale,        sizeof(GrayscaleParam)   },
+	    {PostEffectType::Sepia,            sizeof(SepiaParam)       },
+	    {PostEffectType::Smoothing,        sizeof(SmoothingParam)   },
+	    {PostEffectType::Gaussian,         sizeof(GaussianParam)    },
+	    {PostEffectType::LuminanceOutline, 0                        },
+	    {PostEffectType::DepthOutline,     sizeof(DepthOutlineParam)},
 	    //{PostEffectType::RadialBlur, sizeof(RadialBlurParam)},
 	    //{PostEffectType::Dissolve,   sizeof(DissolveParam)  },
 	    //{PostEffectType::Random,     sizeof(RandomParam)    },
@@ -99,12 +109,12 @@ private:
 
 	// Param Ptr Map
 	std::unordered_map<PostEffectType, void*> paramPtrMap_ = {
-	    {PostEffectType::Vignette,  &vignetteParam_ },
-        {PostEffectType::Grayscale, &grayscaleParam_},
-        {PostEffectType::Sepia,     &sepiaParam_    },
-	    {PostEffectType::Smoothing, &smoothingParam_},
-        {PostEffectType::Gaussian,  &gaussianParam_ },
-	    //{PostEffectType::Outline,    &outlineParam_   },
+	    {PostEffectType::Vignette,     &vignetteParam_    },
+        {PostEffectType::Grayscale,    &grayscaleParam_   },
+        {PostEffectType::Sepia,        &sepiaParam_       },
+	    {PostEffectType::Smoothing,    &smoothingParam_   },
+        {PostEffectType::Gaussian,     &gaussianParam_    },
+        {PostEffectType::DepthOutline, &depthOutlineParam_},
 	    //{PostEffectType::RadialBlur, &radialBlurParam_},
 	    //{PostEffectType::Dissolve,   &dissolveParam_  },
 	    //{PostEffectType::Random,     &randomParam_    },

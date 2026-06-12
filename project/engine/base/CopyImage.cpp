@@ -32,7 +32,13 @@ void CopyImage::CreateGraphicsPipeline(DirectXCommon* dx) {
 	descriptorRange1.BaseShaderRegister = 0;
 	descriptorRange1.OffsetInDescriptorsFromTableStart = D3D12_DESCRIPTOR_RANGE_OFFSET_APPEND;
 
-	D3D12_ROOT_PARAMETER rootParameters[2] = {};
+	D3D12_DESCRIPTOR_RANGE descriptorRange2 = {};
+	descriptorRange2.RangeType = D3D12_DESCRIPTOR_RANGE_TYPE_SRV;
+	descriptorRange2.NumDescriptors = 1;
+	descriptorRange2.BaseShaderRegister = 1;
+	descriptorRange2.OffsetInDescriptorsFromTableStart = D3D12_DESCRIPTOR_RANGE_OFFSET_APPEND;
+
+	D3D12_ROOT_PARAMETER rootParameters[3] = {};
 	rootParameters[0].ParameterType = D3D12_ROOT_PARAMETER_TYPE_DESCRIPTOR_TABLE;
 	rootParameters[0].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;
 	rootParameters[0].DescriptorTable.pDescriptorRanges = &descriptorRange1;
@@ -41,6 +47,11 @@ void CopyImage::CreateGraphicsPipeline(DirectXCommon* dx) {
 	rootParameters[1].ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV;
 	rootParameters[1].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;
 	rootParameters[1].Descriptor.ShaderRegister = 0;
+
+	rootParameters[2].ParameterType = D3D12_ROOT_PARAMETER_TYPE_DESCRIPTOR_TABLE;
+	rootParameters[2].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;
+	rootParameters[2].DescriptorTable.pDescriptorRanges = &descriptorRange2;
+	rootParameters[2].DescriptorTable.NumDescriptorRanges = 1;
 
 	D3D12_STATIC_SAMPLER_DESC staticSampler = {};
 	staticSampler.Filter = D3D12_FILTER_MIN_MAG_MIP_LINEAR;
@@ -52,12 +63,19 @@ void CopyImage::CreateGraphicsPipeline(DirectXCommon* dx) {
 	staticSampler.ShaderRegister = 0;
 	staticSampler.ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;
 
+	D3D12_STATIC_SAMPLER_DESC staticSamplers[2] = {};
+	staticSamplers[0] = staticSampler;
+
+	staticSamplers[1] = staticSampler;
+	staticSamplers[1].Filter = D3D12_FILTER_MIN_MAG_MIP_POINT;
+	staticSamplers[1].ShaderRegister = 1;
+
 	D3D12_ROOT_SIGNATURE_DESC rootDesc = {};
 	rootDesc.Flags = D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT;
 	rootDesc.pParameters = rootParameters;
 	rootDesc.NumParameters = _countof(rootParameters);
-	rootDesc.pStaticSamplers = &staticSampler;
-	rootDesc.NumStaticSamplers = 1;
+	rootDesc.pStaticSamplers = staticSamplers;
+	rootDesc.NumStaticSamplers = _countof(staticSamplers);
 
 	ID3DBlob* signatureBlob = nullptr;
 	ID3DBlob* errorBlob = nullptr;
@@ -115,7 +133,6 @@ void TinyEngine::CopyImage::CreateCB() {
 	cbResource_ = DirectXUtils::CreateBufferResource(dxCommon_->GetDevice(), size);
 	cbResource_->Map(0, nullptr, reinterpret_cast<void**>(&cbData_));
 	memcpy(cbData_, paramPtrMap_[postEffectType_], size);
-	cbResource_->Unmap(0, nullptr);
 }
 
 void TinyEngine::CopyImage::AllParamSetting() {
@@ -149,7 +166,7 @@ void CopyImage::Initialize(DirectXCommon* dx, PostEffectType type) {
 	CreateGraphicsPipeline(dx);
 }
 
-void CopyImage::Draw(DirectXCommon* dx, SrvManager* srv, uint32_t srvIndex) {
+void CopyImage::Draw(DirectXCommon* dx, SrvManager* srv, uint32_t srvIndex, uint32_t depthSrvIndex) {
 	auto cmd = dx->GetCommandList();
 	assert(cmd);
 
@@ -169,6 +186,11 @@ void CopyImage::Draw(DirectXCommon* dx, SrvManager* srv, uint32_t srvIndex) {
 		cmd->SetGraphicsRootConstantBufferView(1, cbResource_->GetGPUVirtualAddress());
 	}
 
+	// DepthOutlineの場合のみ深度SRVをセット
+	if(postEffectType_ == PostEffectType::DepthOutline){
+		cmd->SetGraphicsRootDescriptorTable(2, srv->GetGPUDescriptorHandle(depthSrvIndex));
+	}
+
 	// IA
 	cmd->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
@@ -181,7 +203,7 @@ void TinyEngine::CopyImage::DrawImGui() {
 	ImGui::Begin("PostEffect");
 
 	{
-		static const char* effectNames[] = {"FullScreen", "Grayscale", "Sepia", "Vignette", "Smoothing", "Gaussian", "Outline", "RadialBlur", "Dissolve", "Random"};
+		static const char* effectNames[] = {"FullScreen", "Grayscale", "Sepia", "Vignette", "Smoothing", "Gaussian", "LuminanceOutline", "DepthOutline", "RadialBlur", "Dissolve", "Random"};
 
 		int current = static_cast<int>(postEffectType_);
 		if (ImGui::Combo("Effect Type", &current, effectNames, IM_ARRAYSIZE(effectNames))) {
@@ -224,7 +246,7 @@ void TinyEngine::CopyImage::DrawImGui() {
 		auto& p = vignetteParam_;
 		ImGui::Text("Vignette");
 		ImGui::ColorEdit4("Color", &p.color.x);
-		ImGui::SliderFloat("Intensity", &p.intensity, 0.0f, 3.0f);
+		ImGui::SliderFloat("Intensity", &p.intensity, 0.0f, 1.0f);
 		break;
 	}
 

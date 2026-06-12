@@ -1,21 +1,21 @@
 #pragma once
+#include "CopyImage.h"
 #include "D3DResourceLeakChecker.h"
+#include "DebugCamera.h"
+#include "DirectInput.h"
 #include "DirectXCommon.h"
 #include "EngineContext.h"
+#include "GamePad.h"
 #include "ImGuiManager.h"
 #include "ModelManager.h"
 #include "Object3dCommon.h"
 #include "ParticleCommon.h"
+#include "RenderTexture.h"
 #include "SpriteCommon.h"
 #include "SrvManager.h"
 #include "TextureManager.h"
-#include "WinApp.h"
 #include "TimeManager.h"
-#include "DebugCamera.h"
-#include "DirectInput.h"
-#include "GamePad.h"
-#include "RenderTexture.h"
-#include "CopyImage.h"
+#include "WinApp.h"
 #pragma comment(lib, "d3d12.lib")
 #pragma comment(lib, "dxgi.lib")
 #include <dxgidebug.h>
@@ -36,7 +36,7 @@ public:
 
 	virtual void Update();
 
-	virtual void Draw()=0;
+	virtual void Draw() = 0;
 
 	// 実行
 	void Run();

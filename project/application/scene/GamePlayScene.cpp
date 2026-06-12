@@ -97,6 +97,18 @@ void GamePlayScene::Update() {
 		commonData_->clearTime += deltaTime;
 	}
 
+	Matrix4x4 projInv = MathUtility::Inverse(ctx_.currentCamera->GetProjection());
+	ctx_.engineContext->copyImage->SetProjectionInverse(projInv);
+
+	float hpRatio = player_->GetCurrentHP() / player_->GetMaxHP();
+
+	if (hpRatio < 0.3f) {
+		float intensity = (0.3f - hpRatio) / 0.3f;
+		ctx_.engineContext->copyImage->SetVignetteIntensity(intensity);
+	} else {
+		ctx_.engineContext->copyImage->SetVignetteIntensity(0.0f);
+	}
+
 	// プレイヤーの更新処理
 	player_->Update(deltaTime, ctx_.keyboard, ctx_.gamePad, enemyManager_.get());
 
