@@ -46,3 +46,8 @@ struct RadialBlurParam {
 	float blurWidth = 0.01f;
 	float numSamples = 10.0f;
 };
+
+struct DissolveParam {
+	float threshold = 0.5f;
+	Vector3 edgeColor = {1.0f, 0.4f, 0.3f};
+};

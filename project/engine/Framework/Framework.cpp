@@ -61,7 +61,7 @@ void Framework::Initialize() {
 
 	// CopyImage
 	copyImage_ = std::make_unique<TinyEngine::CopyImage>();
-	copyImage_->Initialize(dxCommon_.get(), PostEffectType::DepthOutline);
+	copyImage_->Initialize(dxCommon_.get(), PostEffectType::DepthOutline, textureManager_.get());
 
 #ifdef USE_IMGUI
 	// ImGuiManager

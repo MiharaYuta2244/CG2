@@ -2,6 +2,7 @@
 #include "DirectXCommon.h"
 #include "PostEffectTypes.h"
 #include "SrvManager.h"
+#include "TextureManager.h"
 #include <dxcapi.h>
 #include <string>
 #include <wrl.h>
@@ -33,7 +34,7 @@ namespace TinyEngine {
 class CopyImage {
 public:
 	// 初期化
-	void Initialize(DirectXCommon* dx, PostEffectType type);
+	void Initialize(DirectXCommon* dx, PostEffectType type, TextureManager* textureManager);
 
 	// 描画
 	void Draw(DirectXCommon* dx, SrvManager* srv, uint32_t srvIndex, uint32_t depthSrvIndex);
@@ -86,6 +87,7 @@ private:
 	GaussianParam gaussianParam_;
 	DepthOutlineParam depthOutlineParam_;
 	RadialBlurParam radialBlurParam_;
+	DissolveParam dissolveParam_;
 
 	// メタデータマップ
 	std::unordered_map<PostEffectType, EffectMeta> effectMetaMap_ = {
@@ -97,8 +99,8 @@ private:
 	    {PostEffectType::Gaussian,         {L"GaussianFilter", sizeof(GaussianParam), &gaussianParam_}           },
 	    {PostEffectType::LuminanceOutline, {L"LuminanceBasedOutline", 0, nullptr}                                },
 	    {PostEffectType::DepthOutline,     {L"DepthBasedOutline", sizeof(DepthOutlineParam), &depthOutlineParam_}},
-	    {PostEffectType::RadialBlur,       {L"RadialBlur", sizeof(RadialBlurParam), &radialBlurParam_}                                   },
-	    {PostEffectType::Dissolve,         {L"Dissolve", 0, nullptr}                                             },
+	    {PostEffectType::RadialBlur,       {L"RadialBlur", sizeof(RadialBlurParam), &radialBlurParam_}           },
+	    {PostEffectType::Dissolve,         {L"Dissolve", sizeof(DissolveParam), &dissolveParam_}                  },
 	    {PostEffectType::Random,           {L"Random", 0, nullptr}                                               },
 	};
 
@@ -107,5 +109,8 @@ private:
 
 	// Data
 	void* cbData_ = nullptr;
+
+	// TextureManagerポインタ
+	TextureManager* textureManager_ = nullptr;
 };
 } // namespace TinyEngine

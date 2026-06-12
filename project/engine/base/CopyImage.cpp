@@ -148,8 +148,9 @@ void TinyEngine::CopyImage::AllParamSetting() {
 	gaussianParam_.texelSize[1] = 1.0f / dxCommon_->GetBackBufferHeight();
 }
 
-void CopyImage::Initialize(DirectXCommon* dx, PostEffectType type) {
+void CopyImage::Initialize(DirectXCommon* dx, PostEffectType type, TextureManager* textureManager) {
 	dxCommon_ = dx;
+	textureManager_ = textureManager;
 
 	// 適用するポストエフェクトのタイプを設定
 	postEffectType_ = type;
@@ -190,6 +191,9 @@ void CopyImage::Draw(DirectXCommon* dx, SrvManager* srv, uint32_t srvIndex, uint
 	// DepthOutlineの場合のみ深度SRVをセット
 	if (postEffectType_ == PostEffectType::DepthOutline) {
 		cmd->SetGraphicsRootDescriptorTable(2, srv->GetGPUDescriptorHandle(depthSrvIndex));
+	} else if (postEffectType_ == PostEffectType::Dissolve) {
+		std::string path = "resources/textures/noise0.png";
+		cmd->SetGraphicsRootDescriptorTable(2, srv->GetGPUDescriptorHandle(textureManager_->GetSrvIndex(path)));
 	}
 
 	// IA
@@ -274,6 +278,13 @@ void TinyEngine::CopyImage::DrawImGui() {
 		ImGui::DragFloat2("center", &p.center.x, 0.01f);
 		ImGui::DragFloat("width", &p.blurWidth, 0.01f);
 		ImGui::DragFloat("samples", &p.numSamples, 1.0f);
+		break;
+	}
+
+	case PostEffectType::Dissolve: {
+		auto& p = dissolveParam_;
+		ImGui::Text("Dissolve");
+		ImGui::SliderFloat("threshold", &p.threshold, 0.0f, 1.0f);
 		break;
 	}
 
