@@ -88,10 +88,13 @@ void GamePlayScene::Initialize(const SceneContext& ctx) {
 
 void GamePlayScene::Update() {
 	float deltaTime = ctx_.timeManager->GetDeltaTime();
-	
+
 	// 経過時間の記録
 	elapsedTime_ += deltaTime;
-	ctx_.engineContext->copyImage->SetTime(elapsedTime_);
+	ctx_.engineContext->copyImage->SetRandomTime(elapsedTime_);
+
+	// グリッチノイズの更新
+	UpdateGlitch(deltaTime);
 
 	// ポーズ画面
 	if (ctx_.keyboard->KeyTriggered(DIK_TAB)) {
@@ -313,6 +316,9 @@ void GamePlayScene::CollisionGameObjects() {
 
 			// カメラシェイク開始
 			ctx_.currentCamera->StartShake(0.2f, 0.2f);
+
+			// グリッチノイズ用タイマーの初期化
+			glitchTimer_ = kGlitchDuration;
 		}
 	}
 
@@ -569,4 +575,22 @@ void GamePlayScene::UpdateDebugImGui() {
 	}
 	ImGui::End();
 #endif
+}
+
+void GamePlayScene::UpdateGlitch(float deltaTime){
+	// グリッチノイズ用タイマーの減算
+	if (glitchTimer_ > 0.0f) {
+		glitchTimer_ -= deltaTime;
+		if (glitchTimer_ < 0.0f) {
+			glitchTimer_ = 0.0f;
+		}
+	}
+
+	float intensity = 0.0f;
+	if (glitchTimer_ > 0.0f) {
+		intensity = glitchTimer_ / kGlitchDuration;
+	}
+
+	ctx_.engineContext->copyImage->SetGlitchTime(elapsedTime_);
+	ctx_.engineContext->copyImage->SetGlitchIntensity(intensity);
 }

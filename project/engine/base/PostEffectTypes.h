@@ -55,3 +55,8 @@ struct DissolveParam {
 struct RandomParam{
 	float time = 0.0f;
 };
+
+struct GlitchParam {
+	float time = 0.0f;
+	float intensity = 0.0f;
+};

@@ -170,7 +170,7 @@ void Object3d::Draw() {
 	commandList->SetGraphicsRootConstantBufferView(9, outlineResource_->GetGPUVirtualAddress());
 
 	if (model_) {
-		model_->Draw(textureFilePath_); // アウトライン描画
+		//model_->Draw(textureFilePath_); // アウトライン描画
 	}
 
 	// 3Dオブジェクト描画準備。3Dオブジェクトの描画に共通のグラフィックスコマンドを積む

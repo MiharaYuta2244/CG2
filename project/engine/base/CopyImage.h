@@ -22,6 +22,7 @@ enum class PostEffectType {
 	RadialBlur,
 	Dissolve,
 	Random,
+	Glitch,
 };
 
 struct EffectMeta {
@@ -52,7 +53,13 @@ public:
 	void SetVignetteColor(Vector4 color) { vignetteParam_.color = color; }
 
 	// RandomShader用に経過時間を設定
-	void SetTime(float time) { randomParam_.time = time; }
+	void SetRandomTime(float time) { randomParam_.time = time; }
+
+	// GlitchノイズのIntensityのSetter
+	void SetGlitchIntensity(float intensity) { glitchParam_.intensity = intensity; }
+
+	// GlitchShader用に経過時間を設定
+	void SetGlitchTime(float time) { glitchParam_.time = time; }
 
 private:
 	// シェーダコンパイラの初期化
@@ -92,6 +99,7 @@ private:
 	RadialBlurParam radialBlurParam_;
 	DissolveParam dissolveParam_;
 	RandomParam randomParam_;
+	GlitchParam glitchParam_;
 
 	// メタデータマップ
 	std::unordered_map<PostEffectType, EffectMeta> effectMetaMap_ = {
@@ -106,6 +114,7 @@ private:
 	    {PostEffectType::RadialBlur,       {L"RadialBlur", sizeof(RadialBlurParam), &radialBlurParam_}           },
 	    {PostEffectType::Dissolve,         {L"Dissolve", sizeof(DissolveParam), &dissolveParam_}                 },
 	    {PostEffectType::Random,           {L"Random", sizeof(RandomParam), &randomParam_}                       },
+	    {PostEffectType::Glitch,           {L"Glitch", sizeof(GlitchParam), &glitchParam_}                       },
 	};
 
 	// CB

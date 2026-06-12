@@ -5,15 +5,15 @@
 #include "GameObjects/Effect/LetterBox.h"
 #include "GameObjects/Enemy/EnemyBulletManager.h"
 #include "GameObjects/Enemy/EnemyManager.h"
-#include "GameObjects/StageObjects/Goal/Goal.h"
-#include "GameObjects/StageObjects/Ground/Ground.h"
+#include "GameObjects/GameUI/Controls.h"
 #include "GameObjects/Player/Player.h"
 #include "GameObjects/Player/PlayerHPGauge.h"
+#include "GameObjects/StageObjects/Goal/Goal.h"
+#include "GameObjects/StageObjects/Ground/Ground.h"
 #include "GameObjects/StageObjects/Wall/WallManager.h"
 #include "Object3d.h"
 #include "Particle.h"
 #include "Skybox.h"
-#include "GameObjects/GameUI/Controls.h"
 #include <memory>
 #include <vector>
 
@@ -39,6 +39,9 @@ private:
 
 	// デバッグ用のImGui更新
 	void UpdateDebugImGui();
+
+	// グリッチノイズの更新
+	void UpdateGlitch(float deltaTime);
 
 private:
 	// プレイヤー
@@ -102,4 +105,8 @@ private:
 
 	// 経過時間
 	float elapsedTime_ = 0.0f;
+
+	// グリッチノイズ用変数
+	float glitchTimer_ = 0.0f;          // 経過時間
+	const float kGlitchDuration = 0.1f; // グリッチノイズをかける時間
 };

@@ -22,8 +22,8 @@ void CopyImage::CreateGraphicsPipeline(DirectXCommon* dx) {
 	// シェーダーコンパイル
 	IDxcBlob* vsBlob = DirectXUtils::CompileShader(L"resources/shaders/PostEffect/FullScreen.VS.hlsl", L"vs_6_0", dxcUtils_.Get(), dxcCompiler_.Get(), includeHandler_.Get());
 	assert(vsBlob != nullptr);
-	IDxcBlob* psBlob =
-	    DirectXUtils::CompileShader(L"resources/shaders/PostEffect/" + effectMetaMap_.at(postEffectType_).shaderName + L".PS.hlsl", L"ps_6_0", dxcUtils_.Get(), dxcCompiler_.Get(), includeHandler_.Get());
+	IDxcBlob* psBlob = DirectXUtils::CompileShader(
+	    L"resources/shaders/PostEffect/" + effectMetaMap_.at(postEffectType_).shaderName + L".PS.hlsl", L"ps_6_0", dxcUtils_.Get(), dxcCompiler_.Get(), includeHandler_.Get());
 	assert(psBlob != nullptr);
 
 	// ルートシグネチャを作成
@@ -208,7 +208,7 @@ void TinyEngine::CopyImage::DrawImGui() {
 	ImGui::Begin("PostEffect");
 
 	{
-		static const char* effectNames[] = {"FullScreen", "Grayscale", "Sepia", "Vignette", "Smoothing", "Gaussian", "LuminanceOutline", "DepthOutline", "RadialBlur", "Dissolve", "Random"};
+		static const char* effectNames[] = {"FullScreen", "Grayscale", "Sepia", "Vignette", "Smoothing", "Gaussian", "LuminanceOutline", "DepthOutline", "RadialBlur", "Dissolve", "Random", "Glitch"};
 
 		int current = static_cast<int>(postEffectType_);
 		if (ImGui::Combo("Effect Type", &current, effectNames, IM_ARRAYSIZE(effectNames))) {
@@ -285,6 +285,13 @@ void TinyEngine::CopyImage::DrawImGui() {
 		auto& p = dissolveParam_;
 		ImGui::Text("Dissolve");
 		ImGui::SliderFloat("threshold", &p.threshold, 0.0f, 1.0f);
+		break;
+	}
+
+	case PostEffectType::Glitch: {
+		auto& p = glitchParam_;
+		ImGui::Text("Glitch");
+		ImGui::SliderFloat("Intensity", &p.intensity, 0.0f, 1.0f);
 		break;
 	}
 
