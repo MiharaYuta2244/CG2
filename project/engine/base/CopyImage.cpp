@@ -22,7 +22,8 @@ void CopyImage::CreateGraphicsPipeline(DirectXCommon* dx) {
 	// シェーダーコンパイル
 	IDxcBlob* vsBlob = DirectXUtils::CompileShader(L"resources/shaders/FullScreen.VS.hlsl", L"vs_6_0", dxcUtils_.Get(), dxcCompiler_.Get(), includeHandler_.Get());
 	assert(vsBlob != nullptr);
-	IDxcBlob* psBlob = DirectXUtils::CompileShader(L"resources/shaders/" + shaderMap_.at(postEffectType_) + L".PS.hlsl", L"ps_6_0", dxcUtils_.Get(), dxcCompiler_.Get(), includeHandler_.Get());
+	IDxcBlob* psBlob =
+	    DirectXUtils::CompileShader(L"resources/shaders/" + effectMetaMap_.at(postEffectType_).shaderName + L".PS.hlsl", L"ps_6_0", dxcUtils_.Get(), dxcCompiler_.Get(), includeHandler_.Get());
 	assert(psBlob != nullptr);
 
 	// ルートシグネチャを作成
@@ -126,13 +127,13 @@ void CopyImage::CreateGraphicsPipeline(DirectXCommon* dx) {
 }
 
 void TinyEngine::CopyImage::CreateCB() {
-	size_t size = cbSizeMap_[postEffectType_];
-	if (size == 0)
+	const auto& meta = effectMetaMap_.at(postEffectType_);
+	if (meta.cbSize == 0)
 		return; // パラメータ不要のエフェクト
 
-	cbResource_ = DirectXUtils::CreateBufferResource(dxCommon_->GetDevice(), size);
+	cbResource_ = DirectXUtils::CreateBufferResource(dxCommon_->GetDevice(), meta.cbSize);
 	cbResource_->Map(0, nullptr, reinterpret_cast<void**>(&cbData_));
-	memcpy(cbData_, paramPtrMap_[postEffectType_], size);
+	memcpy(cbData_, meta.paramPtr, meta.cbSize);
 }
 
 void TinyEngine::CopyImage::AllParamSetting() {
@@ -187,7 +188,7 @@ void CopyImage::Draw(DirectXCommon* dx, SrvManager* srv, uint32_t srvIndex, uint
 	}
 
 	// DepthOutlineの場合のみ深度SRVをセット
-	if(postEffectType_ == PostEffectType::DepthOutline){
+	if (postEffectType_ == PostEffectType::DepthOutline) {
 		cmd->SetGraphicsRootDescriptorTable(2, srv->GetGPUDescriptorHandle(depthSrvIndex));
 	}
 
@@ -273,9 +274,9 @@ void TinyEngine::CopyImage::DrawImGui() {
 	}
 
 	// CB更新
-	size_t size = cbSizeMap_[postEffectType_];
-	if (size > 0 && cbResource_) {
-		memcpy(cbData_, paramPtrMap_[postEffectType_], size);
+	const auto& meta = effectMetaMap_.at(postEffectType_);
+	if (meta.cbSize > 0 && cbResource_) {
+		memcpy(cbData_, meta.paramPtr, meta.cbSize);
 	}
 
 	ImGui::End();

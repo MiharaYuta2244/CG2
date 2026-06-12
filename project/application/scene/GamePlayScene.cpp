@@ -81,6 +81,9 @@ void GamePlayScene::Initialize(const SceneContext& ctx) {
 
 	controls_ = std::make_unique<Controls>();
 	controls_->Initialize(ctx_.engineContext);
+
+	// VignetteのColorを赤に指定
+	ctx_.engineContext->copyImage->SetVignetteColor({1,0,0,1});
 }
 
 void GamePlayScene::Update() {
@@ -97,9 +100,11 @@ void GamePlayScene::Update() {
 		commonData_->clearTime += deltaTime;
 	}
 
+	// Projectionの逆行列をCopyImageに渡す
 	Matrix4x4 projInv = MathUtility::Inverse(ctx_.currentCamera->GetProjection());
 	ctx_.engineContext->copyImage->SetProjectionInverse(projInv);
 
+	// HP量に応じてVignetteのパラメータを変更
 	float hpRatio = player_->GetCurrentHP() / player_->GetMaxHP();
 
 	if (hpRatio < 0.3f) {

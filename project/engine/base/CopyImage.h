@@ -23,6 +23,12 @@ enum class PostEffectType {
 	Random,
 };
 
+struct EffectMeta {
+	std::wstring shaderName;
+	size_t cbSize;
+	void* paramPtr;
+};
+
 namespace TinyEngine {
 class CopyImage {
 public:
@@ -40,6 +46,9 @@ public:
 
 	// VignetteのIntensityのSetter
 	void SetVignetteIntensity(float intensity) { vignetteParam_.intensity = intensity; }
+
+	// VignetteのColorのSetter
+	void SetVignetteColor(Vector4 color) { vignetteParam_.color = color; }
 
 private:
 	// シェーダコンパイラの初期化
@@ -69,19 +78,19 @@ private:
 	// 適用するシェーダー
 	PostEffectType postEffectType_ = PostEffectType::FullScreen;
 
-	// シェーダーのマップ
-	std::unordered_map<PostEffectType, std::wstring> shaderMap_ = {
-	    {PostEffectType::FullScreen,       L"Fullscreen"           },
-	    {PostEffectType::Grayscale,        L"Grayscale"            },
-	    {PostEffectType::Sepia,            L"Sepia"                },
-	    {PostEffectType::Vignette,         L"Vignette"             },
-	    {PostEffectType::Smoothing,        L"BoxFilter"            },
-	    {PostEffectType::Gaussian,         L"GaussianFilter"       },
-	    {PostEffectType::LuminanceOutline, L"LuminanceBasedOutline"},
-	    {PostEffectType::DepthOutline,     L"DepthBasedOutline"    },
-	    {PostEffectType::RadialBlur,       L"RadialBlur"           },
-	    {PostEffectType::Dissolve,         L"Dissolve"             },
-	    {PostEffectType::Random,           L"Random"               },
+	// メタデータマップ
+	std::unordered_map<PostEffectType, EffectMeta> effectMetaMap_ = {
+	    {PostEffectType::FullScreen,       {L"Fullscreen", 0, nullptr}                                           },
+	    {PostEffectType::Vignette,         {L"Vignette", sizeof(VignetteParam), &vignetteParam_}                 },
+	    {PostEffectType::Grayscale,        {L"Grayscale", sizeof(GrayscaleParam), &grayscaleParam_}              },
+	    {PostEffectType::Sepia,            {L"Sepia", sizeof(SepiaParam), &sepiaParam_}                          },
+	    {PostEffectType::Smoothing,        {L"BoxFilter", sizeof(SmoothingParam), &smoothingParam_}              },
+	    {PostEffectType::Gaussian,         {L"GaussianFilter", sizeof(GaussianParam), &gaussianParam_}           },
+	    {PostEffectType::LuminanceOutline, {L"LuminanceBasedOutline", 0, nullptr}                                },
+	    {PostEffectType::DepthOutline,     {L"DepthBasedOutline", sizeof(DepthOutlineParam), &depthOutlineParam_}},
+	    {PostEffectType::RadialBlur,       {L"RadialBlur", 0, nullptr}                                           },
+	    {PostEffectType::Dissolve,         {L"Dissolve", 0, nullptr}                                             },
+	    {PostEffectType::Random,           {L"Random", 0, nullptr}                                               },
 	};
 
 	// 各種パラメータ
@@ -91,34 +100,6 @@ private:
 	SmoothingParam smoothingParam_;
 	GaussianParam gaussianParam_;
 	DepthOutlineParam depthOutlineParam_;
-
-	// CB Size Map
-	std::unordered_map<PostEffectType, size_t> cbSizeMap_ = {
-	    {PostEffectType::FullScreen,       0                        }, // パラメータ不要
-	    {PostEffectType::Vignette,         sizeof(VignetteParam)    },
-	    {PostEffectType::Grayscale,        sizeof(GrayscaleParam)   },
-	    {PostEffectType::Sepia,            sizeof(SepiaParam)       },
-	    {PostEffectType::Smoothing,        sizeof(SmoothingParam)   },
-	    {PostEffectType::Gaussian,         sizeof(GaussianParam)    },
-	    {PostEffectType::LuminanceOutline, 0                        },
-	    {PostEffectType::DepthOutline,     sizeof(DepthOutlineParam)},
-	    //{PostEffectType::RadialBlur, sizeof(RadialBlurParam)},
-	    //{PostEffectType::Dissolve,   sizeof(DissolveParam)  },
-	    //{PostEffectType::Random,     sizeof(RandomParam)    },
-	};
-
-	// Param Ptr Map
-	std::unordered_map<PostEffectType, void*> paramPtrMap_ = {
-	    {PostEffectType::Vignette,     &vignetteParam_    },
-        {PostEffectType::Grayscale,    &grayscaleParam_   },
-        {PostEffectType::Sepia,        &sepiaParam_       },
-	    {PostEffectType::Smoothing,    &smoothingParam_   },
-        {PostEffectType::Gaussian,     &gaussianParam_    },
-        {PostEffectType::DepthOutline, &depthOutlineParam_},
-	    //{PostEffectType::RadialBlur, &radialBlurParam_},
-	    //{PostEffectType::Dissolve,   &dissolveParam_  },
-	    //{PostEffectType::Random,     &randomParam_    },
-	};
 
 	// CB
 	Microsoft::WRL::ComPtr<ID3D12Resource> cbResource_;
