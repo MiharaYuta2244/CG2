@@ -268,6 +268,15 @@ void TinyEngine::CopyImage::DrawImGui() {
 		break;
 	}
 
+	case PostEffectType::RadialBlur: {
+		auto& p = radialBlurParam_;
+		ImGui::Text("Smoothing");
+		ImGui::DragFloat2("center", &p.center.x, 0.01f);
+		ImGui::DragFloat("width", &p.blurWidth, 0.01f);
+		ImGui::DragFloat("samples", &p.numSamples, 1.0f);
+		break;
+	}
+
 	default:
 		ImGui::Text("No parameters for this effect.");
 		break;

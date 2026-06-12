@@ -78,6 +78,15 @@ private:
 	// 適用するシェーダー
 	PostEffectType postEffectType_ = PostEffectType::FullScreen;
 
+	// 各種パラメータ
+	VignetteParam vignetteParam_;
+	GrayscaleParam grayscaleParam_;
+	SepiaParam sepiaParam_;
+	SmoothingParam smoothingParam_;
+	GaussianParam gaussianParam_;
+	DepthOutlineParam depthOutlineParam_;
+	RadialBlurParam radialBlurParam_;
+
 	// メタデータマップ
 	std::unordered_map<PostEffectType, EffectMeta> effectMetaMap_ = {
 	    {PostEffectType::FullScreen,       {L"Fullscreen", 0, nullptr}                                           },
@@ -88,18 +97,10 @@ private:
 	    {PostEffectType::Gaussian,         {L"GaussianFilter", sizeof(GaussianParam), &gaussianParam_}           },
 	    {PostEffectType::LuminanceOutline, {L"LuminanceBasedOutline", 0, nullptr}                                },
 	    {PostEffectType::DepthOutline,     {L"DepthBasedOutline", sizeof(DepthOutlineParam), &depthOutlineParam_}},
-	    {PostEffectType::RadialBlur,       {L"RadialBlur", 0, nullptr}                                           },
+	    {PostEffectType::RadialBlur,       {L"RadialBlur", sizeof(RadialBlurParam), &radialBlurParam_}                                   },
 	    {PostEffectType::Dissolve,         {L"Dissolve", 0, nullptr}                                             },
 	    {PostEffectType::Random,           {L"Random", 0, nullptr}                                               },
 	};
-
-	// 各種パラメータ
-	VignetteParam vignetteParam_;
-	GrayscaleParam grayscaleParam_;
-	SepiaParam sepiaParam_;
-	SmoothingParam smoothingParam_;
-	GaussianParam gaussianParam_;
-	DepthOutlineParam depthOutlineParam_;
 
 	// CB
 	Microsoft::WRL::ComPtr<ID3D12Resource> cbResource_;
