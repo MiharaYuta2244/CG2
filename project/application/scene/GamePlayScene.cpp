@@ -83,11 +83,13 @@ void GamePlayScene::Initialize(const SceneContext& ctx) {
 	controls_->Initialize(ctx_.engineContext);
 
 	// VignetteのColorを赤に指定
-	ctx_.engineContext->copyImage->SetVignetteColor({1,0,0,1});
+	ctx_.engineContext->copyImage->SetVignetteColor({1, 0, 0, 1});
 }
 
 void GamePlayScene::Update() {
 	float deltaTime = ctx_.timeManager->GetDeltaTime();
+	elapsedTime_ += deltaTime;
+	ctx_.engineContext->copyImage->SetTime(elapsedTime_);
 
 	// ポーズ画面
 	if (ctx_.keyboard->KeyTriggered(DIK_TAB)) {

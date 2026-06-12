@@ -99,4 +99,7 @@ private:
 
 	// 操作方法UI
 	std::unique_ptr<Controls> controls_;
+
+	// 経過時間
+	float elapsedTime_ = 0.0f;
 };

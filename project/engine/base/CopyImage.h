@@ -51,6 +51,9 @@ public:
 	// VignetteのColorのSetter
 	void SetVignetteColor(Vector4 color) { vignetteParam_.color = color; }
 
+	// RandomShader用に経過時間を設定
+	void SetTime(float time) { randomParam_.time = time; }
+
 private:
 	// シェーダコンパイラの初期化
 	void InitializeShaderCompiler();
@@ -88,6 +91,7 @@ private:
 	DepthOutlineParam depthOutlineParam_;
 	RadialBlurParam radialBlurParam_;
 	DissolveParam dissolveParam_;
+	RandomParam randomParam_;
 
 	// メタデータマップ
 	std::unordered_map<PostEffectType, EffectMeta> effectMetaMap_ = {
@@ -100,8 +104,8 @@ private:
 	    {PostEffectType::LuminanceOutline, {L"LuminanceBasedOutline", 0, nullptr}                                },
 	    {PostEffectType::DepthOutline,     {L"DepthBasedOutline", sizeof(DepthOutlineParam), &depthOutlineParam_}},
 	    {PostEffectType::RadialBlur,       {L"RadialBlur", sizeof(RadialBlurParam), &radialBlurParam_}           },
-	    {PostEffectType::Dissolve,         {L"Dissolve", sizeof(DissolveParam), &dissolveParam_}                  },
-	    {PostEffectType::Random,           {L"Random", 0, nullptr}                                               },
+	    {PostEffectType::Dissolve,         {L"Dissolve", sizeof(DissolveParam), &dissolveParam_}                 },
+	    {PostEffectType::Random,           {L"Random", sizeof(RandomParam), &randomParam_}                       },
 	};
 
 	// CB
