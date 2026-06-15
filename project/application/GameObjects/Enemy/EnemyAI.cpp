@@ -74,7 +74,6 @@ void EnemyAI::UpdateNormal(float deltaTime, Player* player, WallManager* wallMan
 	if (isPatrolWaiting_) {
 		// 待機中
 		if (patrolStateTimer_ <= 0.0f) {
-
 			// 待機終了から移動開始
 			isPatrolWaiting_ = false;
 
@@ -89,15 +88,12 @@ void EnemyAI::UpdateNormal(float deltaTime, Player* player, WallManager* wallMan
 			patrolDir_.y = 0.0f;
 			patrolDir_.z = std::cos(randomAngle);
 		}
-
 	} else {
 		// 移動中
 		if (patrolStateTimer_ <= 0.0f) {
-
 			// 移動終了から待機開始
 			isPatrolWaiting_ = true;
 			patrolStateTimer_ = RandomUtils::RangeFloat(1.0f, 3.0f);
-
 		} else {
 
 			// 壁チェック
@@ -146,6 +142,32 @@ void EnemyAI::UpdateVigilance(float deltaTime, Player* player, EnemyBulletManage
 
 		// プレイヤーの方を向く
 		LookatPlayer(deltaTime, playerPos, enemyPos);
+
+		// 追跡経路が残っていたらクリア
+		if (!currentPath_.empty()) {
+			currentPath_.clear();
+			pathUpdateTimer_ = 0.0f;
+		}
+
+		// 警戒状態時は基本的に射撃を行う
+		Vector3 toTarget = playerPos - enemyPos;
+		toTarget.y = 0.0f;
+
+		shotTimer_ += deltaTime;
+		if (shotTimer_ >= shotInterval_) {
+			auto bullet = std::make_unique<EnemyBullet>();
+			Vector3 dir3D = MathUtility::Normalize(toTarget);
+			Vector2 dir2D = {dir3D.x, dir3D.z};
+
+			Vector3 spawnPos = enemyPos;
+			spawnPos.x += dir3D.x * bulletMargin_;
+			spawnPos.z += dir3D.z * bulletMargin_;
+			spawnPos.y += 1.0f;
+
+			bullet->Initialize(ctx_, dir2D, spawnPos);
+			enemyBulletManager->AddBullet(std::move(bullet));
+			shotTimer_ = 0.0f;
+		}
 	} else {
 		// 見失った場合、タイマーを減らす
 		lostSightTimer_ -= deltaTime;
@@ -156,34 +178,10 @@ void EnemyAI::UpdateVigilance(float deltaTime, Player* player, EnemyBulletManage
 			currentPath_.clear(); // 経路もリセット
 			return;               // ここで初めて追跡を終了する
 		}
-	}
 
-	// 追跡の目標を、最後に見えた座標にする
-	Vector3 toTarget = lastKnownPlayerPos_ - enemyPos;
-	toTarget.y = 0.0f;
-	float distSq = toTarget.x * toTarget.x + toTarget.z * toTarget.z;
-
-	// 射撃は「今実際にプレイヤーが見えていて、かつ射程内」の時だけ行う
-	if (canSeePlayer && distSq <= attackRange_ * attackRange_) {
-		shotTimer_ += deltaTime;
-		if (shotTimer_ >= shotInterval_) {
-			auto bullet = std::make_unique<EnemyBullet>();
-			Vector3 dir3D = MathUtility::Normalize(toTarget);
-			Vector2 dir2D = {dir3D.x, dir3D.z};
-
-			Vector3 spawnPos = enemyPos;
-			spawnPos.x += dir3D.x * 2.0f;
-			spawnPos.z += dir3D.z * 2.0f;
-			spawnPos.y += 1.0f;
-
-			bullet->Initialize(ctx_, dir2D, spawnPos);
-			enemyBulletManager->AddBullet(std::move(bullet));
-			shotTimer_ = 0.0f;
-		}
-	} else { // 射程外、あるいは壁の裏にいる場合はA*で回り込む
+		// 目標を「最後に見えた位置」にして経路計算し、A*で回り込む
 		pathUpdateTimer_ -= deltaTime;
 
-		// 目標を「最後に見えた位置」にして経路計算
 		if (pathUpdateTimer_ <= 0.0f) {
 			currentPath_ = AStarPathfinder::FindPath(enemyPos, lastKnownPlayerPos_, wallManager);
 			currentWaypointIndex_ = 0;
@@ -206,13 +204,16 @@ void EnemyAI::UpdateVigilance(float deltaTime, Player* player, EnemyBulletManage
 				transform_->translate.x += moveDir.x * moveSpeed * deltaTime;
 				transform_->translate.z += moveDir.z * moveSpeed * deltaTime;
 
-				// 見失っている間は、進行方向を向かせる
-				if (!canSeePlayer) {
-					LookatPlayer(deltaTime, enemyPos + moveDir, enemyPos);
-				}
+				// 見失って移動している間は進行方向を向かせる
+				LookatPlayer(deltaTime, enemyPos + moveDir, enemyPos);
 			}
 		}
 	}
+
+	// 追跡の目標を、最後に見えた座標にする
+	Vector3 toTarget = lastKnownPlayerPos_ - enemyPos;
+	toTarget.y = 0.0f;
+	float distSq = toTarget.x * toTarget.x + toTarget.z * toTarget.z;
 }
 
 bool EnemyAI::CheckPlayerInVision(Player* player, WallManager* wallManager) {

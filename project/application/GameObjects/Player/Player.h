@@ -91,4 +91,7 @@ private:
 
 	// 現在移動中かどうかを保持するフラグ
 	bool isMoving_ = false;
+
+	// 掴める距離の閾値
+	float grabRange_ = 3.0f;
 };

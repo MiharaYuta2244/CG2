@@ -1,7 +1,6 @@
 #pragma once
 #include "AABB.h"
 #include "EnemyBullet.h"
-#include "GameTimer.h"
 #include "Transform.h"
 #include <vector>
 
@@ -64,9 +63,9 @@ private:
 	Vector3 lastKnownPlayerPos_;            // 最後に見えたプレイヤーの座標
 
 	// 射撃用パラメータ
-	float shotTimer_ = 0.0f;                         // 射撃までの残り時間タイマー
-	float shotInterval_ = 2.0f;                      // 射撃間隔
-	float attackRange_ = visionParam_.radius / 2.0f; // 射撃を行う距離
+	float shotTimer_ = 0.0f;     // 射撃までの残り時間タイマー
+	float shotInterval_ = 2.0f;  // 射撃間隔
+	float bulletMargin_ = 10.0f; // 敵と弾の間隔
 
 	// 経路探索用
 	std::vector<Vector3> currentPath_; // A*で計算した経路
@@ -81,5 +80,5 @@ private:
 
 	// 聴覚用パラメータ
 	float hearingRadius_ = 10.0f; // 足音が聞こえる距離
-	float hearTurnSpeed_ = 8.0f; // 足音に反応して振り向く速度
+	float hearTurnSpeed_ = 8.0f;  // 足音に反応して振り向く速度
 };

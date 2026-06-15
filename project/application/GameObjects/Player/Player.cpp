@@ -13,7 +13,7 @@ void Player::Initialize(EngineContext* ctx) {
 	// 描画用インスタンス生成&初期化
 	render_ = std::make_unique<ObjectRender>();
 	render_->Initialize(ctx, "suzanne.obj");
-	render_->SetColor({1.0f, 1.0f, 1.0f, 1.0f});
+	render_->SetColor({1.0f, 0.4f, 0.1f, 1.0f});
 	render_->SetTransform(transform_);
 	render_->SetEnvScale(envScale_);
 
@@ -81,18 +81,17 @@ void Player::Update(float deltaTime, DirectInput* input, GamePad* gamePad, Enemy
 	// 掴み判定用：一番近い敵を探す
 	Enemy* targetEnemy = nullptr;
 	float minDist = FLT_MAX;
-	float grabRange = 3.0f; // 掴める距離の閾値
 
 	for (auto& enemy : enemyManager->GetEnemies()) {
 		if (enemy->IsDead())
 			continue;
 
-		// プレイヤーと敵の距離を計算（適当な距離計算関数を使用）
+		// プレイヤーと敵の距離を計算
 		Vector3 ePos = enemy->GetPos();
 		Vector3 diff = {ePos.x - transform_.translate.x, ePos.y - transform_.translate.y, ePos.z - transform_.translate.z};
 		float dist = std::sqrt(diff.x * diff.x + diff.y * diff.y + diff.z * diff.z);
 
-		if (dist < minDist && dist < grabRange) {
+		if (dist < minDist && dist < grabRange_) {
 			minDist = dist;
 			heldEnemy_ = enemy.get();
 		}
