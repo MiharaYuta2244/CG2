@@ -1,194 +1,560 @@
 [
     {
-        "centerX": 0.0,
-        "centerZ": 3.0,
-        "depth": 1.0,
-        "width": 5.0
-    },
-    {
-        "centerX": 0.0,
-        "centerZ": -3.0,
-        "depth": 1.0,
-        "width": 5.0
-    },
-    {
-        "centerX": -6.0,
+        "centerX": -3.0,
         "centerZ": 0.0,
-        "depth": 4.0,
+        "depth": 20.0,
         "width": 1.0
     },
     {
         "centerX": 6.0,
+        "centerZ": 21.0,
+        "depth": 1.0,
+        "width": 10.0
+    },
+    {
+        "centerX": 6.0,
+        "centerZ": -21.0,
+        "depth": 1.0,
+        "width": 10.0
+    },
+    {
+        "centerX": 15.0,
+        "centerZ": 0.0,
+        "depth": 8.0,
+        "width": 1.0
+    },
+    {
+        "centerX": 15.0,
+        "centerZ": 17.0,
+        "depth": 3.0,
+        "width": 1.0
+    },
+    {
+        "centerX": 15.0,
+        "centerZ": -17.0,
+        "depth": 3.0,
+        "width": 1.0
+    },
+    {
+        "centerX": 21.0,
+        "centerZ": 15.0,
+        "depth": 1.0,
+        "width": 5.0
+    },
+    {
+        "centerX": 21.0,
+        "centerZ": -15.0,
+        "depth": 1.0,
+        "width": 5.0
+    },
+    {
+        "centerX": 25.0,
         "centerZ": 8.0,
         "depth": 6.0,
         "width": 1.0
     },
     {
-        "centerX": 6.0,
+        "centerX": 25.0,
         "centerZ": -8.0,
         "depth": 6.0,
         "width": 1.0
     },
     {
-        "centerX": 20.0,
-        "centerZ": 0.0,
-        "depth": 10.0,
-        "width": 1.0
-    },
-    {
-        "centerX": 20.0,
-        "centerZ": 15.0,
-        "depth": 1.0,
-        "width": 15.0
-    },
-    {
-        "centerX": 20.0,
-        "centerZ": -15.0,
-        "depth": 1.0,
-        "width": 15.0
-    },
-    {
         "centerX": 36.0,
-        "centerZ": 9.0,
-        "depth": 7.0,
-        "width": 1.0
-    },
-    {
-        "centerX": 36.0,
-        "centerZ": -9.0,
-        "depth": 7.0,
-        "width": 1.0
-    },
-    {
-        "centerX": 43.0,
         "centerZ": 3.0,
         "depth": 1.0,
-        "width": 6.0
+        "width": 10.0
     },
     {
-        "centerX": 43.0,
+        "centerX": 36.0,
         "centerZ": -3.0,
         "depth": 1.0,
-        "width": 6.0
+        "width": 10.0
     },
     {
-        "centerX": 50.0,
+        "centerX": 47.0,
         "centerZ": 12.0,
         "depth": 10.0,
         "width": 1.0
     },
     {
-        "centerX": 50.0,
+        "centerX": 47.0,
         "centerZ": -12.0,
         "depth": 10.0,
         "width": 1.0
     },
     {
-        "centerX": 116.0,
+        "centerX": 57.0,
         "centerZ": 21.0,
         "depth": 1.0,
-        "width": 65.0
+        "width": 9.0
     },
     {
-        "centerX": 116.0,
+        "centerX": 57.0,
         "centerZ": -21.0,
         "depth": 1.0,
-        "width": 65.0
+        "width": 9.0
     },
     {
-        "centerX": 72.0,
-        "centerZ": 9.0,
-        "depth": 1.0,
-        "width": 11.0
-    },
-    {
-        "centerX": 72.0,
-        "centerZ": -9.0,
-        "depth": 1.0,
-        "width": 11.0
-    },
-    {
-        "centerX": 104.0,
-        "centerZ": 9.0,
-        "depth": 1.0,
-        "width": 11.0
-    },
-    {
-        "centerX": 104.0,
-        "centerZ": -9.0,
-        "depth": 1.0,
-        "width": 11.0
-    },
-    {
-        "centerX": 124.0,
+        "centerX": 57.0,
         "centerZ": 0.0,
-        "depth": 10.0,
-        "width": 1.0
+        "depth": 5.0,
+        "width": 5.0
     },
     {
-        "centerX": 135.0,
-        "centerZ": 10.0,
+        "centerX": 67.0,
+        "centerZ": 19.0,
         "depth": 3.0,
-        "width": 3.0
-    },
-    {
-        "centerX": 135.0,
-        "centerZ": -0.5,
-        "depth": 3.0,
-        "width": 3.0
-    },
-    {
-        "centerX": 135.0,
-        "centerZ": -11.0,
-        "depth": 3.0,
-        "width": 3.0
-    },
-    {
-        "centerX": 150.0,
-        "centerZ": 16.0,
-        "depth": 4.0,
         "width": 1.0
     },
     {
-        "centerX": 150.0,
-        "centerZ": -16.0,
-        "depth": 4.0,
+        "centerX": 67.0,
+        "centerZ": 7.0,
+        "depth": 5.0,
         "width": 1.0
     },
     {
-        "centerX": 160.0,
-        "centerZ": 0.0,
-        "depth": 10.0,
+        "centerX": 69.0,
+        "centerZ": 17.0,
+        "depth": 1.0,
         "width": 1.0
     },
     {
-        "centerX": 180.0,
+        "centerX": 69.0,
         "centerZ": 11.0,
-        "depth": 9.0,
+        "depth": 1.0,
         "width": 1.0
     },
     {
-        "centerX": 180.0,
-        "centerZ": -11.0,
-        "depth": 9.0,
+        "centerX": 71.0,
+        "centerZ": 19.0,
+        "depth": 3.0,
         "width": 1.0
     },
     {
-        "centerX": 188.0,
-        "centerZ": 0.0,
-        "depth": 4.0,
+        "centerX": 71.0,
+        "centerZ": 9.0,
+        "depth": 3.0,
         "width": 1.0
     },
     {
-        "centerX": 184.0,
+        "centerX": 80.0,
+        "centerZ": 21.0,
+        "depth": 1.0,
+        "width": 8.0
+    },
+    {
+        "centerX": 74.0,
+        "centerZ": 7.0,
+        "depth": 1.0,
+        "width": 2.0
+    },
+    {
+        "centerX": 86.0,
+        "centerZ": 7.0,
+        "depth": 1.0,
+        "width": 2.0
+    },
+    {
+        "centerX": 89.0,
+        "centerZ": 19.0,
+        "depth": 3.0,
+        "width": 1.0
+    },
+    {
+        "centerX": 89.0,
+        "centerZ": 9.0,
+        "depth": 3.0,
+        "width": 1.0
+    },
+    {
+        "centerX": 72.0,
+        "centerZ": 3.0,
+        "depth": 1.0,
+        "width": 4.0
+    },
+    {
+        "centerX": 87.0,
         "centerZ": 3.0,
         "depth": 1.0,
         "width": 3.0
     },
     {
-        "centerX": 184.0,
-        "centerZ": -3.0,
+        "centerX": 77.0,
+        "centerZ": 5.0,
+        "depth": 3.0,
+        "width": 1.0
+    },
+    {
+        "centerX": 83.0,
+        "centerZ": 5.0,
+        "depth": 3.0,
+        "width": 1.0
+    },
+    {
+        "centerX": 93.0,
+        "centerZ": 19.0,
+        "depth": 3.0,
+        "width": 1.0
+    },
+    {
+        "centerX": 93.0,
+        "centerZ": 7.0,
+        "depth": 5.0,
+        "width": 1.0
+    },
+    {
+        "centerX": 91.0,
+        "centerZ": 17.0,
+        "depth": 1.0,
+        "width": 1.0
+    },
+    {
+        "centerX": 91.0,
+        "centerZ": 11.0,
+        "depth": 1.0,
+        "width": 1.0
+    },
+    {
+        "centerX": 91.0,
+        "centerZ": 3.0,
+        "depth": 1.0,
+        "width": 1.0
+    },
+    {
+        "centerX": 53.0,
+        "centerZ": 15.0,
+        "depth": 1.0,
+        "width": 1.0
+    },
+    {
+        "centerX": 53.0,
+        "centerZ": 10.0,
+        "depth": 1.0,
+        "width": 1.0
+    },
+    {
+        "centerX": 60.0,
+        "centerZ": 15.0,
+        "depth": 1.0,
+        "width": 1.0
+    },
+    {
+        "centerX": 60.0,
+        "centerZ": 10.0,
+        "depth": 1.0,
+        "width": 1.0
+    },
+    {
+        "centerX": 53.0,
+        "centerZ": -15.0,
+        "depth": 1.0,
+        "width": 1.0
+    },
+    {
+        "centerX": 80.0,
+        "centerZ": -21.0,
+        "depth": 1.0,
+        "width": 14.0
+    },
+    {
+        "centerX": 93.0,
+        "centerZ": -18.0,
+        "depth": 2.0,
+        "width": 1.0
+    },
+    {
+        "centerX": 93.0,
+        "centerZ": -9.0,
+        "depth": 2.0,
+        "width": 1.0
+    },
+    {
+        "centerX": 87.0,
+        "centerZ": -8.0,
+        "depth": 1.0,
+        "width": 5.0
+    },
+    {
+        "centerX": 72.0,
+        "centerZ": -8.0,
+        "depth": 1.0,
+        "width": 6.0
+    },
+    {
+        "centerX": 104.0,
+        "centerZ": 21.100000381469727,
+        "depth": 1.0,
+        "width": 10.0
+    },
+    {
+        "centerX": 113.0,
+        "centerZ": 11.0,
+        "depth": 9.0,
+        "width": 1.0
+    },
+    {
+        "centerX": 95.0,
+        "centerZ": -10.0,
+        "depth": 1.0,
+        "width": 1.0
+    },
+    {
+        "centerX": 95.0,
+        "centerZ": -17.0,
+        "depth": 1.0,
+        "width": 1.0
+    },
+    {
+        "centerX": 97.0,
+        "centerZ": -9.0,
+        "depth": 2.0,
+        "width": 1.0
+    },
+    {
+        "centerX": 97.0,
+        "centerZ": -19.0,
+        "depth": 3.0,
+        "width": 1.0
+    },
+    {
+        "centerX": 100.0,
+        "centerZ": -8.0,
+        "depth": 1.0,
+        "width": 2.0
+    },
+    {
+        "centerX": 109.0,
+        "centerZ": -8.0,
         "depth": 1.0,
         "width": 3.0
+    },
+    {
+        "centerX": 105.0,
+        "centerZ": -21.0,
+        "depth": 1.0,
+        "width": 7.0
+    },
+    {
+        "centerX": 113.0,
+        "centerZ": -14.5,
+        "depth": 7.5,
+        "width": 1.0
+    },
+    {
+        "centerX": 117.0,
+        "centerZ": 3.0,
+        "depth": 1.0,
+        "width": 3.0
+    },
+    {
+        "centerX": 117.0,
+        "centerZ": -8.0,
+        "depth": 1.0,
+        "width": 3.0
+    },
+    {
+        "centerX": 121.0,
+        "centerZ": 4.0,
+        "depth": 4.0,
+        "width": 1.0
+    },
+    {
+        "centerX": 121.0,
+        "centerZ": -8.0,
+        "depth": 3.0,
+        "width": 1.0
+    },
+    {
+        "centerX": 126.0,
+        "centerZ": 4.0,
+        "depth": 4.0,
+        "width": 1.0
+    },
+    {
+        "centerX": 126.0,
+        "centerZ": -8.0,
+        "depth": 3.0,
+        "width": 1.0
+    },
+    {
+        "centerX": 119.0,
+        "centerZ": -12.0,
+        "depth": 1.0,
+        "width": 3.0
+    },
+    {
+        "centerX": 117.0,
+        "centerZ": -17.0,
+        "depth": 4.0,
+        "width": 1.0
+    },
+    {
+        "centerX": 140.0,
+        "centerZ": -20.0,
+        "depth": 1.0,
+        "width": 23.0
+    },
+    {
+        "centerX": 119.0,
+        "centerZ": 9.0,
+        "depth": 1.0,
+        "width": 3.0
+    },
+    {
+        "centerX": 128.0,
+        "centerZ": 9.0,
+        "depth": 1.0,
+        "width": 3.0
+    },
+    {
+        "centerX": 117.0,
+        "centerZ": 16.0,
+        "depth": 6.0,
+        "width": 1.0
+    },
+    {
+        "centerX": 124.5,
+        "centerZ": 21.0,
+        "depth": 1.0,
+        "width": 6.5
+    },
+    {
+        "centerX": 132.0,
+        "centerZ": 20.0,
+        "depth": 2.0,
+        "width": 1.0
+    },
+    {
+        "centerX": 132.0,
+        "centerZ": 10.0,
+        "depth": 2.0,
+        "width": 1.0
+    },
+    {
+        "centerX": 137.0,
+        "centerZ": -10.0,
+        "depth": 1.0,
+        "width": 10.0
+    },
+    {
+        "centerX": 153.0,
+        "centerZ": 21.0,
+        "depth": 1.0,
+        "width": 20.0
+    },
+    {
+        "centerX": 136.0,
+        "centerZ": 0.0,
+        "depth": 3.0,
+        "width": 3.0
+    },
+    {
+        "centerX": 150.0,
+        "centerZ": 12.0,
+        "depth": 4.0,
+        "width": 4.0
+    },
+    {
+        "centerX": 156.0,
+        "centerZ": 1.0,
+        "depth": 3.0,
+        "width": 3.0
+    },
+    {
+        "centerX": 165.0,
+        "centerZ": 12.0,
+        "depth": 4.0,
+        "width": 4.0
+    },
+    {
+        "centerX": 185.0,
+        "centerZ": 21.0,
+        "depth": 1.0,
+        "width": 12.0
+    },
+    {
+        "centerX": 175.0,
+        "centerZ": 6.0,
+        "depth": 2.0,
+        "width": 1.0
+    },
+    {
+        "centerX": 185.0,
+        "centerZ": 6.0,
+        "depth": 2.0,
+        "width": 1.0
+    },
+    {
+        "centerX": 180.0,
+        "centerZ": 0.0,
+        "depth": 1.0,
+        "width": 2.0
+    },
+    {
+        "centerX": 180.0,
+        "centerZ": -5.0,
+        "depth": 1.0,
+        "width": 2.0
+    },
+    {
+        "centerX": 180.0,
+        "centerZ": -20.0,
+        "depth": 1.0,
+        "width": 17.0
+    },
+    {
+        "centerX": 132.1999969482422,
+        "centerZ": -16.0,
+        "depth": 1.0,
+        "width": 1.0
+    },
+    {
+        "centerX": 140.0,
+        "centerZ": -14.0,
+        "depth": 1.0,
+        "width": 1.0
+    },
+    {
+        "centerX": 156.1999969482422,
+        "centerZ": -14.0,
+        "depth": 2.0,
+        "width": 2.0
+    },
+    {
+        "centerX": 175.0,
+        "centerZ": -13.0,
+        "depth": 1.0,
+        "width": 1.0
+    },
+    {
+        "centerX": 196.0,
+        "centerZ": 12.0,
+        "depth": 8.0,
+        "width": 1.0
+    },
+    {
+        "centerX": 196.0,
+        "centerZ": -11.0,
+        "depth": 8.0,
+        "width": 1.0
+    },
+    {
+        "centerX": 203.0,
+        "centerZ": 5.0,
+        "depth": 1.0,
+        "width": 6.0
+    },
+    {
+        "centerX": 203.0,
+        "centerZ": -4.0,
+        "depth": 1.0,
+        "width": 6.0
+    },
+    {
+        "centerX": 210.0,
+        "centerZ": 0.5,
+        "depth": 5.5,
+        "width": 1.0
     }
 ]

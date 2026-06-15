@@ -71,7 +71,7 @@ private:
 	bool isDead_ = false;
 
 	// ノックバックの強さ
-	float knockBackPower_ = 10.0f;
+	float knockBackPower_ = 20.0f;
 
 	std::unique_ptr<ObjectRender> render_;  // 描画用インスタンス
 	std::unique_ptr<EnemyAI> ai_;           // AI

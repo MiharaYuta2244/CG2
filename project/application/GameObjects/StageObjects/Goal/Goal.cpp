@@ -3,7 +3,7 @@
 void Goal::Initialize(EngineContext* ctx) {
 	transform_.scale = {1.0f, 1.0f, 1.0f};
 	transform_.rotate = {0.0f, 0.0f, 0.0f};
-	transform_.translate = {183.0f, 0.0f, 0.0f};
+	transform_.translate = {205.0f, 0.0f, 0.0f};
 
 	// 描画用インスタンス生成&初期化
 	render_ = std::make_unique<ObjectRender>();

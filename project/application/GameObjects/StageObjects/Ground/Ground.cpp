@@ -7,7 +7,7 @@ void Ground::Initialize(EngineContext* ctx) {
 
 	transform_.scale = {200.0f, 200.0f, 1.0f};
 	transform_.rotate = {-std::numbers::pi_v<float> / 2.0f, 0.0f, 0.0f};
-	transform_.translate = {0.0f, -0.5f, 0.0f};
+	transform_.translate = {transform_.scale.x / 2.0f, -0.5f, 0.0f};
 }
 
 void Ground::Update() {

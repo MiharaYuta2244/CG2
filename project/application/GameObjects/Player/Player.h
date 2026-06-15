@@ -73,7 +73,7 @@ private:
 	Vector2 lastMoveDirection_;
 
 	// プレイヤーの最大HP
-	float maxHP_ = 5.0f;
+	float maxHP_ = 3.0f;
 
 	// 攻撃可能かどうかを表す変数
 	bool enableAttack_ = false;
