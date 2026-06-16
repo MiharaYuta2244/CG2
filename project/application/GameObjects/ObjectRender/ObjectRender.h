@@ -28,6 +28,8 @@ public:
 	// TextureのSetter
 	void SetTexture(const std::string& filepath) { object3d_->SetTexture(filepath); }
 
+	void SetEnableLighting(bool enableLighting) { object3d_->SetEnableLighting(enableLighting); }
+
 	// 描画用オブジェクトを返すGetter
 	TinyEngine::Object3d* GetObject3d() { return object3d_.get(); }
 

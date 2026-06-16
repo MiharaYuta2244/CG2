@@ -47,3 +47,80 @@ bool Collision::Intersect(const AABB& aabb, const Sphere& sphere) {
 bool Collision::Intersect(const AABB& aabb, const Vector3& point) {
 	return point.x >= aabb.min.x && point.x <= aabb.max.x && point.y >= aabb.min.y && point.y <= aabb.max.y && point.z >= aabb.min.z && point.z <= aabb.max.z;
 }
+bool Collision::Intersect(const OBB& obb1, const OBB& obb2) {
+	// テストする15本の分離軸
+	Vector3 axes[15];
+
+	// 1-3: OBB1のローカル軸
+	axes[0] = obb1.orientations[0];
+	axes[1] = obb1.orientations[1];
+	axes[2] = obb1.orientations[2];
+
+	// 4-6: OBB2のローカル軸
+	axes[3] = obb2.orientations[0];
+	axes[4] = obb2.orientations[1];
+	axes[5] = obb2.orientations[2];
+
+	// 7-15: 両者のローカル軸同士の外積
+	int axisIndex = 6;
+	for (int i = 0; i < 3; ++i) {
+		for (int j = 0; j < 3; ++j) {
+			axes[axisIndex++] = MathUtility::Cross(obb1.orientations[i], obb2.orientations[j]);
+		}
+	}
+
+	// OBB間の中心距離ベクトル
+	Vector3 distanceVec = MathUtility::Subtract(obb2.center, obb1.center);
+
+	// 15本の軸すべてに対して分離軸テストを実行
+	for (int i = 0; i < 15; ++i) {
+		// 軸の長さの2乗を計算 (平行な軸の外積などでゼロベクトルになるケースを除外)
+		float lengthSq = axes[i].x * axes[i].x + axes[i].y * axes[i].y + axes[i].z * axes[i].z;
+		if (lengthSq < 1e-6f) {
+			continue; // 軸が無効な場合はスキップ
+		}
+
+		// 中心間の距離を軸に投影
+		float dist = std::abs(MathUtility::Dot(distanceVec, axes[i]));
+
+		// 各OBBの軸への投影半径を計算
+		float r1 = obb1.size.x * std::abs(MathUtility::Dot(axes[i], obb1.orientations[0])) + obb1.size.y * std::abs(MathUtility::Dot(axes[i], obb1.orientations[1])) +
+		           obb1.size.z * std::abs(MathUtility::Dot(axes[i], obb1.orientations[2]));
+
+		float r2 = obb2.size.x * std::abs(MathUtility::Dot(axes[i], obb2.orientations[0])) + obb2.size.y * std::abs(MathUtility::Dot(axes[i], obb2.orientations[1])) +
+		           obb2.size.z * std::abs(MathUtility::Dot(axes[i], obb2.orientations[2]));
+
+		// 分離軸が見つかった場合、衝突していない
+		if (dist > r1 + r2) {
+			return false;
+		}
+	}
+
+	// すべての軸で重なっていれば衝突している
+	return true;
+}
+
+bool Collision::Intersect(const AABB& aabb, const OBB& obb) {
+	// AABBをOBBの形式に変換する
+	OBB aabbAsObb;
+
+	// 中心の計算
+	aabbAsObb.center.x = (aabb.min.x + aabb.max.x) * 0.5f;
+	aabbAsObb.center.y = (aabb.min.y + aabb.max.y) * 0.5f;
+	aabbAsObb.center.z = (aabb.min.z + aabb.max.z) * 0.5f;
+
+	// AABBの軸はワールド座標軸に一致
+	aabbAsObb.orientations[0] = {1.0f, 0.0f, 0.0f};
+	aabbAsObb.orientations[1] = {0.0f, 1.0f, 0.0f};
+	aabbAsObb.orientations[2] = {0.0f, 0.0f, 1.0f};
+
+	// 半値幅の計算
+	aabbAsObb.size.x = (aabb.max.x - aabb.min.x) * 0.5f;
+	aabbAsObb.size.y = (aabb.max.y - aabb.min.y) * 0.5f;
+	aabbAsObb.size.z = (aabb.max.z - aabb.min.z) * 0.5f;
+
+	// OBB同士の判定に委譲
+	return Intersect(aabbAsObb, obb);
+}
+
+bool Collision::Intersect(const OBB& obb, const AABB& aabb) { return Intersect(aabb, obb); }

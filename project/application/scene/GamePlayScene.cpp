@@ -97,7 +97,7 @@ void GamePlayScene::Update() {
 	UpdateGlitch(deltaTime);
 
 	// ポーズ画面
-	if (ctx_.keyboard->KeyTriggered(DIK_TAB)) {
+	if (ctx_.keyboard->KeyTriggered(DIK_TAB) || ctx_.gamePad->GetState().buttonsPressed.start) {
 		RequestScenePush("Pause");
 		return;
 	}
@@ -206,7 +206,7 @@ void GamePlayScene::Update() {
 	}
 
 	// カメラのシェイク更新
-	ctx_.currentCamera->ShakeCamera(deltaTime);
+	ctx_.currentCamera->ShakeCamera(deltaTime, shakePower_);
 
 	// カメラの更新
 	ctx_.currentCamera->Update(*ctx_.keyboard, *ctx_.gamePad);

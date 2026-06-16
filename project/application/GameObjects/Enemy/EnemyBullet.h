@@ -2,6 +2,7 @@
 #include "AABB.h"
 #include "GameObjects/ObjectRender/ObjectRender.h"
 #include "Rect.h"
+#include "OBB.h"
 
 /// <summary>
 /// 敵の弾クラス

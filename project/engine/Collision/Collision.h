@@ -1,6 +1,7 @@
 #pragma once
 #include "AABB.h"
 #include "Sphere.h"
+#include "OBB.h"
 namespace Collision {
 
 // 汎用テンプレート
@@ -13,4 +14,7 @@ bool Intersect(const Sphere& s1, const Sphere& s2);
 bool Intersect(const AABB& aabb1, const AABB& aabb2);
 bool Intersect(const AABB& aabb, const Sphere& sphere);
 bool Intersect(const AABB& aabb, const Vector3& point);
+bool Intersect(const OBB& obb1, const OBB& obb2);
+bool Intersect(const AABB& aabb, const OBB& obb);
+bool Intersect(const OBB& obb, const AABB& aabb);
 }; // namespace Collision

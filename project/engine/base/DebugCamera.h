@@ -44,7 +44,7 @@ public:
 	void StartShake(float duration, float magnitude);
 
 	// シェイクの更新処理
-	void ShakeCamera(float deltaTime);
+	void ShakeCamera(float deltaTime, float shakePower);
 
 private:
 	void UpdateOrientation();

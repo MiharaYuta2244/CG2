@@ -122,7 +122,7 @@ void Camera::StartShake(float duration, float magnitude) {
 	magnitude_ = magnitude;
 }
 
-void Camera::ShakeCamera(float deltaTime) {
+void Camera::ShakeCamera(float deltaTime, float shakePower) {
 	if (!isShake_) {
 		shakeOffset_ = {0.0f, 0.0f, 0.0f};
 		return;
@@ -130,8 +130,8 @@ void Camera::ShakeCamera(float deltaTime) {
 
 	const float decay = 0.9f;
 
-	float offsetX = RandomUtils::RangeFloat(-1, 1) * magnitude_;
-	float offsetY = RandomUtils::RangeFloat(-1, 1) * magnitude_;
+	float offsetX = RandomUtils::RangeFloat(-shakePower, shakePower) * magnitude_;
+	float offsetY = RandomUtils::RangeFloat(-shakePower, shakePower) * magnitude_;
 
 	shakeOffset_ = {offsetX, offsetY, 0.0f};
 

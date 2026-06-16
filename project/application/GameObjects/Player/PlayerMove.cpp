@@ -29,7 +29,7 @@ void PlayerMove::Update(Transform* transform, Vector2 dir, float deltaTime) {
 		rotate.y += diff * rotationSpeed_ * deltaTime;
 
 		// 位置更新
-		transform->translate.x += dir.x * speed_ * deltaTime;
-		transform->translate.z += dir.y * speed_ * deltaTime;
+		transform->translate.x += dir.x * moveSpeed_ * deltaTime;
+		transform->translate.z += dir.y * moveSpeed_ * deltaTime;
 	}
 }

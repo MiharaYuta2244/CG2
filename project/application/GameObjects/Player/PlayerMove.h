@@ -15,5 +15,5 @@ private:
 	float rotationSpeed_ = 4.0f;
 
 	// 移動速度
-	float speed_ = 10.0f;
+	float moveSpeed_ = 10.0f;
 };

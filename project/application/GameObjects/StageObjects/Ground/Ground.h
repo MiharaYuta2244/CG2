@@ -18,5 +18,5 @@ public:
 private:
 	std::unique_ptr<ObjectRender> render_;
 	Transform transform_;
-	Vector4 color_ = {0.5f, 0.5f, 0.5f, 1.0f};
+	Vector4 color_ = {0.2f, 0.2f, 0.2f, 1.0f};
 };

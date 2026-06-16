@@ -4,6 +4,7 @@ void Ground::Initialize(EngineContext* ctx) {
 	render_ = std::make_unique<ObjectRender>();
 	render_->Initialize(ctx, "plane.obj");
 	render_->SetColor(color_);
+	render_->SetEnableLighting(false);
 
 	transform_.scale = {200.0f, 200.0f, 1.0f};
 	transform_.rotate = {-std::numbers::pi_v<float> / 2.0f, 0.0f, 0.0f};

@@ -109,4 +109,7 @@ private:
 	// グリッチノイズ用変数
 	float glitchTimer_ = 0.0f;          // 経過時間
 	const float kGlitchDuration = 0.1f; // グリッチノイズをかける時間
+
+	// カメラのシェイク量
+	float shakePower_ = 2.0f;
 };
