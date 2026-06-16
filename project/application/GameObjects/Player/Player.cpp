@@ -26,48 +26,57 @@ void Player::Initialize(EngineContext* ctx) {
 }
 
 void Player::Update(float deltaTime, DirectInput* input, GamePad* gamePad, EnemyManager* enemyManager) {
-	bool right = input->KeyDown(DIK_D);
-	bool left = input->KeyDown(DIK_A);
-	bool front = input->KeyDown(DIK_W);
-	bool back = input->KeyDown(DIK_S);
+	// アナログ入力ベクトル
+	Vector2 inputDir = {0.0f, 0.0f};
 
-	// ゲームパッドの入力を重ね合わせる
+	if (input->KeyDown(DIK_D))
+		inputDir.x += 1.0f;
+	if (input->KeyDown(DIK_A))
+		inputDir.x -= 1.0f;
+	if (input->KeyDown(DIK_W))
+		inputDir.y += 1.0f;
+	if (input->KeyDown(DIK_S))
+		inputDir.y -= 1.0f;
+
+	// ゲームパッド入力
 	if (gamePad && gamePad->GetState().connected) {
 		const auto& padState = gamePad->GetState();
 
-		// 左スティックか十字キーで移動
-		if (padState.axes.lx > 0.3f || padState.buttons.dpadRight)
-			right = true;
-		if (padState.axes.lx < -0.3f || padState.buttons.dpadLeft)
-			left = true;
-		if (padState.axes.ly < -0.3f || padState.buttons.dpadUp)
-			front = true;
-		if (padState.axes.ly > 0.3f || padState.buttons.dpadDown)
-			back = true;
+		// 十字キー
+		if (padState.buttons.dpadRight)
+			inputDir.x += 1.0f;
+		if (padState.buttons.dpadLeft)
+			inputDir.x -= 1.0f;
+		if (padState.buttons.dpadUp)
+			inputDir.y += 1.0f;
+		if (padState.buttons.dpadDown)
+			inputDir.y -= 1.0f;
+
+		// 左スティック入力（デッドゾーンを超えていれば上書き）
+		if (std::abs(padState.axes.lx) > 0.1f || std::abs(padState.axes.ly) > 0.1f) {
+			inputDir.x = padState.axes.lx;
+			inputDir.y = -padState.axes.ly;
+		}
 	}
 
-	// 入力方向ベクトル
-	Vector2 dir = {0.0f, 0.0f};
+	// ベクトルの長さを計算し、斜め移動時などに長さが1.0を超えないようにクランプ
+	float length = std::sqrtf(inputDir.x * inputDir.x + inputDir.y * inputDir.y);
+	if (length > 1.0f) {
+		inputDir.x /= length;
+		inputDir.y /= length;
+	}
 
-	if (right)
-		dir.x += 1.0f;
-	if (left)
-		dir.x -= 1.0f;
-	if (front)
-		dir.y += 1.0f;
-	if (back)
-		dir.y -= 1.0f;
-
-	// 移動方向があれば記録
-	if (dir.x != 0.0f || dir.y != 0.0f) {
-		lastMoveDirection_ = MathUtility::Normalize(dir);
+	// 移動状態の更新と向きの記録
+	if (length > 0.05f) {
+		// 正規化して記録（攻撃・投げの方向用）
+		lastMoveDirection_ = {inputDir.x / length, inputDir.y / length};
 		isMoving_ = true;
-	}else {
+	} else {
 		isMoving_ = false;
 	}
 
 	// 移動更新
-	move_->Update(&transform_, dir, deltaTime);
+	move_->Update(&transform_, inputDir, deltaTime);
 
 	// HP管理インスタンス更新
 	hp_->Update(deltaTime);
@@ -129,7 +138,7 @@ void Player::Update(float deltaTime, DirectInput* input, GamePad* gamePad, Enemy
 		if (isHold_ && heldEnemy_ != nullptr) {
 			heldEnemy_->SetPos(transform_.translate);
 		}
-	}else if (isHold_ && isGrabReleased) { // 手放す処理
+	} else if (isHold_ && isGrabReleased) { // 手放す処理
 		isHold_ = false;
 		if (heldEnemy_) {
 			heldEnemy_->SetEnableMove(true);
