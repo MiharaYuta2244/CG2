@@ -94,4 +94,7 @@ private:
 
 	// 掴める距離の閾値
 	float grabRange_ = 3.0f;
+
+	// 敵を掴んでいるときにかける速度倍率
+	float speedMultiplier_ = 1.0f;
 };

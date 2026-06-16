@@ -2,7 +2,7 @@
 #include <complex>
 #include <numbers>
 
-void PlayerMove::Update(Transform* transform, Vector2 inputDir, float deltaTime) {
+void PlayerMove::Update(Transform* transform, Vector2 inputDir, float deltaTime, float speedMultiplier) {
 	Vector3& rotate = transform->rotate;
 
 	// 入力ベクトルの長さを取得
@@ -18,6 +18,9 @@ void PlayerMove::Update(Transform* transform, Vector2 inputDir, float deltaTime)
 	} else if (inputLength > 0.1f) {
 		currentMaxSpeed = maxSpeedWalk_;
 	}
+
+	// 最大速度に倍率をかける(掴み中に減速がかかるように)
+	currentMaxSpeed *= speedMultiplier;
 
 	if (hasInput) {
 		// 向き用の正規化ベクトル

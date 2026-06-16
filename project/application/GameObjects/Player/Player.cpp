@@ -75,8 +75,11 @@ void Player::Update(float deltaTime, DirectInput* input, GamePad* gamePad, Enemy
 		isMoving_ = false;
 	}
 
+	// 敵を掴んでいる場合は速度を半減させる
+	speedMultiplier_ = isHold_ ? 0.5f : 1.0f;
+
 	// 移動更新
-	move_->Update(&transform_, inputDir, deltaTime);
+	move_->Update(&transform_, inputDir, deltaTime, speedMultiplier_);
 
 	// HP管理インスタンス更新
 	hp_->Update(deltaTime);
@@ -136,7 +139,14 @@ void Player::Update(float deltaTime, DirectInput* input, GamePad* gamePad, Enemy
 
 		// 掴んでいる間はプレイヤーの位置に敵を固定
 		if (isHold_ && heldEnemy_ != nullptr) {
-			heldEnemy_->SetPos(transform_.translate);
+			Vector3 forward = {lastMoveDirection_.x, 0.0f, lastMoveDirection_.y};
+
+			// 前方オフセット
+			float offset = 0.8f;
+			Vector3 holdPos = {transform_.translate.x + forward.x * offset, transform_.translate.y, transform_.translate.z + forward.z * offset};
+
+			heldEnemy_->SetPos(holdPos);
+			heldEnemy_->SetRotate(transform_.rotate);
 		}
 	} else if (isHold_ && isGrabReleased) { // 手放す処理
 		isHold_ = false;

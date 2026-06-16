@@ -93,7 +93,9 @@ void Enemy::Draw() {
 		render_->Draw();
 
 		// 視界
-		visionCone_->Draw();
+		if (enableMove_) {
+			visionCone_->Draw();
+		}
 
 		// 「!」マークの描画
 		if (exclamationMark_) {
