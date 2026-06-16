@@ -275,6 +275,7 @@ copy "$(windowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="application\Scene\TestScene.cpp" />
     <ClCompile Include="engine\3d\particle\modules\UVScrollModule.cpp" />
     <ClCompile Include="engine\3d\Primitive\VisonCone.cpp" />
+    <ClCompile Include="engine\base\PostEffectPipeline.cpp" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="resources\shaders\Object3d.PS.hlsl">
@@ -358,6 +359,7 @@ copy "$(windowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="application\GameObjects\ResultUI\Button\IButton.h" />
     <ClInclude Include="application\Scene\EasingEditorScene.h" />
     <ClInclude Include="engine\base\CopyImage.h" />
+    <ClInclude Include="engine\base\PostEffectPass.h" />
     <ClInclude Include="engine\base\PostEffectTypes.h" />
     <ClInclude Include="engine\base\SceneContext.h" />
     <ClInclude Include="engine\base\utility\easing\EasingEditor.h" />
@@ -479,6 +481,7 @@ copy "$(windowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="application\Scene\TestScene.h" />
     <ClInclude Include="engine\3d\particle\modules\UVScrollModule.h" />
     <ClInclude Include="engine\3d\Primitive\VisonCone.h" />
+    <ClInclude Include="engine\base\PostEffectPipeline.h" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="externals\imgui\LICENSE.txt" />

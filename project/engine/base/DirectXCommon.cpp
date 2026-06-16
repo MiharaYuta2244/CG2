@@ -232,11 +232,11 @@ void DirectXCommon::CreateDescriptorHeaps() {
 	descriptorSizeDSV_ = device_->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_DSV);
 
 	// RTV用のディスクリプタの数は2。RTVはShader内で触るものではないので、ShaderVisibleはfalse
-	rtvDescriptorHeap_ = CreateDescripterHeap(device_, D3D12_DESCRIPTOR_HEAP_TYPE_RTV, 3, false);
+	rtvDescriptorHeap_ = CreateDescripterHeap(device_, D3D12_DESCRIPTOR_HEAP_TYPE_RTV, 16, false);
 	// SRV用のヒープでディスクリプタの数は128。SRVはShader内で触るものなので、ShaderVisibleはtrue
 	srvDescriptorHeap_ = CreateDescripterHeap(device_, D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV, kMaxSRVCount, true);
 	// DSV用のヒープでディスクリプタの数は1。DSVはShader内で触るものではないので、ShaderVisibleはfalse
-	dsvDescriptorHeap_ = CreateDescripterHeap(device_, D3D12_DESCRIPTOR_HEAP_TYPE_DSV, 2, false);
+	dsvDescriptorHeap_ = CreateDescripterHeap(device_, D3D12_DESCRIPTOR_HEAP_TYPE_DSV, 16, false);
 }
 
 void DirectXCommon::CreateRTV() {
@@ -466,47 +466,33 @@ ComPtr<ID3D12Resource>
 }
 
 D3D12_CPU_DESCRIPTOR_HANDLE DirectXCommon::CreateRTV(ID3D12Resource* resource) { 
-	// RTVヒープの先頭を取得
+	assert(rtvAllocIndex_ < 16);
+
 	D3D12_CPU_DESCRIPTOR_HANDLE handle = rtvDescriptorHeap_->GetCPUDescriptorHandleForHeapStart();
+	handle.ptr += descriptorSizeRTV_ * rtvAllocIndex_;
 
-	// 次に使うRTVインデックスを計算
-	static uint32_t rtvIndex = 2;
-	handle.ptr += descriptorSizeRTV_ * rtvIndex;
-
-	// RTVの設定
 	D3D12_RENDER_TARGET_VIEW_DESC rtvDesc{};
 	rtvDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM_SRGB;
 	rtvDesc.ViewDimension = D3D12_RTV_DIMENSION_TEXTURE2D;
-
-	// RTVを作成
 	device_->CreateRenderTargetView(resource, &rtvDesc, handle);
 
-	// 次のRTVのためにインデックスを進める
-	rtvIndex++;
-
+	rtvAllocIndex_++;
 	return handle;
 }
 
 D3D12_CPU_DESCRIPTOR_HANDLE DirectXCommon::CreateDSV(ID3D12Resource* resource) { 
-	// DSVヒープの先頭を取得
+	assert(dsvAllocIndex_ < 16);
+
 	D3D12_CPU_DESCRIPTOR_HANDLE handle = dsvDescriptorHeap_->GetCPUDescriptorHandleForHeapStart();
+	handle.ptr += descriptorSizeDSV_ * dsvAllocIndex_;
 
-	// 次に使うDSVインデックスを計算
-	static uint32_t dsvIndex = 1; // 0 は既にメインのDSVで使用済み
-	handle.ptr += descriptorSizeDSV_ * dsvIndex;
-
-	// DSVの設定
 	D3D12_DEPTH_STENCIL_VIEW_DESC dsvDesc{};
 	dsvDesc.Format = DXGI_FORMAT_D24_UNORM_S8_UINT;
 	dsvDesc.ViewDimension = D3D12_DSV_DIMENSION_TEXTURE2D;
 	dsvDesc.Flags = D3D12_DSV_FLAG_NONE;
-
-	// DSVを作成
 	device_->CreateDepthStencilView(resource, &dsvDesc, handle);
 
-	// 次のDSVのためにインデックスを進める
-	dsvIndex++;
-
+	dsvAllocIndex_++;
 	return handle;
 }
 

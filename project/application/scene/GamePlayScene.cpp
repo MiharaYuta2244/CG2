@@ -82,16 +82,22 @@ void GamePlayScene::Initialize(const SceneContext& ctx) {
 	controls_ = std::make_unique<Controls>();
 	controls_->Initialize(ctx_.engineContext);
 
-	// VignetteのColorを赤に指定
-	ctx_.engineContext->copyImage->SetVignetteColor({1, 0, 0, 1});
+	// シーンで使うエフェクトの宣言
+	ctx_.engineContext->postEffectPipeline->SetEffects({
+	    PostEffectType::DepthOutline, // アウトライン
+	    PostEffectType::Vignette,     // ビネット
+	    PostEffectType::Glitch,       // グリッチ
+	});
+
+	// パラメータ設定
+	auto* vignette = ctx_.engineContext->postEffectPipeline->GetPass(PostEffectType::Vignette);
+	if (vignette) {
+		vignette->SetVignetteColor({1, 0, 0, 1});
+	}
 }
 
 void GamePlayScene::Update() {
 	float deltaTime = ctx_.timeManager->GetDeltaTime();
-
-	// 経過時間の記録
-	elapsedTime_ += deltaTime;
-	ctx_.engineContext->copyImage->SetRandomTime(elapsedTime_);
 
 	// グリッチノイズの更新
 	UpdateGlitch(deltaTime);
@@ -109,16 +115,16 @@ void GamePlayScene::Update() {
 
 	// Projectionの逆行列をCopyImageに渡す
 	Matrix4x4 projInv = MathUtility::Inverse(ctx_.currentCamera->GetProjection());
-	ctx_.engineContext->copyImage->SetProjectionInverse(projInv);
+	auto* outline = ctx_.engineContext->postEffectPipeline->GetPass(PostEffectType::DepthOutline);
+	if (outline) {
+		outline->SetProjectionInverse(projInv);
+	}
 
 	// HP量に応じてVignetteのパラメータを変更
-	float hpRatio = player_->GetCurrentHP() / player_->GetMaxHP();
-
-	if (hpRatio < 0.3f) {
-		float intensity = (0.3f - hpRatio) / 0.3f;
-		ctx_.engineContext->copyImage->SetVignetteIntensity(intensity);
-	} else {
-		ctx_.engineContext->copyImage->SetVignetteIntensity(0.0f);
+	auto* vignette = ctx_.engineContext->postEffectPipeline->GetPass(PostEffectType::Vignette);
+	if (vignette) {
+		float intensity = player_->GetCurrentHP() <= 1.0f ? 0.5f : 0.0f;
+		vignette->SetVignetteIntensity(intensity);
 	}
 
 	// プレイヤーの更新処理
@@ -301,7 +307,10 @@ void GamePlayScene::Draw() {
 	controls_->Draw();
 }
 
-void GamePlayScene::Finalize() {}
+void GamePlayScene::Finalize() {
+	// シーン終了時にエフェクトをデフォルトに戻す
+	ctx_.engineContext->postEffectPipeline->SetEffects({PostEffectType::FullScreen});
+}
 
 void GamePlayScene::CollisionGameObjects() {
 	// ==========================================
@@ -577,7 +586,7 @@ void GamePlayScene::UpdateDebugImGui() {
 #endif
 }
 
-void GamePlayScene::UpdateGlitch(float deltaTime){
+void GamePlayScene::UpdateGlitch(float deltaTime) {
 	// グリッチノイズ用タイマーの減算
 	if (glitchTimer_ > 0.0f) {
 		glitchTimer_ -= deltaTime;
@@ -591,6 +600,9 @@ void GamePlayScene::UpdateGlitch(float deltaTime){
 		intensity = glitchTimer_ / kGlitchDuration;
 	}
 
-	ctx_.engineContext->copyImage->SetGlitchTime(elapsedTime_);
-	ctx_.engineContext->copyImage->SetGlitchIntensity(intensity);
+	auto* glitch = ctx_.engineContext->postEffectPipeline->GetPass(PostEffectType::Glitch);
+	if (glitch) {
+		glitch->SetGlitchTime(elapsedTime_);
+		glitch->SetGlitchIntensity(intensity);
+	}
 }

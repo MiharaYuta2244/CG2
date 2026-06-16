@@ -130,8 +130,8 @@ private:
 	// RenderTexture
 	std::unique_ptr<RenderTexture> renderTexture_;
 
-	// CopyImage
-	std::unique_ptr<TinyEngine::CopyImage> copyImage_;
+	// PostEffectPipeline
+	std::unique_ptr<PostEffectPipeline> postEffectPipeline_;
 
 	// コンテキスト構造体
 	EngineContext engineContext_;

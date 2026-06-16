@@ -1,8 +1,8 @@
 #pragma once
-#include "CopyImage.h"
 #include "ModelManager.h"
 #include "Object3dCommon.h"
 #include "ParticleCommon.h"
+#include "PostEffectPipeline.h"
 #include "SkyBoxCommon.h"
 #include "SpriteCommon.h"
 #include "SrvManager.h"
@@ -19,5 +19,5 @@ struct EngineContext {
 	ParticleCommon* particleCommon = nullptr;
 	SrvManager* srvManager = nullptr;
 	SkyboxCommon* skyboxCommon = nullptr;
-	TinyEngine::CopyImage* copyImage = nullptr;
+	PostEffectPipeline* postEffectPipeline = nullptr;
 };

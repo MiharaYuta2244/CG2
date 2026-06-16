@@ -59,9 +59,10 @@ void Framework::Initialize() {
 	// RenderTexture
 	renderTexture_->Initialize(dxCommon_.get(), srvManager_.get(), WinApp::kClientWidth, WinApp::kClientHeight);
 
-	// CopyImage
-	copyImage_ = std::make_unique<TinyEngine::CopyImage>();
-	copyImage_->Initialize(dxCommon_.get(), PostEffectType::DepthOutline, textureManager_.get());
+	// PostEffectPipeline
+	postEffectPipeline_ = std::make_unique<PostEffectPipeline>();
+	postEffectPipeline_->Inititlize(dxCommon_.get(), srvManager_.get(), textureManager_.get());
+	postEffectPipeline_->SetEffects({PostEffectType::FullScreen});
 
 #ifdef USE_IMGUI
 	// ImGuiManager
@@ -106,7 +107,7 @@ void Framework::Initialize() {
 	engineContext_.particleCommon = particleCommon_.get();
 	engineContext_.srvManager = srvManager_.get();
 	engineContext_.skyboxCommon = skyboxCommon_.get();
-	engineContext_.copyImage = copyImage_.get();
+	engineContext_.postEffectPipeline = postEffectPipeline_.get();
 
 	// DirectInput
 	input_->Initialize(winApp_.get());
@@ -124,9 +125,6 @@ void Framework::Update() {
 #ifdef USE_IMGUI
 	// ImGui前処理
 	imGuiManager_->BeginFrame();
-
-	// ポストエフェクトのパラメータ調整用
-	copyImage_->DrawImGui();
 #endif
 
 	// デバッグカメラ更新
@@ -182,7 +180,7 @@ void Framework::PostDraw() {
 	SRVManagerPreDraw();
 
 	// RenderTextureからSwapChainへコピー
-	copyImage_->Draw(dxCommon_.get(), srvManager_.get(), renderTexture_->GetSRVIndexColor(), renderTexture_->GetSRVIndexDepth());
+	postEffectPipeline_->Excute(dxCommon_.get(), srvManager_.get(), renderTexture_->GetSRVIndexColor(), renderTexture_->GetSRVIndexDepth());
 
 	// ImGuiの内部コマンドを生成する
 #ifdef USE_IMGUI

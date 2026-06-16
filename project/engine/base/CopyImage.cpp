@@ -172,6 +172,12 @@ void CopyImage::Draw(DirectXCommon* dx, SrvManager* srv, uint32_t srvIndex, uint
 	auto cmd = dx->GetCommandList();
 	assert(cmd);
 
+	// Setter経由で変更されたパラメータをGPUバッファへ毎フレーム反映する
+	const auto& meta = effectMetaMap_.at(postEffectType_);
+	if (meta.cbSize > 0 && cbResource_ && cbData_) {
+		memcpy(cbData_, meta.paramPtr, meta.cbSize);
+	}
+
 	// ルートシグネチャとPSOをセット
 	cmd->SetGraphicsRootSignature(rootSignature_.Get());
 	cmd->SetPipelineState(pipelineState_.Get());

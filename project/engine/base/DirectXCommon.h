@@ -71,6 +71,7 @@ public:
 
 	uint32_t GetBackBufferWidth() const { return backBufferWidth_; }
 	uint32_t GetBackBufferHeight() const { return backBufferHeight_; }
+	D3D12_CPU_DESCRIPTOR_HANDLE GetCurrentBackBufferRTV() const { return rtvHandles_[backBufferIndex_]; }
 
 public:
 	// 最大SRV数(最大テクスチャ枚数)
@@ -165,11 +166,15 @@ private:
 	uint32_t backBufferWidth_;
 	uint32_t backBufferHeight_;
 
+	// RTVとDSVの次に使うスロットインデックス
+	uint32_t rtvAllocIndex_ = 2;
+	uint32_t dsvAllocIndex_ = 1;
+
 #ifdef _DEBUG
 	void SetupDebugLayer();
 #endif
 
-	// 追加: コマンドリストを実行して完了まで待つユーティリティ
+	// コマンドリストを実行して完了まで待つユーティリティ
 public:
 	void ExecuteCommandListAndWait();
 };
