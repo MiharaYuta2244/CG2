@@ -44,7 +44,7 @@ struct DepthOutlineParam {
 struct RadialBlurParam {
 	Vector2 center = {0.5f, 0.5f};
 	float blurWidth = 0.01f;
-	float numSamples = 10.0f;
+	float numSamples = 1.0f;
 };
 
 struct DissolveParam {

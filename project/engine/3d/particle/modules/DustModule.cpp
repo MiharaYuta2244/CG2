@@ -10,6 +10,9 @@ void DustModule::Initialize(ParticleState& particle, EngineContext* /*ctx*/) {
     float s = RandomUtils::RangeFloat(sizeMin_, sizeMax_);
     particle.transform.scale = {s, s, s};
 
+    // 回転
+    particle.transform.rotate = {std::numbers::pi_v<float> / 2.0f, 0, 0};
+
     // 色
     float g = RandomUtils::RangeFloat(0.6f, 0.85f);
     float r = g * RandomUtils::RangeFloat(0.9f, 1.0f);

@@ -59,8 +59,8 @@ void Particle::Initialize(
 
 	// エミッタの初期化
 	if (customEmitter) {
-		emitter = *customEmitter;
-		emitter.transform.translate = emitterPos; // 位置だけは引数で上書き
+		emitter_ = *customEmitter;
+		emitter_.transform.translate = emitterPos; // 位置だけは引数で上書き
 	} else {
 		InitializeEmitter(emitterPos); // デフォルトのエミッタ設定
 	}
@@ -75,12 +75,12 @@ bool Particle::HasModuleEmitter(const std::string& moduleName) const { return em
 
 void Particle::InitializeEmitter(Vector3 emitterPos) {
 	// 従来のデフォルト初期化
-	emitter.count = 10;
-	emitter.frequency = 0.2f;
-	emitter.frequencyTime = 0.0f;
-	emitter.transform.translate = emitterPos;
-	emitter.transform.rotate = {0.0f, 0.0f, 0.0f};
-	emitter.transform.scale = {1.0f, 1.0f, 1.0f};
+	emitter_.count = 10;
+	emitter_.frequency = 0.2f;
+	emitter_.frequencyTime = 0.0f;
+	emitter_.transform.translate = emitterPos;
+	emitter_.transform.rotate = {0.0f, 0.0f, 0.0f};
+	emitter_.transform.scale = {1.0f, 1.0f, 1.0f};
 }
 
 void Particle::Update() {
@@ -100,7 +100,7 @@ void Particle::Update() {
 	// エミッタのImGui
 #ifdef USE_IMGUI
 	ImGui::Begin("Emitter");
-	ImGui::DragFloat3("Translate", &emitter.transform.translate.x, 0.01f, -100.0f, 100.0f);
+	ImGui::DragFloat3("Translate", &emitter_.transform.translate.x, 0.01f, -100.0f, 100.0f);
 	ImGui::End();
 #endif
 
@@ -370,13 +370,13 @@ ParticleState Particle::MakeParticle(const Emitter& emitter, Vector3 translate) 
 	Vector3 extent = emitter.transform.scale;
 
 	// ランダムオフセットを作る（ボックス内）
-	//Vector3 randomOffset = {RandomUtils::RangeFloat(-extent.x, extent.x), RandomUtils::RangeFloat(-extent.y, extent.y), RandomUtils::RangeFloat(-extent.z, extent.z)};
+	Vector3 randomOffset = {RandomUtils::RangeFloat(-extent.x, extent.x), RandomUtils::RangeFloat(-extent.y, extent.y), RandomUtils::RangeFloat(-extent.z, extent.z)};
 
 	// モジュールがある場合はモジュール側で初期化をまかせる
 	if (module_) {
 		module_->Initialize(particle, ctx_);
 		// モジュールはtranslateを書き換えない想定だが、発生位置はエミッタ内ランダム位置へ設定する
-		particle.transform.translate = translate;
+		particle.transform.translate = translate + randomOffset;
 		return particle;
 	}
 
@@ -466,10 +466,10 @@ void Particle::InitializeAccelerationField() {
 }
 
 void Particle::UpdateEmitter() {
-	emitter.frequencyTime += timeManager_->GetDeltaTime();
-	if (emitter.frequency <= emitter.frequencyTime) {
-		particles_.splice(particles_.end(), Emit(emitter, emitter.transform.translate));
-		emitter.frequencyTime -= emitter.frequency;
+	emitter_.frequencyTime += timeManager_->GetDeltaTime();
+	if (emitter_.frequency <= emitter_.frequencyTime) {
+		particles_.splice(particles_.end(), Emit(emitter_, emitter_.transform.translate));
+		emitter_.frequencyTime -= emitter_.frequency;
 	}
 }
 

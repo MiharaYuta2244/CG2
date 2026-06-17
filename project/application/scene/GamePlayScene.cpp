@@ -87,6 +87,7 @@ void GamePlayScene::Initialize(const SceneContext& ctx) {
 	    PostEffectType::DepthOutline, // アウトライン
 	    PostEffectType::Vignette,     // ビネット
 	    PostEffectType::Glitch,       // グリッチ
+	    PostEffectType::RadialBlur,   // ラディアルブラー
 	});
 
 	// パラメータ設定
@@ -94,6 +95,9 @@ void GamePlayScene::Initialize(const SceneContext& ctx) {
 	if (vignette) {
 		vignette->SetVignetteColor({1, 0, 0, 1});
 	}
+
+	// RadialBlurのアニメーション開始フラグ
+	isDeathAnimStarted_ = false;
 }
 
 void GamePlayScene::Update() {
@@ -140,7 +144,7 @@ void GamePlayScene::Update() {
 	wallManager_->Update();
 
 	// ゴール判定インスタンス更新
-	goal_->Update();
+	goal_->Update(deltaTime);
 
 	// スカイボックス更新
 	skybox_->Update(mainCamera_->GetViewMatrix(), mainCamera_->GetProjection());
@@ -157,13 +161,28 @@ void GamePlayScene::Update() {
 		flashEffect_->Trigger();
 	}
 
+	bool isPlaying = numSamplesAnim_.anim.Update(deltaTime, numSamplesAnim_.temp);
+
 	// フラッシュの演出が終わったらレターボックスの出現
 	if (flashEffect_->Finish()) {
 		letterBox_->Trigger();
+
+		// 死亡演出の開始処理
+		if (!isDeathAnimStarted_) {
+			isDeathAnimStarted_ = true;
+			numSamplesAnim_.anim.Start(1.0f, 50.0f, 1.0f, EaseType::EASEOUTCIRC);
+		}
+
+		// 死亡演出の更新処理
+		auto* radialBlur = ctx_.engineContext->postEffectPipeline->GetPass(PostEffectType::RadialBlur);
+
+		if (radialBlur) {
+			radialBlur->SetRadialBlurNumSamples(numSamplesAnim_.temp);
+		}
 	}
 
 	// レターボックスの演出が終わったらシーン遷移
-	if (!letterBox_->GetIsActive()) {
+	if (!letterBox_->GetIsActive() && !isPlaying) {
 		if (!isTransitionRequested_) {
 			RequestSceneChange("Result");
 			isTransitionRequested_ = true;
@@ -272,8 +291,11 @@ void GamePlayScene::Update() {
 }
 
 void GamePlayScene::Draw() {
-	// プレイヤーの描画処理
-	player_->Draw();
+	// 地面の描画
+	ground_->Draw();
+
+	// 壁の管理インスタンス描画
+	wallManager_->Draw();
 
 	// 敵の描画処理
 	enemyManager_->Draw();
@@ -281,22 +303,19 @@ void GamePlayScene::Draw() {
 	// 敵の弾の描画処理
 	enemyBulletManager_->Draw();
 
-	// 壁の管理インスタンス描画
-	wallManager_->Draw();
-
-	// ゴール判定インスタンス描画
-	goal_->Draw();
+	// プレイヤーの描画処理
+	player_->Draw();
 
 	// プレイヤーのHPゲージ描画
 	playerHPGauge_->Draw();
-
-	// 地面の描画
-	ground_->Draw();
 
 	// パーティクルの描画
 	for (auto& particle : enemyDeathParticle_) {
 		particle->Draw();
 	}
+
+	// ゴール判定インスタンス描画
+	goal_->Draw();
 
 	// フラッシュエフェクト描画
 	flashEffect_->Draw();

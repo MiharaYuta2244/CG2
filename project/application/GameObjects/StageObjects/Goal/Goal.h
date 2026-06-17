@@ -1,6 +1,8 @@
 #pragma once
 #include "AABB.h"
 #include "GameObjects/ObjectRender/ObjectRender.h"
+#include "GameTimer.h"
+#include "Particle.h"
 
 /// <summary>
 /// ゴール判定用クラス
@@ -11,7 +13,7 @@ public:
 	void Initialize(EngineContext* ctx);
 
 	// 更新処理
-	void Update();
+	void Update(float deltaTime);
 
 	// 描画処理
 	void Draw();
@@ -26,9 +28,12 @@ public:
 	bool GetGoal() const { return isGoal_; }
 
 private:
+	EngineContext* ctx_ = nullptr;
 	Transform transform_;
 	AABB col_;
 	bool isGoal_ = false; // ゴールフラグ
 
-	std::unique_ptr<ObjectRender> render_; // 描画用インスタンス
+	std::vector<std::unique_ptr<TinyEngine::Particle>> particle_; // パーティクル
+	GameTimer particleGenerateTimer_;                             // パーティクル生成用のタイマー
+	TinyEngine::Particle::Emitter emitter_;                       // エミッター
 };

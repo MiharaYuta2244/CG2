@@ -2,8 +2,10 @@
 #include "AABB.h"
 #include "DirectInput.h"
 #include "GameObjects/ObjectRender/ObjectRender.h"
+#include "Particle.h"
 #include "PlayerHealth.h"
 #include "PlayerMove.h"
+#include "GameTimer.h"
 
 class EnemyManager;
 class Enemy;
@@ -71,6 +73,7 @@ private:
 	AABB attackCol_;
 	AABB bodyCol_;
 	Vector2 lastMoveDirection_;
+	EngineContext* ctx_ = nullptr;
 
 	// プレイヤーの最大HP
 	float maxHP_ = 3.0f;
@@ -83,9 +86,9 @@ private:
 	// つかんでいる敵のポインタを記憶するための変数
 	Enemy* heldEnemy_ = nullptr;
 
-	std::unique_ptr<ObjectRender> render_; // 描画用インスタンス
-	std::unique_ptr<PlayerMove> move_;     // 移動用インスタンス
-	std::unique_ptr<PlayerHealth> hp_;     // HP管理用インスタンス
+	std::unique_ptr<ObjectRender> render_;                            // 描画用インスタンス
+	std::unique_ptr<PlayerMove> move_;                                // 移動用インスタンス
+	std::unique_ptr<PlayerHealth> hp_;                                // HP管理用インスタンス
 
 	float envScale_ = 1.0f;
 
@@ -97,4 +100,8 @@ private:
 
 	// 敵を掴んでいるときにかける速度倍率
 	float speedMultiplier_ = 1.0f;
+
+	// パーティクル関連
+	std::vector<std::unique_ptr<TinyEngine::Particle>> dustParticle_; // 砂埃パーティクル
+	GameTimer particleGenerateTimer_; // パーティクル生成用のタイマー
 };

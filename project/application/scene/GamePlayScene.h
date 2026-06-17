@@ -112,4 +112,8 @@ private:
 
 	// カメラのシェイク量
 	float shakePower_ = 2.0f;
+
+	// プレイヤー死亡時演出用RadialBlurのNumSamplesAnim
+	AnimationBundle<float> numSamplesAnim_;
+	bool isDeathAnimStarted_ = false; // アニメーションの開始フラグ
 };

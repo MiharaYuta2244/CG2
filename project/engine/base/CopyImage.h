@@ -61,6 +61,12 @@ public:
 	// GlitchShader用に経過時間を設定
 	void SetGlitchTime(float time) { glitchParam_.time = time; }
 
+	// RadialBlur用にWidthを設定
+	void SetRadialBlurWidth(float blurWidth) {radialBlurParam_.blurWidth = blurWidth; }
+
+	// RadialBlur用にNumnumSamplesを設定
+	void SetRadialBlurNumSamples(float numSamples) { radialBlurParam_.numSamples = numSamples; }
+
 private:
 	// シェーダコンパイラの初期化
 	void InitializeShaderCompiler();

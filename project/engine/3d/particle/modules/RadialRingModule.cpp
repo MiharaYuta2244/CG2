@@ -11,6 +11,9 @@ void RadialRingModule::Initialize(ParticleState& particle, EngineContext* /*ctx*
 	float s = RandomUtils::RangeFloat(sizeMin_, sizeMax_);
 	particle.transform.scale = {s, s, s};
 
+	// 回転
+	particle.transform.rotate = {std::numbers::pi_v<float> / 2.0f, 0, 0};
+
 	// 色
 	float r = RandomUtils::RangeFloat(0.85f, 1.0f);
 	float g = RandomUtils::RangeFloat(0.0f, 0.5f);

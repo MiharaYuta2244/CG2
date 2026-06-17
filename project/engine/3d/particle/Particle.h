@@ -76,15 +76,15 @@ public:
 	void SetWorldMatrix(Matrix4x4 worldMatrix) { worldMatrix_ = worldMatrix; }
 	void SetCamera(Camera* camera) { camera_ = camera; }
 	void SetIsBillboard(bool isBillboard) { isBillboard_ = isBillboard; }
-	void SetTranslate(Vector3 translate) { emitter.transform.translate = translate; }
+	void SetTranslate(Vector3 translate) { emitter_.transform.translate = translate; }
 	void SetEmitMode(bool isLoop, float duration = 0.0f) {
 		isLoop_ = isLoop;
 		duration_ = duration;
 	}
 	void SetEmitterParam(uint32_t count, float frequency) {
-		emitter.count = count;
-		emitter.frequency = frequency;
-		emitter.frequencyTime = frequency;
+		emitter_.count = count;
+		emitter_.frequency = frequency;
+		emitter_.frequencyTime = frequency;
 	}
 
 	// モジュールごとのエミッタを登録する
@@ -201,7 +201,7 @@ private:
 	bool isBillboard_ = true;
 
 	// デフォルトエミッタ
-	Emitter emitter{};
+	Emitter emitter_{};
 
 	// モジュールごとのエミッタ設定
 	std::unordered_map<std::string, Emitter> emitters_;

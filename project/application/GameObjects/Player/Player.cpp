@@ -3,7 +3,11 @@
 #include "GameObjects/Enemy/EnemyManager.h"
 #include "JsonManager.h"
 
+using namespace TinyEngine;
+
 void Player::Initialize(EngineContext* ctx) {
+	ctx_ = ctx;
+
 	transform_.scale = {1.0f, 1.0f, 1.0f};
 	transform_.rotate = {0.0f, std::numbers::pi_v<float> / 2.0f, 0.0f};
 	transform_.translate = {0.0f, 0.0f, 0.0f};
@@ -23,6 +27,9 @@ void Player::Initialize(EngineContext* ctx) {
 	// HP管理用インスタンス生成&初期化
 	hp_ = std::make_unique<PlayerHealth>();
 	hp_->Initialize(maxHP_);
+
+	// パーティクル生成タイマー初期化
+	particleGenerateTimer_.Initialize(0.2f);
 }
 
 void Player::Update(float deltaTime, DirectInput* input, GamePad* gamePad, EnemyManager* enemyManager) {
@@ -165,6 +172,31 @@ void Player::Update(float deltaTime, DirectInput* input, GamePad* gamePad, Enemy
 		heldEnemy_ = nullptr; // 投げたのでポインタをクリア
 	}
 
+	// パーティクルの生成タイマー更新
+	if (isMoving_) {
+		particleGenerateTimer_.Update(deltaTime);
+	}
+
+	// パーティクルの生成
+	if (particleGenerateTimer_.IsEnd()) {
+		auto particle = std::make_unique<Particle>();
+		particle->Initialize(ctx_, transform_.translate, "Dust.png", std::make_unique<DustModule>(), nullptr, TinyEngine::ParticleMeshType::Square);
+		particle->SetEmitMode(false, 0.1f);
+		particle->SetEmitterParam(5, 0.1f);
+		dustParticle_.push_back(std::move(particle));
+
+		// タイマーの再設定
+		particleGenerateTimer_.Initialize(0.2f);
+	}
+
+	// パーティクルの更新
+	for (auto& particle : dustParticle_) {
+		particle->Update();
+	}
+
+	// パーティクル削除処理
+	std::erase_if(dustParticle_, [this](const std::unique_ptr<TinyEngine::Particle>& p) { return p->IsFinished(); });
+
 #ifdef USE_IMGUI
 	ImGui::Begin("Player");
 	ImGui::DragFloat3("Scale", &transform_.scale.x, 0.01f);
@@ -185,6 +217,11 @@ void Player::PostUpdate() {
 }
 
 void Player::Draw() {
+	// パーティクルの描画
+	for (auto& particle : dustParticle_) {
+		particle->Draw();
+	}
+
 	// 描画
 	render_->Draw();
 }
