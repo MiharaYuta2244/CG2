@@ -1,7 +1,6 @@
 #include "Player.h"
 #include "GameObjects/Enemy/Enemy.h"
 #include "GameObjects/Enemy/EnemyManager.h"
-#include "JsonManager.h"
 
 using namespace TinyEngine;
 
@@ -11,8 +10,6 @@ void Player::Initialize(EngineContext* ctx) {
 	transform_.scale = {1.0f, 1.0f, 1.0f};
 	transform_.rotate = {0.0f, std::numbers::pi_v<float> / 2.0f, 0.0f};
 	transform_.translate = {0.0f, 0.0f, 0.0f};
-
-	JsonManager::Save("player_transform.json", transform_);
 
 	// 描画用インスタンス生成&初期化
 	render_ = std::make_unique<ObjectRender>();
@@ -85,8 +82,10 @@ void Player::Update(float deltaTime, DirectInput* input, GamePad* gamePad, Enemy
 	// 敵を掴んでいる場合は速度を半減させる
 	speedMultiplier_ = isHold_ ? 0.5f : 1.0f;
 
-	// 移動更新
-	move_->Update(&transform_, inputDir, deltaTime, speedMultiplier_);
+	if (!hp_->IsDead()) {
+		// 移動更新
+		move_->Update(&transform_, inputDir, deltaTime, speedMultiplier_);
+	}
 
 	// HP管理インスタンス更新
 	hp_->Update(deltaTime);
@@ -178,7 +177,7 @@ void Player::Update(float deltaTime, DirectInput* input, GamePad* gamePad, Enemy
 	}
 
 	// パーティクルの生成
-	if (particleGenerateTimer_.IsEnd()) {
+	if (particleGenerateTimer_.IsEnd() && !hp_->IsDead()) {
 		auto particle = std::make_unique<Particle>();
 		particle->Initialize(ctx_, transform_.translate, "Dust.png", std::make_unique<DustModule>(), nullptr, TinyEngine::ParticleMeshType::Square);
 		particle->SetEmitMode(false, 0.1f);

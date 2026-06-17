@@ -134,11 +134,8 @@ void GamePlayScene::Update() {
 		vignette->SetVignetteIntensity(intensity);
 	}
 
-	// プレイヤー死亡時もしくはゴール時は実行しない
-	if (!player_->IsDead() && !goal_->GetGoal()) {
-		// プレイヤーの更新処理
-		player_->Update(deltaTime, ctx_.keyboard, ctx_.gamePad, enemyManager_.get());
-	}
+	// プレイヤーの更新処理
+	player_->Update(deltaTime, ctx_.keyboard, ctx_.gamePad, enemyManager_.get());
 
 	// 敵の更新処理
 	enemyManager_->Update(deltaTime, player_.get(), enemyBulletManager_.get(), wallManager_.get());
