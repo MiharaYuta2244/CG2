@@ -14,6 +14,7 @@
 #include "Object3d.h"
 #include "Particle.h"
 #include "Skybox.h"
+#include "Cinematic/CameraDeathZoomController.h"
 #include <memory>
 #include <vector>
 
@@ -116,4 +117,7 @@ private:
 	// プレイヤー死亡時演出用RadialBlurのNumSamplesAnim
 	AnimationBundle<float> numSamplesAnim_;
 	bool isDeathAnimStarted_ = false; // アニメーションの開始フラグ
+
+	// プレイヤー死亡時カメラ演出用インスタンス
+	std::unique_ptr<CameraDeathZoomController> cameraZoomController_;
 };

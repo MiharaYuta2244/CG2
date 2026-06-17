@@ -98,6 +98,9 @@ void GamePlayScene::Initialize(const SceneContext& ctx) {
 
 	// RadialBlurのアニメーション開始フラグ
 	isDeathAnimStarted_ = false;
+
+	// プレイヤー死亡時カメラ演出用インスタンス生成
+	cameraZoomController_ = std::make_unique<CameraDeathZoomController>();
 }
 
 void GamePlayScene::Update() {
@@ -131,8 +134,11 @@ void GamePlayScene::Update() {
 		vignette->SetVignetteIntensity(intensity);
 	}
 
-	// プレイヤーの更新処理
-	player_->Update(deltaTime, ctx_.keyboard, ctx_.gamePad, enemyManager_.get());
+	// プレイヤー死亡時もしくはゴール時は実行しない
+	if (!player_->IsDead() && !goal_->GetGoal()) {
+		// プレイヤーの更新処理
+		player_->Update(deltaTime, ctx_.keyboard, ctx_.gamePad, enemyManager_.get());
+	}
 
 	// 敵の更新処理
 	enemyManager_->Update(deltaTime, player_.get(), enemyBulletManager_.get(), wallManager_.get());
@@ -191,7 +197,15 @@ void GamePlayScene::Update() {
 
 	// プレイヤーが死亡したらシーン遷移
 	if (player_->IsDead()) {
-		if (!isTransitionRequested_) {
+		// カメラ演出開始
+		cameraZoomController_->Start(ctx_.currentCamera->GetTranslation().y);
+
+		// カメラ演出更新
+		Vector3 currentPos = ctx_.currentCamera->GetTranslation();
+		Vector3 nextPos = {currentPos.x, cameraZoomController_->Update(deltaTime), currentPos.z};
+		ctx_.currentCamera->SetTranslation(nextPos);
+
+		if (!isTransitionRequested_ && cameraZoomController_->GetIsFinished()) {
 			RequestSceneChange("Result");
 			isTransitionRequested_ = true;
 		}
@@ -599,7 +613,7 @@ void GamePlayScene::UpdateDebugImGui() {
 #ifdef USE_IMGUI
 	ImGui::Begin("Debug List");
 	if (ImGui::Button("Kill Player")) {
-		player_->Damage(1000.0f);
+		player_->Damage(player_->GetMaxHP());
 	}
 	ImGui::End();
 #endif

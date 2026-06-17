@@ -164,6 +164,7 @@ copy "$(windowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="application\GameObjects\Enemy\AStarPathfinder.cpp" />
     <ClCompile Include="application\GameObjects\GameUI\Controls.cpp" />
     <ClCompile Include="application\GameObjects\StageObjects\Door\Door.cpp" />
+    <ClCompile Include="application\Cinematic\CameraDeathZoomController.cpp" />
     <ClCompile Include="engine\Animation\KeyframeAnimation.cpp" />
     <ClCompile Include="application\GameObjects\Enemy\Enemy.cpp" />
     <ClCompile Include="application\GameObjects\Enemy\EnemyAI.cpp" />
@@ -348,6 +349,7 @@ copy "$(windowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="application\GameObjects\GameUI\Controls.h" />
     <ClInclude Include="application\GameObjects\CommonData.h" />
     <ClInclude Include="application\GameObjects\StageObjects\Door\Door.h" />
+    <ClInclude Include="application\Cinematic\CameraDeathZoomController.h" />
     <ClInclude Include="engine\3d\particle\modules\ParticleModuleHeader.h" />
     <ClInclude Include="engine\Animation\KeyframeAnimation.h" />
     <ClInclude Include="application\GameObjects\Enemy\Enemy.h" />
