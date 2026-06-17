@@ -1,14 +1,10 @@
 #pragma once
-#include "CameraForGPU.h"
 #include "EngineContext.h"
-#include "FogParam.h"
 #include "Material.h"
-#include "TimeParam.h"
 #include "Transform.h"
 #include "TransformationMatrix.h"
 #include <d3d12.h>
 #include <string>
-#include <vector>
 #include <wrl.h>
 
 namespace TinyEngine {

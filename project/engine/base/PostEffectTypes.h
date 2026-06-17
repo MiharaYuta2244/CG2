@@ -60,3 +60,22 @@ struct GlitchParam {
 	float time = 0.0f;
 	float intensity = 0.0f;
 };
+
+struct ScanlineParam {
+	float scanlineCount = 400.0f;
+	float intensity = 0.5f;
+	float speed = 1.0f;
+	float time = 0.0f;
+};
+
+struct DistortionParam {
+	float time = 0.0f;
+	float speed = 2.0f;
+	float amplitude = 0.01f;
+	float frequency = 15.0f;
+};
+
+struct BarrelDistortionParam {
+	float strength = 1.0f;
+	float padding[3];
+};

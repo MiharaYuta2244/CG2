@@ -23,6 +23,9 @@ enum class PostEffectType {
 	Dissolve,
 	Random,
 	Glitch,
+	Scanline,
+	Distortion,
+	BarrelDistortion,
 };
 
 struct EffectMeta {
@@ -70,6 +73,15 @@ public:
 	// Dissolveのパラメータ設定
 	void SetDissolveParam(DissolveParam dissolveParam) { dissolveParam_ = dissolveParam; }
 
+	// Scanlineのパラメータ設定
+	void SetScanlineParam(ScanlineParam scanlineParam) { scanlineParam_ = scanlineParam; }
+
+	// Dsitortionのパラメータ設定
+	void SetDistortionParam(DistortionParam distortionParam) { distortionParam_ = distortionParam; }
+
+	// Fisheyeのパラメータ設定
+	void SetFisheyeParam(BarrelDistortionParam fisheyeParam) { BarrelDistortionParam_ = fisheyeParam; }
+
 private:
 	// シェーダコンパイラの初期化
 	void InitializeShaderCompiler();
@@ -109,21 +121,27 @@ private:
 	DissolveParam dissolveParam_;
 	RandomParam randomParam_;
 	GlitchParam glitchParam_;
+	ScanlineParam scanlineParam_;
+	DistortionParam distortionParam_;
+	BarrelDistortionParam BarrelDistortionParam_;
 
 	// メタデータマップ
 	std::unordered_map<PostEffectType, EffectMeta> effectMetaMap_ = {
-	    {PostEffectType::FullScreen,       {L"Fullscreen", 0, nullptr}                                           },
-	    {PostEffectType::Vignette,         {L"Vignette", sizeof(VignetteParam), &vignetteParam_}                 },
-	    {PostEffectType::Grayscale,        {L"Grayscale", sizeof(GrayscaleParam), &grayscaleParam_}              },
-	    {PostEffectType::Sepia,            {L"Sepia", sizeof(SepiaParam), &sepiaParam_}                          },
-	    {PostEffectType::Smoothing,        {L"BoxFilter", sizeof(SmoothingParam), &smoothingParam_}              },
-	    {PostEffectType::Gaussian,         {L"GaussianFilter", sizeof(GaussianParam), &gaussianParam_}           },
-	    {PostEffectType::LuminanceOutline, {L"LuminanceBasedOutline", 0, nullptr}                                },
-	    {PostEffectType::DepthOutline,     {L"DepthBasedOutline", sizeof(DepthOutlineParam), &depthOutlineParam_}},
-	    {PostEffectType::RadialBlur,       {L"RadialBlur", sizeof(RadialBlurParam), &radialBlurParam_}           },
-	    {PostEffectType::Dissolve,         {L"Dissolve", sizeof(DissolveParam), &dissolveParam_}                 },
-	    {PostEffectType::Random,           {L"Random", sizeof(RandomParam), &randomParam_}                       },
-	    {PostEffectType::Glitch,           {L"Glitch", sizeof(GlitchParam), &glitchParam_}                       },
+	    {PostEffectType::FullScreen,       {L"Fullscreen", 0, nullptr}                                                  },
+	    {PostEffectType::Vignette,         {L"Vignette", sizeof(VignetteParam), &vignetteParam_}                        },
+	    {PostEffectType::Grayscale,        {L"Grayscale", sizeof(GrayscaleParam), &grayscaleParam_}                     },
+	    {PostEffectType::Sepia,            {L"Sepia", sizeof(SepiaParam), &sepiaParam_}                                 },
+	    {PostEffectType::Smoothing,        {L"BoxFilter", sizeof(SmoothingParam), &smoothingParam_}                     },
+	    {PostEffectType::Gaussian,         {L"GaussianFilter", sizeof(GaussianParam), &gaussianParam_}                  },
+	    {PostEffectType::LuminanceOutline, {L"LuminanceBasedOutline", 0, nullptr}                                       },
+	    {PostEffectType::DepthOutline,     {L"DepthBasedOutline", sizeof(DepthOutlineParam), &depthOutlineParam_}       },
+	    {PostEffectType::RadialBlur,       {L"RadialBlur", sizeof(RadialBlurParam), &radialBlurParam_}                  },
+	    {PostEffectType::Dissolve,         {L"Dissolve", sizeof(DissolveParam), &dissolveParam_}                        },
+	    {PostEffectType::Random,           {L"Random", sizeof(RandomParam), &randomParam_}                              },
+	    {PostEffectType::Glitch,           {L"Glitch", sizeof(GlitchParam), &glitchParam_}                              },
+	    {PostEffectType::Scanline,         {L"Scanline", sizeof(ScanlineParam), &scanlineParam_}                        },
+	    {PostEffectType::Distortion,       {L"Distortion", sizeof(DistortionParam), &distortionParam_}                  },
+	    {PostEffectType::BarrelDistortion, {L"BarrelDistortion", sizeof(BarrelDistortionParam), &BarrelDistortionParam_}},
 	};
 
 	// CB

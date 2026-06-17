@@ -11,6 +11,7 @@ void Wall::Initialize(EngineContext* ctx, WallStatus wallStatus) {
 	render_->Initialize(ctx, "Cube.obj");
 	render_->SetTransform(transform_);
 	render_->SetColor(color_);
+	render_->SetEnableLighting(false);
 }
 
 void Wall::Update() {

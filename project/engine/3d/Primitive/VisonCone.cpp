@@ -19,8 +19,8 @@ void VisionCone::Initialize(EngineContext* ctx, float radius, float angleDegrees
 	worldMatrix_ = MathUtility::MakeAffineMatrix(transform_.scale, transform_.rotate, transform_.translate);
 
 	// 視界用マテリアルの初期設定
-	material_.color = {0.0f, 1.0f, 0.0f, 0.3f}; // 半透明の緑色
-	material_.enableLighting = false;           // 敵の視界は影に影響されず発光してほしいためライティングOFF
+	material_.color = {0.0f, 1.0f, 0.0f, 0.3f};
+	material_.enableLighting = false;
 	material_.enableFoging = false;
 	material_.uvTransform = MathUtility::MakeIdentity4x4();
 	material_.shininess = 1.0f;

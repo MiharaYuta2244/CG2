@@ -2,7 +2,7 @@
 #include "BaseScene.h"
 #include "Menu/MenuList.h"
 
-class TitleScene : public BaseScene{
+class TitleScene : public BaseScene {
 public:
 	void Initialize(const SceneContext& ctx) override;
 
@@ -15,4 +15,10 @@ public:
 private:
 	// メニュー
 	std::unique_ptr<MenuList> menu_;
+
+	// ポストエフェクトパラメータ
+	ScanlineParam scanlineParam_;     // 走査線
+	DistortionParam distortionParam_; // 歪み
+	BarrelDistortionParam fisheyeParam_;       // 魚眼
+	GlitchParam glitchParam_;         // グリッチ
 };
