@@ -449,11 +449,7 @@ void GamePlayScene::CollisionGameObjects() {
 					commonData_->killCount++;
 
 					// パーティクルの生成
-					auto particle = std::make_unique<Particle>();
-					particle->Initialize(ctx_.engineContext, enemy->GetPos(), "gradationLine.png", std::make_unique<ShockWaveModule>(), nullptr, TinyEngine::ParticleMeshType::Cylinder);
-					particle->SetEmitMode(false, 0.1f);
-					particle->SetEmitterParam(20, 0.05f);
-					enemyDeathParticle_.push_back(std::move(particle));
+					GenerateEnemyDeathParticle(enemy->GetPos());
 
 					break;
 				}
@@ -530,11 +526,7 @@ void GamePlayScene::CollisionGameObjects() {
 					commonData_->killCount += 2;
 
 					// パーティクルの生成
-					auto particle = std::make_unique<Particle>();
-					particle->Initialize(ctx_.engineContext, a->GetPos(), "gradationLine.png", std::make_unique<ShockWaveModule>(), nullptr, TinyEngine::ParticleMeshType::Cylinder);
-					particle->SetEmitMode(false, 0.1f);
-					particle->SetEmitterParam(20, 0.05f);
-					enemyDeathParticle_.push_back(std::move(particle));
+					GenerateEnemyDeathParticle(a->GetPos());
 				}
 			}
 		}
@@ -620,14 +612,16 @@ void GamePlayScene::UpdateGlitch(float deltaTime) {
 	// グリッチノイズ用タイマーの減算
 	if (glitchTimer_ > 0.0f) {
 		glitchTimer_ -= deltaTime;
+		elapsedTime_ += deltaTime;
 		if (glitchTimer_ < 0.0f) {
 			glitchTimer_ = 0.0f;
+			elapsedTime_ = 0.0f;
 		}
 	}
 
 	float intensity = 0.0f;
 	if (glitchTimer_ > 0.0f) {
-		intensity = glitchTimer_ / kGlitchDuration;
+		intensity = 1.0f;
 	}
 
 	auto* glitch = ctx_.engineContext->postEffectPipeline->GetPass(PostEffectType::Glitch);
@@ -635,4 +629,12 @@ void GamePlayScene::UpdateGlitch(float deltaTime) {
 		glitch->SetGlitchTime(elapsedTime_);
 		glitch->SetGlitchIntensity(intensity);
 	}
+}
+
+void GamePlayScene::GenerateEnemyDeathParticle(const Vector3& pos){
+	auto particle = std::make_unique<Particle>();
+	particle->Initialize(ctx_.engineContext, pos, "gradationLine.png", std::make_unique<ShockWaveModule>(), nullptr, TinyEngine::ParticleMeshType::Cylinder);
+	particle->SetEmitMode(false, 0.1f);
+	particle->SetEmitterParam(20, 0.05f);
+	enemyDeathParticle_.push_back(std::move(particle));
 }

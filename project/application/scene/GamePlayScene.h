@@ -44,6 +44,9 @@ private:
 	// グリッチノイズの更新
 	void UpdateGlitch(float deltaTime);
 
+	// 敵死亡時パーティクル生成
+	void GenerateEnemyDeathParticle(const Vector3& pos);
+
 private:
 	// プレイヤー
 	std::unique_ptr<Player> player_;

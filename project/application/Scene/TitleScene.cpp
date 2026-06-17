@@ -16,9 +16,9 @@ void TitleScene::Initialize(const SceneContext& ctx) {
 
 	// シーンで使うエフェクトの宣言
 	ctx_.engineContext->postEffectPipeline->SetEffects({
-	    PostEffectType::Scanline,   // 走査線
-	    PostEffectType::BarrelDistortion,    // 魚眼
-	    PostEffectType::Glitch,     // グリッチ
+	    PostEffectType::Scanline,         // 走査線
+	    PostEffectType::BarrelDistortion, // 魚眼
+	    PostEffectType::Glitch,           // グリッチ
 	});
 
 	fisheyeParam_.strength = 0.05f;
