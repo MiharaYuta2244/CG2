@@ -1,4 +1,5 @@
 #include "PlayerMove.h"
+#include "ImGuiManager.h"
 #include <complex>
 #include <numbers>
 
@@ -66,4 +67,12 @@ void PlayerMove::Update(Transform* transform, Vector2 inputDir, float deltaTime,
 	// 位置更新
 	transform->translate.x += velocity_.x * deltaTime;
 	transform->translate.z += velocity_.y * deltaTime;
+
+#ifdef USE_IMGUI
+	ImGui::Begin("SpeedParam");
+	ImGui::DragFloat("Walk", &maxSpeedWalk_, 0.01f);
+	ImGui::DragFloat("Run", &maxSpeedRun_, 0.01f);
+	ImGui::DragFloat("Dash", &maxSpeedDash_, 0.01f);
+	ImGui::End();
+#endif
 }

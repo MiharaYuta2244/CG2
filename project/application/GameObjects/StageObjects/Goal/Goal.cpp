@@ -22,8 +22,13 @@ void Goal::Update(float deltaTime) {
 	Vector3 pos = transform_.translate;
 
 	// 当たり判定更新
-	col_.max = {pos.x + 0.5f, pos.y + 0.5f, pos.z + 0.5f};
-	col_.min = {pos.x - 0.5f, pos.y - 0.5f, pos.z - 0.5f};
+	Vector3 scale = transform_.scale;
+	Vector3 halfScale;
+	halfScale.x = scale.x / 2.0f;
+	halfScale.y = scale.y / 2.0f;
+	halfScale.z = scale.z / 2.0f;
+	col_.max = {pos.x + halfScale.x, pos.y + halfScale.y, pos.z + halfScale.z};
+	col_.min = {pos.x - halfScale.x, pos.y - halfScale.y, pos.z - halfScale.z};
 
 	// パーティクル生成用のタイマー更新
 	particleGenerateTimer_.Update(deltaTime);

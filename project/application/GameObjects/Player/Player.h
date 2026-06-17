@@ -81,6 +81,7 @@ private:
 	// 攻撃可能かどうかを表す変数
 	bool enableAttack_ = false;
 
+	// 掴み状態かどうか
 	bool isHold_ = false;
 
 	// つかんでいる敵のポインタを記憶するための変数
@@ -90,6 +91,7 @@ private:
 	std::unique_ptr<PlayerMove> move_;                                // 移動用インスタンス
 	std::unique_ptr<PlayerHealth> hp_;                                // HP管理用インスタンス
 
+	// 環境マップ　強さ
 	float envScale_ = 1.0f;
 
 	// 現在移動中かどうかを保持するフラグ

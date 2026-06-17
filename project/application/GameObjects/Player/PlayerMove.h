@@ -25,5 +25,5 @@ private:
 	// スティックの倒し具合に応じた3段階の最大速度
 	float maxSpeedWalk_ = 4.0f;  // 小さく倒した時
 	float maxSpeedRun_ = 8.0f;   // 中くらい倒した時
-	float maxSpeedDash_ = 14.0f; // 最大まで倒した時
+	float maxSpeedDash_ = 12.0f; // 最大まで倒した時
 };

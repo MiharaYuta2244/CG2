@@ -82,4 +82,7 @@ private:
 
 	// プレイヤーを発見したかどうか
 	EnemyAI::State lastState = EnemyAI::State::Normal;
+
+	// 環境マップ　強さ
+	float envScale_ = 1.0f;
 };

@@ -170,7 +170,7 @@ void GamePlayScene::Update() {
 		// 死亡演出の開始処理
 		if (!isDeathAnimStarted_) {
 			isDeathAnimStarted_ = true;
-			numSamplesAnim_.anim.Start(1.0f, 50.0f, 1.0f, EaseType::EASEOUTCIRC);
+			numSamplesAnim_.anim.Start(0.0f, 1.0f, 1.0f, EaseType::EASEOUTCIRC);
 		}
 
 		// 死亡演出の更新処理

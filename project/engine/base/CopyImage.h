@@ -62,10 +62,13 @@ public:
 	void SetGlitchTime(float time) { glitchParam_.time = time; }
 
 	// RadialBlur用にWidthを設定
-	void SetRadialBlurWidth(float blurWidth) {radialBlurParam_.blurWidth = blurWidth; }
+	void SetRadialBlurWidth(float blurWidth) { radialBlurParam_.blurWidth = blurWidth; }
 
 	// RadialBlur用にNumnumSamplesを設定
 	void SetRadialBlurNumSamples(float numSamples) { radialBlurParam_.numSamples = numSamples; }
+
+	// Dissolveのパラメータ設定
+	void SetDissolveParam(DissolveParam dissolveParam) { dissolveParam_ = dissolveParam; }
 
 private:
 	// シェーダコンパイラの初期化

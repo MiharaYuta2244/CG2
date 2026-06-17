@@ -14,6 +14,7 @@ void Enemy::Initialize(EngineContext* ctx, Vector3 pos) {
 	render_ = std::make_unique<ObjectRender>();
 	render_->Initialize(ctx, "Hiyoko.obj");
 	render_->SetTransform(transform_);
+	render_->SetEnvScale(envScale_);
 
 	// AIインスタンス生成&初期化
 	ai_ = std::make_unique<EnemyAI>();
