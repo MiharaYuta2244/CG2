@@ -20,7 +20,7 @@ public:
 
 private:
 	// 切り替わる回数
-	int maxStep_ = 3;
+	int maxStep_ = 4;
 
 	// 現在の段階
 	int step_ = 0;

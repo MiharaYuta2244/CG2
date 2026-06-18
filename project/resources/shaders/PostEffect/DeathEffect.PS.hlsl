@@ -16,17 +16,17 @@ float4 main(VertexShaderOutput input) : SV_TARGET
     // カラーを輝度に変換
     float luminance = dot(texColor.rgb, float3(0.2125, 0.7154, 0.0721));
     
-    float3 black = float3(0.05, 0.05, 0.05); // 背景などの暗い部分
+    float3 black = float3(0.01, 0.01, 0.01); // 背景などの暗い部分
     float3 red = float3(0.6, 0.0, 0.0); // 壁などの中間輝度部分
     float3 white = float3(0.9, 0.9, 0.9); // プレイヤーなどの明るい部分
     
     // 輝度に応じて3色に分ける
     float3 effectColor;
-    if (luminance < 0.3)
+    if (luminance < 0.05)
     {
         effectColor = black;
     }
-    else if (luminance < 0.65)
+    else if (luminance < 0.3)
     {
         effectColor = red;
     }
