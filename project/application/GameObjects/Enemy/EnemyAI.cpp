@@ -176,6 +176,7 @@ void EnemyAI::UpdateVigilance(float deltaTime, Player* player, EnemyBulletManage
 		if (lostSightTimer_ <= 0.0f) {
 			state_ = State::Normal;
 			currentPath_.clear(); // 経路もリセット
+			shotTimer_ = 0.0f;    // 弾のクールタイムリセット
 			return;               // ここで初めて追跡を終了する
 		}
 
