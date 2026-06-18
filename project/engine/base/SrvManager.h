@@ -9,6 +9,7 @@ public:
 	void Initialize(DirectXCommon* dxCommon);
 
 	uint32_t Allocate();
+	void Free(uint32_t index);
 
 	D3D12_CPU_DESCRIPTOR_HANDLE GetCPUDescriptorHandle(uint32_t index);
 	D3D12_GPU_DESCRIPTOR_HANDLE GetGPUDescriptorHandle(uint32_t index);
@@ -43,4 +44,7 @@ private:
 
 	// 次に使用するSRVインデックス
 	uint32_t useIndex = 1;
+
+	// 解放されたインデックスを保持するリスト
+	std::vector<uint32_t> freeIndices_;
 };

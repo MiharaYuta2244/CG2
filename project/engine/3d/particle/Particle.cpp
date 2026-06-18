@@ -13,6 +13,12 @@ using namespace Microsoft::WRL;
 using namespace DirectX;
 using namespace TinyEngine;
 
+Particle::~Particle(){
+	if (ctx_ && ctx_->srvManager) {
+		ctx_->srvManager->Free(srvIndex_);
+	}
+}
+
 void Particle::Initialize(
     EngineContext* ctx, Vector3 emitterPos, const std::string& texturePath, std::unique_ptr<ParticleModule> module, const Emitter* customEmitter,
     ParticleMeshType meshType) {
@@ -25,7 +31,8 @@ void Particle::Initialize(
 	CreateInstancingResource();
 
 	// SRVの作成（インスタンシング用）
-	CreateInstancingSRV(ctx->srvManager->Allocate());
+	srvIndex_ = ctx_->srvManager->Allocate();
+	CreateInstancingSRV(srvIndex_);
 
 	// 指定されたメッシュタイプに応じてモデルデータを作成
 	switch (meshType) {

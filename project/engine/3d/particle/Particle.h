@@ -49,6 +49,9 @@ private:
 	};
 
 public:
+	// デストラクタ
+	~Particle();
+
 	/// <summary>
 	///	初期化処理
 	/// </summary>
@@ -223,5 +226,8 @@ private:
 	float elapsedTime_ = 0.0f; // エミッタの経過時間
 	bool isLoop_ = true;       // ループするかどうか
 	bool isFinished_ = false;  // すべての処理が終わり、削除可能かどうか
+
+	// 確保したSRVインデックスを保持する変数
+	uint32_t srvIndex_ = 0;
 };
 } // namespace TinyEngine

@@ -17,18 +17,26 @@ void SrvManager::Initialize(DirectXCommon* dxCommon) {
 }
 
 uint32_t SrvManager::Allocate() {
+	// 空きリストにインデックスがあれば、それを再利用する
+	if (!freeIndices_.empty()) {
+		uint32_t index = freeIndices_.back();
+		freeIndices_.pop_back();
+		return index;
+	}
+
+	// 空きがなければ新しく払い出す
 	if (useIndex >= kMaxSRVCount) {
 		assert(false);
 	}
 
-	// returnする番号を一旦記録しておく
 	int index = useIndex;
-
-	// 次回のために番号を1進める
 	useIndex++;
-
-	// 上で記録した番号をreturn
 	return index;
+}
+
+void SrvManager::Free(uint32_t index){
+	// 使用が終わったインデックスの空きリストに戻す
+	freeIndices_.push_back(index); 
 }
 
 D3D12_CPU_DESCRIPTOR_HANDLE SrvManager::GetCPUDescriptorHandle(uint32_t index) {

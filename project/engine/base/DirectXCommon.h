@@ -1,17 +1,17 @@
 #pragma once
 class WinApp; // 前方宣言
 class SrvManager;
-#include <chrono>
-#include "WinApp.h"
 #include "Logger.h"
-#include <memory>
+#include "WinApp.h"
+#include <cassert>
+#include <chrono>
 #include <d3d12.h>
 #include <dxgi1_6.h>
-#include <cassert>
+#include <memory>
 #include <wrl.h>
 #pragma comment(lib, "dxguid.lib")
-#include <dxcapi.h>
 #include <Vector4.h>
+#include <dxcapi.h>
 
 /// <summary>
 /// DirectXの共通処理を管理するクラス
@@ -61,10 +61,20 @@ public:
 	Microsoft::WRL::ComPtr<ID3D12Resource> CreateDepthStencilTextureResource(Microsoft::WRL::ComPtr<ID3D12Device> device, int32_t width, int32_t height);
 
 	// RTVの作成(RenderTexture用)
-	D3D12_CPU_DESCRIPTOR_HANDLE CreateRTV(ID3D12Resource* resource);
+	void CreateRTV(ID3D12Resource* resource, uint32_t index);
 
 	// DSVの作成(RenderTexture用)
-	D3D12_CPU_DESCRIPTOR_HANDLE CreateDSV(ID3D12Resource* resource);
+	void CreateDSV(ID3D12Resource* resource, uint32_t index);
+
+	// RTVのインデックス管理用関数
+	uint32_t AllocateRTV();
+	void FreeRTV(uint32_t index);
+	D3D12_CPU_DESCRIPTOR_HANDLE GetRTVHandle(uint32_t index);
+
+	// DSVのインデックス管理用関数
+	uint32_t AllocateDSV();
+	void FreeDSV(uint32_t index);
+	D3D12_CPU_DESCRIPTOR_HANDLE GetDSVHandle(uint32_t index);
 
 	D3D12_VIEWPORT CreateViewport();
 	D3D12_RECT CreateScissor();
@@ -105,7 +115,6 @@ private:
 	std::chrono::steady_clock::time_point reference_;
 
 private:
-
 	std::shared_ptr<WinApp> winApp_;
 
 	// DXGI
@@ -169,6 +178,10 @@ private:
 	// RTVとDSVの次に使うスロットインデックス
 	uint32_t rtvAllocIndex_ = 2;
 	uint32_t dsvAllocIndex_ = 1;
+
+	// 空きインデックスを管理するリスト
+	std::vector<uint32_t> freeRtvIndices_;
+	std::vector<uint32_t> freeDsvIndices_;
 
 #ifdef _DEBUG
 	void SetupDebugLayer();

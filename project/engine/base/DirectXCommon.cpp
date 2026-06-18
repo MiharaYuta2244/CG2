@@ -1,10 +1,10 @@
-#include <format>
-#include <thread>
-#include <MathUtility.h>
 #include "DirectXCommon.h"
+#include "SrvManager.h"
 #include "StringUtility.h"
 #include "WinApp.h"
-#include "SrvManager.h"
+#include <MathUtility.h>
+#include <format>
+#include <thread>
 
 const uint32_t DirectXCommon::kMaxSRVCount = 512;
 
@@ -72,13 +72,13 @@ void DirectXCommon::BeginFrame() {
 	commandList_->ResourceBarrier(1, &barrier);
 
 	// 描画先のRTVとDSVを設定する
-	//D3D12_CPU_DESCRIPTOR_HANDLE dsvHandle = dsvDescriptorHeap_->GetCPUDescriptorHandleForHeapStart();
+	// D3D12_CPU_DESCRIPTOR_HANDLE dsvHandle = dsvDescriptorHeap_->GetCPUDescriptorHandleForHeapStart();
 	commandList_->OMSetRenderTargets(1, &rtvHandles_[backBufferIndex_], false, nullptr);
 	// 指定した色で画面全体をクリアする
 	float clearColor[] = {0.89f, 0.80f, 0.58f, 1.0f}; // 黒色
 	commandList_->ClearRenderTargetView(rtvHandles_[backBufferIndex_], clearColor, 0, nullptr);
 	// 指定した深度で画面全体をクリアする
-	//commandList_->ClearDepthStencilView(dsvHandle, D3D12_CLEAR_FLAG_DEPTH, 1.0f, 0, 0, nullptr);
+	// commandList_->ClearDepthStencilView(dsvHandle, D3D12_CLEAR_FLAG_DEPTH, 1.0f, 0, 0, nullptr);
 
 	viewport_ = CreateViewport();
 	scissorRect_ = CreateScissor();
@@ -416,18 +416,17 @@ ComPtr<ID3D12Resource> DirectXCommon::CreateDepthStencilTextureResource(ComPtr<I
 	// Resourceの生成
 	ComPtr<ID3D12Resource> resource = nullptr;
 	HRESULT hr = device->CreateCommittedResource(
-	    &heapProperties,                  // Heapの設定
-	    D3D12_HEAP_FLAG_NONE,             // Heapの特殊な設定。特になし。
-	    &resourceDesc,                    // Resourceの設定
+	    &heapProperties,                 // Heapの設定
+	    D3D12_HEAP_FLAG_NONE,            // Heapの特殊な設定。特になし。
+	    &resourceDesc,                   // Resourceの設定
 	    D3D12_RESOURCE_STATE_DEPTH_READ, // 深度値を書き込む状態にしておく
-	    &depthClearValue,                 // Clear最適値
-	    IID_PPV_ARGS(&resource));         // 作成するResourceポインタへのポインタ
+	    &depthClearValue,                // Clear最適値
+	    IID_PPV_ARGS(&resource));        // 作成するResourceポインタへのポインタ
 	assert(SUCCEEDED(hr));
 	return resource;
 }
 
-ComPtr<ID3D12Resource>
-    DirectXCommon::CreateRenderTextureResource(ComPtr<ID3D12Device> device, uint32_t width, uint32_t height, DXGI_FORMAT format, const Vector4& clearColor) {
+ComPtr<ID3D12Resource> DirectXCommon::CreateRenderTextureResource(ComPtr<ID3D12Device> device, uint32_t width, uint32_t height, DXGI_FORMAT format, const Vector4& clearColor) {
 	// 生成するResourceの設定
 	D3D12_RESOURCE_DESC resourceDesc{};
 	resourceDesc.Width = width;                                   // Textureの幅
@@ -455,44 +454,68 @@ ComPtr<ID3D12Resource>
 	// Resourceの生成
 	ComPtr<ID3D12Resource> resource = nullptr;
 	HRESULT hr = device->CreateCommittedResource(
-	    &heapProperties,                  // Heapの設定
-	    D3D12_HEAP_FLAG_NONE,             // Heapの特殊な設定。特になし。
-	    &resourceDesc,                    // Resourceの設定
+	    &heapProperties,                            // Heapの設定
+	    D3D12_HEAP_FLAG_NONE,                       // Heapの特殊な設定。特になし。
+	    &resourceDesc,                              // Resourceの設定
 	    D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE, // 深度値を書き込む状態にしておく
-	    &clearValue,                      // Clear最適値
-	    IID_PPV_ARGS(&resource));         // 作成するResourceポインタへのポインタ
+	    &clearValue,                                // Clear最適値
+	    IID_PPV_ARGS(&resource));                   // 作成するResourceポインタへのポインタ
 	assert(SUCCEEDED(hr));
 	return resource;
 }
 
-D3D12_CPU_DESCRIPTOR_HANDLE DirectXCommon::CreateRTV(ID3D12Resource* resource) { 
-	assert(rtvAllocIndex_ < 16);
-
-	D3D12_CPU_DESCRIPTOR_HANDLE handle = rtvDescriptorHeap_->GetCPUDescriptorHandleForHeapStart();
-	handle.ptr += descriptorSizeRTV_ * rtvAllocIndex_;
+void DirectXCommon::CreateRTV(ID3D12Resource* resource, uint32_t index) {
+	D3D12_CPU_DESCRIPTOR_HANDLE handle = GetRTVHandle(index);
 
 	D3D12_RENDER_TARGET_VIEW_DESC rtvDesc{};
 	rtvDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM_SRGB;
 	rtvDesc.ViewDimension = D3D12_RTV_DIMENSION_TEXTURE2D;
 	device_->CreateRenderTargetView(resource, &rtvDesc, handle);
-
-	rtvAllocIndex_++;
-	return handle;
 }
 
-D3D12_CPU_DESCRIPTOR_HANDLE DirectXCommon::CreateDSV(ID3D12Resource* resource) { 
-	assert(dsvAllocIndex_ < 16);
-
-	D3D12_CPU_DESCRIPTOR_HANDLE handle = dsvDescriptorHeap_->GetCPUDescriptorHandleForHeapStart();
-	handle.ptr += descriptorSizeDSV_ * dsvAllocIndex_;
+void DirectXCommon::CreateDSV(ID3D12Resource* resource, uint32_t index) {
+	D3D12_CPU_DESCRIPTOR_HANDLE handle = GetDSVHandle(index);
 
 	D3D12_DEPTH_STENCIL_VIEW_DESC dsvDesc{};
 	dsvDesc.Format = DXGI_FORMAT_D24_UNORM_S8_UINT;
 	dsvDesc.ViewDimension = D3D12_DSV_DIMENSION_TEXTURE2D;
 	dsvDesc.Flags = D3D12_DSV_FLAG_NONE;
 	device_->CreateDepthStencilView(resource, &dsvDesc, handle);
+}
 
-	dsvAllocIndex_++;
+uint32_t DirectXCommon::AllocateRTV() {
+	if (!freeRtvIndices_.empty()) {
+		uint32_t index = freeRtvIndices_.back();
+		freeRtvIndices_.pop_back();
+		return index;
+	}
+	assert(rtvAllocIndex_ < 16);
+	return rtvAllocIndex_++;
+}
+
+void DirectXCommon::FreeRTV(uint32_t index) { freeRtvIndices_.push_back(index); }
+
+D3D12_CPU_DESCRIPTOR_HANDLE DirectXCommon::GetRTVHandle(uint32_t index) {
+	D3D12_CPU_DESCRIPTOR_HANDLE handle = rtvDescriptorHeap_->GetCPUDescriptorHandleForHeapStart();
+	handle.ptr += descriptorSizeRTV_ * index;
+	return handle;
+}
+
+uint32_t DirectXCommon::AllocateDSV() {
+	if (!freeDsvIndices_.empty()) {
+		uint32_t index = freeDsvIndices_.back();
+		freeDsvIndices_.pop_back();
+		return index;
+	}
+	assert(dsvAllocIndex_ < 16);
+	return dsvAllocIndex_++;
+}
+
+void DirectXCommon::FreeDSV(uint32_t index) { freeDsvIndices_.push_back(index); }
+
+D3D12_CPU_DESCRIPTOR_HANDLE DirectXCommon::GetDSVHandle(uint32_t index) {
+	D3D12_CPU_DESCRIPTOR_HANDLE handle = dsvDescriptorHeap_->GetCPUDescriptorHandleForHeapStart();
+	handle.ptr += descriptorSizeDSV_ * index;
 	return handle;
 }
 

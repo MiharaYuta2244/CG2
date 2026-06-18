@@ -1,17 +1,36 @@
 #include "RenderTexture.h"
 
+RenderTexture::~RenderTexture(){
+	// RTV/DSVインデックスの解放
+	if (dxCommon_) {
+		dxCommon_->FreeRTV(rtvIndex_);
+		dxCommon_->FreeDSV(dsvIndex_);
+	}
+	// SRVインデックスの解放
+	if (srvManager_) {
+		srvManager_->Free(srvIndexColor_);
+		srvManager_->Free(srvIndexDepth_);
+	}
+}
+
 void RenderTexture::Initialize(DirectXCommon* dx, SrvManager* srv, uint32_t width, uint32_t height) {
+	dxCommon_ = dx;
+	srvManager_ = srv;
+
 	auto device = dx->GetDevice();
 
 	resourceColor_ = dx->CreateRenderTextureResource(dx->GetDevice(), width, height, DXGI_FORMAT_R8G8B8A8_UNORM_SRGB, {0.2f, 0.2f, 0.2f, 1.0f});
-
 	resourceDepth_ = dx->CreateDepthStencilTextureResource(device, width, height);
 
-	// RTVを作成
-	rtvHandle_ = dx->CreateRTV(resourceColor_.Get());
+	// RTVのインデックスを確保し、それを使って作成・ハンドル取得を行う
+	rtvIndex_ = dx->AllocateRTV();
+	dx->CreateRTV(resourceColor_.Get(), rtvIndex_);
+	rtvHandle_ = dx->GetRTVHandle(rtvIndex_);
 
-	// DSVを作成
-	dsvHandle_ = dx->CreateDSV(resourceDepth_.Get());
+	// DSVのインデックスを確保し、それを使って作成・ハンドル取得を行う
+	dsvIndex_ = dx->AllocateDSV();
+	dx->CreateDSV(resourceDepth_.Get(), dsvIndex_);
+	dsvHandle_ = dx->GetDSVHandle(dsvIndex_);
 
 	// SRVを作成
 	srvIndexColor_ = srv->Allocate();
