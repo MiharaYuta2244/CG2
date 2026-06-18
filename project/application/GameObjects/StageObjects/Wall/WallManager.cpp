@@ -9,9 +9,9 @@ void WallManager::Initialize(EngineContext* ctx) {
 	LoadFromJson(jsonPath_);
 }
 
-void WallManager::Update() {
+void WallManager::Update(float deltaTime) {
 	for (auto& wall : walls_) {
-		wall->Update();
+		wall->Update(deltaTime);
 	}
 }
 

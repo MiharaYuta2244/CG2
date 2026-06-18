@@ -5,6 +5,7 @@ cbuffer GlitchParam : register(b0)
 {
     float time;
     float intensity;
+    float2 padding;
 };
 
 struct VSOutput

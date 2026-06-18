@@ -84,5 +84,5 @@ private:
 	EnemyAI::State lastState = EnemyAI::State::Normal;
 
 	// 環境マップ　強さ
-	float envScale_ = 1.0f;
+	float envScale_ = 0.0f;
 };

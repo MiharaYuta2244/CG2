@@ -311,6 +311,8 @@ void Object3d::CreateMaterialData() {
 	material_.uvTransform = MathUtility::MakeIdentity4x4();
 	material_.shininess = 64.0f;
 	material_.envScale = 0.0f;
+	material_.enableNoise = false;
+	material_.time = 0.0f;
 	// GPUへ書き込み
 	*materialData_ = material_;
 }

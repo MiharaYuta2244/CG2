@@ -75,6 +75,9 @@ private:
 	Vector2 lastMoveDirection_;
 	EngineContext* ctx_ = nullptr;
 
+	// 色
+	Vector4 color_ = {1.0f, 0.1568f, 0.0f, 1.0f};
+
 	// プレイヤーの最大HP
 	float maxHP_ = 3.0f;
 
@@ -92,7 +95,7 @@ private:
 	std::unique_ptr<PlayerHealth> hp_;                                // HP管理用インスタンス
 
 	// 環境マップ　強さ
-	float envScale_ = 1.0f;
+	float envScale_ = 0.0f;
 
 	// 現在移動中かどうかを保持するフラグ
 	bool isMoving_ = false;

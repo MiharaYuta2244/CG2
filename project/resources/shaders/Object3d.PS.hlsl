@@ -8,6 +8,8 @@ struct Material
     int enableFoging;
     float shininess;
     float envScale;
+    float time;
+    int enableNoise;
 };
 
 struct DirectionalLight
@@ -70,6 +72,12 @@ ConstantBuffer<FogParam> gFogParam : register(b3);
 ConstantBuffer<TimeParam> gTimeParam : register(b4);
 ConstantBuffer<PointLight> gPointLight : register(b5);
 ConstantBuffer<SpotLight> gSpotLight : register(b6);
+
+// ノイズ生成関数
+float random(float2 p)
+{
+    return frac(sin(dot(p, float2(12.9898, 78.233))) * 43758.5453);
+}
 
 PixelShaderOutput main(VertexShaderOutput input)
 {
@@ -170,6 +178,26 @@ PixelShaderOutput main(VertexShaderOutput input)
     else
     {
         output.color = gMaterial.color * textureColor;
+    }
+    
+    // ノイズ処理の追加
+    if (gMaterial.enableNoise)
+    {
+        // ノイズの細かさ
+        float fineness = 10.0f;
+        
+        // ワールド座標のX, Zと時間を使ってノイズを生成
+        float2 noiseCoord = input.worldPosition.xz * fineness;
+        float noise = random(noiseCoord + gMaterial.time);
+        
+        // ノイズの濃さ
+        float strength = 0.8f;
+        
+        // 元の色に対して、ノイズの分だけ少し暗くする
+        output.color.rgb -= noise * strength;
+        
+        // 色がマイナスにならないようにサチュレート
+        output.color.rgb = saturate(output.color.rgb);
     }
     
     // 環境マップ

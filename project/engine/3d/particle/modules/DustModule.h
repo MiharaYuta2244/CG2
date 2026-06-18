@@ -7,9 +7,9 @@
 /// </summary>
 class DustModule : public ParticleModule {
 public:
-    DustModule(float lifeMin = 0.4f, float lifeMax = 0.9f,
-               float baseSpeed = 6.00f,
-               float sizeMin = 0.15f, float sizeMax = 0.35f,
+    DustModule(float lifeMin = 0.3f, float lifeMax = 0.6f,
+               float baseSpeed = 12.00f,
+               float sizeMin = 0.15f, float sizeMax = 0.4f,
                float gravityScale = -9.8f * 0.05f)
         : lifeMin_(lifeMin),
           lifeMax_(lifeMax),

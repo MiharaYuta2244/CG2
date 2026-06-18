@@ -12,9 +12,13 @@ void Wall::Initialize(EngineContext* ctx, WallStatus wallStatus) {
 	render_->SetTransform(transform_);
 	render_->SetColor(color_);
 	render_->SetEnableLighting(false);
+	render_->SetEnableNoise(true);
 }
 
-void Wall::Update() {
+void Wall::Update(float deltaTime) {
+	time_ += deltaTime;
+	render_->SetTime(time_);
+
 	// 当たり判定更新
 	Vector3 pos = transform_.translate;
 	Vector3 scale = transform_.scale;

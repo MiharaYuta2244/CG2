@@ -36,7 +36,7 @@ public:
 	void Initialize(EngineContext* ctx, WallStatus wallStatus);
 
 	// 更新処理
-	void Update();
+	void Update(float deltaTime);
 
 	// 描画処理
 	void Draw();
@@ -54,7 +54,8 @@ private:
 	Transform transform_;
 	AABB collision_; // 当たり判定
 	WallStatus wallStatus_;
-	Vector4 color_ = {0.1f, 0.1f, 0.1f, 1.0f};
+	Vector4 color_ = {0.1f, 0.1f, 0.18f, 1.0f};
+	float time_ = 0.0f;
 
 	std::unique_ptr<ObjectRender> render_; // 描画用インスタンス
 };

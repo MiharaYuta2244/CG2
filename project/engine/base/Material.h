@@ -13,4 +13,6 @@ struct Material {
 	int32_t enableFoging;
 	float shininess;
 	float envScale;
+	float time;
+	int32_t enableNoise;
 };

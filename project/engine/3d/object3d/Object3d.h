@@ -69,6 +69,8 @@ public:
 	void SetOutlineColor(float thickness) { outline_.thickness = thickness; }
 	void SetName(const std::string& name) { name_ = name; }
 	void SetTexture(const std::string& filePath);
+	void SetEnableNoise(bool isEnable) { material_.enableNoise = isEnable ? 1 : 0; }
+	void SetTime(float time) { material_.time = time; }
 
 	// getter
 	Vector3& GetScale() { return transform_.scale; }

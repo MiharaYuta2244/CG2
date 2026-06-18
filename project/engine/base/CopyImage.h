@@ -26,6 +26,7 @@ enum class PostEffectType {
 	Scanline,
 	Distortion,
 	BarrelDistortion,
+	DeathEffect,
 };
 
 struct EffectMeta {
@@ -82,6 +83,9 @@ public:
 	// Fisheyeのパラメータ設定
 	void SetFisheyeParam(BarrelDistortionParam fisheyeParam) { BarrelDistortionParam_ = fisheyeParam; }
 
+	// DeathEffectのIntensity設定
+	void SetDeathEffectIntensity(float intensity) { deathEffectParam_.intensity = intensity; }
+
 private:
 	// シェーダコンパイラの初期化
 	void InitializeShaderCompiler();
@@ -124,6 +128,7 @@ private:
 	ScanlineParam scanlineParam_;
 	DistortionParam distortionParam_;
 	BarrelDistortionParam BarrelDistortionParam_;
+	DeathEffectParam deathEffectParam_;
 
 	// メタデータマップ
 	std::unordered_map<PostEffectType, EffectMeta> effectMetaMap_ = {
@@ -142,6 +147,7 @@ private:
 	    {PostEffectType::Scanline,         {L"Scanline", sizeof(ScanlineParam), &scanlineParam_}                        },
 	    {PostEffectType::Distortion,       {L"Distortion", sizeof(DistortionParam), &distortionParam_}                  },
 	    {PostEffectType::BarrelDistortion, {L"BarrelDistortion", sizeof(BarrelDistortionParam), &BarrelDistortionParam_}},
+	    {PostEffectType::DeathEffect,      {L"DeathEffect", sizeof(DeathEffectParam), &deathEffectParam_}               },
 	};
 
 	// CB

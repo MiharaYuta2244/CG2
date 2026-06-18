@@ -6,6 +6,7 @@ SamplerState gSampler : register(s0);
 cbuffer RandomParam : register(b0)
 {
     float time;
+    float3 padding;
 };
 
 struct PixelShaderOutput

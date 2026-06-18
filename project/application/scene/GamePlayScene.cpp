@@ -84,10 +84,10 @@ void GamePlayScene::Initialize(const SceneContext& ctx) {
 
 	// シーンで使うエフェクトの宣言
 	ctx_.engineContext->postEffectPipeline->SetEffects({
-	    PostEffectType::DepthOutline, // アウトライン
+	    //PostEffectType::DepthOutline, // アウトライン
 	    PostEffectType::Vignette,     // ビネット
 	    PostEffectType::Glitch,       // グリッチ
-	    PostEffectType::RadialBlur,   // ラディアルブラー
+	    PostEffectType::DeathEffect,  // 死亡時エフェクト
 	});
 
 	// パラメータ設定
@@ -129,9 +129,13 @@ void GamePlayScene::Update() {
 
 	// HP量に応じてVignetteのパラメータを変更
 	auto* vignette = ctx_.engineContext->postEffectPipeline->GetPass(PostEffectType::Vignette);
-	if (vignette) {
-		float intensity = player_->GetCurrentHP() <= 1.0f ? 0.5f : 0.0f;
-		vignette->SetVignetteIntensity(intensity);
+	if (!player_->IsDead()) {
+		if (vignette) {
+			float intensity = player_->GetCurrentHP() <= 1.0f ? 0.5f : 0.0f;
+			vignette->SetVignetteIntensity(intensity);
+		}
+	} else {
+		vignette->SetVignetteIntensity(0.0f);
 	}
 
 	// プレイヤーの更新処理
@@ -144,7 +148,7 @@ void GamePlayScene::Update() {
 	enemyBulletManager_->Update(deltaTime);
 
 	// 壁の管理インスタンス更新
-	wallManager_->Update();
+	wallManager_->Update(deltaTime);
 
 	// ゴール判定インスタンス更新
 	goal_->Update(deltaTime);
@@ -175,13 +179,6 @@ void GamePlayScene::Update() {
 			isDeathAnimStarted_ = true;
 			numSamplesAnim_.anim.Start(0.0f, 1.0f, 1.0f, EaseType::EASEOUTCIRC);
 		}
-
-		// 死亡演出の更新処理
-		auto* radialBlur = ctx_.engineContext->postEffectPipeline->GetPass(PostEffectType::RadialBlur);
-
-		if (radialBlur) {
-			radialBlur->SetRadialBlurNumSamples(numSamplesAnim_.temp);
-		}
 	}
 
 	// レターボックスの演出が終わったらシーン遷移
@@ -189,6 +186,18 @@ void GamePlayScene::Update() {
 		if (!isTransitionRequested_) {
 			RequestSceneChange("Result");
 			isTransitionRequested_ = true;
+		}
+	}
+
+	// プレイヤーの生死状態に応じてDeathEffectの強度を制御
+	auto* deathEffect = ctx_.engineContext->postEffectPipeline->GetPass(PostEffectType::DeathEffect);
+	if (deathEffect) {
+		if (player_->IsDead()) {
+			// プレイヤー死亡時はエフェクトを全開にする
+			deathEffect->SetDeathEffectIntensity(1.0f);
+		} else {
+			// 生存時は通常画面
+			deathEffect->SetDeathEffectIntensity(0.0f);
 		}
 	}
 
@@ -631,7 +640,7 @@ void GamePlayScene::UpdateGlitch(float deltaTime) {
 	}
 }
 
-void GamePlayScene::GenerateEnemyDeathParticle(const Vector3& pos){
+void GamePlayScene::GenerateEnemyDeathParticle(const Vector3& pos) {
 	auto particle = std::make_unique<Particle>();
 	particle->Initialize(ctx_.engineContext, pos, "gradationLine.png", std::make_unique<ShockWaveModule>(), nullptr, TinyEngine::ParticleMeshType::Cylinder);
 	particle->SetEmitMode(false, 0.1f);

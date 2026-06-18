@@ -12,7 +12,7 @@ public:
 	void Initialize(EngineContext* ctx);
 
 	// 更新処理
-	void Update();
+	void Update(float deltaTime);
 
 	// 描画処理
 	void Draw();

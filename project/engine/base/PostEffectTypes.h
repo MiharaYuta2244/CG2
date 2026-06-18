@@ -54,11 +54,13 @@ struct DissolveParam {
 
 struct RandomParam{
 	float time = 0.0f;
+	float padding[3];
 };
 
 struct GlitchParam {
 	float time = 0.0f;
 	float intensity = 0.0f;
+	float padding[2];
 };
 
 struct ScanlineParam {
@@ -77,5 +79,10 @@ struct DistortionParam {
 
 struct BarrelDistortionParam {
 	float strength = 1.0f;
+	float padding[3];
+};
+
+struct DeathEffectParam {
+	float intensity = 0.0f;
 	float padding[3];
 };
