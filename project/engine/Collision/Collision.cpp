@@ -124,3 +124,59 @@ bool Collision::Intersect(const AABB& aabb, const OBB& obb) {
 }
 
 bool Collision::Intersect(const OBB& obb, const AABB& aabb) { return Intersect(aabb, obb); }
+
+bool Collision::Intersect(const Segment& segment, const AABB& aabb, float& outT) {
+	float tMin = 0.0f;
+	float tMax = 1.0f;
+
+	// X軸
+	if (std::abs(segment.diff.x) < 1e-6f) {
+		if (segment.origin.x < aabb.min.x || segment.origin.x > aabb.max.x)
+			return false;
+	} else {
+		float invD = 1.0f / segment.diff.x;
+		float t0 = (aabb.min.x - segment.origin.x) * invD;
+		float t1 = (aabb.max.x - segment.origin.x) * invD;
+		if (invD < 0.0f)
+			std::swap(t0, t1);
+		tMin = std::max(tMin, t0);
+		tMax = std::min(tMax, t1);
+		if (tMax < tMin)
+			return false;
+	}
+
+	// Y軸
+	if (std::abs(segment.diff.y) < 1e-6f) {
+		if (segment.origin.y < aabb.min.y || segment.origin.y > aabb.max.y)
+			return false;
+	} else {
+		float invD = 1.0f / segment.diff.y;
+		float t0 = (aabb.min.y - segment.origin.y) * invD;
+		float t1 = (aabb.max.y - segment.origin.y) * invD;
+		if (invD < 0.0f)
+			std::swap(t0, t1);
+		tMin = std::max(tMin, t0);
+		tMax = std::min(tMax, t1);
+		if (tMax < tMin)
+			return false;
+	}
+
+	// Z軸
+	if (std::abs(segment.diff.z) < 1e-6f) {
+		if (segment.origin.z < aabb.min.z || segment.origin.z > aabb.max.z)
+			return false;
+	} else {
+		float invD = 1.0f / segment.diff.z;
+		float t0 = (aabb.min.z - segment.origin.z) * invD;
+		float t1 = (aabb.max.z - segment.origin.z) * invD;
+		if (invD < 0.0f)
+			std::swap(t0, t1);
+		tMin = std::max(tMin, t0);
+		tMax = std::min(tMax, t1);
+		if (tMax < tMin)
+			return false;
+	}
+
+	outT = tMin;
+	return true;
+}

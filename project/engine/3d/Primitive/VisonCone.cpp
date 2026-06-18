@@ -1,6 +1,7 @@
 #include "DirectXUtils.h"
 #include "MathUtility.h"
 #include "VisonCone.h"
+#include "Collision.h"
 #include <algorithm>
 #include <cmath>
 
@@ -9,6 +10,11 @@ using namespace DirectX;
 
 void VisionCone::Initialize(EngineContext* ctx, float radius, float angleDegrees, uint32_t segments) {
 	ctx_ = ctx;
+
+	// パラメータを保存しておく
+	radius_ = radius;
+	angleDegrees_ = angleDegrees;
+	segments_ = segments;
 
 	// トランスフォームの初期化
 	transform_ = {
@@ -118,9 +124,54 @@ void VisionCone::CreateConstantBuffers() {
 	materialResource_->Map(0, nullptr, reinterpret_cast<void**>(&materialData_));
 }
 
-void VisionCone::Update() {
+void VisionCone::Update(const std::list<std::unique_ptr<Wall>>& walls) {
 	// ワールド行列の再計算
 	worldMatrix_ = MathUtility::MakeAffineMatrix(transform_.scale, transform_.rotate, transform_.translate);
+
+	// 頂点バッファをMapしてアクセス可能にする
+	VertexData* vertices = nullptr;
+	vertexResource_->Map(0, nullptr, reinterpret_cast<void**>(&vertices));
+
+	vertices[0].position = {0.0f, 0.0f, 0.0f, 1.0f};
+
+	float halfAngle = angleDegrees_ * 0.5f;
+	float angleStep = angleDegrees_ / segments_;
+
+	// 各セグメントについてレイキャストを行う
+	for (uint32_t i = 0; i <= segments_; ++i) {
+		float currentAngle = -halfAngle + (angleStep * i);
+		float rad = currentAngle * (std::numbers::pi_v<float> / 180.0f);
+
+		// ローカル座標系での最大到達点
+		Vector3 localTarget = {std::sin(rad) * radius_, 0.0f, std::cos(rad) * radius_};
+
+		// ワールド座標に変換してレイを生成
+		Vector3 worldOrigin = transform_.translate;
+		Vector3 worldTarget = MathUtility::Transform(localTarget, worldMatrix_);
+
+		Segment ray;
+		ray.origin = worldOrigin;
+		ray.diff = {worldTarget.x - worldOrigin.x, worldTarget.y - worldOrigin.y, worldTarget.z - worldOrigin.z};
+
+		float closestT = 1.0f;
+
+		// 全ての壁に対して交差判定を行う
+		for (const auto& wall : walls) {
+			float t = 0.0f;
+			if (Collision::Intersect(ray, wall->GetCollision(), t)) {
+				// 最も手前にある壁の衝突地点を記録
+				if (t < closestT) {
+					closestT = t;
+				}
+			}
+		}
+
+		// 衝突結果に基づいてローカルの頂点座標を更新
+		vertices[i + 1].position = {localTarget.x * closestT, localTarget.y * closestT, localTarget.z * closestT, 1.0f};
+	}
+
+	// 頂点バッファのアンマップ
+	vertexResource_->Unmap(0, nullptr);
 
 	// WVP行列の計算
 	Camera* camera = ctx_->object3dCommon->GetDefaultCamera();

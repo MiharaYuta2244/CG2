@@ -2,6 +2,12 @@
 #include "AABB.h"
 #include "Sphere.h"
 #include "OBB.h"
+
+struct Segment {
+	Vector3 origin; // 始点
+	Vector3 diff;   // 始点から終点へのベクトル
+};
+
 namespace Collision {
 
 // 汎用テンプレート
@@ -17,4 +23,5 @@ bool Intersect(const AABB& aabb, const Vector3& point);
 bool Intersect(const OBB& obb1, const OBB& obb2);
 bool Intersect(const AABB& aabb, const OBB& obb);
 bool Intersect(const OBB& obb, const AABB& aabb);
+bool Intersect(const Segment& segment, const AABB& aabb, float& outT);
 }; // namespace Collision

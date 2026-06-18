@@ -61,7 +61,7 @@ void Enemy::Update(float deltaTime, Player* player, EnemyBulletManager* enemyBul
 	// 視界
 	visionCone_->SetTranslate(transform_.translate);
 	visionCone_->SetRotate(transform_.rotate);
-	visionCone_->Update();
+	visionCone_->Update(wallManager->GetWalls());
 
 	if (knockBackAnim_.anim.GetIsActive()) {
 		knockBackAnim_.anim.Update(deltaTime, knockBackAnim_.temp);

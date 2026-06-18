@@ -3,6 +3,7 @@
 #include "Material.h"
 #include "Transform.h"
 #include "TransformationMatrix.h"
+#include "GameObjects/StageObjects/Wall/WallManager.h"
 #include <d3d12.h>
 #include <string>
 #include <wrl.h>
@@ -32,7 +33,7 @@ public:
 	/// <summary>
 	/// 更新処理
 	/// </summary>
-	void Update();
+	void Update(const std::list<std::unique_ptr<Wall>>& walls);
 
 	/// <summary>
 	/// 描画処理
@@ -86,6 +87,10 @@ private:
 	Matrix4x4 worldMatrix_;
 	Matrix4x4 worldViewProjectionMatrix_;
 	Material material_;
+
+	float radius_ = 0.0f;
+	float angleDegrees_ = 0.0f;
+	uint32_t segments_ = 0;
 };
 
 } // namespace TinyEngine
