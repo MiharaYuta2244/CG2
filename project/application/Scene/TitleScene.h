@@ -17,8 +17,7 @@ private:
 	std::unique_ptr<MenuList> menu_;
 
 	// ポストエフェクトパラメータ
-	ScanlineParam scanlineParam_;     // 走査線
-	DistortionParam distortionParam_; // 歪み
-	BarrelDistortionParam fisheyeParam_;       // 魚眼
-	GlitchParam glitchParam_;         // グリッチ
+	ScanlineParam scanlineParam_;                 // 走査線
+	BarrelDistortionParam barrelDistortionParam_; // 魚眼
+	GlitchParam glitchParam_;                     // グリッチ
 };

@@ -21,7 +21,7 @@ void TitleScene::Initialize(const SceneContext& ctx) {
 	    PostEffectType::Glitch,           // グリッチ
 	});
 
-	fisheyeParam_.strength = 0.05f;
+	barrelDistortionParam_.strength = 0.05f;
 	glitchParam_.intensity = 0.1f;
 	scanlineParam_.scanlineCount = 150.0f;
 	scanlineParam_.intensity = 0.7f;
@@ -35,7 +35,6 @@ void TitleScene::Update() {
 	menu_->Update(ctx_.keyboard, ctx_.gamePad, ctx_.timeManager->GetDeltaTime());
 
 	// 歪みのパラメータにDeltaTime加算
-	distortionParam_.time += deltaTime;
 	glitchParam_.time += deltaTime;
 	scanlineParam_.time += deltaTime;
 
@@ -55,7 +54,7 @@ void TitleScene::Update() {
 	// Fisheye
 	// =======================
 	if (ImGui::CollapsingHeader("Fisheye")) {
-		ImGui::DragFloat("Strength", &fisheyeParam_.strength, 0.01f, 0.0f, 5.0f);
+		ImGui::DragFloat("Strength", &barrelDistortionParam_.strength, 0.01f, 0.0f, 5.0f);
 	}
 
 	// =======================
@@ -66,15 +65,16 @@ void TitleScene::Update() {
 	}
 
 	ImGui::End();
+#endif
 
 	auto* scanline = ctx_.engineContext->postEffectPipeline->GetPass(PostEffectType::Scanline);
 	if (scanline) {
 		scanline->SetScanlineParam(scanlineParam_);
 	}
 
-	auto* fisheye = ctx_.engineContext->postEffectPipeline->GetPass(PostEffectType::BarrelDistortion);
-	if (fisheye) {
-		fisheye->SetFisheyeParam(fisheyeParam_);
+	auto* barrelDistortionParam = ctx_.engineContext->postEffectPipeline->GetPass(PostEffectType::BarrelDistortion);
+	if (barrelDistortionParam) {
+		barrelDistortionParam->SetFisheyeParam(barrelDistortionParam_);
 	}
 
 	auto* glitch = ctx_.engineContext->postEffectPipeline->GetPass(PostEffectType::Glitch);
@@ -82,7 +82,6 @@ void TitleScene::Update() {
 		glitch->SetGlitchTime(glitchParam_.time);
 		glitch->SetGlitchIntensity(glitchParam_.intensity);
 	}
-#endif
 }
 
 void TitleScene::Draw() {

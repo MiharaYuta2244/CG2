@@ -22,4 +22,9 @@ private:
 
 	// メインカメラ
 	std::unique_ptr<Camera> mainCamera_;
+
+	// ポストエフェクトパラメータ
+	ScanlineParam scanlineParam_;                 // 走査線
+	BarrelDistortionParam barrelDistortionParam_; // 魚眼
+	GlitchParam glitchParam_;                     // グリッチ
 };
