@@ -306,10 +306,7 @@
     <ClCompile Include="application\GameObjects\ResultUI\ResultUIManager.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
-    <ClCompile Include="application\GameObjects\ResultUI\Text\ResultScoreText.cpp">
-      <Filter>ソース ファイル</Filter>
-    </ClCompile>
-    <ClCompile Include="application\GameObjects\ResultUI\Text\ResultTimerText.cpp">
+    <ClCompile Include="application\GameObjects\ResultUI\Text\ResultParamText.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
     <ClCompile Include="application\GameObjects\ResultUI\Animation\SpriteScaleWipeAnimator.cpp">
@@ -730,10 +727,7 @@
     <ClInclude Include="application\GameObjects\ResultUI\ResultUIManager.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
-    <ClInclude Include="application\GameObjects\ResultUI\Text\ResultScoreText.h">
-      <Filter>ヘッダー ファイル</Filter>
-    </ClInclude>
-    <ClInclude Include="application\GameObjects\ResultUI\Text\ResultTimerText.h">
+    <ClInclude Include="application\GameObjects\ResultUI\Text\ResultParamText.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
     <ClInclude Include="application\GameObjects\ResultUI\Animation\SpriteScaleWipeAnimator.h">
@@ -812,6 +806,9 @@
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
     <ClInclude Include="application\Cinematic\CameraDeathZoomController.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="application\GameObjects\IGameObject.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
   </ItemGroup>

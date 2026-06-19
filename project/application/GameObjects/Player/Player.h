@@ -1,11 +1,12 @@
 #pragma once
 #include "AABB.h"
 #include "DirectInput.h"
+#include "GameObjects/IGameObject.h"
 #include "GameObjects/ObjectRender/ObjectRender.h"
+#include "GameTimer.h"
 #include "Particle.h"
 #include "PlayerHealth.h"
 #include "PlayerMove.h"
-#include "GameTimer.h"
 
 class EnemyManager;
 class Enemy;
@@ -13,7 +14,7 @@ class Enemy;
 /// <summary>
 /// プレイヤーの処理をまとめたクラス
 /// </summary>
-class Player {
+class Player : public IGameObject {
 public:
 	// 初期化処理
 	void Initialize(EngineContext* ctx);
@@ -63,12 +64,14 @@ public:
 	// プレイヤーが移動中かどうかを取得するGetter
 	bool IsMoving() const { return isMoving_; }
 
+	// ギズモ用
+	std::string GetName() const override { return "Player"; }
+
 private:
 	// 当たり判定の更新処理
 	void UpdateCollision();
 
 private:
-	Transform transform_;
 	Vector2 velocity_;
 	AABB attackCol_;
 	AABB bodyCol_;
@@ -90,9 +93,9 @@ private:
 	// つかんでいる敵のポインタを記憶するための変数
 	Enemy* heldEnemy_ = nullptr;
 
-	std::unique_ptr<ObjectRender> render_;                            // 描画用インスタンス
-	std::unique_ptr<PlayerMove> move_;                                // 移動用インスタンス
-	std::unique_ptr<PlayerHealth> hp_;                                // HP管理用インスタンス
+	std::unique_ptr<ObjectRender> render_; // 描画用インスタンス
+	std::unique_ptr<PlayerMove> move_;     // 移動用インスタンス
+	std::unique_ptr<PlayerHealth> hp_;     // HP管理用インスタンス
 
 	// 環境マップ　強さ
 	float envScale_ = 0.0f;
@@ -108,5 +111,5 @@ private:
 
 	// パーティクル関連
 	std::vector<std::unique_ptr<TinyEngine::Particle>> dustParticle_; // 砂埃パーティクル
-	GameTimer particleGenerateTimer_; // パーティクル生成用のタイマー
+	GameTimer particleGenerateTimer_;                                 // パーティクル生成用のタイマー
 };

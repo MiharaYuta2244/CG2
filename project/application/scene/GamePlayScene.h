@@ -70,10 +70,10 @@ private:
 	std::unique_ptr<PlayerHPGauge> playerHPGauge_;
 
 	// オブジェクトのリスト
-	std::vector<TinyEngine::Object3d*> objects_;
+	std::vector<IGameObject*> objects_;
 
 	// 選択中のオブジェクトポインタ
-	TinyEngine::Object3d* selectedObject_ = nullptr;
+	IGameObject* selectedGameObject_ = nullptr;
 
 	// SRTの内扱うパラメータ
 	ImGuizmo::OPERATION currentGizmoOperation_ = ImGuizmo::TRANSLATE;

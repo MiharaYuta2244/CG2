@@ -5,12 +5,16 @@
 #include "GameObjects/ObjectRender/ObjectRender.h"
 #include "VisonCone.h"
 #include "ExclamationMark.h"
+#include "GameObjects/IGameObject.h"
 
 class EnemyBulletManager;
 class Player;
 class WallManager;
 
-class Enemy {
+/// <summary>
+/// 敵クラス
+/// </summary>
+class Enemy : public IGameObject {
 public:
 	// 初期化処理
 	void Initialize(EngineContext* ctx, Vector3 pos);
@@ -56,6 +60,9 @@ public:
 	// TransformのGetter
 	Transform GetTransform() const { return transform_; }
 
+	// ギズモ用
+	std::string GetName() const override { return "Enemy"; }
+
 private:
 	// 当たり判定の更新
 	void UpdateCollision();
@@ -64,7 +71,6 @@ private:
 	void GenerateExMark();
 
 private:
-	Transform transform_;
 	AABB bodyCol_; // 本体のAABB
 	bool enableMove_ = true;
 	AnimationBundle<Vector3> knockBackAnim_;

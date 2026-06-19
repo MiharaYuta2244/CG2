@@ -55,8 +55,6 @@ void GamePlayScene::Initialize(const SceneContext& ctx) {
 	playerHPGauge_->Initialize(ctx_.engineContext);
 	playerHPGauge_->HPBarSpriteApply(static_cast<int>(player_->GetCurrentHP()), static_cast<int>(player_->GetMaxHP()));
 
-	// objects_.push_back(player_->GetObject3d());
-
 	// イージングエディターの生成
 	easingEditor_ = std::make_unique<EasingEditor>();
 
@@ -84,7 +82,7 @@ void GamePlayScene::Initialize(const SceneContext& ctx) {
 
 	// シーンで使うエフェクトの宣言
 	ctx_.engineContext->postEffectPipeline->SetEffects({
-	    //PostEffectType::DepthOutline, // アウトライン
+	    PostEffectType::DepthOutline, // アウトライン
 	    PostEffectType::Vignette,     // ビネット
 	    PostEffectType::Glitch,       // グリッチ
 	    PostEffectType::DeathEffect,  // 死亡時エフェクト
@@ -101,6 +99,16 @@ void GamePlayScene::Initialize(const SceneContext& ctx) {
 
 	// プレイヤー死亡時カメラ演出用インスタンス生成
 	cameraZoomController_ = std::make_unique<CameraDeathZoomController>();
+
+	// ギズモで操作する用にリストに追加
+	objects_.push_back(player_.get()); // プレイヤー
+	objects_.push_back(ground_.get()); // 床
+	for (auto& enemy : enemyManager_->GetEnemies()) {
+		objects_.push_back(enemy.get()); // 敵
+	}
+	for (auto& wall : wallManager_->GetWalls()) {
+		objects_.push_back(wall.get()); // 壁
+	}
 }
 
 void GamePlayScene::Update() {
@@ -343,6 +351,7 @@ void GamePlayScene::Draw() {
 	// レターボックス描画
 	letterBox_->Draw();
 
+	// 操作方法UI描画
 	controls_->Draw();
 }
 
@@ -544,62 +553,113 @@ void GamePlayScene::CollisionGameObjects() {
 
 void GamePlayScene::UpdateImGui() {
 #ifdef USE_IMGUI
+	// 毎フレーム、現在生存しているオブジェクトでリストを再構築
+	objects_.clear();
+	objects_.push_back(player_.get()); // プレイヤー
+	objects_.push_back(ground_.get()); // 床
+	for (auto& enemy : enemyManager_->GetEnemies()) {
+		objects_.push_back(enemy.get()); // 敵
+	}
+	for (auto& wall : wallManager_->GetWalls()) {
+		objects_.push_back(wall.get()); // 壁
+	}
+
+	// 選択中のオブジェクトが破棄されていないか検証
+	bool isSelectedValid = false;
+	for (IGameObject* obj : objects_) {
+		if (obj == selectedGameObject_) {
+			isSelectedValid = true;
+			break;
+		}
+	}
+
+	// 存在しなければ選択を解除
+	if (!isSelectedValid) {
+		selectedGameObject_ = nullptr;
+	}
+
 	ImGui::Begin("Object Manager");
 
 	// 操作モードの選択
 	if (ImGui::RadioButton("Translate", currentGizmoOperation_ == ImGuizmo::TRANSLATE)) {
 		currentGizmoOperation_ = ImGuizmo::TRANSLATE;
 	}
-
 	ImGui::SameLine();
-
 	if (ImGui::RadioButton("Rotate", currentGizmoOperation_ == ImGuizmo::ROTATE)) {
 		currentGizmoOperation_ = ImGuizmo::ROTATE;
 	}
-
 	ImGui::SameLine();
-
 	if (ImGui::RadioButton("Scale", currentGizmoOperation_ == ImGuizmo::SCALE)) {
 		currentGizmoOperation_ = ImGuizmo::SCALE;
 	}
 
 	ImGui::Separator();
 
-	// リストから選択
-	if (ImGui::BeginListBox("Objects")) {
-		for (auto& obj : objects_) {
-			std::string label = obj->GetName() + " (ID: " + std::to_string(obj->GetID()) + ")";
-			bool isSelected = (selectedObject_ == obj);
-			if (ImGui::Selectable(label.c_str(), isSelected)) {
-				selectedObject_ = obj;
-			}
+	// オブジェクトリストの表示
+	ImGui::Text("Objects");
+	ImGui::BeginChild("ObjectList", ImVec2(0, 150), true);
+	for (size_t i = 0; i < objects_.size(); ++i) {
+		IGameObject* obj = objects_[i];
+		std::string label = obj->GetName() + " ##" + std::to_string(i);
+
+		bool isSelected = (selectedGameObject_ == obj);
+		if (ImGui::Selectable(label.c_str(), isSelected)) {
+			selectedGameObject_ = obj;
 		}
-		ImGui::EndListBox();
 	}
+	ImGui::EndChild();
 	ImGui::End();
 
 	// ギズモ描画レイヤー
-	if (selectedObject_ != nullptr) {
-		// ウィンドウ位置とサイズを画面全体に固定
+	if (selectedGameObject_ != nullptr) {
 		ImGui::SetNextWindowPos(ImVec2(0, 0), ImGuiCond_Always);
-		ImGui::SetNextWindowSize(ImVec2(1280, 720), ImGuiCond_Always); // 解像度に合わせて調整
+		ImGui::SetNextWindowSize(ImVec2(1280, 720), ImGuiCond_Always);
 
-		// 背景を完全に透明にする設定
 		ImGui::PushStyleColor(ImGuiCol_WindowBg, ImVec4(0, 0, 0, 0));
 		ImGui::Begin("GizmoLayer", nullptr, ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoInputs | ImGuiWindowFlags_NoScrollbar);
 
 		ImGuizmo::BeginFrame();
 		ImGuizmo::SetOrthographic(false);
 		ImGuizmo::Enable(true);
-		ImGuizmo::SetDrawlist(ImGui::GetWindowDrawList()); // 現在のウィンドウのDrawListを使用
+		ImGuizmo::SetDrawlist(ImGui::GetWindowDrawList());
 
-		// 描画範囲の設定
 		float windowWidth = (float)ImGui::GetWindowWidth();
 		float windowHeight = (float)ImGui::GetWindowHeight();
 		ImGuizmo::SetRect(ImGui::GetWindowPos().x, ImGui::GetWindowPos().y, windowWidth, windowHeight);
 
-		// 選択中オブジェクトのギズモを描画
-		selectedObject_->DrawGizmo(ctx_.currentCamera->GetViewMatrix(), ctx_.currentCamera->GetProjection(), currentGizmoOperation_, ImGuizmo::LOCAL);
+		// 対象のTransformを取得
+		Transform& transform = selectedGameObject_->GetTransform();
+
+		// ラジアンから度に変換して配列に格納
+		float degRot[3] = {transform.rotate.x * 180.0f / std::numbers::pi_v<float>, transform.rotate.y * 180.0f / std::numbers::pi_v<float>, transform.rotate.z * 180.0f / std::numbers::pi_v<float>};
+
+		// Transformの要素から4x4行列を作成
+		float objectMatrix[16];
+		ImGuizmo::RecomposeMatrixFromComponents(&transform.translate.x, degRot, &transform.scale.x, objectMatrix);
+		Matrix4x4 viewMat = ctx_.currentCamera->GetViewMatrix();
+		Matrix4x4 projMat = ctx_.currentCamera->GetProjection();
+
+		// ImGuizmoで操作
+		ImGuizmo::Manipulate(&viewMat.m[0][0], &projMat.m[0][0], currentGizmoOperation_, currentGizmoMode_, objectMatrix);
+
+		// ギズモが操作中なら、行列から要素を分解してTransformに戻す
+		if (ImGuizmo::IsUsing()) {
+			float newTrans[3], newRot[3], newScale[3];
+			ImGuizmo::DecomposeMatrixToComponents(objectMatrix, newTrans, newRot, newScale);
+
+			// ギズモ操作前の元の高さを保存しておく
+			float oldY = transform.translate.y;
+
+			transform.translate = {newTrans[0], newTrans[1], newTrans[2]};
+
+			// Y座標だけは元の高さを維持するように上書き固定する
+			transform.translate.y = oldY;
+
+			transform.scale = {newScale[0], newScale[1], newScale[2]};
+
+			// 度からラジアンに戻して保存
+			transform.rotate = {newRot[0] * std::numbers::pi_v<float> / 180.0f, newRot[1] * std::numbers::pi_v<float> / 180.0f, newRot[2] * std::numbers::pi_v<float> / 180.0f};
+		}
 
 		ImGui::End();
 		ImGui::PopStyleColor();

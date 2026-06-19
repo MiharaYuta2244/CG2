@@ -1,24 +1,18 @@
-#include "ResultTimerText.h"
+#include "ResultParamText.h"
 
 using namespace TinyEngine;
 
-void ResultTimerText::Initialize(EngineContext* ctx) {
+void ResultParamText::Initialize(EngineContext* ctx, Vector2 basePos, Vector2 baseSize) {
 	// テキスト生成&初期化
 	text_ = std::make_unique<Sprite>();
 	text_->Initialize(ctx, "Title_Play.png");
-	text_->SetPosition(basePos_);
 
-	// アニメーションスプライトの生成&初期化
+	// アニメーションスプライト生成&初期化
 	animSprite_ = std::make_unique<SpriteScaleWipeAnimator>();
-	animSprite_->Initialize(ctx, basePos_, baseSize_);
+	animSprite_->Initialize(ctx, basePos, baseSize);
 }
 
-void ResultTimerText::Update(float deltaTime, DirectInput* input) {
-	// アニメーションの開始処理
-	if (input->KeyTriggered(DIK_F1)) {
-		animSprite_->StartAnimation();
-	}
-
+void ResultParamText::Update(float deltaTime, DirectInput* input) {
 	// アニメーションスプライトの更新
 	animSprite_->Update(deltaTime);
 
@@ -27,7 +21,7 @@ void ResultTimerText::Update(float deltaTime, DirectInput* input) {
 	text_->Update();
 }
 
-void ResultTimerText::Draw() {
+void ResultParamText::Draw() {
 	// テキストの描画
 	if (animSprite_->GetBeforeAnimationFinished()) {
 		text_->Draw();

@@ -3,11 +3,12 @@
 #include "GameObjects/ObjectRender/ObjectRender.h"
 #include "GameTimer.h"
 #include "Particle.h"
+#include "GameObjects/IGameObject.h"
 
 /// <summary>
 /// ゴール判定用クラス
 /// </summary>
-class Goal {
+class Goal : public IGameObject {
 public:
 	// 初期化処理
 	void Initialize(EngineContext* ctx);
@@ -29,7 +30,6 @@ public:
 
 private:
 	EngineContext* ctx_ = nullptr;
-	Transform transform_;
 	AABB col_;
 	bool isGoal_ = false; // ゴールフラグ
 

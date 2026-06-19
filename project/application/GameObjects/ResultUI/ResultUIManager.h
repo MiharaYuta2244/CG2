@@ -2,8 +2,7 @@
 #include "Button/RetryButton.h"
 #include "Button/ToTitleButton.h"
 #include "GameObjects/CommonData.h"
-#include "Text/ResultScoreText.h"
-#include "Text/ResultTimerText.h"
+#include "Text/ResultParamText.h"
 
 /// <summary>
 /// リザルトシーンのUI管理クラス
@@ -34,10 +33,10 @@ private:
 
 private:
 	// スコアテキスト
-	std::unique_ptr<ResultScoreText> scoreText_;
+	std::unique_ptr<ResultParamText> scoreText_;
 
 	// クリアタイマーテキスト
-	std::unique_ptr<ResultTimerText> timerText_;
+	std::unique_ptr<ResultParamText> timerText_;
 
 	// リトライボタン
 	std::unique_ptr<RetryButton> retryButton_;

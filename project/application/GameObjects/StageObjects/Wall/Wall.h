@@ -1,5 +1,6 @@
 #pragma once
 #include "AABB.h"
+#include "GameObjects/IGameObject.h"
 #include "GameObjects/ObjectRender/ObjectRender.h"
 
 struct WallStatus {
@@ -30,7 +31,7 @@ inline void from_json(const Json& j, WallStatus& wState) {
 /// <summary>
 /// 壁クラス
 /// </summary>
-class Wall {
+class Wall : public IGameObject {
 public:
 	// 初期化処理
 	void Initialize(EngineContext* ctx, WallStatus wallStatus);
@@ -50,8 +51,10 @@ public:
 	// WallStatusのGetter
 	WallStatus& GetWallStatus() { return wallStatus_; }
 
+	// ギズモ用
+	std::string GetName() const override { return "Wall"; }
+
 private:
-	Transform transform_;
 	AABB collision_; // 当たり判定
 	WallStatus wallStatus_;
 	Vector4 color_ = {0.1f, 0.1f, 0.18f, 1.0f};
