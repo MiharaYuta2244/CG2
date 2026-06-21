@@ -6,6 +6,7 @@
 #include "VisonCone.h"
 #include "ExclamationMark.h"
 #include "GameObjects/IGameObject.h"
+#include "Particle.h"
 
 class EnemyBulletManager;
 class Player;
@@ -70,6 +71,9 @@ private:
 	// プレイヤー発見時「!」マークの生成
 	void GenerateExMark();
 
+	// マズルフラッシュ生成関数
+	void GenerateMuzzleFlash(const Vector3& direction);
+
 private:
 	AABB bodyCol_; // 本体のAABB
 	bool enableMove_ = true;
@@ -91,4 +95,7 @@ private:
 
 	// 環境マップ　強さ
 	float envScale_ = 0.0f;
+
+	// マズルフラッシュエフェクト管理用コンテナ
+	std::vector<std::unique_ptr<TinyEngine::Particle>> muzzleParticles_;
 };

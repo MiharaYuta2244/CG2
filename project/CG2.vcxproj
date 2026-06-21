@@ -280,6 +280,9 @@ copy "$(windowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="engine\3d\particle\modules\UVScrollModule.cpp" />
     <ClCompile Include="engine\3d\Primitive\VisonCone.cpp" />
     <ClCompile Include="engine\base\PostEffectPipeline.cpp" />
+    <ClCompile Include="engine\3d\particle\modules\MuzzleFlashModule.cpp" />
+    <ClCompile Include="engine\3d\particle\modules\MuzzleSparkModule.cpp" />
+    <ClCompile Include="engine\3d\particle\modules\MuzzleSmokeModule.cpp" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="resources\shaders\Object3d.PS.hlsl">
@@ -491,6 +494,9 @@ copy "$(windowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="engine\3d\particle\modules\HitSparkModule.h" />
     <ClInclude Include="engine\3d\particle\modules\HitFlashModule.h" />
     <ClInclude Include="engine\3d\particle\modules\HitRingModule.h" />
+    <ClInclude Include="engine\3d\particle\modules\MuzzleFlashModule.h" />
+    <ClInclude Include="engine\3d\particle\modules\MuzzleSparkModule.h" />
+    <ClInclude Include="engine\3d\particle\modules\MuzzleSmokeModule.h" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="externals\imgui\LICENSE.txt" />

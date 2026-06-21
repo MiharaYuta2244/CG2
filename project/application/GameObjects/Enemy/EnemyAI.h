@@ -32,6 +32,8 @@ public:
 	// Getter
 	State GetState() const { return state_; }
 	Visionparam GetVisionParam() const { return visionParam_; }
+	bool IsShotThisFrame() const { return isShotThisFrame_; }
+	Vector3 GetShotDirection() const { return shotDirection_; }
 
 private:
 	// プレーヤー方向に回転する
@@ -66,6 +68,8 @@ private:
 	float shotTimer_ = 0.0f;     // 射撃までの残り時間タイマー
 	float shotInterval_ = 2.0f;  // 射撃間隔
 	float bulletMargin_ = 10.0f; // 敵と弾の間隔
+	bool isShotThisFrame_ = false;
+	Vector3 shotDirection_ = {0.0f, 0.0f, 1.0f};
 
 	// 経路探索用
 	std::vector<Vector3> currentPath_; // A*で計算した経路

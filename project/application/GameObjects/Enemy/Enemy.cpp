@@ -1,5 +1,8 @@
 #include "Enemy.h"
 #include "EnemyBulletManager.h"
+#include "MuzzleFlashModule.h"
+#include "MuzzleSparkModule.h"
+#include "MuzzleSmokeModule.h"
 
 using namespace TinyEngine;
 
@@ -34,6 +37,10 @@ void Enemy::Update(float deltaTime, Player* player, EnemyBulletManager* enemyBul
 	// AIインスタンス更新
 	if (enableMove_) {
 		ai_->Update(deltaTime, player, enemyBulletManager, wallManager);
+
+		if (ai_->IsShotThisFrame()) {
+			GenerateMuzzleFlash(ai_->GetShotDirection());
+		}
 	}
 
 	// プレイヤー発見時に「!」マークの生成
@@ -78,6 +85,12 @@ void Enemy::Update(float deltaTime, Player* player, EnemyBulletManager* enemyBul
 
 	// 敵AIの状態を記録
 	lastState = ai_->GetState();
+
+	// マズルフラッシュパーティクルの更新と自動削除
+	for (auto& particle : muzzleParticles_) {
+		particle->Update();
+	}
+	std::erase_if(muzzleParticles_, [](const std::unique_ptr<Particle>& p) { return p->IsFinished(); });
 }
 
 void Enemy::PostUpdate() {
@@ -101,6 +114,11 @@ void Enemy::Draw() {
 		// 「!」マークの描画
 		if (exclamationMark_) {
 			exclamationMark_->Draw();
+		}
+
+		// マズルフラッシュパーティクルの描画
+		for (auto& particle : muzzleParticles_) {
+			particle->Draw();
 		}
 	}
 }
@@ -137,4 +155,29 @@ void Enemy::GenerateExMark() {
 	exclamationMark_ = std::make_unique<ExclamationMark>();
 	Vector3 pos = {transform_.translate.x, transform_.translate.y + 1.0f, transform_.translate.z};
 	exclamationMark_->Initialize(ctx_, transform_.translate);
+}
+
+void Enemy::GenerateMuzzleFlash(const Vector3& direction) {
+	Vector3 muzzlePos = transform_.translate + direction * 1.2f;
+
+	// 閃光
+	auto flash = std::make_unique<Particle>();
+	flash->Initialize(ctx_, muzzlePos, "AttractEffect.png", std::make_unique<MuzzleFlashModule>(), nullptr, ParticleMeshType::Square);
+	flash->SetEmitMode(false, 0.05f);
+	flash->SetEmitterParam(1, 0.01f);
+	muzzleParticles_.push_back(std::move(flash));
+
+	// 火花
+	auto sparks = std::make_unique<Particle>();
+	sparks->Initialize(ctx_, muzzlePos, "white.png", std::make_unique<MuzzleSparkModule>(direction), nullptr, ParticleMeshType::Square);
+	sparks->SetEmitMode(false, 0.05f);
+	sparks->SetEmitterParam(10, 0.01f);
+	muzzleParticles_.push_back(std::move(sparks));
+
+	// 煙
+	auto smoke = std::make_unique<Particle>();
+	smoke->Initialize(ctx_, muzzlePos, "Dust.png", std::make_unique<MuzzleSmokeModule>(direction), nullptr, ParticleMeshType::Square);
+	smoke->SetEmitMode(false, 0.05f);
+	smoke->SetEmitterParam(3, 0.01f);
+	muzzleParticles_.push_back(std::move(smoke));
 }

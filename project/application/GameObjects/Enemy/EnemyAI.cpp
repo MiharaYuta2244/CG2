@@ -14,6 +14,8 @@ void EnemyAI::Initialize(Transform* transform, EngineContext* ctx) {
 }
 
 void EnemyAI::Update(float deltaTime, Player* player, EnemyBulletManager* enemyBulletManager, WallManager* wallManager) {
+	isShotThisFrame_ = false;
+
 	// 状態に応じたUpdateを呼ぶ
 	switch (state_) {
 	case State::Normal:
@@ -166,6 +168,10 @@ void EnemyAI::UpdateVigilance(float deltaTime, Player* player, EnemyBulletManage
 
 			bullet->Initialize(ctx_, dir2D, spawnPos);
 			enemyBulletManager->AddBullet(std::move(bullet));
+
+			isShotThisFrame_ = true;
+			shotDirection_ = dir3D;
+
 			shotTimer_ = 0.0f;
 		}
 	} else {

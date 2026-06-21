@@ -87,8 +87,8 @@ void GamePlayScene::Initialize(const SceneContext& ctx) {
 	ctx_.engineContext->postEffectPipeline->SetEffects({
 	    PostEffectType::DepthOutline, // アウトライン
 	    PostEffectType::Vignette,     // ビネット
-	    // PostEffectType::Glitch,       // グリッチ
-	    // PostEffectType::DeathEffect,  // 死亡時エフェクト
+	    PostEffectType::Glitch,       // グリッチ
+	    PostEffectType::DeathEffect,  // 死亡時エフェクト
 	});
 
 	// パラメータ設定
@@ -705,22 +705,22 @@ void GamePlayScene::UpdateGlitch(float deltaTime) {
 
 void GamePlayScene::GenerateEnemyDeathParticle(const Vector3& pos) {
 	// 火花
-	auto sparks = std::make_unique<TinyEngine::Particle>();
-	sparks->Initialize(ctx_.engineContext, pos, "white.png", std::make_unique<HitSparkModule>(), nullptr, TinyEngine::ParticleMeshType::Square);
+	auto sparks = std::make_unique<Particle>();
+	sparks->Initialize(ctx_.engineContext, pos, "white.png", std::make_unique<HitSparkModule>(), nullptr, ParticleMeshType::Square);
 	sparks->SetEmitMode(false, 0.05f);
 	sparks->SetEmitterParam(50, 0.01f);
 	enemyDeathParticle_.push_back(std::move(sparks));
 
 	// 中心フラッシュ
-	auto flash = std::make_unique<TinyEngine::Particle>();
-	flash->Initialize(ctx_.engineContext, pos, "AttractEffect.png", std::make_unique<HitFlashModule>(), nullptr, TinyEngine::ParticleMeshType::Square);
+	auto flash = std::make_unique<Particle>();
+	flash->Initialize(ctx_.engineContext, pos, "AttractEffect.png", std::make_unique<HitFlashModule>(), nullptr, ParticleMeshType::Square);
 	flash->SetEmitMode(false, 0.05f);
 	flash->SetEmitterParam(4, 0.01f);
 	enemyDeathParticle_.push_back(std::move(flash));
 
 	// 衝撃波リング
-	auto ringWave = std::make_unique<TinyEngine::Particle>();
-	ringWave->Initialize(ctx_.engineContext, pos, "gradationLine.png", std::make_unique<HitRingModule>(), nullptr, TinyEngine::ParticleMeshType::Cylinder);
+	auto ringWave = std::make_unique<Particle>();
+	ringWave->Initialize(ctx_.engineContext, pos, "gradationLine.png", std::make_unique<HitRingModule>(), nullptr, ParticleMeshType::Cylinder);
 	ringWave->SetEmitMode(false, 0.05f);
 	ringWave->SetEmitterParam(1, 0.01f);
 	enemyDeathParticle_.push_back(std::move(ringWave));
