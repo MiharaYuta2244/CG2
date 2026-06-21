@@ -1,5 +1,6 @@
 #pragma once
 #include "DirectInput.h"
+#include "GameObjects/Effect/DecideEffect.h"
 #include <Sprite.h>
 #include <functional>
 #include <string>
@@ -54,6 +55,9 @@ private:
 	float voronoiTimer_ = 0.0f;                          // ボロノイノイズ用タイマー
 	Vector4 voronoiColor_ = {0.0f, 0.2f, 0.2f, 1.0f};    // ボロノイノイズの色
 	Vector4 backgroundColor_ = {0.0f, 0.0f, 0.0f, 1.0f}; // 背景色
+
+	// 決定ボタン入力時のエフェクト
+	std::unique_ptr<DecideEffect> decideEffect_;
 
 	// スティックでの連続切り換え制御用変数
 	float stickCooldown_ = 0.0f;

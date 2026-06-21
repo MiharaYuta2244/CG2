@@ -71,6 +71,9 @@ private:
 	// 当たり判定の更新処理
 	void UpdateCollision();
 
+	// ヒットエフェクト生成関数
+	void GenerateHitEffect();
+
 private:
 	Vector2 velocity_;
 	AABB attackCol_;
@@ -112,4 +115,8 @@ private:
 	// パーティクル関連
 	std::vector<std::unique_ptr<TinyEngine::Particle>> dustParticle_; // 砂埃パーティクル
 	GameTimer particleGenerateTimer_;                                 // パーティクル生成用のタイマー
+
+	// 被弾時エフェクト
+	std::vector<std::unique_ptr<TinyEngine::Particle>> hitEffects_;
+	float preHP_ = maxHP_;
 };

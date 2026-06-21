@@ -13,6 +13,10 @@ void ResultParamText::Initialize(EngineContext* ctx, Vector2 basePos, Vector2 ba
 }
 
 void ResultParamText::Update(float deltaTime, DirectInput* input) {
+	if(input->KeyTriggered(DIK_F1)){
+		animSprite_->StartAnimation();
+	}
+
 	// アニメーションスプライトの更新
 	animSprite_->Update(deltaTime);
 

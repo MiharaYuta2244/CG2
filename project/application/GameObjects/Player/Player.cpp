@@ -1,6 +1,9 @@
 #include "Player.h"
 #include "GameObjects/Enemy/Enemy.h"
 #include "GameObjects/Enemy/EnemyManager.h"
+#include "HitFlashModule.h"
+#include "HitRingModule.h"
+#include "HitSparkModule.h"
 
 using namespace TinyEngine;
 
@@ -196,6 +199,14 @@ void Player::Update(float deltaTime, DirectInput* input, GamePad* gamePad, Enemy
 	// パーティクル削除処理
 	std::erase_if(dustParticle_, [this](const std::unique_ptr<TinyEngine::Particle>& p) { return p->IsFinished(); });
 
+	// ヒットエフェクトの更新
+	for (auto& particle : hitEffects_) {
+		particle->Update();
+	}
+
+	// ヒットエフェクト削除
+	std::erase_if(hitEffects_, [](const std::unique_ptr<TinyEngine::Particle>& p) { return p->IsFinished(); });
+
 #ifdef USE_IMGUI
 	ImGui::Begin("Player");
 	ImGui::DragFloat3("Scale", &transform_.scale.x, 0.01f);
@@ -223,13 +234,24 @@ void Player::Draw() {
 		particle->Draw();
 	}
 
+	// ヒットエフェクトパーティクルの描画
+	for (auto& particle : hitEffects_) {
+		particle->Draw();
+	}
+
 	// 描画
 	render_->Draw();
 }
 
 bool Player::IsDead() const { return hp_->IsDead(); }
 
-void Player::Damage(float value) { hp_->Damage(value); }
+void Player::Damage(float value) {
+	// ダメージ処理
+	hp_->Damage(value);
+
+	// ヒットエフェクト生成
+	GenerateHitEffect();
+}
 
 void Player::UpdateCollision() {
 	// 攻撃用の当たり判定更新
@@ -240,4 +262,34 @@ void Player::UpdateCollision() {
 	// 本体の当たり判定更新
 	bodyCol_.max = {pos.x + 0.5f, pos.y + 0.5f, pos.z + 0.5f};
 	bodyCol_.min = {pos.x - 0.5f, pos.y - 0.5f, pos.z - 0.5f};
+}
+
+void Player::GenerateHitEffect() {
+	if (preHP_ == hp_->GetCurrentHP())
+		return;
+
+	Vector3 effectPos = transform_.translate;
+
+	// 飛び散る火花
+	auto sparks = std::make_unique<TinyEngine::Particle>();
+	sparks->Initialize(ctx_, effectPos, "white.png", std::make_unique<HitSparkModule>(), nullptr, TinyEngine::ParticleMeshType::Square);
+	sparks->SetEmitMode(false, 0.05f);
+	sparks->SetEmitterParam(50, 0.01f);
+	hitEffects_.push_back(std::move(sparks));
+
+	// 中心の閃光フラッシュ
+	auto flash = std::make_unique<TinyEngine::Particle>();
+	flash->Initialize(ctx_, effectPos, "AttractEffect.png", std::make_unique<HitFlashModule>(), nullptr, TinyEngine::ParticleMeshType::Square);
+	flash->SetEmitMode(false, 0.05f);
+	flash->SetEmitterParam(4, 0.01f);
+	hitEffects_.push_back(std::move(flash));
+
+	// 拡散する衝撃波リング
+	auto ringWave = std::make_unique<TinyEngine::Particle>();
+	ringWave->Initialize(ctx_, effectPos, "gradationLine.png", std::make_unique<HitRingModule>(), nullptr, TinyEngine::ParticleMeshType::Cylinder);
+	ringWave->SetEmitMode(false, 0.05f);
+	ringWave->SetEmitterParam(1, 0.01f);
+	hitEffects_.push_back(std::move(ringWave));
+
+	preHP_ = hp_->GetCurrentHP();
 }

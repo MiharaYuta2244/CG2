@@ -19,6 +19,10 @@ void MenuList::Initialize(EngineContext* ctx) {
 	background_->SetEnableVoronoi(true);
 	background_->SetVoronoiColor(voronoiColor_);
 	background_->SetZDepth(100.0f);
+
+	// 決定ボタン入力時のエフェクト
+	decideEffect_ = std::make_unique<DecideEffect>();
+	decideEffect_->Initialize(ctx, startPos_);
 }
 
 void MenuList::AddItem(const std::string& label, const std::string& texturePath, std::function<void()> onSelect) {
@@ -85,6 +89,7 @@ void MenuList::Update(DirectInput* input, GamePad* gamePad, float deltaTime) {
 	}
 	if (decide) {
 		items_[currentIndex_].onSelect();
+		decideEffect_->StartAnimation();
 	}
 
 #ifdef USE_IMGUI
@@ -118,11 +123,15 @@ void MenuList::Update(DirectInput* input, GamePad* gamePad, float deltaTime) {
 	titleLogo_->SetPosition(titleLogoPos_);
 	titleLogo_->SetColor(logoColor_);
 	titleLogo_->Update();
+
+	// 決定ボタン入力時エフェクト更新
+	decideEffect_->Update(deltaTime);
 }
 
 void MenuList::Draw() {
 	background_->Draw();
 	titleLogo_->Draw();
+	decideEffect_->Draw();
 
 	for (int i = 0; i < items_.size(); i++) {
 		auto& sprite = items_[i].sprite;
