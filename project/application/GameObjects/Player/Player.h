@@ -7,6 +7,8 @@
 #include "Particle.h"
 #include "PlayerHealth.h"
 #include "PlayerMove.h"
+#include "AnimationBundle.h"
+#include "OBB.h"
 
 class EnemyManager;
 class Enemy;
@@ -42,7 +44,7 @@ public:
 	void Damage(float value);
 
 	// 攻撃用の当たり判定Getter
-	AABB GetAttackCol() const { return attackCol_; }
+	OBB GetAttackCol() const { return attackCol_; }
 
 	// 攻撃可能かどうかSetter
 	void SetEnableAttack(bool enableAttack) { enableAttack_ = enableAttack; }
@@ -79,7 +81,7 @@ private:
 
 private:
 	Vector2 velocity_;
-	AABB attackCol_;
+	OBB attackCol_;
 	AABB bodyCol_;
 	Vector2 lastMoveDirection_;
 	EngineContext* ctx_ = nullptr;
@@ -102,6 +104,7 @@ private:
 	std::unique_ptr<ObjectRender> render_; // 描画用インスタンス
 	std::unique_ptr<PlayerMove> move_;     // 移動用インスタンス
 	std::unique_ptr<PlayerHealth> hp_;     // HP管理用インスタンス
+	std::unique_ptr<ObjectRender> hand_;   // 攻撃確認用
 
 	// 環境マップ　強さ
 	float envScale_ = 0.0f;
@@ -115,6 +118,9 @@ private:
 	// 敵を掴んでいるときにかける速度倍率
 	float speedMultiplier_ = 1.0f;
 
+	// 攻撃用のオフセット
+	float attackOffset_ = 0.8f;
+
 	// パーティクル関連
 	std::vector<std::unique_ptr<TinyEngine::Particle>> dustParticle_; // 砂埃パーティクル
 	GameTimer particleGenerateTimer_;                                 // パーティクル生成用のタイマー
@@ -122,4 +128,7 @@ private:
 	// 被弾時エフェクト
 	std::vector<std::unique_ptr<TinyEngine::Particle>> hitEffects_;
 	float preHP_ = maxHP_;
+
+	// 攻撃確認用フラグ
+	bool isHandAnimPlaying_ = false;
 };

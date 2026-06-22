@@ -22,6 +22,8 @@ public:
 	// TransformのSetter
 	void SetTransform(Transform transform) { object3d_->SetTransform(transform); }
 
+	void SetTranslate(Vector3 translate) { object3d_->SetTranslate(translate); }
+
 	// 環境マップにかけるスケールの設定
 	void SetEnvScale(float envScale) { object3d_->SetEnvScale(envScale); }
 

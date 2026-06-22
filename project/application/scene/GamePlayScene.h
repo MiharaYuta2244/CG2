@@ -123,4 +123,7 @@ private:
 
 	// カメラのピボット位置保持用の変数
 	Vector3 currentCameraPivot_ = {0.0f, 0.0f, 0.0f};
+
+	// プレイヤーの向きに応じたカメラのオフセット量
+	float offsetDistance_ = 1.0f;
 };

@@ -30,6 +30,13 @@ void Player::Initialize(EngineContext* ctx) {
 
 	// パーティクル生成タイマー初期化
 	particleGenerateTimer_.Initialize(0.2f);
+
+	// 攻撃確認用
+	hand_ = std::make_unique<ObjectRender>();
+	hand_->Initialize(ctx, "Cube.obj");
+	Transform handTransform = transform_;
+	handTransform.scale = {0.5f, 0.5f, 0.5f};
+	hand_->SetTransform(handTransform);
 }
 
 void Player::Update(float deltaTime, DirectInput* input, GamePad* gamePad, EnemyManager* enemyManager) {
@@ -162,8 +169,7 @@ void Player::Update(float deltaTime, DirectInput* input, GamePad* gamePad, Enemy
 			Vector3 forward = {lastMoveDirection_.x, 0.0f, lastMoveDirection_.y};
 
 			// 前方オフセット
-			float offset = 0.8f;
-			Vector3 holdPos = {transform_.translate.x + forward.x * offset, transform_.translate.y, transform_.translate.z + forward.z * offset};
+			Vector3 holdPos = {transform_.translate.x + forward.x * attackOffset_, transform_.translate.y, transform_.translate.z + forward.z * attackOffset_};
 
 			heldEnemy_->SetPos(holdPos);
 			heldEnemy_->SetRotate(transform_.rotate);
@@ -183,6 +189,21 @@ void Player::Update(float deltaTime, DirectInput* input, GamePad* gamePad, Enemy
 		heldEnemy_->SetEnableMove(true);
 		heldEnemy_->StartKnockBack({lastMoveDirection_.x, 0.0f, lastMoveDirection_.y});
 		heldEnemy_ = nullptr; // 投げたのでポインタをクリア
+	}
+
+	// 攻撃確認用
+	if (isAttackTriggered) {
+		Vector3 forward = {lastMoveDirection_.x, 0.0f, lastMoveDirection_.y};
+		float offset = 1.5f;
+
+		Vector3 attackPos = {transform_.translate.x + forward.x * offset, transform_.translate.y, transform_.translate.z + forward.z * offset};
+
+		hand_->SetTranslate(attackPos);
+		isHandAnimPlaying_ = true;
+	}
+
+	if (!input->KeyDown(DIK_K) && !(gamePad && gamePad->GetState().axes.rt > 0.3f)) {
+		isHandAnimPlaying_ = false;
 	}
 
 	// パーティクルの生成タイマー更新
@@ -218,6 +239,13 @@ void Player::Update(float deltaTime, DirectInput* input, GamePad* gamePad, Enemy
 	// ヒットエフェクト削除
 	std::erase_if(hitEffects_, [](const std::unique_ptr<TinyEngine::Particle>& p) { return p->IsFinished(); });
 
+	// 攻撃確認用
+	hand_->Update();
+
+	if (!isHandAnimPlaying_) {
+		hand_->SetTranslate(transform_.translate);
+	}
+
 #ifdef USE_IMGUI
 	ImGui::Begin("Player");
 	ImGui::DragFloat3("Scale", &transform_.scale.x, 0.01f);
@@ -252,6 +280,9 @@ void Player::Draw() {
 
 	// 描画
 	render_->Draw();
+
+	// 攻撃確認用
+	hand_->Draw();
 }
 
 bool Player::IsDead() const { return hp_->IsDead(); }
@@ -267,8 +298,20 @@ void Player::Damage(float value) {
 void Player::UpdateCollision() {
 	// 攻撃用の当たり判定更新
 	Vector3 pos = transform_.translate;
-	attackCol_.max = {pos.x + 0.5f, pos.y, pos.z + 0.5f};
-	attackCol_.min = {pos.x - 0.5f, pos.y, pos.z - 0.5f};
+	Vector3 forward = {std::sin(transform_.rotate.y), 0.0f, std::cos(transform_.rotate.y)};
+	Vector3 right = {forward.z, 0.0f, -forward.x};
+	Vector3 up = {0.0f, 1.0f, 0.0f};
+
+	float attackLength = 1.5f; // 前方に伸びる距離
+	float attackWidth = 0.6f;  // 横幅
+	float attackHeight = 1.0f; // 高さ
+
+	Vector3 center = {pos.x + forward.x * attackLength * 0.5f, pos.y, pos.z + forward.z * attackLength * 0.5f};
+	attackCol_.center = center;
+	attackCol_.orientations[0] = right;
+	attackCol_.orientations[1] = up;
+	attackCol_.orientations[2] = forward;
+	attackCol_.size = {attackWidth, attackHeight, attackLength};
 
 	// 本体の当たり判定更新
 	bodyCol_.max = {pos.x + 0.5f, pos.y + 0.5f, pos.z + 0.5f};

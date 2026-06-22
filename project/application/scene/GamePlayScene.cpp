@@ -259,11 +259,8 @@ void GamePlayScene::Update() {
 		// プレイヤーの向いている方向ベクトルを計算
 		Vector3 forward = {std::sin(playerRot.y), 0.0f, std::cos(playerRot.y)};
 
-		// 進行方向に対するオフセット量
-		float offsetDistance = 1.0f;
-
 		// 目標のピボット位置
-		Vector3 targetPivot = {playerPos.x + forward.x * offsetDistance, playerPos.y, playerPos.z + forward.z * offsetDistance};
+		Vector3 targetPivot = {playerPos.x + forward.x * offsetDistance_, playerPos.y, playerPos.z + forward.z * offsetDistance_};
 
 		// 線形補間を使ってカメラを滑らかに追従させる
 		float followSpeed = 5.0f; // 追従の滑らかさ
