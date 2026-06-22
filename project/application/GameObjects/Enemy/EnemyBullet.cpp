@@ -5,7 +5,7 @@
 void EnemyBullet::Initialize(EngineContext* ctx, Vector2 dir, Vector3 pos) {
 	// 弾の長さを定義
 	float length = 15.0f;
-	float width = 0.1f;
+	float width = 0.5f;
 
 	// 移動方向を受け取る
 	direction_ = dir;

@@ -14,5 +14,5 @@ public:
 	virtual std::string GetName() const { return "GameObject"; }
 
 protected:
-	Transform transform_;
+	Transform transform_{};
 };
