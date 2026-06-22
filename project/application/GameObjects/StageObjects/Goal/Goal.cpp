@@ -52,15 +52,6 @@ void Goal::Update(float deltaTime) {
 
 	// パーティクル削除処理
 	std::erase_if(particle_, [this](const std::unique_ptr<TinyEngine::Particle>& p) { return p->IsFinished(); });
-
-#ifdef USE_IMGUI
-	ImGui::Begin("Goal");
-	ImGui::DragFloat3("Translate", &transform_.translate.x, 1.0f);
-	ImGui::DragFloat3("Scale", &transform_.scale.x, 0.01f);
-	ImGui::End();
-
-	emitter_.transform = transform_;
-#endif // USE_IMGUI
 }
 
 void Goal::Draw() {

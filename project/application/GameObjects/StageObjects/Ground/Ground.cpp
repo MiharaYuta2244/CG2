@@ -12,15 +12,6 @@ void Ground::Initialize(EngineContext* ctx) {
 }
 
 void Ground::Update() {
-#ifdef USE_IMGUI
-	ImGui::Begin("Ground");
-	ImGui::DragFloat3("Scale", &transform_.scale.x, 0.01f);
-	ImGui::DragFloat3("Rotate", &transform_.rotate.x, 0.01f);
-	ImGui::DragFloat3("Position", &transform_.translate.x, 0.01f);
-	ImGui::ColorEdit4("Color", &color_.x);
-	ImGui::End();
-#endif
-
 	render_->SetColor(color_);
 	render_->Update(transform_);
 }

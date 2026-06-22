@@ -234,9 +234,6 @@ void GamePlayScene::Update() {
 	// 敵の管理インスタンスImGui
 	enemyManager_->DrawImGui();
 
-	// プレイヤーのHPゲージImGui
-	playerHPGauge_->DrawImGui();
-
 	// ギズモ用ImGui更新
 	UpdateImGui();
 

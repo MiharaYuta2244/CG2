@@ -25,7 +25,7 @@ public:
 	Vector3 GetPosition() const { return transform_.translate; }
 
 	// 当たり判定Getter
-	AABB GetCollision() const { return col_; }
+	OBB GetCollision() const { return col_; }
 
 private:
 	Transform transform_;
@@ -37,9 +37,12 @@ private:
 	Vector2 direction_;
 
 	// AABB当たり判定
-	AABB col_;
+	OBB col_;
 
 	// 生存時間管理用の変数
 	float deathTimer_ = 0.0f;      // 経過時間タイマー
 	const float kLifeTime_ = 0.5f; // 消滅までの時間
+
+	// 敵と弾の余白
+	float margin_ = 6.5f;
 };
