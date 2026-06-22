@@ -104,13 +104,6 @@ void Particle::Update() {
 		isActive = false; // 指定した稼働時間を超えたら新規発生をストップ
 	}
 
-	// エミッタのImGui
-#ifdef USE_IMGUI
-	ImGui::Begin("Emitter");
-	ImGui::DragFloat3("Translate", &emitter_.transform.translate.x, 0.01f, -100.0f, 100.0f);
-	ImGui::End();
-#endif
-
 	// エミッタの更新とパーティクル発生
 	if (isActive) {
 		UpdateEmitter();

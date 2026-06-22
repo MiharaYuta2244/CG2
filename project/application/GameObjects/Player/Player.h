@@ -61,6 +61,9 @@ public:
 	// 描画用のオブジェクトを返すGetter
 	TinyEngine::Object3d* GetObject3d() { return render_->GetObject3d(); }
 
+	// 回転のGetter
+	Vector3 GetRotation() const { return transform_.rotate; }
+
 	// プレイヤーが移動中かどうかを取得するGetter
 	bool IsMoving() const { return isMoving_; }
 

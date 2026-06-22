@@ -35,6 +35,7 @@ void Player::Initialize(EngineContext* ctx) {
 void Player::Update(float deltaTime, DirectInput* input, GamePad* gamePad, EnemyManager* enemyManager) {
 	// アナログ入力ベクトル
 	Vector2 inputDir = {0.0f, 0.0f};
+	Vector2 aimDir = {0.0f, 0.0f};
 
 	if (input->KeyDown(DIK_D))
 		inputDir.x += 1.0f;
@@ -64,6 +65,12 @@ void Player::Update(float deltaTime, DirectInput* input, GamePad* gamePad, Enemy
 			inputDir.x = padState.axes.lx;
 			inputDir.y = -padState.axes.ly;
 		}
+
+		// 右スティック入力
+		if (std::abs(padState.axes.rx) > 0.1f || std::abs(padState.axes.ry) > 0.1f) {
+			aimDir.x = padState.axes.rx;
+			aimDir.y = -padState.axes.ry;
+		}
 	}
 
 	// ベクトルの長さを計算し、斜め移動時などに長さが1.0を超えないようにクランプ
@@ -87,7 +94,11 @@ void Player::Update(float deltaTime, DirectInput* input, GamePad* gamePad, Enemy
 
 	if (!hp_->IsDead()) {
 		// 移動更新
-		move_->Update(&transform_, inputDir, deltaTime, speedMultiplier_);
+		move_->Update(&transform_, inputDir, aimDir, deltaTime, speedMultiplier_);
+
+		// 攻撃等に使うベクトルの更新
+		lastMoveDirection_.x = std::sin(transform_.rotate.y);
+		lastMoveDirection_.y = std::cos(transform_.rotate.y);
 	}
 
 	// HP管理インスタンス更新

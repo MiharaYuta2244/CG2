@@ -29,6 +29,7 @@ void GamePlayScene::Initialize(const SceneContext& ctx) {
 	mainCamera_->SetTranslation({0.0f, 60.0f, 0.0f});
 	mainCamera_->SetPivot(player_->GetPosition());
 	mainCamera_->SetEuler({std::numbers::pi_v<float> / 2.0f, 0.0f, 0.0f});
+	currentCameraPivot_ = player_->GetPosition();
 
 	// カメラの設定
 	ctx_.currentCamera = mainCamera_.get();
@@ -57,9 +58,6 @@ void GamePlayScene::Initialize(const SceneContext& ctx) {
 	playerHPGauge_ = std::make_unique<PlayerHPGauge>();
 	playerHPGauge_->Initialize(ctx_.engineContext);
 	playerHPGauge_->HPBarSpriteApply(static_cast<int>(player_->GetCurrentHP()), static_cast<int>(player_->GetMaxHP()));
-
-	// イージングエディターの生成
-	easingEditor_ = std::make_unique<EasingEditor>();
 
 	// フラッシュエフェクトの生成&初期化
 	flashEffect_ = std::make_unique<FlashEffect>();
@@ -255,7 +253,25 @@ void GamePlayScene::Update() {
 
 	// カメラの追従
 	if (!isDebugCameraActive_) {
-		ctx_.currentCamera->SetPivot(player_->GetPosition());
+		Vector3 playerPos = player_->GetPosition();
+		Vector3 playerRot = player_->GetRotation();
+
+		// プレイヤーの向いている方向ベクトルを計算
+		Vector3 forward = {std::sin(playerRot.y), 0.0f, std::cos(playerRot.y)};
+
+		// 進行方向に対するオフセット量
+		float offsetDistance = 1.0f;
+
+		// 目標のピボット位置
+		Vector3 targetPivot = {playerPos.x + forward.x * offsetDistance, playerPos.y, playerPos.z + forward.z * offsetDistance};
+
+		// 線形補間を使ってカメラを滑らかに追従させる
+		float followSpeed = 5.0f; // 追従の滑らかさ
+		currentCameraPivot_.x += (targetPivot.x - currentCameraPivot_.x) * followSpeed * deltaTime;
+		currentCameraPivot_.y += (targetPivot.y - currentCameraPivot_.y) * followSpeed * deltaTime;
+		currentCameraPivot_.z += (targetPivot.z - currentCameraPivot_.z) * followSpeed * deltaTime;
+
+		ctx_.currentCamera->SetPivot(currentCameraPivot_);
 	}
 
 	// カメラのシェイク更新
@@ -263,9 +279,6 @@ void GamePlayScene::Update() {
 
 	// カメラの更新
 	ctx_.currentCamera->Update(*ctx_.keyboard, *ctx_.gamePad);
-
-	// イージングエディター更新処理
-	easingEditor_->DrawWindow(deltaTime);
 
 	// フラッシュエフェクト更新
 	flashEffect_->Update(deltaTime);
@@ -277,29 +290,6 @@ void GamePlayScene::Update() {
 	ground_->Update();
 
 	controls_->Update();
-
-#ifdef USE_IMGUI
-	Vector3 rot = ctx_.currentCamera->GetEuler();
-
-	ImGui::Begin("Camera");
-	ImGui::DragFloat("Pitch", &rot.x, 0.01f);
-	ImGui::DragFloat("Yaw", &rot.y, 0.01f);
-	ImGui::DragFloat3("Translate", &ctx_.currentCamera->GetTranslation().x, 0.01f);
-	ImGui::End();
-
-	ctx_.currentCamera->SetEuler(rot);
-
-	Vector3 position = skybox_->GetPosition();
-	Vector3 scale = skybox_->GetScale();
-
-	ImGui::Begin("Skybox");
-	ImGui::DragFloat3("Position", &position.x, 0.01f);
-	ImGui::DragFloat3("Scale", &scale.x, 0.01f);
-	ImGui::End();
-
-	skybox_->SetPosition(position);
-	skybox_->SetScale(scale);
-#endif // USE_IMGUI
 
 #ifdef _DEBUG
 	if (ctx_.keyboard->KeyTriggered(DIK_F1)) {

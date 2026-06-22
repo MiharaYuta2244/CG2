@@ -81,9 +81,6 @@ private:
 	// 座標系の設定
 	ImGuizmo::MODE currentGizmoMode_ = ImGuizmo::LOCAL;
 
-	// イージングエディター
-	std::unique_ptr<EasingEditor> easingEditor_;
-
 	// フラッシュエフェクト
 	std::unique_ptr<FlashEffect> flashEffect_;
 
@@ -123,4 +120,7 @@ private:
 
 	// プレイヤー死亡時カメラ演出用インスタンス
 	std::unique_ptr<CameraDeathZoomController> cameraZoomController_;
+
+	// カメラのピボット位置保持用の変数
+	Vector3 currentCameraPivot_ = {0.0f, 0.0f, 0.0f};
 };

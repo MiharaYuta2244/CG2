@@ -8,7 +8,7 @@
 class PlayerMove {
 public:
 	// 更新処理
-	void Update(Transform* transform, Vector2 inputDir, float deltaTime, float speedMultiplier = 1.0f);
+	void Update(Transform* transform, Vector2 inputDir, Vector2 aimDir, float deltaTime, float speedMultiplier = 1.0f);
 
 	// 速度の取得
 	Vector2 GetVelocity() const { return velocity_; }
