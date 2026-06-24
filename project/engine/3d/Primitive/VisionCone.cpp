@@ -1,6 +1,6 @@
 #include "DirectXUtils.h"
 #include "MathUtility.h"
-#include "VisonCone.h"
+#include "VisionCone.h"
 #include "Collision.h"
 #include <algorithm>
 #include <cmath>

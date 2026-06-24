@@ -288,7 +288,6 @@ void GamePlayScene::Update() {
 
 	controls_->Update();
 
-#ifdef _DEBUG
 	if (ctx_.keyboard->KeyTriggered(DIK_F1)) {
 		ctx_.sceneManager->ChangeScene("EasingEditorScene");
 	}
@@ -302,7 +301,14 @@ void GamePlayScene::Update() {
 			ctx_.currentCamera->SetTranslation({0.0f, 60.0f, 0.0f});
 		}
 	}
-#endif // _DEBUG
+
+	if (ctx_.keyboard->KeyTriggered(DIK_F3)) {
+		enemyManager_->SetMove();
+	}
+
+	if (ctx_.keyboard->KeyTriggered(DIK_F4)) {
+		enemyManager_->SetStop();
+	}
 }
 
 void GamePlayScene::Draw() {

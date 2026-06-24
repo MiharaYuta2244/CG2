@@ -9,6 +9,7 @@
 #include "PlayerMove.h"
 #include "AnimationBundle.h"
 #include "OBB.h"
+#include "GameObjects/Enemy/EnemyBullet.h"
 
 class EnemyManager;
 class Enemy;
@@ -131,4 +132,10 @@ private:
 
 	// 攻撃確認用フラグ
 	bool isHandAnimPlaying_ = false;
+
+	// 敵ホールド時に発射する弾
+	std::unique_ptr<EnemyBullet> enemyBullet_;
+	GameTimer bulletShotTimer_;
+	GameTimer bulletDeleteTimer_;
+	bool isShot_ = false;
 };

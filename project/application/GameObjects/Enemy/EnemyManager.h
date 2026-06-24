@@ -35,6 +35,8 @@ public:
 	void PostUpdate();
 	void Draw();
 	void DrawImGui();
+	void SetMove();
+	void SetStop();
 
 	// 敵のリストを取得するGetter
 	std::list<std::unique_ptr<Enemy>>& GetEnemies() { return enemies_; }

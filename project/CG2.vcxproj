@@ -162,6 +162,7 @@ copy "$(windowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="application\GameObjects\Enemy\AStarPathfinder.cpp" />
+    <ClCompile Include="application\GameObjects\Enemy\IEnemy.cpp" />
     <ClCompile Include="application\GameObjects\GameUI\Controls.cpp" />
     <ClCompile Include="application\GameObjects\StageObjects\Door\Door.cpp" />
     <ClCompile Include="application\Cinematic\CameraDeathZoomController.cpp" />
@@ -278,7 +279,7 @@ copy "$(windowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="engine\base\RenderTexture.cpp" />
     <ClCompile Include="application\Scene\TestScene.cpp" />
     <ClCompile Include="engine\3d\particle\modules\UVScrollModule.cpp" />
-    <ClCompile Include="engine\3d\Primitive\VisonCone.cpp" />
+    <ClCompile Include="engine\3d\Primitive\VisionCone.cpp" />
     <ClCompile Include="engine\base\PostEffectPipeline.cpp" />
     <ClCompile Include="engine\3d\particle\modules\MuzzleFlashModule.cpp" />
     <ClCompile Include="engine\3d\particle\modules\MuzzleSparkModule.cpp" />
@@ -352,6 +353,7 @@ copy "$(windowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="application\GameObjects\Enemy\AStarPathfinder.h" />
+    <ClInclude Include="application\GameObjects\Enemy\IEnemy.h" />
     <ClInclude Include="application\GameObjects\GameUI\Controls.h" />
     <ClInclude Include="application\GameObjects\CommonData.h" />
     <ClInclude Include="application\GameObjects\IGameObject.h" />
@@ -489,7 +491,7 @@ copy "$(windowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="engine\tool\LevelDataLoader\LevelDataLoader.h" />
     <ClInclude Include="application\Scene\TestScene.h" />
     <ClInclude Include="engine\3d\particle\modules\UVScrollModule.h" />
-    <ClInclude Include="engine\3d\Primitive\VisonCone.h" />
+    <ClInclude Include="engine\3d\Primitive\VisionCone.h" />
     <ClInclude Include="engine\base\PostEffectPipeline.h" />
     <ClInclude Include="engine\3d\particle\modules\HitSparkModule.h" />
     <ClInclude Include="engine\3d\particle\modules\HitFlashModule.h" />

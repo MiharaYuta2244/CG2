@@ -1,12 +1,12 @@
-#include "Enemy.h"
+#include "IEnemy.h"
 #include "EnemyBulletManager.h"
 #include "MuzzleFlashModule.h"
-#include "MuzzleSparkModule.h"
 #include "MuzzleSmokeModule.h"
+#include "MuzzleSparkModule.h"
 
 using namespace TinyEngine;
 
-void Enemy::Initialize(EngineContext* ctx, Vector3 pos) {
+void IEnemy::Initialize(EngineContext* ctx, Vector3 pos) {
 	transform_.scale = {1.0f, 1.0f, 1.0f};
 	transform_.rotate = {0.0f, 0.0f, 0.0f};
 	transform_.translate = pos;
@@ -29,13 +29,13 @@ void Enemy::Initialize(EngineContext* ctx, Vector3 pos) {
 	visionCone_->Initialize(ctx, param.radius, param.angle);
 }
 
-void Enemy::Update(float deltaTime, Player* player, EnemyBulletManager* enemyBulletManager, WallManager* wallManager) {
-	if (isDead_ || !isMove_) {
+void IEnemy::Update(float deltaTime, Player* player, EnemyBulletManager* enemyBulletManager, WallManager* wallManager) {
+	if (isDead_) {
 		return;
 	}
 
 	// AIインスタンス更新
-	if (enableMove_) {
+	if (enableAI_) {
 		ai_->Update(deltaTime, player, enemyBulletManager, wallManager);
 
 		if (ai_->IsShotThisFrame()) {
@@ -93,7 +93,7 @@ void Enemy::Update(float deltaTime, Player* player, EnemyBulletManager* enemyBul
 	std::erase_if(muzzleParticles_, [](const std::unique_ptr<Particle>& p) { return p->IsFinished(); });
 }
 
-void Enemy::PostUpdate() {
+void IEnemy::PostUpdate() {
 	// 押し戻しを反映したAABBの再計算
 	UpdateCollision();
 
@@ -101,13 +101,13 @@ void Enemy::PostUpdate() {
 	render_->Update(transform_);
 }
 
-void Enemy::Draw() {
+void IEnemy::Draw() {
 	if (!isDead_) {
 		// 描画
 		render_->Draw();
 
 		// 視界
-		if (enableMove_) {
+		if (enableAI_) {
 			visionCone_->Draw();
 		}
 
@@ -123,7 +123,7 @@ void Enemy::Draw() {
 	}
 }
 
-void Enemy::StartKnockBack(Vector3 dir) {
+void IEnemy::StartKnockBack(Vector3 dir) {
 	Vector3 pos = transform_.translate;
 
 	// 入力方向ベクトルを正規化
@@ -137,27 +137,27 @@ void Enemy::StartKnockBack(Vector3 dir) {
 	knockBackAnim_.anim.Start(transform_.translate, targetPos, 0.5f, EaseType::EASEOUTCUBIC);
 }
 
-void Enemy::Kill() {
+void IEnemy::Kill() {
 	if (isDead_)
 		return;
 
 	isDead_ = true;
 }
 
-void Enemy::UpdateCollision() {
+void IEnemy::UpdateCollision() {
 	Vector3 pos = transform_.translate;
 	bodyCol_.max = {pos.x + 0.5f, pos.y, pos.z + 0.5f};
 	bodyCol_.min = {pos.x - 0.5f, pos.y, pos.z - 0.5f};
 }
 
-void Enemy::GenerateExMark() {
+void IEnemy::GenerateExMark() {
 	// 「!」マークインスタンス生成&初期化
 	exclamationMark_ = std::make_unique<ExclamationMark>();
 	Vector3 pos = {transform_.translate.x, transform_.translate.y + 1.0f, transform_.translate.z};
 	exclamationMark_->Initialize(ctx_, transform_.translate);
 }
 
-void Enemy::GenerateMuzzleFlash(const Vector3& direction) {
+void IEnemy::GenerateMuzzleFlash(const Vector3& direction) {
 	Vector3 muzzlePos = transform_.translate + direction * 1.2f;
 
 	// 閃光

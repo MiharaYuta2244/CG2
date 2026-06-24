@@ -148,7 +148,7 @@ void Player::Update(float deltaTime, DirectInput* input, GamePad* gamePad, Enemy
 			isGrabTriggered = true;
 		}
 		// 放す
-		if (padState.buttonsReleased.x || padState.buttonsReleased.a) {
+		if (isHold_ && !isGrabTriggered) {
 			isGrabReleased = true;
 		}
 		// Rトリガーで突き飛ばし
@@ -161,7 +161,7 @@ void Player::Update(float deltaTime, DirectInput* input, GamePad* gamePad, Enemy
 	if (enableAttack_ && isGrabTriggered) {
 		if (!isHold_ && heldEnemy_ != nullptr) {
 			isHold_ = true;
-			heldEnemy_->SetEnableMove(false);
+			heldEnemy_->SetEnableAI(false);
 		}
 
 		// 掴んでいる間はプレイヤーの位置に敵を固定
@@ -177,7 +177,7 @@ void Player::Update(float deltaTime, DirectInput* input, GamePad* gamePad, Enemy
 	} else if (isHold_ && isGrabReleased) { // 手放す処理
 		isHold_ = false;
 		if (heldEnemy_) {
-			heldEnemy_->SetEnableMove(true);
+			heldEnemy_->SetEnableAI(true);
 			heldEnemy_ = nullptr; // 手放す
 		}
 	}
@@ -186,7 +186,7 @@ void Player::Update(float deltaTime, DirectInput* input, GamePad* gamePad, Enemy
 	if (enableAttack_ && isAttackTriggered && heldEnemy_ != nullptr) {
 		isHold_ = false;
 		enableAttack_ = false;
-		heldEnemy_->SetEnableMove(true);
+		heldEnemy_->SetEnableAI(true);
 		heldEnemy_->StartKnockBack({lastMoveDirection_.x, 0.0f, lastMoveDirection_.y});
 		heldEnemy_ = nullptr; // 投げたのでポインタをクリア
 	}

@@ -345,7 +345,7 @@
     <ClCompile Include="engine\3d\particle\modules\UVScrollModule.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
-    <ClCompile Include="engine\3d\Primitive\VisonCone.cpp">
+    <ClCompile Include="engine\3d\Primitive\VisionCone.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
     <ClCompile Include="application\GameObjects\Enemy\AStarPathfinder.cpp">
@@ -385,6 +385,9 @@
       <Filter>ソース ファイル</Filter>
     </ClCompile>
     <ClCompile Include="engine\3d\particle\modules\MuzzleSmokeModule.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="application\GameObjects\Enemy\IEnemy.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
   </ItemGroup>
@@ -799,7 +802,7 @@
     <ClInclude Include="engine\3d\particle\modules\ParticleModuleHeader.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
-    <ClInclude Include="engine\3d\Primitive\VisonCone.h">
+    <ClInclude Include="engine\3d\Primitive\VisionCone.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
     <ClInclude Include="application\GameObjects\Enemy\AStarPathfinder.h">
@@ -851,6 +854,9 @@
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
     <ClInclude Include="engine\3d\particle\modules\MuzzleSmokeModule.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="application\GameObjects\Enemy\IEnemy.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
   </ItemGroup>

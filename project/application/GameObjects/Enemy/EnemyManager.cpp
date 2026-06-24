@@ -19,7 +19,9 @@ void EnemyManager::Update(float deltaTime, Player* player, EnemyBulletManager* e
 
 	// 生きている敵をすべて更新
 	for (auto& enemy : enemies_) {
-		enemy->Update(deltaTime, player, enemyBulletManager, wallManager);
+		if (enemy->GetIsMove()) {
+			enemy->Update(deltaTime, player, enemyBulletManager, wallManager);
+		}
 	}
 }
 
@@ -72,7 +74,7 @@ void EnemyManager::DrawImGui() {
 
 			// --- Rotation ---
 			Vector3 rot = enemy->GetRotate();
-			if (ImGui::DragFloat3("Rotation (deg)", &rot.x, 0.5f)) {
+			if (ImGui::DragFloat3("Rotation", &rot.x, 0.5f)) {
 				enemy->SetRotate(rot);
 			}
 
@@ -91,6 +93,18 @@ void EnemyManager::DrawImGui() {
 
 	ImGui::End();
 #endif
+}
+
+void EnemyManager::SetMove(){
+	for (auto& enemy : enemies_) {
+		enemy->SetIsMove(true);
+	}
+}
+
+void EnemyManager::SetStop() {
+	for (auto& enemy : enemies_) {
+		enemy->SetIsMove(false);
+	}
 }
 
 void EnemyManager::LoadFromJson(const std::string& filepath) {

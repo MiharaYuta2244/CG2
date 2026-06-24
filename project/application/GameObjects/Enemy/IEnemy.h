@@ -13,9 +13,9 @@ class Player;
 class WallManager;
 
 /// <summary>
-/// 敵クラス
+/// 敵の基底クラス
 /// </summary>
-class Enemy : public IGameObject {
+class IEnemy : public IGameObject {
 public:
 	// 初期化処理
 	void Initialize(EngineContext* ctx, Vector3 pos);
@@ -47,7 +47,8 @@ public:
 	// 敵の回転Setter
 	void SetRotate(Vector3 rot) { transform_.rotate = rot; }
 
-	void SetEnableAI(bool enableMove) { enableMove_ = enableMove; }
+	// AI挙動フラグSetter
+	void SetEnableAI(bool enableMove) { enableAI_ = enableMove; }
 
 	// ノックバックを始める
 	void StartKnockBack(Vector3 dir);
@@ -64,10 +65,13 @@ public:
 	// ギズモ用
 	std::string GetName() const override { return "Enemy"; }
 
+	// 移動フラグSetter
 	void SetIsMove(bool isMove) { isMove_ = isMove; }
+
+	// 移動フラグGetter
 	bool GetIsMove() { return isMove_; }
 
-private:
+protected:
 	// 当たり判定の更新
 	void UpdateCollision();
 
@@ -78,20 +82,31 @@ private:
 	void GenerateMuzzleFlash(const Vector3& direction);
 
 private:
-	AABB bodyCol_; // 本体のAABB
-	bool enableMove_ = true;
-	AnimationBundle<Vector3> knockBackAnim_;
-	bool isDead_ = false;
-
-	// ノックバックの強さ
-	float knockBackPower_ = 20.0f;
-
-	std::unique_ptr<ObjectRender> render_;               // 描画用インスタンス
+	std::unique_ptr<ObjectRender> render_;               // 本体描画
 	std::unique_ptr<EnemyAI> ai_;                        // AI
 	std::unique_ptr<TinyEngine::VisionCone> visionCone_; // 視界
 	std::unique_ptr<ExclamationMark> exclamationMark_;   // 「!」マーク
 
+	// SRT
+	Transform transform_;
+
+	// エンジンコンテキストポインタ
 	EngineContext* ctx_ = nullptr;
+
+	// 本体の当たり判定
+	AABB bodyCol_;
+
+	// AI挙動のフラグ
+	bool enableAI_ = true;
+
+	// ノックバック用イージング変数
+	AnimationBundle<Vector3> knockBackAnim_;
+
+	// 生存フラグ
+	bool isDead_ = false;
+
+	// ノックバックの強さ
+	float knockBackPower_ = 20.0f;
 
 	// プレイヤーを発見したかどうか
 	EnemyAI::State lastState = EnemyAI::State::Normal;
