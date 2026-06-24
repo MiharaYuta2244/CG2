@@ -532,12 +532,18 @@ void GamePlayScene::CollisionGameObjects() {
 			if (Collision::Intersect(a->GetBodyCol(), b->GetBodyCol())) {
 				// どちらかがノックバック状態であれば
 				if (a->IsKnockBack() || b->IsKnockBack()) {
-					a->Kill();
-					b->Kill();
-					commonData_->killCount += 2;
+					a->Damage();
+					b->Damage();
 
-					// パーティクルの生成
-					GenerateEnemyDeathParticle(a->GetPos());
+					// ダメージの結果死亡した場合のみ処理を行う
+					if (a->IsDead()) {
+						commonData_->killCount += 1;
+						GenerateEnemyDeathParticle(a->GetPos());
+					}
+					if (b->IsDead()) {
+						commonData_->killCount += 1;
+						GenerateEnemyDeathParticle(b->GetPos());
+					}
 				}
 			}
 		}

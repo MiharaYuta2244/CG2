@@ -2,6 +2,7 @@
 #include "AABB.h"
 #include "AnimationBundle.h"
 #include "EnemyAI.h"
+#include "EnemyType.h"
 #include "ExclamationMark.h"
 #include "GameObjects/IGameObject.h"
 #include "GameObjects/ObjectRender/ObjectRender.h"
@@ -18,7 +19,7 @@ class WallManager;
 class Enemy : public IGameObject {
 public:
 	// 初期化処理
-	void Initialize(EngineContext* ctx, Vector3 pos);
+	void Initialize(EngineContext* ctx, Vector3 pos, EnemyType type);
 
 	// 更新処理
 	void Update(float deltaTime, Player* player, EnemyBulletManager* enemyBulletManager, WallManager* wallManager);
@@ -57,6 +58,9 @@ public:
 
 	// 死亡させる処理
 	void Kill();
+
+	// ダメージ処理
+	void Damage();
 
 	// TransformのGetter
 	Transform GetTransform() const { return transform_; }
@@ -104,4 +108,13 @@ private:
 
 	// 移動フラグ
 	bool isMove_ = true;
+
+	// 敵のタイプ
+	EnemyType type_;
+
+	// HP
+	int hp_ = 1;
+
+	// 色
+	Vector4 color_ = {1, 1, 1, 1};
 };

@@ -8,9 +8,10 @@
 #include "Random.h"
 #include <cmath>
 
-void EnemyAI::Initialize(Transform* transform, EngineContext* ctx) {
+void EnemyAI::Initialize(Transform* transform, EngineContext* ctx, EnemyType type) {
 	transform_ = transform;
 	ctx_ = ctx;
+	type_ = type;
 }
 
 void EnemyAI::Update(float deltaTime, Player* player, EnemyBulletManager* enemyBulletManager, WallManager* wallManager) {
@@ -154,24 +155,43 @@ void EnemyAI::UpdateVigilance(float deltaTime, Player* player, EnemyBulletManage
 		// 警戒状態時は基本的に射撃を行う
 		Vector3 toTarget = playerPos - enemyPos;
 		toTarget.y = 0.0f;
-
 		shotTimer_ += deltaTime;
+
 		if (shotTimer_ >= shotInterval_) {
 			auto bullet = std::make_unique<EnemyBullet>();
 			Vector3 dir3D = MathUtility::Normalize(toTarget);
 			Vector2 dir2D = {dir3D.x, dir3D.z};
 
-			Vector3 spawnPos = enemyPos;
-			spawnPos.x += dir3D.x * bulletMargin_;
-			spawnPos.z += dir3D.z * bulletMargin_;
-			spawnPos.y += 1.0f;
+			if (type_ == EnemyType::Shotgun) {
+				// 散弾の実装
+				float baseAngle = std::atan2(dir3D.x, dir3D.z);
+				for (int i = -1; i <= 1; ++i) {
+					auto bullet = std::make_unique<EnemyBullet>();
+					float angle = baseAngle + i * (15.0f * std::numbers::pi_v<float> / 180.0f); // 15度ずつずらす
+					Vector2 dir2D = {std::sin(angle), std::cos(angle)};
 
-			bullet->Initialize(ctx_, dir2D, spawnPos);
-			enemyBulletManager->AddBullet(std::move(bullet));
+					Vector3 spawnPos = enemyPos;
+					spawnPos.x += dir2D.x * bulletMargin_;
+					spawnPos.z += dir2D.y * bulletMargin_;
+					spawnPos.y += 1.0f;
+
+					bullet->Initialize(ctx_, dir2D, spawnPos);
+					enemyBulletManager->AddBullet(std::move(bullet));
+				}
+			} else {
+				// 通常の単発処理
+				auto bullet = std::make_unique<EnemyBullet>();
+				Vector2 dir2D = {dir3D.x, dir3D.z};
+				Vector3 spawnPos = enemyPos;
+				spawnPos.x += dir3D.x * bulletMargin_;
+				spawnPos.z += dir3D.z * bulletMargin_;
+				spawnPos.y += 1.0f;
+				bullet->Initialize(ctx_, dir2D, spawnPos);
+				enemyBulletManager->AddBullet(std::move(bullet));
+			}
 
 			isShotThisFrame_ = true;
 			shotDirection_ = dir3D;
-
 			shotTimer_ = 0.0f;
 		}
 	} else {

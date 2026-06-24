@@ -1,27 +1,37 @@
 #include "Enemy.h"
 #include "EnemyBulletManager.h"
 #include "MuzzleFlashModule.h"
-#include "MuzzleSparkModule.h"
 #include "MuzzleSmokeModule.h"
+#include "MuzzleSparkModule.h"
 
 using namespace TinyEngine;
 
-void Enemy::Initialize(EngineContext* ctx, Vector3 pos) {
+void Enemy::Initialize(EngineContext* ctx, Vector3 pos, EnemyType type) {
+	ctx_ = ctx;
+
+	type_ = type;
+	if (type_ == EnemyType::Normal) {
+		hp_ = 1;
+		color_ = {1, 1, 1, 1};
+	} else if (type_ == EnemyType::Shotgun) {
+		hp_ = 2;
+		color_ = {1, 0, 0, 1};
+	}
+
 	transform_.scale = {1.0f, 1.0f, 1.0f};
 	transform_.rotate = {0.0f, 0.0f, 0.0f};
 	transform_.translate = pos;
-
-	ctx_ = ctx;
 
 	// 描画用インスタンスの生成&初期化
 	render_ = std::make_unique<ObjectRender>();
 	render_->Initialize(ctx, "Hiyoko.obj");
 	render_->SetTransform(transform_);
 	render_->SetEnvScale(envScale_);
+	render_->SetColor(color_);
 
 	// AIインスタンス生成&初期化
 	ai_ = std::make_unique<EnemyAI>();
-	ai_->Initialize(&transform_, ctx);
+	ai_->Initialize(&transform_, ctx, type);
 
 	// 視界インスタンス生成&初期化
 	visionCone_ = std::make_unique<VisionCone>();
@@ -142,6 +152,16 @@ void Enemy::Kill() {
 		return;
 
 	isDead_ = true;
+}
+
+void Enemy::Damage() {
+	if (isDead_)
+		return;
+
+	hp_--;
+	if (hp_ <= 0) {
+		Kill();
+	}
 }
 
 void Enemy::UpdateCollision() {

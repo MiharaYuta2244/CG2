@@ -1,6 +1,7 @@
 #pragma once
 #include "AABB.h"
 #include "EnemyBullet.h"
+#include "EnemyType.h"
 #include "Transform.h"
 #include <vector>
 
@@ -24,7 +25,7 @@ public:
 	};
 
 	// 初期化
-	void Initialize(Transform* transform, EngineContext* ctx);
+	void Initialize(Transform* transform, EngineContext* ctx, EnemyType type);
 
 	// 更新処理
 	void Update(float deltaTime, Player* player, EnemyBulletManager* enemyBulletManager, WallManager* wallManager);
@@ -57,6 +58,9 @@ private:
 
 	// 敵の状態
 	State state_ = State::Normal;
+
+	// 敵のタイプ
+	EnemyType type_;
 
 	// 視界のパラメータ
 	Visionparam visionParam_ = {30.0f, 40.0f};
