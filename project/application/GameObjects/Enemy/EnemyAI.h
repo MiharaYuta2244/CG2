@@ -80,9 +80,10 @@ private:
 	Vector3 lastKnownPlayerPos_;            // 最後に見えたプレイヤーの座標
 
 	// 射撃用パラメータ
-	float shotTimer_ = 0.0f;     // 射撃までの残り時間タイマー
-	float shotInterval_ = 2.0f;  // 射撃間隔
-	float bulletMargin_ = 10.0f; // 敵と弾の間隔
+	float shotTimer_ = 0.0f;          // 射撃までの残り時間タイマー
+	float shotIntervalNormal_ = 2.0f; // 射撃間隔(通常時)
+	float shotIntervalHold_ = 1.5f;   // 射撃間隔(拘束時)
+	float bulletMargin_ = 10.0f;      // 敵と弾の間隔
 	bool isShotThisFrame_ = false;
 	bool isShotHoldState_ = true;
 	Vector3 shotDirection_ = {0.0f, 0.0f, 1.0f};

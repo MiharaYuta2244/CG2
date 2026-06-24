@@ -161,7 +161,7 @@ void EnemyAI::UpdateVigilance(float deltaTime, Player* player, EnemyBulletManage
 		shotTimer_ += deltaTime;
 
 		// 弾の発射処理
-		if (shotTimer_ >= shotInterval_) {
+		if (shotTimer_ >= shotIntervalNormal_) {
 			Shot(toTarget, enemyBulletManager);
 		}
 
@@ -223,7 +223,7 @@ void EnemyAI::UpdateHold(float deltaTime, Player* player, EnemyBulletManager* en
 	shotTimer_ += deltaTime;
 
 	// 弾の発射処理
-	if (shotTimer_ >= shotInterval_) {
+	if (shotTimer_ >= shotIntervalHold_) {
 		Shot(playerDirection, enemyBulletManager);
 
 		// 拘束時の発射フラグを下す

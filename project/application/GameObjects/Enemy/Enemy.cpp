@@ -45,13 +45,11 @@ void Enemy::Update(float deltaTime, Player* player, EnemyBulletManager* enemyBul
 	}
 
 	// AIインスタンス更新
-	//if (enableMove_) {
-		ai_->Update(deltaTime, player, enemyBulletManager, wallManager);
+	ai_->Update(deltaTime, player, enemyBulletManager, wallManager);
 
-		if (ai_->IsShotThisFrame()) {
-			GenerateMuzzleFlash(ai_->GetShotDirection());
-		}
-	//}
+	if (ai_->IsShotThisFrame()) {
+		GenerateMuzzleFlash(ai_->GetShotDirection());
+	}
 
 	// プレイヤー発見時に「!」マークの生成
 	if (lastState != ai_->GetState() && ai_->GetState() == EnemyAI::State::Vigilance) {

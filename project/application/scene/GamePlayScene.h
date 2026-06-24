@@ -125,5 +125,5 @@ private:
 	Vector3 currentCameraPivot_ = {0.0f, 0.0f, 0.0f};
 
 	// プレイヤーの向きに応じたカメラのオフセット量
-	float offsetDistance_ = 1.0f;
+	float offsetDistance_ = 4.0f;
 };
