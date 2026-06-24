@@ -70,6 +70,8 @@ public:
 
 	void SetIsMove(bool isMove) { isMove_ = isMove; }
 	bool GetIsMove() { return isMove_; }
+	void SetShotHoldState(bool isShotHoldState) { ai_->SetShotHoldState(isShotHoldState); }
+	void SetAIState(EnemyAI::State state);
 
 private:
 	// 当たり判定の更新

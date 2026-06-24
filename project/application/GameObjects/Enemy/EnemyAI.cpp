@@ -25,6 +25,9 @@ void EnemyAI::Update(float deltaTime, Player* player, EnemyBulletManager* enemyB
 	case State::Vigilance:
 		UpdateVigilance(deltaTime, player, enemyBulletManager, wallManager);
 		break;
+	case State::Hold:
+		UpdateHold(deltaTime, player, enemyBulletManager);
+		break;
 	}
 }
 
@@ -157,43 +160,11 @@ void EnemyAI::UpdateVigilance(float deltaTime, Player* player, EnemyBulletManage
 		toTarget.y = 0.0f;
 		shotTimer_ += deltaTime;
 
+		// 弾の発射処理
 		if (shotTimer_ >= shotInterval_) {
-			auto bullet = std::make_unique<EnemyBullet>();
-			Vector3 dir3D = MathUtility::Normalize(toTarget);
-			Vector2 dir2D = {dir3D.x, dir3D.z};
-
-			if (type_ == EnemyType::Shotgun) {
-				// 散弾の実装
-				float baseAngle = std::atan2(dir3D.x, dir3D.z);
-				for (int i = -1; i <= 1; ++i) {
-					auto bullet = std::make_unique<EnemyBullet>();
-					float angle = baseAngle + i * (15.0f * std::numbers::pi_v<float> / 180.0f); // 15度ずつずらす
-					Vector2 dir2D = {std::sin(angle), std::cos(angle)};
-
-					Vector3 spawnPos = enemyPos;
-					spawnPos.x += dir2D.x * bulletMargin_;
-					spawnPos.z += dir2D.y * bulletMargin_;
-					spawnPos.y += 1.0f;
-
-					bullet->Initialize(ctx_, dir2D, spawnPos);
-					enemyBulletManager->AddBullet(std::move(bullet));
-				}
-			} else {
-				// 通常の単発処理
-				auto bullet = std::make_unique<EnemyBullet>();
-				Vector2 dir2D = {dir3D.x, dir3D.z};
-				Vector3 spawnPos = enemyPos;
-				spawnPos.x += dir3D.x * bulletMargin_;
-				spawnPos.z += dir3D.z * bulletMargin_;
-				spawnPos.y += 1.0f;
-				bullet->Initialize(ctx_, dir2D, spawnPos);
-				enemyBulletManager->AddBullet(std::move(bullet));
-			}
-
-			isShotThisFrame_ = true;
-			shotDirection_ = dir3D;
-			shotTimer_ = 0.0f;
+			Shot(toTarget, enemyBulletManager);
 		}
+
 	} else {
 		// 見失った場合、タイマーを減らす
 		lostSightTimer_ -= deltaTime;
@@ -241,6 +212,23 @@ void EnemyAI::UpdateVigilance(float deltaTime, Player* player, EnemyBulletManage
 	Vector3 toTarget = lastKnownPlayerPos_ - enemyPos;
 	toTarget.y = 0.0f;
 	float distSq = toTarget.x * toTarget.x + toTarget.z * toTarget.z;
+}
+
+void EnemyAI::UpdateHold(float deltaTime, Player* player, EnemyBulletManager* enemyBulletManager) {
+	if (!isShotHoldState_)
+		return;
+
+	// プレイヤーが向いている方向に一度だけ射撃を行う
+	Vector3 playerDirection = {player->GetDirection().x, 0.0f, player->GetDirection().y};
+	shotTimer_ += deltaTime;
+
+	// 弾の発射処理
+	if (shotTimer_ >= shotInterval_) {
+		Shot(playerDirection, enemyBulletManager);
+
+		// 拘束時の発射フラグを下す
+		isShotHoldState_ = false;
+	}
 }
 
 bool EnemyAI::CheckPlayerInVision(Player* player, WallManager* wallManager) {
@@ -329,4 +317,42 @@ bool EnemyAI::IsSegmentIntersectAABB(const Vector3& start, const Vector3& end, c
 	}
 
 	return true; // 交差している
+}
+
+void EnemyAI::Shot(Vector3 toTarget, EnemyBulletManager* enemyBulletManager) {
+	auto bullet = std::make_unique<EnemyBullet>();
+	Vector3 dir3D = MathUtility::Normalize(toTarget);
+	Vector2 dir2D = {dir3D.x, dir3D.z};
+	Vector3 spawnPos = transform_->translate;
+
+	switch (type_) {
+	case EnemyType::Normal:
+		// 通常の単発処理
+		spawnPos.x += dir3D.x * bulletMargin_;
+		spawnPos.z += dir3D.z * bulletMargin_;
+		spawnPos.y += 1.0f;
+		bullet->Initialize(ctx_, dir2D, spawnPos);
+		enemyBulletManager->AddBullet(std::move(bullet));
+		break;
+	case EnemyType::Shotgun:
+		// 散弾の実装
+		float baseAngle = std::atan2(dir3D.x, dir3D.z);
+		for (int i = -1; i <= 1; ++i) {
+			auto bullet = std::make_unique<EnemyBullet>();
+			float angle = baseAngle + i * (15.0f * std::numbers::pi_v<float> / 180.0f); // 15度ずつずらす
+			dir2D = {std::sin(angle), std::cos(angle)};
+			spawnPos = transform_->translate;
+			spawnPos.x += dir2D.x * bulletMargin_;
+			spawnPos.z += dir2D.y * bulletMargin_;
+			spawnPos.y += 1.0f;
+
+			bullet->Initialize(ctx_, dir2D, spawnPos);
+			enemyBulletManager->AddBullet(std::move(bullet));
+		}
+		break;
+	}
+
+	isShotThisFrame_ = true;
+	shotDirection_ = dir3D;
+	shotTimer_ = 0.0f;
 }

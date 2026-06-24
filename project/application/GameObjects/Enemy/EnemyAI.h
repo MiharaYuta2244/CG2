@@ -22,6 +22,7 @@ public:
 	enum class State {
 		Normal,    // 徘徊、通常状態
 		Vigilance, // 警戒、プレイヤー追跡状態
+		Hold,      // プレイヤーに拘束されている状態
 	};
 
 	// 初期化
@@ -36,6 +37,10 @@ public:
 	bool IsShotThisFrame() const { return isShotThisFrame_; }
 	Vector3 GetShotDirection() const { return shotDirection_; }
 
+	// Setter
+	void SetShotHoldState(bool isShotHoldState) { isShotHoldState_ = isShotHoldState; }
+	void SetState(State state) { state_ = state; }
+
 private:
 	// プレーヤー方向に回転する
 	void LookatPlayer(float deltaTime, Vector3 playerPos, Vector3 enemyPos, float turnSpeed = 6.0f);
@@ -46,11 +51,17 @@ private:
 	// 警戒状態の更新処理
 	void UpdateVigilance(float deltaTime, Player* player, EnemyBulletManager* enemyBulletManager, WallManager* wallManager);
 
+	// 拘束状態の更新処理
+	void UpdateHold(float deltaTime, Player* player, EnemyBulletManager* enemyBulletManager);
+
 	// プレイヤーが視界内にいるか判定する
 	bool CheckPlayerInVision(Player* player, WallManager* wallManager);
 
 	// 線分（敵からプレイヤー）とAABB（壁）の交差判定
 	bool IsSegmentIntersectAABB(const Vector3& start, const Vector3& end, const AABB& aabb);
+
+	// 弾の発射処理
+	void Shot(Vector3 toTarget, EnemyBulletManager* enemyBulletManager);
 
 private:
 	Transform* transform_ = nullptr;
@@ -73,6 +84,7 @@ private:
 	float shotInterval_ = 2.0f;  // 射撃間隔
 	float bulletMargin_ = 10.0f; // 敵と弾の間隔
 	bool isShotThisFrame_ = false;
+	bool isShotHoldState_ = true;
 	Vector3 shotDirection_ = {0.0f, 0.0f, 1.0f};
 
 	// 経路探索用

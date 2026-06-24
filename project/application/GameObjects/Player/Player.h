@@ -4,12 +4,10 @@
 #include "GameObjects/IGameObject.h"
 #include "GameObjects/ObjectRender/ObjectRender.h"
 #include "GameTimer.h"
+#include "OBB.h"
 #include "Particle.h"
 #include "PlayerHealth.h"
 #include "PlayerMove.h"
-#include "AnimationBundle.h"
-#include "OBB.h"
-#include "GameObjects/Enemy/EnemyBullet.h"
 
 class EnemyManager;
 class Enemy;
@@ -73,6 +71,9 @@ public:
 	// ギズモ用
 	std::string GetName() const override { return "Player"; }
 
+	// プレイヤーの向いている方向のGetter
+	Vector2 GetDirection() const { return lastMoveDirection_; }
+
 private:
 	// 当たり判定の更新処理
 	void UpdateCollision();
@@ -132,10 +133,4 @@ private:
 
 	// 攻撃確認用フラグ
 	bool isHandAnimPlaying_ = false;
-
-	// 敵ホールド時に発射する弾
-	std::unique_ptr<EnemyBullet> enemyBullet_;
-	GameTimer bulletShotTimer_;
-	GameTimer bulletDeleteTimer_;
-	bool isShot_ = false;
 };

@@ -162,6 +162,8 @@ void Player::Update(float deltaTime, DirectInput* input, GamePad* gamePad, Enemy
 		if (!isHold_ && heldEnemy_ != nullptr) {
 			isHold_ = true;
 			heldEnemy_->SetEnableAI(false);
+			heldEnemy_->SetShotHoldState(true);
+			heldEnemy_->SetAIState(EnemyAI::State::Hold);
 		}
 
 		// 掴んでいる間はプレイヤーの位置に敵を固定
@@ -178,6 +180,7 @@ void Player::Update(float deltaTime, DirectInput* input, GamePad* gamePad, Enemy
 		isHold_ = false;
 		if (heldEnemy_) {
 			heldEnemy_->SetEnableAI(true);
+			heldEnemy_->SetAIState(EnemyAI::State::Normal);
 			heldEnemy_ = nullptr; // 手放す
 		}
 	}
@@ -188,6 +191,7 @@ void Player::Update(float deltaTime, DirectInput* input, GamePad* gamePad, Enemy
 		enableAttack_ = false;
 		heldEnemy_->SetEnableAI(true);
 		heldEnemy_->StartKnockBack({lastMoveDirection_.x, 0.0f, lastMoveDirection_.y});
+		heldEnemy_->SetAIState(EnemyAI::State::Normal);
 		heldEnemy_ = nullptr; // 投げたのでポインタをクリア
 	}
 

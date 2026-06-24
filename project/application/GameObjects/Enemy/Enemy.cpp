@@ -45,13 +45,13 @@ void Enemy::Update(float deltaTime, Player* player, EnemyBulletManager* enemyBul
 	}
 
 	// AIインスタンス更新
-	if (enableMove_) {
+	//if (enableMove_) {
 		ai_->Update(deltaTime, player, enemyBulletManager, wallManager);
 
 		if (ai_->IsShotThisFrame()) {
 			GenerateMuzzleFlash(ai_->GetShotDirection());
 		}
-	}
+	//}
 
 	// プレイヤー発見時に「!」マークの生成
 	if (lastState != ai_->GetState() && ai_->GetState() == EnemyAI::State::Vigilance) {
@@ -200,4 +200,10 @@ void Enemy::GenerateMuzzleFlash(const Vector3& direction) {
 	smoke->SetEmitMode(false, 0.05f);
 	smoke->SetEmitterParam(3, 0.01f);
 	muzzleParticles_.push_back(std::move(smoke));
+}
+
+void Enemy::SetAIState(EnemyAI::State state) {
+	if (ai_) {
+		ai_->SetState(state);
+	}
 }

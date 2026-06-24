@@ -1,8 +1,6 @@
 #include "DirectXCommon.h"
-#include "SrvManager.h"
 #include "StringUtility.h"
 #include "WinApp.h"
-#include <MathUtility.h>
 #include <format>
 #include <thread>
 

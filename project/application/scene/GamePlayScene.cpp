@@ -548,6 +548,23 @@ void GamePlayScene::CollisionGameObjects() {
 			}
 		}
 	}
+
+	// ==========================================
+	// 敵と敵の弾の当たり判定
+	// ==========================================
+	for (const auto& enemy : enemyManager_->GetEnemies()) {
+		for (const auto& bullet : enemyBulletManager_->GetBullets()) {
+			// 衝突判定
+			if (Collision::Intersect(enemy->GetBodyCol(), bullet->GetCollision())) {
+				enemy->Damage();
+
+				if (enemy->IsDead()) {
+					commonData_->killCount += 1;
+					GenerateEnemyDeathParticle(enemy->GetPos());
+				}
+			}
+		}
+	}
 }
 
 void GamePlayScene::UpdateImGui() {

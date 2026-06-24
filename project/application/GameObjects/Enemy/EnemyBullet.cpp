@@ -1,5 +1,4 @@
 #include "EnemyBullet.h"
-#include <algorithm>
 #include <cmath>
 
 void EnemyBullet::Initialize(EngineContext* ctx, Vector2 dir, Vector3 pos) {
