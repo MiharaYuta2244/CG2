@@ -126,4 +126,6 @@ private:
 
 	// プレイヤーの向きに応じたカメラのオフセット量
 	float offsetDistance_ = 4.0f;
+
+	RadialBlurParam param_;
 };
