@@ -30,6 +30,7 @@ void GamePlayScene::Initialize(const SceneContext& ctx) {
 	mainCamera_->SetPivot(player_->GetPosition());
 	mainCamera_->SetEuler({std::numbers::pi_v<float> / 2.0f, 0.0f, 0.0f});
 	currentCameraPivot_ = player_->GetPosition();
+	cameraPosY_ = 60.0f;
 
 	// カメラの設定
 	ctx_.currentCamera = mainCamera_.get();

@@ -38,6 +38,9 @@ struct EffectMeta {
 namespace TinyEngine {
 class CopyImage {
 public:
+	// デストラクタ
+	~CopyImage();
+
 	// 初期化
 	void Initialize(DirectXCommon* dx, PostEffectType type, TextureManager* textureManager);
 

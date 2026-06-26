@@ -11,6 +11,8 @@ RenderTexture::~RenderTexture(){
 		srvManager_->Free(srvIndexColor_);
 		srvManager_->Free(srvIndexDepth_);
 	}
+
+	Logger::Log("RenderTexture Destructor Called!\n", LogLevel::Error);
 }
 
 void RenderTexture::Initialize(DirectXCommon* dx, SrvManager* srv, uint32_t width, uint32_t height) {

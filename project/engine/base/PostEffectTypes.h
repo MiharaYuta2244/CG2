@@ -29,12 +29,11 @@ struct SmoothingParam {
 };
 
 struct GaussianParam {
-	int radius = 2;
 	float intensity = 1.0f;
 	float sigma = 2.0f;
-	float padding0;
 	float texelSize[2] = {0.0f, 0.0f};
-	float paddeing1[2];
+	int radius = 2;
+	float padding[3];
 };
 
 struct DepthOutlineParam {

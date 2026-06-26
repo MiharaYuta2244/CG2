@@ -5,10 +5,11 @@ SamplerState gSampler : register(s0);
 
 cbuffer GaussianParam : register(b0)
 {
-    int radius; // 2 = 5x5
     float intensity;
     float sigma; // 標準偏差
     float2 texelSize;
+    int radius; // 2 = 5x5
+    float3 padding;
 }
 
 struct PixelShaderOutput

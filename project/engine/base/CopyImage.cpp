@@ -6,6 +6,8 @@
 using namespace Microsoft::WRL;
 using namespace TinyEngine;
 
+CopyImage::~CopyImage(){ Logger::Log("CopyImage Destructor Called!\n", LogLevel::Error); }
+
 void CopyImage::InitializeShaderCompiler() {
 	HRESULT hr = DxcCreateInstance(CLSID_DxcUtils, IID_PPV_ARGS(&dxcUtils_));
 	assert(SUCCEEDED(hr));
@@ -131,7 +133,9 @@ void TinyEngine::CopyImage::CreateCB() {
 	if (meta.cbSize == 0)
 		return; // パラメータ不要のエフェクト
 
-	cbResource_ = DirectXUtils::CreateBufferResource(dxCommon_->GetDevice(), meta.cbSize);
+	size_t alignedSize = (meta.cbSize + 255) & ~255;
+
+	cbResource_ = DirectXUtils::CreateBufferResource(dxCommon_->GetDevice(), alignedSize);
 	cbResource_->Map(0, nullptr, reinterpret_cast<void**>(&cbData_));
 	memcpy(cbData_, meta.paramPtr, meta.cbSize);
 }
@@ -214,7 +218,8 @@ void TinyEngine::CopyImage::DrawImGui() {
 	ImGui::Begin("PostEffect");
 
 	{
-		static const char* effectNames[] = {"FullScreen", "Grayscale", "Sepia", "Vignette", "Smoothing", "Gaussian", "LuminanceOutline", "DepthOutline", "RadialBlur", "Dissolve", "Random", "Glitch"};
+		static const char* effectNames[] = {"FullScreen", "Grayscale", "Sepia",  "Vignette", "Smoothing", "Gaussian",   "LuminanceOutline", "DepthOutline",
+		                                    "RadialBlur", "Dissolve",  "Random", "Glitch",   "Scanline",  "Distortion", "BarrelDistortion", "DeathEffect"};
 
 		int current = static_cast<int>(postEffectType_);
 		if (ImGui::Combo("Effect Type", &current, effectNames, IM_ARRAYSIZE(effectNames))) {

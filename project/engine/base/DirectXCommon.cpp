@@ -110,7 +110,13 @@ void DirectXCommon::EndFrame() {
 
 	// GPUにコマンドリストの実行を行わせる
 	Microsoft::WRL::ComPtr<ID3D12CommandList> commandLists[] = {commandList_.Get()};
+
+	Logger::Log("--- ExecuteCommandLists Start ---", LogLevel::Info);
+
 	commandQueue_->ExecuteCommandLists(1, commandLists->GetAddressOf());
+
+	Logger::Log("--- ExecuteCommandLists End ---", LogLevel::Info);
+
 	// GPUとOSに画面の交換を行うように通知する
 	swapChain_->Present(1, 0);
 
@@ -130,6 +136,8 @@ void DirectXCommon::EndFrame() {
 		// イベントを待つ
 		WaitForSingleObject(fenceEvent_, INFINITE);
 	}
+
+	Logger::Log("--- GPU Frame Completed ---", LogLevel::Info);
 
 	// 次のフレーム用のコマンドリストを準備
 	hr = commandAllocator_->Reset();

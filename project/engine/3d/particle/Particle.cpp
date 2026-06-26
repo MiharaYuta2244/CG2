@@ -15,6 +15,7 @@ using namespace TinyEngine;
 
 Particle::~Particle(){
 	if (ctx_ && ctx_->srvManager) {
+		Logger::Log("Particle Destroyed. SRV Index: " + std::to_string(srvIndex_), LogLevel::Info);
 		ctx_->srvManager->Free(srvIndex_);
 	}
 }
@@ -32,6 +33,7 @@ void Particle::Initialize(
 
 	// SRVの作成（インスタンシング用）
 	srvIndex_ = ctx_->srvManager->Allocate();
+	Logger::Log("Particle Initialized. Texture: " + texturePath + ", SRV Index: " + std::to_string(srvIndex_), LogLevel::Info);
 	CreateInstancingSRV(srvIndex_);
 
 	// 指定されたメッシュタイプに応じてモデルデータを作成
@@ -138,6 +140,8 @@ void Particle::Draw() {
 	if (numInstance_ <= 0) {
 		return;
 	}
+
+	Logger::Log("Particle Draw Command Added. SRV Index: " + std::to_string(srvIndex_), LogLevel::Debug);
 
 	// 3Dオブジェクト描画準備。3Dオブジェクトの描画に共通のグラフィックスコマンドを積む
 	ctx_->particleCommon->DrawSettingCommon();
