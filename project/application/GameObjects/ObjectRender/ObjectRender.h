@@ -33,6 +33,7 @@ public:
 	void SetEnableLighting(bool enableLighting) { object3d_->SetEnableLighting(enableLighting); }
 	void SetEnableNoise(bool enableNoise) { object3d_->SetEnableNoise(enableNoise); }
 	void SetTime(float time) { object3d_->SetTime(time); }
+	void SetIsSkinning(bool isSkinning) { object3d_->SetIsSkinning(isSkinning); }
 
 	// 描画用オブジェクトを返すGetter
 	TinyEngine::Object3d* GetObject3d() { return object3d_.get(); }

@@ -21,6 +21,8 @@ public:
 	/// </summary>
 	void DrawSettingOutline();
 
+	void DrawSettingSkinning(TextureManager* textureManager);
+
 	/// <summary>
 	/// 初期化関数
 	/// </summary>
@@ -31,6 +33,9 @@ public:
 	/// 更新関数
 	/// </summary>
 	void Update();
+
+	// スキニング用パイプラインの生成関数
+	void CreateSkinningGraphicsPipeline();
 
 	// Setter
 	void SetDefaultCamera(Camera* camera) { defaultCamera_ = camera; }
@@ -43,6 +48,8 @@ public:
 	PointLight& GetPointLight() { return globalPointLight_; }
 	SpotLight& GetSpotLight() { return globalSpotLight_; }
 	ID3D12PipelineState* GetOutlinePipelineState() { return outlinePipelineState_.Get(); }
+	ID3D12RootSignature* GetSkinningRootSignature() const { return skinningRootSignature_.Get(); }
+	ID3D12PipelineState* GetSkinningGraphicsPipelineState() const { return skinningGraphicsPipelineState_.Get(); }
 
 #ifdef USE_IMGUI
 	// Lighting用ImGuiの描画
@@ -83,6 +90,8 @@ private:
 	Microsoft::WRL::ComPtr<ID3D12RootSignature> rootSignature_;
 	Microsoft::WRL::ComPtr<ID3D12PipelineState> graphicsPipelineState_;
 	Microsoft::WRL::ComPtr<ID3D12PipelineState> outlinePipelineState_;
+	Microsoft::WRL::ComPtr<ID3D12RootSignature> skinningRootSignature_;
+	Microsoft::WRL::ComPtr<ID3D12PipelineState> skinningGraphicsPipelineState_;
 
 	// Shader Compiler
 	Microsoft::WRL::ComPtr<IDxcUtils> dxcUtils_;

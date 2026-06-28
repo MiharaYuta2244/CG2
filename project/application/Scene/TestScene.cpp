@@ -19,11 +19,13 @@ void TestScene::Initialize(const SceneContext& ctx) {
 	walk_->Initialize(ctx.engineContext, "walk.gltf");
 	Animation walkAnimation = keyframeAnimation.LoadAnimationFile("walk.gltf");
 	walk_->GetObject3d()->PlayAnimation(walkAnimation);
+	walk_->SetIsSkinning(true);
 
 	sneakWalk_ = std::make_unique<ObjectRender>();
 	sneakWalk_->Initialize(ctx.engineContext, "sneakWalk.gltf");
 	Animation sneakWalkAnimation = keyframeAnimation.LoadAnimationFile("sneakWalk.gltf");
 	sneakWalk_->GetObject3d()->PlayAnimation(sneakWalkAnimation);
+	sneakWalk_->SetIsSkinning(true);
 
 	walkTransform_.scale = {500, 500, 500};
 	walkTransform_.rotate = {std::numbers::pi_v<float> / 2.0f, std::numbers::pi_v<float>, 0};
@@ -89,17 +91,17 @@ void TestScene::Update() {
 }
 
 void TestScene::Draw() {
-	for (auto& object : sceneObjects) {
+	/*for (auto& object : sceneObjects) {
 	    object->Draw();
-	}
+	}*/
 
 	// plane_->Draw();
-	//walk_->Draw();
-	//sneakWalk_->Draw();
+	walk_->Draw();
+	sneakWalk_->Draw();
 
-	for (auto& particle : particles_) {
+	/*for (auto& particle : particles_) {
 		particle->Draw();
-	}
+	}*/
 }
 
 void TestScene::Finalize() {}

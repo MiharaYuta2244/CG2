@@ -103,6 +103,8 @@ void Object3d::Update() {
 
 		// 上書きされたTransformを使って、各骨のローカル行列とグローバル行列を再計算
 		model_->UpdateSkeleton(skeleton_);
+
+		model_->UpdateSkinCluster(skinCluster_, skeleton_);
 	}
 
 	// 非均一スケールに対応した逆転置行列の計算
@@ -170,11 +172,27 @@ void Object3d::Draw() {
 	commandList->SetGraphicsRootConstantBufferView(9, outlineResource_->GetGPUVirtualAddress());
 
 	if (model_) {
-		//model_->Draw(textureFilePath_); // アウトライン描画
+		// model_->Draw(textureFilePath_); // アウトライン描画
 	}
 
-	// 3Dオブジェクト描画準備。3Dオブジェクトの描画に共通のグラフィックスコマンドを積む
-	ctx_->object3dCommon->DrawSettingCommon(ctx_->textureManager);
+	// スキニングの有無で描画セットアップを切り替える
+	if (isSkinning_) {
+		// スキニング用のPSOとRootSignatureを適用
+		ctx_->object3dCommon->DrawSettingSkinning(ctx_->textureManager);
+
+		// スキニング特有のデータをシェーダーに渡す
+		if (model_) {
+			// 例: RootParameterの適切なインデックスに MatrixPalette (t3) の DescriptorTable をセット
+			// ※ 番号は skinningRootSignature_ 構築時の t3 (WellForGPU) に対応するインデックスに合わせてください。
+			// commandList->SetGraphicsRootDescriptorTable(3, skinCluster_.paletteSrvHandle.second);
+
+			ctx_->object3dCommon->DrawSettingSkinning(ctx_->textureManager);
+			commandList->SetGraphicsRootDescriptorTable(11, skinCluster_.paletteSrvHandle.second);
+		}
+	} else {
+		// 通常のPSOとRootSignatureを適用
+		ctx_->object3dCommon->DrawSettingCommon(ctx_->textureManager);
+	}
 
 	// wvp用のBufferの場所を設定
 	commandList->SetGraphicsRootConstantBufferView(1, wvpResource_->GetGPUVirtualAddress());
@@ -230,6 +248,11 @@ void Object3d::SetModel(const std::string& filePath) {
 		modelData_ = model_->GetModelData();
 
 		skeleton_ = model_->CreateSkeleton(modelData_.rootNode);
+
+		auto device = ctx_->object3dCommon->GetDxCommon()->GetDevice();
+		skinCluster_ = model_->CreateSkinCluster(
+		    device, skeleton_, model_->GetModelData(), ctx_->object3dCommon->GetDxCommon()->GetSrvDescriptorHeap(), ctx_->object3dCommon->GetDxCommon()->GetDescriptorSizeRTV(),
+		    ctx_->srvManager->Allocate());
 
 		// モデルのデフォルトのテクスチャパスを記憶しておく
 		textureFilePath_ = modelData_.material.textureFilePath;

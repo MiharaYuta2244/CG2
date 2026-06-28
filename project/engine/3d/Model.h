@@ -1,33 +1,54 @@
 #pragma once
-#include <wrl.h>
+#include "KeyframeAnimation.h"
 #include "Material.h"
 #include "MaterialData.h"
-#include "ModelData.h"
-#include "ModelCommon.h"
 #include "MeshData.h"
+#include "ModelCommon.h"
+#include "ModelData.h"
 #include "Node.h"
-#include "KeyframeAnimation.h"
+#include <assimp/scene.h>
 #include <d3d12.h>
 #include <string>
 #include <vector>
-#include <assimp/scene.h>
+#include <wrl.h>
 
 class TextureManager;
 
 struct Joint {
-    QuaternionTransform transform;
-    Matrix4x4 localMatrix;
-    Matrix4x4 skeletonSpaceMatrix; // 親の行列を乗算したグローバル行列
-    std::string name;
-    std::vector<int32_t> children;
-    int32_t index;
-    std::optional<int32_t> parent;
+	QuaternionTransform transform;
+	Matrix4x4 localMatrix;
+	Matrix4x4 skeletonSpaceMatrix; // 親の行列を乗算したグローバル行列
+	std::string name;
+	std::vector<int32_t> children;
+	int32_t index;
+	std::optional<int32_t> parent;
 };
 
 struct Skeleton {
-    int32_t root;
-    std::map<std::string, int32_t> jointMap; // 名前からインデックスを引くマップ
-    std::vector<Joint> joints;
+	int32_t root;
+	std::map<std::string, int32_t> jointMap; // 名前からインデックスを引くマップ
+	std::vector<Joint> joints;
+};
+
+const uint32_t kNumMaxInfluence = 4;
+struct VertexInfluence {
+	std::array<float, kNumMaxInfluence> weight;
+	std::array<int32_t, kNumMaxInfluence> jointIndices;
+};
+
+struct WellForGPU {
+	Matrix4x4 skeltonSpaceMatrix;
+	Matrix4x4 skeltonSpaceInverseTransposeMatrix;
+};
+
+struct SkinCluster {
+	std::vector<Matrix4x4> inverseBindPoseMatrix;
+	Microsoft::WRL::ComPtr<ID3D12Resource> influenceResource;
+	D3D12_VERTEX_BUFFER_VIEW influenceBufferView;
+	std::span<VertexInfluence> mappedInfluence;
+	Microsoft::WRL::ComPtr<ID3D12Resource> paletteResource;
+	std::span<WellForGPU> mappedPalete;
+	std::pair<D3D12_CPU_DESCRIPTOR_HANDLE, D3D12_GPU_DESCRIPTOR_HANDLE> paletteSrvHandle;
 };
 
 /// <summary>
@@ -54,6 +75,12 @@ public:
 	void UpdateSkeleton(Skeleton& skeleton);
 
 	void ApplyAnimation(Skeleton& skeleton, const Animation& animation, float animationTime);
+
+	SkinCluster CreateSkinCluster(
+	    const Microsoft::WRL::ComPtr<ID3D12Device>& device, const Skeleton& skeleton, const ModelData& modelData, const Microsoft::WRL::ComPtr<ID3D12DescriptorHeap>& descriptorHeap,
+	    uint32_t descriptorSize, uint32_t srvIndex);
+
+	void UpdateSkinCluster(SkinCluster& skinCluster, const Skeleton& skeleton);
 
 private:
 	/// <summary>
@@ -83,7 +110,7 @@ private:
 	// assimpのNode(aiNode)から、右の構造体に変換する関数を作る
 	Node ReadNode(aiNode* node);
 
-private: 
+private:
 	ModelCommon* modelCommon_ = nullptr;
 	TextureManager* textureManager_ = nullptr;
 	std::string filename_;
@@ -108,4 +135,6 @@ private:
 
 	// インデックスカウント
 	uint32_t indexCount_;
+
+	D3D12_VERTEX_BUFFER_VIEW skinClusterVertexBufferView_;
 };

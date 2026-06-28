@@ -71,6 +71,8 @@ public:
 	void SetTexture(const std::string& filePath);
 	void SetEnableNoise(bool isEnable) { material_.enableNoise = isEnable ? 1 : 0; }
 	void SetTime(float time) { material_.time = time; }
+	void SetIsSkinning(bool isSkinning) { isSkinning_ = isSkinning; }
+	bool GetIsSkinning() const { return isSkinning_; }
 
 	// getter
 	Vector3& GetScale() { return transform_.scale; }
@@ -186,5 +188,8 @@ private:
 	Animation animation_;         // 再生中のアニメーションデータ
 	float animationTimer_ = 0.0f; // アニメーションの経過時間
 	bool isAnimating_ = false;    // 再生中フラグ
+
+	SkinCluster skinCluster_;
+	bool isSkinning_ = false;
 };
 } // namespace TinyEngine
