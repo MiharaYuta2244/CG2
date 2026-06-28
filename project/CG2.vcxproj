@@ -379,7 +379,6 @@ copy "$(windowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="engine\base\PostEffectPass.h" />
     <ClInclude Include="engine\base\PostEffectTypes.h" />
     <ClInclude Include="engine\base\SceneContext.h" />
-    <ClInclude Include="engine\base\SkinCluster.h" />
     <ClInclude Include="engine\base\utility\easing\EasingEditor.h" />
     <ClInclude Include="engine\math\mathLib\OBB.h" />
     <ClInclude Include="engine\math\mathLib\Quaternion.h" />

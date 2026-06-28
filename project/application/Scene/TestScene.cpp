@@ -27,12 +27,15 @@ void TestScene::Initialize(const SceneContext& ctx) {
 	sneakWalk_->GetObject3d()->PlayAnimation(sneakWalkAnimation);
 	sneakWalk_->SetIsSkinning(true);
 
+	testObj_ = std::make_unique<ObjectRender>();
+	testObj_->Initialize(ctx.engineContext, "Hiyoko.obj");
+
 	walkTransform_.scale = {500, 500, 500};
-	walkTransform_.rotate = {std::numbers::pi_v<float> / 2.0f, std::numbers::pi_v<float>, 0};
+	walkTransform_.rotate = {0, 0, 0};
 	walkTransform_.translate = {-10, 0, 0};
 
 	sneakWalkTransform_.scale = {500, 500, 500};
-	sneakWalkTransform_.rotate = {std::numbers::pi_v<float> / 2.0f, std::numbers::pi_v<float>, 0};
+	sneakWalkTransform_.rotate = {0, 0, 0};
 	sneakWalkTransform_.translate = {0, 0, 0};
 }
 
@@ -44,6 +47,7 @@ void TestScene::Update() {
 	// plane_->Update(transform_);
 	walk_->Update(walkTransform_);
 	sneakWalk_->Update(sneakWalkTransform_);
+	testObj_->Update();
 
 	if(ctx_.keyboard->KeyTriggered(DIK_SPACE)){
 		std::unique_ptr<TinyEngine::Particle> particle = std::make_unique<TinyEngine::Particle>();
@@ -98,6 +102,7 @@ void TestScene::Draw() {
 	// plane_->Draw();
 	walk_->Draw();
 	sneakWalk_->Draw();
+	testObj_->Draw();
 
 	/*for (auto& particle : particles_) {
 		particle->Draw();

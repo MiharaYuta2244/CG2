@@ -45,6 +45,8 @@ Skeleton Model::CreateSkeleton(const Node& rootNode) {
 		skeleton.jointMap.emplace(joint.name, joint.index);
 	}
 
+	UpdateSkeleton(skeleton);
+
 	return skeleton;
 }
 
@@ -189,9 +191,6 @@ void Model::UpdateSkinCluster(SkinCluster& skinCluster, const Skeleton& skeleton
 void Model::Draw(const std::string& textureFilePath) {
 	auto commandList = modelCommon_->GetDxCommon()->GetCommandList();
 
-	// VertexBufferViewを設定
-	//commandList->IASetVertexBuffers(0, 1, &vertexBufferView_); // VBVを設定
-
 	D3D12_VERTEX_BUFFER_VIEW vbvs[2] = {vertexBufferView_, skinClusterVertexBufferView_};
 
 	commandList->IASetVertexBuffers(0, 2, vbvs);
@@ -328,8 +327,8 @@ ModelData Model::LoadModelFile(const std::string& filename) {
 							}
 						} else {
 							// mHeight > 0 の場合は非圧縮RGBA等の生データが入っている。
-							// ここを対応するには生データをPNG等へ変換する処理が必要（未実装）
-							// 現時点ではデフォルトテクスチャを使用する
+							// ここを対応するには生データをPNG等へ変換する処理が必要
+							// 現時点ではデフォルトテクスチャを使用
 						}
 					}
 				} else {

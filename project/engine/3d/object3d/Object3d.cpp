@@ -182,10 +182,6 @@ void Object3d::Draw() {
 
 		// スキニング特有のデータをシェーダーに渡す
 		if (model_) {
-			// 例: RootParameterの適切なインデックスに MatrixPalette (t3) の DescriptorTable をセット
-			// ※ 番号は skinningRootSignature_ 構築時の t3 (WellForGPU) に対応するインデックスに合わせてください。
-			// commandList->SetGraphicsRootDescriptorTable(3, skinCluster_.paletteSrvHandle.second);
-
 			ctx_->object3dCommon->DrawSettingSkinning(ctx_->textureManager);
 			commandList->SetGraphicsRootDescriptorTable(11, skinCluster_.paletteSrvHandle.second);
 		}

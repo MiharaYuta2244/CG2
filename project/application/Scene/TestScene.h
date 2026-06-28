@@ -25,6 +25,7 @@ private:
 
 	std::unique_ptr<ObjectRender> walk_;
 	std::unique_ptr<ObjectRender> sneakWalk_;
+	std::unique_ptr<ObjectRender> testObj_;
 
 	Transform walkTransform_{};
 	Transform sneakWalkTransform_{};
