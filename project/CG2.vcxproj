@@ -167,6 +167,7 @@ copy "$(windowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="application\GameObjects\StageObjects\Door\Door.cpp" />
     <ClCompile Include="application\Cinematic\CameraDeathZoomController.cpp" />
     <ClCompile Include="application\GameObjects\Effect\DecideEffect.cpp" />
+    <ClCompile Include="application\GameObjects\StageObjects\Door\DoorManager.cpp" />
     <ClCompile Include="engine\Animation\KeyframeAnimation.cpp" />
     <ClCompile Include="application\GameObjects\Enemy\Enemy.cpp" />
     <ClCompile Include="application\GameObjects\Enemy\EnemyAI.cpp" />
@@ -233,6 +234,7 @@ copy "$(windowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="engine\3d\particle\modules\HitSparkModule.cpp" />
     <ClCompile Include="engine\3d\particle\modules\HitFlashModule.cpp" />
     <ClCompile Include="engine\3d\particle\modules\HitRingModule.cpp" />
+    <ClCompile Include="application\GameObjects\StageObjects\Glass\Glass.cpp" />
     <ClCompile Include="main.cpp">
       <Optimization Condition="'$(Configuration)|$(Platform)'=='Development|x64'">MaxSpeed</Optimization>
       <WholeProgramOptimization Condition="'$(Configuration)|$(Platform)'=='Development|x64'">true</WholeProgramOptimization>
@@ -361,6 +363,7 @@ copy "$(windowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="application\GameObjects\StageObjects\Door\Door.h" />
     <ClInclude Include="application\Cinematic\CameraDeathZoomController.h" />
     <ClInclude Include="application\GameObjects\Effect\DecideEffect.h" />
+    <ClInclude Include="application\GameObjects\StageObjects\Door\DoorManager.h" />
     <ClInclude Include="engine\3d\particle\modules\ParticleModuleHeader.h" />
     <ClInclude Include="engine\Animation\KeyframeAnimation.h" />
     <ClInclude Include="application\GameObjects\Enemy\Enemy.h" />
@@ -500,6 +503,7 @@ copy "$(windowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="engine\3d\particle\modules\MuzzleFlashModule.h" />
     <ClInclude Include="engine\3d\particle\modules\MuzzleSparkModule.h" />
     <ClInclude Include="engine\3d\particle\modules\MuzzleSmokeModule.h" />
+    <ClInclude Include="application\GameObjects\StageObjects\Glass\Glass.h" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="externals\imgui\LICENSE.txt" />

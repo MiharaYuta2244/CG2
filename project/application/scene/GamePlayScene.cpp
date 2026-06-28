@@ -51,6 +51,10 @@ void GamePlayScene::Initialize(const SceneContext& ctx) {
 	wallManager_ = std::make_unique<WallManager>();
 	wallManager_->Initialize(ctx_.engineContext);
 
+	// ドアの管理インスタンス生成&初期化
+	doorManager_ = std::make_unique<DoorManager>();
+	doorManager_->Initialize(ctx_.engineContext);
+
 	// ゴール判定インスタンス生成&初期化
 	goal_ = std::make_unique<Goal>();
 	goal_->Initialize(ctx_.engineContext);
@@ -160,6 +164,9 @@ void GamePlayScene::Update() {
 	// 壁の管理インスタンス更新
 	wallManager_->Update(deltaTime);
 
+	// ドアの管理インスタンス更新
+	doorManager_->Update(deltaTime);
+
 	// ゴール判定インスタンス更新
 	goal_->Update(deltaTime);
 
@@ -230,6 +237,9 @@ void GamePlayScene::Update() {
 	// 壁の管理インスタンスImGui
 	wallManager_->DrawImGui();
 
+	// ドアの管理インスタンスImGui
+	doorManager_->DrawImGui();
+
 	// 敵の管理インスタンスImGui
 	enemyManager_->DrawImGui();
 
@@ -266,7 +276,7 @@ void GamePlayScene::Update() {
 		// 線形補間を使ってカメラを滑らかに追従させる
 		float followSpeed = 5.0f; // 追従の滑らかさ
 		currentCameraPivot_.x += (targetPivot.x - currentCameraPivot_.x) * followSpeed * deltaTime;
-		currentCameraPivot_.y += (targetPivot.y - currentCameraPivot_.y) * followSpeed * deltaTime;
+		currentCameraPivot_.y = cameraPosY_;
 		currentCameraPivot_.z += (targetPivot.z - currentCameraPivot_.z) * followSpeed * deltaTime;
 
 		ctx_.currentCamera->SetPivot(currentCameraPivot_);
@@ -318,6 +328,9 @@ void GamePlayScene::Draw() {
 
 	// 壁の管理インスタンス描画
 	wallManager_->Draw();
+
+	// ドアの管理インスタンス描画
+	doorManager_->Draw();
 
 	// 敵の描画処理
 	enemyManager_->Draw();
@@ -690,6 +703,8 @@ void GamePlayScene::UpdateDebugImGui() {
 	if (ImGui::Button("Kill Player")) {
 		player_->Damage(player_->GetMaxHP());
 	}
+
+	ImGui::DragFloat("CameraPosY", &cameraPosY_, 0.1f);
 	ImGui::End();
 #endif
 }
