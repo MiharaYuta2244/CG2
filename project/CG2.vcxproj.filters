@@ -874,6 +874,9 @@
     <ClInclude Include="application\GameObjects\StageObjects\Door\DoorManager.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
+    <ClInclude Include="application\GameObjects\StageObjects\Wall\WallStatus.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Text Include="externals\imgui\LICENSE.txt">

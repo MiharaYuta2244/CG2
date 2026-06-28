@@ -29,3 +29,11 @@ void Door::Draw() {
 
 	render_->Draw();
 }
+
+void Door::SetWallStatus(WallStatus wallStatus) {
+	transform_.scale.x = wallStatus.width;
+	transform_.scale.z = wallStatus.depth;
+	transform_.translate.x = wallStatus.centerX;
+	transform_.translate.z = wallStatus.centerZ;
+	wallStatus_ = wallStatus;
+}

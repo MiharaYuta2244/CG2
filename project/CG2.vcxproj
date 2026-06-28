@@ -364,6 +364,7 @@ copy "$(windowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="application\Cinematic\CameraDeathZoomController.h" />
     <ClInclude Include="application\GameObjects\Effect\DecideEffect.h" />
     <ClInclude Include="application\GameObjects\StageObjects\Door\DoorManager.h" />
+    <ClInclude Include="application\GameObjects\StageObjects\Wall\WallStatus.h" />
     <ClInclude Include="engine\3d\particle\modules\ParticleModuleHeader.h" />
     <ClInclude Include="engine\Animation\KeyframeAnimation.h" />
     <ClInclude Include="application\GameObjects\Enemy\Enemy.h" />
