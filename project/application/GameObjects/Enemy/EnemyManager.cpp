@@ -13,14 +13,14 @@ void EnemyManager::Initialize(EngineContext* ctx) {
 	LoadFromJson(jsonPath_);
 }
 
-void EnemyManager::Update(float deltaTime, Player* player, EnemyBulletManager* enemyBulletManager, WallManager* wallManager) {
+void EnemyManager::Update(float deltaTime, Player* player, EnemyBulletManager* enemyBulletManager, WallManager* wallManager, DoorManager* doorManager) {
 	// 死亡した敵をリストから削除
 	enemies_.remove_if([](const std::unique_ptr<Enemy>& enemy) { return enemy->IsDead(); });
 
 	// 生きている敵をすべて更新
 	for (auto& enemy : enemies_) {
 		if (enemy->GetIsMove()) {
-			enemy->Update(deltaTime, player, enemyBulletManager, wallManager);
+			enemy->Update(deltaTime, player, enemyBulletManager, wallManager, doorManager);
 		}
 	}
 }

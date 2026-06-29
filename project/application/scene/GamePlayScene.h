@@ -1,5 +1,6 @@
 #pragma once
 #include "BaseScene.h"
+#include "Cinematic/CameraDeathZoomController.h"
 #include "EasingEditor.h"
 #include "GameObjects/Effect/FlashEffect.h"
 #include "GameObjects/Effect/LetterBox.h"
@@ -8,14 +9,13 @@
 #include "GameObjects/GameUI/Controls.h"
 #include "GameObjects/Player/Player.h"
 #include "GameObjects/Player/PlayerHPGauge.h"
+#include "GameObjects/StageObjects/Door/DoorManager.h"
 #include "GameObjects/StageObjects/Goal/Goal.h"
 #include "GameObjects/StageObjects/Ground/Ground.h"
 #include "GameObjects/StageObjects/Wall/WallManager.h"
-#include "GameObjects/StageObjects/Door/DoorManager.h"
 #include "Object3d.h"
 #include "Particle.h"
 #include "Skybox.h"
-#include "Cinematic/CameraDeathZoomController.h"
 #include <memory>
 #include <vector>
 

@@ -1,5 +1,7 @@
 #include "Enemy.h"
 #include "EnemyBulletManager.h"
+#include "GameObjects/Stageobjects/Door/DoorManager.h"
+#include "GameObjects/Stageobjects/Wall/WallManager.h"
 #include "MuzzleFlashModule.h"
 #include "MuzzleSmokeModule.h"
 #include "MuzzleSparkModule.h"
@@ -39,7 +41,7 @@ void Enemy::Initialize(EngineContext* ctx, Vector3 pos, EnemyType type) {
 	visionCone_->Initialize(ctx, param.radius, param.angle);
 }
 
-void Enemy::Update(float deltaTime, Player* player, EnemyBulletManager* enemyBulletManager, WallManager* wallManager) {
+void Enemy::Update(float deltaTime, Player* player, EnemyBulletManager* enemyBulletManager, WallManager* wallManager, DoorManager* doorManager) {
 	if (isDead_ || !isMove_) {
 		return;
 	}
@@ -76,7 +78,7 @@ void Enemy::Update(float deltaTime, Player* player, EnemyBulletManager* enemyBul
 	// 視界
 	visionCone_->SetTranslate(transform_.translate);
 	visionCone_->SetRotate(transform_.rotate);
-	visionCone_->Update(wallManager->GetWalls());
+	visionCone_->Update(wallManager->GetWalls(), doorManager->GetDoors());
 
 	if (knockBackAnim_.anim.GetIsActive()) {
 		knockBackAnim_.anim.Update(deltaTime, knockBackAnim_.temp);
@@ -93,6 +95,21 @@ void Enemy::Update(float deltaTime, Player* player, EnemyBulletManager* enemyBul
 
 	// 敵AIの状態を記録
 	lastState = ai_->GetState();
+
+	// 点滅用タイマーを回す
+	if (damageBlinkTimer_ > 0.0f) {
+		damageBlinkTimer_ -= deltaTime;
+
+		// 0.05秒ごとにON/OFF切り替え
+		const float blinkInterval = 0.05f;
+		if (fmod(damageBlinkTimer_, blinkInterval * 2) < blinkInterval) {
+			isBlinkVisible_ = false;
+		} else {
+			isBlinkVisible_ = true;
+		}
+	} else {
+		isBlinkVisible_ = true;
+	}
 
 	// マズルフラッシュパーティクルの更新と自動削除
 	for (auto& particle : muzzleParticles_) {
@@ -112,7 +129,9 @@ void Enemy::PostUpdate() {
 void Enemy::Draw() {
 	if (!isDead_) {
 		// 描画
-		render_->Draw();
+		if (isBlinkVisible_) {
+			render_->Draw();
+		}
 
 		// 視界
 		if (enableMove_) {
@@ -159,7 +178,13 @@ void Enemy::Damage() {
 	hp_--;
 	if (hp_ <= 0) {
 		Kill();
+	} else {
+		ai_->SetState(EnemyAI::State::Normal);
+		ai_->ResetShotTimer();
 	}
+
+	damageBlinkTimer_ = 1.0f; // 点滅させる時間を設定
+	isBlinkVisible_ = true;   // 点滅用のフラグを立てる
 }
 
 void Enemy::UpdateCollision() {

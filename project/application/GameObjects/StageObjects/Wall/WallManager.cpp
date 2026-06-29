@@ -47,6 +47,11 @@ void WallManager::DrawImGui() {
 		auto& wall = *it;
 		WallStatus& s = wall->GetWallStatus();
 
+		s.width = wall->GetTransform().scale.x;
+		s.depth = wall->GetTransform().scale.z;
+		s.centerX = wall->GetTransform().translate.x;
+		s.centerZ = wall->GetTransform().translate.z;
+
 		// ID 衝突防止
 		ImGui::PushID(index);
 
@@ -54,12 +59,15 @@ void WallManager::DrawImGui() {
 		std::string header = "Wall " + std::to_string(index);
 		if (ImGui::CollapsingHeader(header.c_str(), ImGuiTreeNodeFlags_DefaultOpen)) {
 
-			ImGui::DragFloat("Width", &s.width, 0.1f);
-			ImGui::DragFloat("Depth", &s.depth, 0.1f);
-			ImGui::DragFloat("CenterX", &s.centerX, 0.1f);
-			ImGui::DragFloat("CenterZ", &s.centerZ, 0.1f);
+			bool isChanged = false;
+			isChanged |= ImGui::DragFloat("Width", &s.width, 0.1f);
+			isChanged |= ImGui::DragFloat("Depth", &s.depth, 0.1f);
+			isChanged |= ImGui::DragFloat("CenterX", &s.centerX, 0.1f);
+			isChanged |= ImGui::DragFloat("CenterZ", &s.centerZ, 0.1f);
 
-			wall->SetWallStatus(s);
+			if (isChanged) {
+				wall->SetWallStatus(s);
+			}
 
 			// 削除ボタン
 			if (ImGui::Button("Delete")) {

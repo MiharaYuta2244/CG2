@@ -7,6 +7,7 @@
 class Player;
 class EnemyBulletManager;
 class WallManager;
+class DoorManager;
 
 struct EnemyData {
 	Vector3 pos;
@@ -31,7 +32,7 @@ inline void from_json(const Json& j, EnemyData& e) {
 class EnemyManager {
 public:
 	void Initialize(EngineContext* ctx);
-	void Update(float deltaTime, Player* player, EnemyBulletManager* enemyBulletManager, WallManager* wallManager);
+	void Update(float deltaTime, Player* player, EnemyBulletManager* enemyBulletManager, WallManager* wallManager, DoorManager* doorManager);
 	void PostUpdate();
 	void Draw();
 	void DrawImGui();

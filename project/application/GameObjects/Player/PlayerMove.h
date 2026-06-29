@@ -23,7 +23,7 @@ private:
 	float friction_ = 50.0f;          // 摩擦
 
 	// スティックの倒し具合に応じた3段階の最大速度
-	float maxSpeedWalk_ = 4.0f;  // 小さく倒した時
-	float maxSpeedRun_ = 8.0f;   // 中くらい倒した時
-	float maxSpeedDash_ = 12.0f; // 最大まで倒した時
+	float maxSpeedWalk_ = 5.0f;  // 小さく倒した時
+	float maxSpeedRun_ = 10.0f;   // 中くらい倒した時
+	float maxSpeedDash_ = 14.0f; // 最大まで倒した時
 };

@@ -10,16 +10,20 @@ using namespace TinyEngine;
 void Player::Initialize(EngineContext* ctx) {
 	ctx_ = ctx;
 
-	transform_.scale = {1.0f, 1.0f, 1.0f};
+	transform_.scale = {3.0f, 3.0f, 3.0f};
 	transform_.rotate = {0.0f, std::numbers::pi_v<float> / 2.0f, 0.0f};
 	transform_.translate = {0.0f, 0.0f, 0.0f};
 
 	// 描画用インスタンス生成&初期化
 	render_ = std::make_unique<ObjectRender>();
-	render_->Initialize(ctx, "suzanne.obj");
+	render_->Initialize(ctx, "Gorilla.gltf");
+	KeyframeAnimation keyframeAnimation;
+	Animation sneakWalkAnimation = keyframeAnimation.LoadAnimationFile("Gorilla.gltf");
+	render_->GetObject3d()->PlayAnimation(sneakWalkAnimation);
 	render_->SetColor(color_);
 	render_->SetTransform(transform_);
 	render_->SetEnvScale(envScale_);
+	render_->SetIsSkinning(true);
 
 	// 移動用インスタンス生成
 	move_ = std::make_unique<PlayerMove>();
@@ -164,6 +168,7 @@ void Player::Update(float deltaTime, DirectInput* input, GamePad* gamePad, Enemy
 			heldEnemy_->SetEnableAI(false);
 			heldEnemy_->SetShotHoldState(true);
 			heldEnemy_->SetAIState(EnemyAI::State::Hold);
+			heldEnemy_->ResetShotTimer();
 		}
 
 		// 掴んでいる間はプレイヤーの位置に敵を固定
@@ -218,9 +223,9 @@ void Player::Update(float deltaTime, DirectInput* input, GamePad* gamePad, Enemy
 	// パーティクルの生成
 	if (particleGenerateTimer_.IsEnd() && !hp_->IsDead()) {
 		auto particle = std::make_unique<Particle>();
-		particle->Initialize(ctx_, transform_.translate, "Dust.png", std::make_unique<DustModule>(), nullptr, TinyEngine::ParticleMeshType::Square);
+		particle->Initialize(ctx_, transform_.translate, "Dust.png", std::make_unique<DustStepModule>(), nullptr, TinyEngine::ParticleMeshType::Square);
 		particle->SetEmitMode(false, 0.1f);
-		particle->SetEmitterParam(5, 0.1f);
+		particle->SetEmitterParam(1, 0.3f);
 		dustParticle_.push_back(std::move(particle));
 
 		// タイマーの再設定
@@ -252,9 +257,6 @@ void Player::Update(float deltaTime, DirectInput* input, GamePad* gamePad, Enemy
 
 #ifdef USE_IMGUI
 	ImGui::Begin("Player");
-	ImGui::DragFloat3("Scale", &transform_.scale.x, 0.01f);
-	ImGui::DragFloat3("Rotate", &transform_.rotate.x, 0.01f);
-	ImGui::DragFloat3("Translate", &transform_.translate.x, 0.01f);
 	ImGui::SliderFloat("EnvScale", &envScale_, 0.0f, 1.0f);
 	ImGui::ColorEdit4("Color", &color_.x);
 	ImGui::End();
@@ -286,7 +288,7 @@ void Player::Draw() {
 	render_->Draw();
 
 	// 攻撃確認用
-	hand_->Draw();
+	//hand_->Draw();
 }
 
 bool Player::IsDead() const { return hp_->IsDead(); }

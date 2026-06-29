@@ -1,7 +1,9 @@
-#include "DirectXUtils.h"
-#include "MathUtility.h"
 #include "VisionCone.h"
 #include "Collision.h"
+#include "DirectXUtils.h"
+#include "GameObjects/Stageobjects/Door/Door.h"
+#include "GameObjects/StageObjects/Wall/Wall.h"
+#include "MathUtility.h"
 #include <algorithm>
 #include <cmath>
 
@@ -124,7 +126,7 @@ void VisionCone::CreateConstantBuffers() {
 	materialResource_->Map(0, nullptr, reinterpret_cast<void**>(&materialData_));
 }
 
-void VisionCone::Update(const std::list<std::unique_ptr<Wall>>& walls) {
+void VisionCone::Update(const std::list<std::unique_ptr<Wall>>& walls, const std::list<std::unique_ptr<Door>>& doors) {
 	// ワールド行列の再計算
 	worldMatrix_ = MathUtility::MakeAffineMatrix(transform_.scale, transform_.rotate, transform_.translate);
 
@@ -162,6 +164,18 @@ void VisionCone::Update(const std::list<std::unique_ptr<Wall>>& walls) {
 				// 最も手前にある壁の衝突地点を記録
 				if (t < closestT) {
 					closestT = t;
+				}
+			}
+		}
+
+		// 全てのドアに対して交差判定を行う
+		for (const auto& door : doors) {
+			if (!door->GetIsOpen()) {
+				float t = 0.0f;
+				if (Collision::Intersect(ray, door->GetCollision(), t)) {
+					if (t < closestT) {
+						closestT = t;
+					}
 				}
 			}
 		}

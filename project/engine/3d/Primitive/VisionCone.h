@@ -3,10 +3,12 @@
 #include "Material.h"
 #include "Transform.h"
 #include "TransformationMatrix.h"
-#include "GameObjects/StageObjects/Wall/WallManager.h"
 #include <d3d12.h>
 #include <string>
 #include <wrl.h>
+
+class Door;
+class Wall;
 
 namespace TinyEngine {
 
@@ -33,7 +35,7 @@ public:
 	/// <summary>
 	/// 更新処理
 	/// </summary>
-	void Update(const std::list<std::unique_ptr<Wall>>& walls);
+	void Update(const std::list<std::unique_ptr<Wall>>& walls, const std::list<std::unique_ptr<Door>>& doors);
 
 	/// <summary>
 	/// 描画処理

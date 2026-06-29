@@ -115,6 +115,9 @@ void GamePlayScene::Initialize(const SceneContext& ctx) {
 	for (auto& wall : wallManager_->GetWalls()) {
 		objects_.push_back(wall.get()); // 壁
 	}
+	for (auto& door : doorManager_->GetDoors()) {
+		objects_.push_back(door.get()); // ドア
+	}
 }
 
 void GamePlayScene::Update() {
@@ -156,7 +159,7 @@ void GamePlayScene::Update() {
 	player_->Update(deltaTime, ctx_.keyboard, ctx_.gamePad, enemyManager_.get());
 
 	// 敵の更新処理
-	enemyManager_->Update(deltaTime, player_.get(), enemyBulletManager_.get(), wallManager_.get());
+	enemyManager_->Update(deltaTime, player_.get(), enemyBulletManager_.get(), wallManager_.get(), doorManager_.get());
 
 	// 敵の弾の更新処理
 	enemyBulletManager_->Update(deltaTime);
@@ -165,11 +168,11 @@ void GamePlayScene::Update() {
 	wallManager_->Update(deltaTime);
 
 	// ドアの管理インスタンス更新
-	doorManager_->Update(deltaTime);
+	doorManager_->Update(deltaTime, player_->GetPosition());
 
 	// ゴール判定インスタンス更新
 	goal_->Update(deltaTime);
-
+	
 	// スカイボックス更新
 	skybox_->Update(mainCamera_->GetViewMatrix(), mainCamera_->GetProjection());
 
@@ -516,6 +519,73 @@ void GamePlayScene::CollisionGameObjects() {
 		}
 	}
 
+	// =========================================================
+	// 敵とドアの当たり判定
+	// =========================================================
+	for (auto& enemy : enemyManager_->GetEnemies()) {
+		for (auto& door : doorManager_->GetDoors()) {
+			AABB wallAABB = door->GetCollision();
+			AABB enemyAABB = enemy->GetBodyCol();
+			Vector3 enemyPos = enemy->GetPos();
+
+			// ドアが開いているなら敵は通り抜けられるのでスキップ
+			if (door->GetIsOpen()) {
+				continue;
+			}
+
+			// 衝突判定
+			if (Collision::Intersect(enemy->GetBodyCol(), door->GetCollision())) {
+				// 押し戻し・衝突応答処理
+				// ----------------------------------------
+				// 壁激突死の判定：もしノックバック中なら死亡させて処理を抜ける
+				// ----------------------------------------
+				if (enemy->IsKnockBack()) {
+					enemy->Kill();
+					commonData_->killCount++;
+
+					// パーティクルの生成
+					GenerateEnemyDeathParticle(enemy->GetPos());
+
+					break;
+				}
+
+				// ----------------------------------------
+				// 通常時の押し出し処理
+				// ----------------------------------------
+				float overlapX1 = wallAABB.max.x - enemyAABB.min.x;
+				float overlapX2 = enemyAABB.max.x - wallAABB.min.x;
+				float overlapZ1 = wallAABB.max.z - enemyAABB.min.z;
+				float overlapZ2 = enemyAABB.max.z - wallAABB.min.z;
+
+				float minOverlapX = std::min(overlapX1, overlapX2);
+				float minOverlapZ = std::min(overlapZ1, overlapZ2);
+
+				if (minOverlapX < minOverlapZ) {
+					if (overlapX1 < overlapX2) {
+						enemyPos.x += overlapX1;
+					} else {
+						enemyPos.x -= overlapX2;
+					}
+				} else {
+					if (overlapZ1 < overlapZ2) {
+						enemyPos.z += overlapZ1;
+					} else {
+						enemyPos.z -= overlapZ2;
+					}
+				}
+
+				// 結果を敵の座標に反映
+				enemy->SetPos(enemyPos);
+
+				// 連続で壁に当たるケースを考慮してAABB更新
+				enemyAABB.max.x = enemyPos.x + 0.5f;
+				enemyAABB.min.x = enemyPos.x - 0.5f;
+				enemyAABB.max.z = enemyPos.z + 0.5f;
+				enemyAABB.min.z = enemyPos.z - 0.5f;
+			}
+		}
+	}
+
 	// ==========================================
 	// プレイヤーとゴールの当たり判定
 	// ==========================================
@@ -592,6 +662,9 @@ void GamePlayScene::UpdateImGui() {
 	}
 	for (auto& wall : wallManager_->GetWalls()) {
 		objects_.push_back(wall.get()); // 壁
+	}
+	for (auto& door : doorManager_->GetDoors()) {
+		objects_.push_back(door.get()); // ドア
 	}
 
 	// 選択中のオブジェクトが破棄されていないか検証

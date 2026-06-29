@@ -9,9 +9,9 @@ void DoorManager::Initialize(EngineContext* ctx) {
 	LoadFromJson(jsonPath_);
 }
 
-void DoorManager::Update(float deltaTime) {
+void DoorManager::Update(float deltaTime, Vector3 playerPos) {
 	for (auto& door : doors_) {
-		door->Update(deltaTime);
+		door->Update(deltaTime, playerPos);
 	}
 }
 
@@ -29,7 +29,7 @@ void DoorManager::DrawImGui() {
 
 	// 壁追加
 	if (ImGui::Button("Add Door")) {
-		WallStatus s = {1.0f, 1.0f, 0.0f, 0.0f};
+		DoorStatus s = {1.0f, 1.0f, 0.0f, 0.0f};
 		auto door = std::make_unique<Door>();
 		door->Initialize(ctx_, s);
 		doors_.push_back(std::move(door));
@@ -45,7 +45,13 @@ void DoorManager::DrawImGui() {
 	int index = 0;
 	for (auto it = doors_.begin(); it != doors_.end();) {
 		auto& door = *it;
-		WallStatus& s = door->GetWallStatus();
+		DoorStatus& s = door->GetDoorStatus();
+
+		s.width = door->GetTransform().scale.x;
+		s.depth = door->GetTransform().scale.z;
+		s.centerX = door->GetTransform().translate.x;
+		s.centerZ = door->GetTransform().translate.z;
+		s.rotateY = door->GetTransform().rotate.y;
 
 		// ID 衝突防止
 		ImGui::PushID(index);
@@ -54,12 +60,16 @@ void DoorManager::DrawImGui() {
 		std::string header = "Door " + std::to_string(index);
 		if (ImGui::CollapsingHeader(header.c_str(), ImGuiTreeNodeFlags_DefaultOpen)) {
 
-			ImGui::DragFloat("Width", &s.width, 0.1f);
-			ImGui::DragFloat("Depth", &s.depth, 0.1f);
-			ImGui::DragFloat("CenterX", &s.centerX, 0.1f);
-			ImGui::DragFloat("CenterZ", &s.centerZ, 0.1f);
+			bool isChanged = false;
+			isChanged |= ImGui::DragFloat("Width", &s.width, 0.1f);
+			isChanged |= ImGui::DragFloat("Depth", &s.depth, 0.1f);
+			isChanged |= ImGui::DragFloat("CenterX", &s.centerX, 0.1f);
+			isChanged |= ImGui::DragFloat("CenterZ", &s.centerZ, 0.1f);
+			isChanged |= ImGui::DragFloat("RotateY", &s.rotateY, 0.1f);
 
-			door->SetWallStatus(s);
+			if (isChanged) {
+				door->SetDoorStatus(s);
+			}
 
 			// 削除ボタン
 			if (ImGui::Button("Delete")) {
@@ -81,13 +91,13 @@ void DoorManager::DrawImGui() {
 void DoorManager::LoadFromJson(const std::string& filepath) {
 	doors_.clear();
 
-	// JSONからWallStatusの配列として読み込む
-	std::vector<WallStatus> doorDataList;
+	// JSONからDoorStatusの配列として読み込む
+	std::vector<DoorStatus> doorDataList;
 	if (!JsonManager::Load(filepath, doorDataList)) {
 		return;
 	}
 
-	// 読み込んだステータスからWallを生成
+	// 読み込んだステータスからDoorを生成
 	for (const auto& s : doorDataList) {
 		auto door = std::make_unique<Door>();
 		door->Initialize(ctx_, s);
@@ -96,10 +106,10 @@ void DoorManager::LoadFromJson(const std::string& filepath) {
 }
 
 void DoorManager::SaveToJson(const std::string& filepath) {
-	// 現在ある壁のステータスリストを作成
-	std::vector<WallStatus> doorDataList;
+	// 現在あるドアのステータスリストを作成
+	std::vector<DoorStatus> doorDataList;
 	for (auto& door : doors_) {
-		doorDataList.push_back(door->GetWallStatus());
+		doorDataList.push_back(door->GetDoorStatus());
 	}
 
 	// JSONファイルへ保存

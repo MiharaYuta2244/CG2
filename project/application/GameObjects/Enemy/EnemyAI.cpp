@@ -166,6 +166,9 @@ void EnemyAI::UpdateVigilance(float deltaTime, Player* player, EnemyBulletManage
 		}
 
 	} else {
+		// shotTimerをリセット
+		shotTimer_ = 0.0f;
+
 		// 見失った場合、タイマーを減らす
 		lostSightTimer_ -= deltaTime;
 

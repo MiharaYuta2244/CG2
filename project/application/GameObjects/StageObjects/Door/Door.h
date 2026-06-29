@@ -1,19 +1,20 @@
 #pragma once
-#include "GameObjects/ObjectRender/ObjectRender.h"
 #include "AABB.h"
+#include "AnimationBundle.h"
 #include "GameObjects/IGameObject.h"
-#include "GameObjects/StageObjects/Wall/WallStatus.h"
+#include "GameObjects/ObjectRender/ObjectRender.h"
+#include "DoorStatus.h"
 
 /// <summary>
 /// ステージに配置するドア
 /// </summary>
-class Door : public IGameObject{
+class Door : public IGameObject {
 public:
 	// 初期化処理
-	void Initialize(EngineContext* ctx, WallStatus wallStatus);
+	void Initialize(EngineContext* ctx, DoorStatus doorStatus);
 
 	// 更新処理
-	void Update(float deltaTime);
+	void Update(float deltaTime, Vector3 playerPos);
 
 	// 描画処理
 	void Draw();
@@ -21,22 +22,45 @@ public:
 	// 当たり判定Getter
 	AABB GetCollision() const { return collision_; }
 
-	// WallStatusのSetter
-	void SetWallStatus(WallStatus wallStatus);
+	// DoorStatusのSetter
+	void SetDoorStatus(DoorStatus doorStatus);
 
-	// WallStatusのGetter
-	WallStatus& GetWallStatus() { return wallStatus_; }
+	// DoorStatusのGetter
+	DoorStatus& GetDoorStatus() { return doorStatus_; }
 
 	// ギズモ用
 	std::string GetName() const override { return "Door"; }
 
+	// 開閉状態のGetter
+	bool GetIsOpen() const { return isOpen_; }
+
+private:
+	// ドアのtransformを求める
+	void CulcTransform();
+
+	// 当たり判定の更新
+	void UpdateCollision();
+
 private:
 	AABB collision_; // 当たり判定
-	WallStatus wallStatus_;
+	DoorStatus doorStatus_;
 	Vector4 color_ = {0.1f, 0.1f, 0.18f, 1.0f};
 	float time_ = 0.0f;
-	bool isOpen_ = false;
 	Vector2 collisionSize_ = {4.0f, 4.0f};
+	Vector3 marginPos_ = {0, 0, 2};
+	Transform transformSecond_;
 
-	std::unique_ptr<ObjectRender> render_; // 描画用インスタンス
+	// 描画用インスタンス
+	std::array<std::unique_ptr<ObjectRender>, 2> renders_;
+
+	// 移動量アニメーション
+	AnimationBundle<float> openAnimBundle_;
+
+	bool isOpen_ = false;             // 開閉状態
+	bool wasOpen_ = false;            // 1フレーム前の開閉状態
+	float openOffset_ = 0.0f;         // 現在のドアの開き具合
+	float previousOpenOffset_ = 0.0f; // 前回フレームでの開き具合
+	float maxOpenOffset_ = 2.0f;      // 最大でどれだけ開くか
+	float targetDistance_ = 10.0f;    // プレイヤーがこの距離以内に近づいたら開く
+	float animDuration_ = 0.8f;       // アニメーションにかかる時間
 };

@@ -12,6 +12,7 @@
 class EnemyBulletManager;
 class Player;
 class WallManager;
+class DoorManager;
 
 /// <summary>
 /// 敵クラス
@@ -22,7 +23,7 @@ public:
 	void Initialize(EngineContext* ctx, Vector3 pos, EnemyType type);
 
 	// 更新処理
-	void Update(float deltaTime, Player* player, EnemyBulletManager* enemyBulletManager, WallManager* wallManager);
+	void Update(float deltaTime, Player* player, EnemyBulletManager* enemyBulletManager, WallManager* wallManager, DoorManager* doorManager);
 
 	// 押し戻し完了後に呼ぶ最終更新処理
 	void PostUpdate();
@@ -61,6 +62,9 @@ public:
 
 	// ダメージ処理
 	void Damage();
+
+	// shotTimerリセット
+	void ResetShotTimer() { ai_->ResetShotTimer(); }
 
 	// TransformのGetter
 	Transform GetTransform() const { return transform_; }
@@ -119,4 +123,8 @@ private:
 
 	// 色
 	Vector4 color_ = {1, 1, 1, 1};
+
+	// 点滅用変数
+	float damageBlinkTimer_ = 0.0f;
+	bool isBlinkVisible_ = false;
 };

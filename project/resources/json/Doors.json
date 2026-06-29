@@ -1,0 +1,37 @@
+[
+    {
+        "centerX": 25.0,
+        "centerZ": 0.9999998807907104,
+        "depth": 1.0,
+        "rotateY": 0.0,
+        "width": 1.0
+    },
+    {
+        "centerX": 15.0,
+        "centerZ": 13.0,
+        "depth": 1.0,
+        "rotateY": 0.0,
+        "width": 1.0
+    },
+    {
+        "centerX": 15.0,
+        "centerZ": -11.0,
+        "depth": 1.0,
+        "rotateY": 0.0,
+        "width": 1.0
+    },
+    {
+        "centerX": 124.5,
+        "centerZ": 1.0,
+        "depth": 1.0,
+        "rotateY": 1.5499999523162842,
+        "width": 1.0
+    },
+    {
+        "centerX": 124.5,
+        "centerZ": -6.0,
+        "depth": 1.0,
+        "rotateY": 1.5499999523162842,
+        "width": 1.0
+    }
+]

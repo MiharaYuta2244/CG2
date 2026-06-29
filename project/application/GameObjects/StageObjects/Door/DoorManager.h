@@ -9,7 +9,7 @@ public:
 	void Initialize(EngineContext* ctx);
 
 	// 更新処理
-	void Update(float deltaTime);
+	void Update(float deltaTime, Vector3 playerPos);
 
 	// 描画処理
 	void Draw();

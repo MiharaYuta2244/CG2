@@ -41,6 +41,9 @@ public:
 	void SetShotHoldState(bool isShotHoldState) { isShotHoldState_ = isShotHoldState; }
 	void SetState(State state) { state_ = state; }
 
+	// ShotTimerのリセット
+	void ResetShotTimer() { shotTimer_ = 0.0f; }
+
 private:
 	// プレーヤー方向に回転する
 	void LookatPlayer(float deltaTime, Vector3 playerPos, Vector3 enemyPos, float turnSpeed = 6.0f);
