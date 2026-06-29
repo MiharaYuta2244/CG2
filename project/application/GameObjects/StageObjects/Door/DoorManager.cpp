@@ -27,19 +27,6 @@ void DoorManager::DrawImGui() {
 
 	ImGui::Text("Door Count: %d", (int)doors_.size());
 
-	// 壁追加
-	if (ImGui::Button("Add Door")) {
-		DoorStatus s = {1.0f, 1.0f, 0.0f, 0.0f};
-		auto door = std::make_unique<Door>();
-		door->Initialize(ctx_, s);
-		doors_.push_back(std::move(door));
-	}
-
-	// JSON保存ボタンに変更
-	if (ImGui::Button("Save JSON")) {
-		SaveToJson(jsonPath_);
-	}
-
 	ImGui::Separator();
 
 	int index = 0;
@@ -82,6 +69,21 @@ void DoorManager::DrawImGui() {
 		ImGui::PopID();
 		++it;
 		++index;
+	}
+
+	ImGui::Separator();
+
+	// 壁追加
+	if (ImGui::Button("Add Door")) {
+		DoorStatus s = {1.0f, 1.0f, 0.0f, 0.0f};
+		auto door = std::make_unique<Door>();
+		door->Initialize(ctx_, s);
+		doors_.push_back(std::move(door));
+	}
+
+	// JSON保存ボタンに変更
+	if (ImGui::Button("Save JSON")) {
+		SaveToJson(jsonPath_);
 	}
 
 	ImGui::End();

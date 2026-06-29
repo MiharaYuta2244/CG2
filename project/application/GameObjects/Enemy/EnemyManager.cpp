@@ -43,20 +43,6 @@ void EnemyManager::DrawImGui() {
 
 	ImGui::Text("Enemy Count: %d", (int)enemies_.size());
 
-	// 敵の追加ボタン
-	if (ImGui::Button("Add Enemy")) {
-		auto newEnemy = std::make_unique<Enemy>();
-		newEnemy->Initialize(ctx_, {0.0f, 0.0f, 0.0f}, static_cast<EnemyType>(RandomUtils::RangeInt(0, 1)));
-		newEnemy->SetPos({0.0f, 0.0f, 0.0f});
-		newEnemy->SetRotate({0.0f, 0.0f, 0.0f});
-		enemies_.push_back(std::move(newEnemy));
-	}
-
-	// JSON保存ボタン
-	if (ImGui::Button("Save JSON")) {
-		SaveToJson(jsonPath_);
-	}
-
 	ImGui::Separator();
 
 	int index = 0;
@@ -89,6 +75,22 @@ void EnemyManager::DrawImGui() {
 		++it;
 		++index;
 		ImGui::PopID();
+	}
+
+	ImGui::Separator();
+
+	// 敵の追加ボタン
+	if (ImGui::Button("Add Enemy")) {
+		auto newEnemy = std::make_unique<Enemy>();
+		newEnemy->Initialize(ctx_, {0.0f, 0.0f, 0.0f}, static_cast<EnemyType>(RandomUtils::RangeInt(0, 1)));
+		newEnemy->SetPos({0.0f, 0.0f, 0.0f});
+		newEnemy->SetRotate({0.0f, 0.0f, 0.0f});
+		enemies_.push_back(std::move(newEnemy));
+	}
+
+	// JSON保存ボタン
+	if (ImGui::Button("Save JSON")) {
+		SaveToJson(jsonPath_);
 	}
 
 	ImGui::End();

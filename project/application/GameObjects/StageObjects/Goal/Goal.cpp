@@ -7,7 +7,7 @@ void Goal::Initialize(EngineContext* ctx) {
 
 	transform_.scale = {0.01f, 1.0f, 3.5f};
 	transform_.rotate = {0.0f, 0.0f, 0.0f};
-	transform_.translate = {196.0f, 0.0f, 0.5f};
+	transform_.translate = {542.0f, 0.0f, -17.0f};
 
 	// パーティクル生成用のタイマー初期化
 	particleGenerateTimer_.Initialize(0.2f);
@@ -52,6 +52,12 @@ void Goal::Update(float deltaTime) {
 
 	// パーティクル削除処理
 	std::erase_if(particle_, [this](const std::unique_ptr<TinyEngine::Particle>& p) { return p->IsFinished(); });
+
+	#ifdef USE_IMGUI
+	ImGui::Begin("Goal");
+	ImGui::DragFloat3("Pos", &transform_.translate.x, 0.1f);
+	ImGui::End();
+	#endif
 }
 
 void Goal::Draw() {

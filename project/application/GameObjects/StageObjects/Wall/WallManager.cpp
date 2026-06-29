@@ -27,19 +27,6 @@ void WallManager::DrawImGui() {
 
 	ImGui::Text("Wall Count: %d", (int)walls_.size());
 
-	// 壁追加
-	if (ImGui::Button("Add Wall")) {
-		WallStatus s = {1.0f, 1.0f, 0.0f, 0.0f};
-		auto wall = std::make_unique<Wall>();
-		wall->Initialize(ctx_, s);
-		walls_.push_back(std::move(wall));
-	}
-
-	// JSON保存ボタンに変更
-	if (ImGui::Button("Save JSON")) {
-		SaveToJson(jsonPath_);
-	}
-
 	ImGui::Separator();
 
 	int index = 0;
@@ -80,6 +67,21 @@ void WallManager::DrawImGui() {
 		ImGui::PopID();
 		++it;
 		++index;
+	}
+
+	ImGui::Separator();
+
+	// 壁追加
+	if (ImGui::Button("Add Wall")) {
+		WallStatus s = {1.0f, 1.0f, 0.0f, 0.0f};
+		auto wall = std::make_unique<Wall>();
+		wall->Initialize(ctx_, s);
+		walls_.push_back(std::move(wall));
+	}
+
+	// JSON保存ボタンに変更
+	if (ImGui::Button("Save JSON")) {
+		SaveToJson(jsonPath_);
 	}
 
 	ImGui::End();

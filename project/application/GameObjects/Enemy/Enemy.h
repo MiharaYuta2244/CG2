@@ -126,5 +126,5 @@ private:
 
 	// 点滅用変数
 	float damageBlinkTimer_ = 0.0f;
-	bool isBlinkVisible_ = false;
+	bool isBlinkVisible_ = true;
 };
