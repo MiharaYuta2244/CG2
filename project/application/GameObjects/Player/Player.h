@@ -129,7 +129,7 @@ private:
 	float speedMultiplier_ = 1.0f;
 
 	// 攻撃用のオフセット
-	float attackOffset_ = 0.8f;
+	float attackOffset_ = 1.5f;
 
 	// パーティクル関連
 	std::vector<std::unique_ptr<TinyEngine::Particle>> dustParticle_; // 砂埃パーティクル

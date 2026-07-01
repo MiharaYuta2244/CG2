@@ -127,20 +127,23 @@ void Player::Update(float deltaTime, DirectInput* input, GamePad* gamePad, Enemy
 
 	// 掴み判定用：一番近い敵を探す
 	Enemy* targetEnemy = nullptr;
-	float minDist = FLT_MAX;
 
-	for (auto& enemy : enemyManager->GetEnemies()) {
-		if (enemy->IsDead())
-			continue;
+	// 敵を掴んでいない時のみ新しいターゲットを探す
+	if (!isHold_) {
+		float minDist = FLT_MAX;
+		for (auto& enemy : enemyManager->GetEnemies()) {
+			if (enemy->IsDead())
+				continue;
 
-		// プレイヤーと敵の距離を計算
-		Vector3 ePos = enemy->GetPos();
-		Vector3 diff = {ePos.x - transform_.translate.x, ePos.y - transform_.translate.y, ePos.z - transform_.translate.z};
-		float dist = std::sqrt(diff.x * diff.x + diff.y * diff.y + diff.z * diff.z);
+			// プレイヤーと敵の距離を計算
+			Vector3 ePos = enemy->GetPos();
+			Vector3 diff = {ePos.x - transform_.translate.x, ePos.y - transform_.translate.y, ePos.z - transform_.translate.z};
+			float dist = std::sqrt(diff.x * diff.x + diff.y * diff.y + diff.z * diff.z);
 
-		if (dist < minDist && dist < grabRange_) {
-			minDist = dist;
-			heldEnemy_ = enemy.get();
+			if (dist < minDist && dist < grabRange_) {
+				minDist = dist;
+				targetEnemy = enemy.get();
+			}
 		}
 	}
 
@@ -167,8 +170,9 @@ void Player::Update(float deltaTime, DirectInput* input, GamePad* gamePad, Enemy
 
 	// 掴み・投げ処理の更新
 	if (enableAttack_ && isGrabTriggered_) {
-		if (!isHold_ && heldEnemy_ != nullptr) {
+		if (!isHold_ && targetEnemy != nullptr) {
 			isHold_ = true;
+			heldEnemy_ = targetEnemy;
 			heldEnemy_->SetEnableAI(false);
 			heldEnemy_->SetShotHoldState(true);
 			heldEnemy_->SetAIState(EnemyAI::State::Hold);
