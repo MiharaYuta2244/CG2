@@ -72,6 +72,9 @@ public:
 	// ギズモ用
 	std::string GetName() const override { return "Enemy"; }
 
+	// 無敵状態かどうか
+	bool IsInvincible() const { return invincibleTimer_ > 0.0f; }
+
 	void SetIsMove(bool isMove) { isMove_ = isMove; }
 	bool GetIsMove() { return isMove_; }
 	void SetShotHoldState(bool isShotHoldState) { ai_->SetShotHoldState(isShotHoldState); }
@@ -127,4 +130,7 @@ private:
 	// 点滅用変数
 	float damageBlinkTimer_ = 0.0f;
 	bool isBlinkVisible_ = true;
+
+	// 無敵時間用タイマー
+	float invincibleTimer_ = 0.0f;
 };

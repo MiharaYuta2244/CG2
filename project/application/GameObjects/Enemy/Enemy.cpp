@@ -46,6 +46,11 @@ void Enemy::Update(float deltaTime, Player* player, EnemyBulletManager* enemyBul
 		return;
 	}
 
+	// 無敵タイマー更新
+	if (invincibleTimer_ > 0.0f) {
+		invincibleTimer_ -= deltaTime;
+	}
+
 	// AIインスタンス更新
 	ai_->Update(deltaTime, player, enemyBulletManager, wallManager);
 
@@ -175,6 +180,11 @@ void Enemy::Damage() {
 	if (isDead_)
 		return;
 
+	// 無敵時間中は早期リターン
+	if (invincibleTimer_ > 0.0f) {
+		return;
+	}
+
 	hp_--;
 	if (hp_ <= 0) {
 		Kill();
@@ -185,6 +195,7 @@ void Enemy::Damage() {
 
 	damageBlinkTimer_ = 1.0f; // 点滅させる時間を設定
 	isBlinkVisible_ = true;   // 点滅用のフラグを立てる
+	invincibleTimer_ = 0.5f;  // 無敵時間の設定
 }
 
 void Enemy::UpdateCollision() {

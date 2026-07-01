@@ -8,7 +8,6 @@
 #include "GameObjects/Enemy/EnemyManager.h"
 #include "GameObjects/GameUI/Controls.h"
 #include "GameObjects/Player/Player.h"
-#include "GameObjects/Player/PlayerHPGauge.h"
 #include "GameObjects/StageObjects/Door/DoorManager.h"
 #include "GameObjects/StageObjects/Goal/Goal.h"
 #include "GameObjects/StageObjects/Ground/Ground.h"
@@ -70,9 +69,6 @@ private:
 	// 死亡パーティクルリスト
 	std::list<std::unique_ptr<TinyEngine::Particle>> enemyDeathParticle_;
 
-	// プレイヤーのHPゲージ
-	std::unique_ptr<PlayerHPGauge> playerHPGauge_;
-
 	// オブジェクトのリスト
 	std::vector<IGameObject*> objects_;
 
@@ -129,7 +125,7 @@ private:
 	Vector3 currentCameraPivot_ = {0.0f, 0.0f, 0.0f};
 
 	// プレイヤーの向きに応じたカメラのオフセット量
-	float offsetDistance_ = 4.0f;
+	float offsetDistance_ = 0.0f;
 
 	float cameraPosY_ = 0.0f;
 };

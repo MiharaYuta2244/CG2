@@ -287,6 +287,7 @@ copy "$(windowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="engine\3d\particle\modules\MuzzleFlashModule.cpp" />
     <ClCompile Include="engine\3d\particle\modules\MuzzleSparkModule.cpp" />
     <ClCompile Include="engine\3d\particle\modules\MuzzleSmokeModule.cpp" />
+    <ClCompile Include="application\GameObjects\Player\PlayerHPIcon.cpp" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="resources\shaders\Object3d.PS.hlsl">
@@ -508,6 +509,7 @@ copy "$(windowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="engine\3d\particle\modules\MuzzleSparkModule.h" />
     <ClInclude Include="engine\3d\particle\modules\MuzzleSmokeModule.h" />
     <ClInclude Include="application\GameObjects\StageObjects\Glass\Glass.h" />
+    <ClInclude Include="application\GameObjects\Player\PlayerHPIcon.h" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="externals\imgui\LICENSE.txt" />

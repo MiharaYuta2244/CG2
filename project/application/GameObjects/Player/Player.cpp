@@ -41,6 +41,10 @@ void Player::Initialize(EngineContext* ctx) {
 	Transform handTransform = transform_;
 	handTransform.scale = {0.5f, 0.5f, 0.5f};
 	hand_->SetTransform(handTransform);
+
+	// プレイヤーのHPゲージ生成&初期化
+	hpIcon_ = std::make_unique<PlayerHPIcon>();
+	hpIcon_->Initialize(ctx);
 }
 
 void Player::Update(float deltaTime, DirectInput* input, GamePad* gamePad, EnemyManager* enemyManager) {
@@ -140,7 +144,7 @@ void Player::Update(float deltaTime, DirectInput* input, GamePad* gamePad, Enemy
 		}
 	}
 
-	bool isGrabTriggered = input->KeyDown(DIK_J);
+	isGrabTriggered_ = input->KeyDown(DIK_J);
 	bool isGrabReleased = input->KeyReleased(DIK_J);
 	bool isAttackTriggered = input->KeyTriggered(DIK_K);
 
@@ -149,10 +153,10 @@ void Player::Update(float deltaTime, DirectInput* input, GamePad* gamePad, Enemy
 
 		// Lトリガーで掴み
 		if (padState.axes.lt > 0.3f) {
-			isGrabTriggered = true;
+			isGrabTriggered_ = true;
 		}
 		// 放す
-		if (isHold_ && !isGrabTriggered) {
+		if (isHold_ && !isGrabTriggered_) {
 			isGrabReleased = true;
 		}
 		// Rトリガーで突き飛ばし
@@ -162,7 +166,7 @@ void Player::Update(float deltaTime, DirectInput* input, GamePad* gamePad, Enemy
 	}
 
 	// 掴み・投げ処理の更新
-	if (enableAttack_ && isGrabTriggered) {
+	if (enableAttack_ && isGrabTriggered_) {
 		if (!isHold_ && heldEnemy_ != nullptr) {
 			isHold_ = true;
 			heldEnemy_->SetEnableAI(false);
@@ -255,6 +259,9 @@ void Player::Update(float deltaTime, DirectInput* input, GamePad* gamePad, Enemy
 		hand_->SetTranslate(transform_.translate);
 	}
 
+	// プレイヤーのHPゲージ更新
+	hpIcon_->Update(deltaTime);
+
 #ifdef USE_IMGUI
 	ImGui::Begin("Player");
 	ImGui::SliderFloat("EnvScale", &envScale_, 0.0f, 1.0f);
@@ -287,18 +294,35 @@ void Player::Draw() {
 	// 描画
 	render_->Draw();
 
+	// プレイヤーHPのUI描画
+	hpIcon_->Draw();
+
 	// 攻撃確認用
-	//hand_->Draw();
+	hand_->Draw();
 }
 
 bool Player::IsDead() const { return hp_->IsDead(); }
 
 void Player::Damage(float value) {
+	// ダメージ前のHPを保存
+	float beforeHP = hp_->GetCurrentHP();
+
 	// ダメージ処理
 	hp_->Damage(value);
 
+	// ダメージ後のHP
+	float afterHP = hp_->GetCurrentHP();
+
 	// ヒットエフェクト生成
 	GenerateHitEffect();
+
+	// HPIconのアニメーション開始処理
+	int startIdx = static_cast<int>(afterHP);
+	int endIdx = static_cast<int>(beforeHP);
+
+	for (int i = startIdx; i < endIdx; ++i) {
+		hpIcon_->DmageAnimStart(i);
+	}
 }
 
 void Player::UpdateCollision() {

@@ -6,6 +6,7 @@
 #include "GameTimer.h"
 #include "OBB.h"
 #include "Particle.h"
+#include "PlayerHPIcon.h"
 #include "PlayerHealth.h"
 #include "PlayerMove.h"
 
@@ -74,6 +75,12 @@ public:
 	// プレイヤーの向いている方向のGetter
 	Vector2 GetDirection() const { return lastMoveDirection_; }
 
+	// 敵を掴んでいるかどうかGetter
+	bool IsGrabbingEnemy() const { return isGrabTriggered_; }
+
+	// 掴んでいる敵のポインタGetter
+	Enemy* GetGrabbedEnemy() { return heldEnemy_; }
+
 private:
 	// 当たり判定の更新処理
 	void UpdateCollision();
@@ -107,6 +114,7 @@ private:
 	std::unique_ptr<PlayerMove> move_;     // 移動用インスタンス
 	std::unique_ptr<PlayerHealth> hp_;     // HP管理用インスタンス
 	std::unique_ptr<ObjectRender> hand_;   // 攻撃確認用
+	std::unique_ptr<PlayerHPIcon> hpIcon_; // HPのUI
 
 	// 環境マップ　強さ
 	float envScale_ = 0.0f;
@@ -133,4 +141,7 @@ private:
 
 	// 攻撃確認用フラグ
 	bool isHandAnimPlaying_ = false;
+
+	// 敵を掴んでいるかどうか
+	bool isGrabTriggered_ = false;
 };

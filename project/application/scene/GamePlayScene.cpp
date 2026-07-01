@@ -28,7 +28,7 @@ void GamePlayScene::Initialize(const SceneContext& ctx) {
 	mainCamera_->Initialize();
 	mainCamera_->SetTranslation({0.0f, 60.0f, 0.0f});
 	mainCamera_->SetPivot(player_->GetPosition());
-	mainCamera_->SetEuler({std::numbers::pi_v<float> / 2.0f, 0.0f, 0.0f});
+	mainCamera_->SetEuler({std::numbers::pi_v<float> / 2.0f, 0.0f, 0.0f});                          
 	currentCameraPivot_ = player_->GetPosition();
 	cameraPosY_ = 20.0f;
 
@@ -58,11 +58,6 @@ void GamePlayScene::Initialize(const SceneContext& ctx) {
 	// ゴール判定インスタンス生成&初期化
 	goal_ = std::make_unique<Goal>();
 	goal_->Initialize(ctx_.engineContext);
-
-	// プレイヤーのHPゲージ生成&初期化
-	playerHPGauge_ = std::make_unique<PlayerHPGauge>();
-	playerHPGauge_->Initialize(ctx_.engineContext);
-	playerHPGauge_->HPBarSpriteApply(static_cast<int>(player_->GetCurrentHP()), static_cast<int>(player_->GetMaxHP()));
 
 	// フラッシュエフェクトの生成&初期化
 	flashEffect_ = std::make_unique<FlashEffect>();
@@ -252,10 +247,6 @@ void GamePlayScene::Update() {
 	// デバッグ用のImGui更新
 	UpdateDebugImGui();
 
-	// プレイヤーのHPゲージ更新
-	playerHPGauge_->HPBarSpriteApply(static_cast<int>(player_->GetCurrentHP()), static_cast<int>(player_->GetMaxHP()));
-	playerHPGauge_->Update(deltaTime);
-
 	// パーティクルの更新
 	for (auto& particle : enemyDeathParticle_) {
 		particle->Update();
@@ -344,9 +335,6 @@ void GamePlayScene::Draw() {
 	// プレイヤーの描画処理
 	player_->Draw();
 
-	// プレイヤーのHPゲージ描画
-	playerHPGauge_->Draw();
-
 	// パーティクルの描画
 	for (auto& particle : enemyDeathParticle_) {
 		particle->Draw();
@@ -375,17 +363,42 @@ void GamePlayScene::CollisionGameObjects() {
 	// プレイヤーと敵の弾の当たり判定
 	// ==========================================
 	AABB playerCol = player_->GetBodyCol();
-	for (const auto& bullet : enemyBulletManager_->GetBullets()) {
-		// 衝突判定
-		if (Collision::Intersect(playerCol, bullet->GetCollision())) {
-			// プレイヤーにダメージを与える処理
-			player_->Damage(1.0f);
+	for (auto& bullet : enemyBulletManager_->GetBullets()) {
+		// 弾が有効で、かつプレイヤーと接触しているか
+		if (Collision::Intersect(player_->GetBodyCol(), bullet->GetCollision())) {
 
-			// カメラシェイク開始
-			ctx_.currentCamera->StartShake(0.2f, 0.2f);
+			bool isGuarded = false; // 弾を防げたかどうかのフラグ
 
-			// グリッチノイズ用タイマーの初期化
-			glitchTimer_ = kGlitchDuration;
+			// プレイヤーが敵を掴んでいるかチェック
+			if (player_->IsGrabbingEnemy()) {
+
+				// プレイヤーの向きベクトルを取得
+				Vector2 playerDir = player_->GetDirection();
+
+				// プレイヤーから弾への方向ベクトルを計算し、正規化する
+				Vector3 playerToBullet = bullet->GetPosition() - player_->GetPosition();
+				playerToBullet = MathUtility::Normalize(playerToBullet);
+
+				// 内積を計算して、正面から来ているか判定する
+				float dot = playerDir.x * playerToBullet.x + playerDir.y * playerToBullet.z;
+
+				if (dot > 0.0f) {
+					isGuarded = true;
+					Enemy* shieldEnemy = player_->GetGrabbedEnemy();
+					if (shieldEnemy) {
+						shieldEnemy->Damage();
+						if (shieldEnemy->IsDead()) {
+							commonData_->killCount += 1;
+							GenerateEnemyDeathParticle(shieldEnemy->GetPos());
+						}
+					}
+				}
+			}
+
+			if (!isGuarded) {
+				// 盾で防げなかった
+				player_->Damage(1);
+			}
 		}
 	}
 
