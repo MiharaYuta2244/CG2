@@ -46,6 +46,9 @@ public:
 	// シェイクの更新処理
 	void ShakeCamera(float deltaTime, float shakePower);
 
+	// シェイクしているかどうかGetter
+	bool GetIsShake() const { return isShake_; }
+
 private:
 	void UpdateOrientation();
 

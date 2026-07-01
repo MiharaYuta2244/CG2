@@ -172,6 +172,7 @@ void Player::Update(float deltaTime, DirectInput* input, GamePad* gamePad, Enemy
 	if (enableAttack_ && isGrabTriggered_) {
 		if (!isHold_ && targetEnemy != nullptr) {
 			isHold_ = true;
+
 			heldEnemy_ = targetEnemy;
 			heldEnemy_->SetEnableAI(false);
 			heldEnemy_->SetShotHoldState(true);
@@ -199,13 +200,27 @@ void Player::Update(float deltaTime, DirectInput* input, GamePad* gamePad, Enemy
 	}
 
 	// 投げる・攻撃処理
-	if (enableAttack_ && isAttackTriggered && heldEnemy_ != nullptr) {
-		isHold_ = false;
-		enableAttack_ = false;
-		heldEnemy_->SetEnableAI(true);
-		heldEnemy_->StartKnockBack({lastMoveDirection_.x, 0.0f, lastMoveDirection_.y});
-		heldEnemy_->SetAIState(EnemyAI::State::Normal);
-		heldEnemy_ = nullptr; // 投げたのでポインタをクリア
+	if (enableAttack_ && isAttackTriggered) {
+		// 投げる対象を決定する（掴んでいる敵がいればそれ、いなければ近くの敵）
+		Enemy* throwTarget = nullptr;
+
+		if (isHold_ && heldEnemy_ != nullptr) {
+			// 掴んでいる敵を投げる場合
+			throwTarget = heldEnemy_;
+			isHold_ = false;
+			heldEnemy_ = nullptr; // 投げたのでポインタをクリア
+		} else if (!isHold_ && targetEnemy != nullptr) {
+			// 掴んでいないが、近くにいる敵を直接投げる場合
+			throwTarget = targetEnemy;
+		}
+
+		// 投げる対象がいればノックバック処理を実行
+		if (throwTarget != nullptr) {
+			enableAttack_ = false;
+			throwTarget->SetEnableAI(true);
+			throwTarget->StartKnockBack({lastMoveDirection_.x, 0.0f, lastMoveDirection_.y});
+			throwTarget->SetAIState(EnemyAI::State::Normal);
+		}
 	}
 
 	// 攻撃確認用

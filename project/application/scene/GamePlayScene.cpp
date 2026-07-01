@@ -30,7 +30,7 @@ void GamePlayScene::Initialize(const SceneContext& ctx) {
 	mainCamera_->SetPivot(player_->GetPosition());
 	mainCamera_->SetEuler({std::numbers::pi_v<float> / 2.0f, 0.0f, 0.0f});                          
 	currentCameraPivot_ = player_->GetPosition();
-	cameraPosY_ = 20.0f;
+	cameraPosY_ = -14.0f;
 
 	// カメラの設定
 	ctx_.currentCamera = mainCamera_.get();
@@ -369,6 +369,14 @@ void GamePlayScene::CollisionGameObjects() {
 
 			bool isGuarded = false; // 弾を防げたかどうかのフラグ
 
+			if(!ctx_.currentCamera->GetIsShake()){
+				// カメラシェイク
+				ctx_.currentCamera->StartShake(0.2f, 0.2f);
+
+				// グリッチノイズタイマー設定
+				glitchTimer_ = 0.5f;
+			}
+
 			// プレイヤーが敵を掴んでいるかチェック
 			if (player_->IsGrabbingEnemy()) {
 
@@ -631,6 +639,8 @@ void GamePlayScene::CollisionGameObjects() {
 				if (a->IsKnockBack() || b->IsKnockBack()) {
 					a->Damage();
 					b->Damage();
+					a->StopAnimation();
+					b->StopAnimation();
 
 					// ダメージの結果死亡した場合のみ処理を行う
 					if (a->IsDead()) {

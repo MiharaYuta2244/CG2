@@ -48,6 +48,7 @@ public:
 	void SetRotate(const Vector3& rotate) { transform_.rotate = rotate; }
 	void SetTranslate(const Vector3& translate) { transform_.translate = translate; }
 	void SetColor(const Vector4& color) { material_.color = color; }
+	void SetTransform(const Transform& transform) { transform_ = transform; }
 
 	// Getter
 	Transform& GetTransform() { return transform_; }

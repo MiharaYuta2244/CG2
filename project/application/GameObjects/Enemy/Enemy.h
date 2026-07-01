@@ -80,6 +80,9 @@ public:
 	void SetShotHoldState(bool isShotHoldState) { ai_->SetShotHoldState(isShotHoldState); }
 	void SetAIState(EnemyAI::State state);
 
+	// アニメーションを止める処理
+	void StopAnimation();
+
 private:
 	// 当たり判定の更新
 	void UpdateCollision();

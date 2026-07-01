@@ -1,5 +1,9 @@
 #include "EnemyBullet.h"
+#include "GameObjects/StageObjects/Door/Door.h"
+#include "GameObjects/StageObjects/Wall/Wall.h"
 #include <cmath>
+
+using namespace TinyEngine;
 
 void EnemyBullet::Initialize(EngineContext* ctx, Vector2 dir, Vector3 pos) {
 	// 弾の長さを定義
@@ -20,8 +24,12 @@ void EnemyBullet::Initialize(EngineContext* ctx, Vector2 dir, Vector3 pos) {
 	transform_.scale = {width, 1.0f, length};
 
 	// 描画用インスタンス生成&初期化
-	render_ = std::make_unique<ObjectRender>();
-	render_->Initialize(ctx, "Cube.obj");
+	render_ = std::make_unique<VisionCone>();
+	render_->Initialize(ctx, length, 20.0f);
+	render_->SetColor({1, 1, 1, 1});
+	Transform transform = transform_;
+	transform.translate =  pos - centerOffset;
+	render_->SetTransform(transform);
 
 	// タイマーのリセット
 	deathTimer_ = 0.0f;
@@ -46,7 +54,9 @@ void EnemyBullet::Update(float deltaTime, float bulletSpeed) {
 	deathTimer_ += deltaTime;
 
 	// 描画用インスタンス更新
-	render_->Update(transform_);
+	std::list<std::unique_ptr<Wall>> emptyWalls;
+	std::list<std::unique_ptr<Door>> emptyDoors;
+	render_->Update(emptyWalls, emptyDoors);
 }
 
 void EnemyBullet::Draw() {

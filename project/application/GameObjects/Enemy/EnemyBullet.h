@@ -3,6 +3,7 @@
 #include "GameObjects/ObjectRender/ObjectRender.h"
 #include "Rect.h"
 #include "OBB.h"
+#include "VisionCone.h"
 
 /// <summary>
 /// 敵の弾クラス
@@ -31,7 +32,7 @@ private:
 	Transform transform_;
 
 	// 描画用インスタンス
-	std::unique_ptr<ObjectRender> render_;
+	std::unique_ptr<TinyEngine::VisionCone> render_;
 
 	// 方向
 	Vector2 direction_;

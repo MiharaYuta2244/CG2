@@ -233,11 +233,18 @@ void Enemy::GenerateMuzzleFlash(const Vector3& direction) {
 	smoke->Initialize(ctx_, muzzlePos, "Dust.png", std::make_unique<MuzzleSmokeModule>(direction), nullptr, ParticleMeshType::Square);
 	smoke->SetEmitMode(false, 0.05f);
 	smoke->SetEmitterParam(3, 0.01f);
+	smoke->SetColor({0.4f,0.4f,0.1f,1.0f});
 	muzzleParticles_.push_back(std::move(smoke));
 }
 
 void Enemy::SetAIState(EnemyAI::State state) {
 	if (ai_) {
 		ai_->SetState(state);
+	}
+}
+
+void Enemy::StopAnimation(){
+	if(knockBackAnim_.anim.GetIsActive()){
+		knockBackAnim_.anim.Reset();
 	}
 }
