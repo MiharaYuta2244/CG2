@@ -11,6 +11,10 @@ void PlayerHPIcon::Initialize(EngineContext* ctx) {
 		sprites_[i]->SetAnchorPoint({0.5f, 0.5f});
 	}
 
+	// 背景スプライト生成&初期化
+	bgSprite_ = std::make_unique<Sprite>();
+	bgSprite_->Initialize(ctx, "white.png");
+
 	// 基準になるスケールの記録
 	baseScaleY_ = sprites_[0]->GetSize().y;
 }
@@ -32,14 +36,14 @@ void PlayerHPIcon::Update(float deltaTime) {
 		sprite->Update();
 	}
 
-#ifdef USE_IMGUI
-	ImGui::Begin("HPIcon");
-	ImGui::DragFloat2("BasePos", &basePos_.x, 1.0f);
-	ImGui::End();
-#endif
+	// 背景スプライト更新
+	bgSprite_->Update();
 }
 
 void PlayerHPIcon::Draw() {
+	// 背景スプライト描画
+	bgSprite_->Draw();
+
 	for (auto& sprite : sprites_) {
 		sprite->Draw();
 	}
