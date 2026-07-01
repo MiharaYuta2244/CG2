@@ -14,6 +14,9 @@ void PlayerHPIcon::Initialize(EngineContext* ctx) {
 	// 背景スプライト生成&初期化
 	bgSprite_ = std::make_unique<Sprite>();
 	bgSprite_->Initialize(ctx, "white.png");
+	bgSprite_->SetPosition(bgPos_);
+	bgSprite_->SetSize(bgSize_);
+	bgSprite_->SetColor(bgColor_);
 
 	// 基準になるスケールの記録
 	baseScaleY_ = sprites_[0]->GetSize().y;
