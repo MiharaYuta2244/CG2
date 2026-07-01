@@ -1,9 +1,9 @@
 #pragma once
 #include "AABB.h"
 #include "GameObjects/ObjectRender/ObjectRender.h"
-#include "Rect.h"
 #include "OBB.h"
-#include "VisionCone.h"
+#include "Rect.h"
+#include "AnimationBundle.h"
 
 /// <summary>
 /// 敵の弾クラス
@@ -32,7 +32,7 @@ private:
 	Transform transform_;
 
 	// 描画用インスタンス
-	std::unique_ptr<TinyEngine::VisionCone> render_;
+	std::unique_ptr<ObjectRender> render_;
 
 	// 方向
 	Vector2 direction_;
@@ -42,8 +42,14 @@ private:
 
 	// 生存時間管理用の変数
 	float deathTimer_ = 0.0f;      // 経過時間タイマー
-	const float kLifeTime_ = 0.1f; // 消滅までの時間
+	const float kLifeTime_ = 1.0f; // 消滅までの時間
 
 	// 敵と弾の余白
 	float margin_ = 6.5f;
+
+	// レーザー用のタイマー
+	float laserTimer_ = 0.0f;
+
+	// スケールアニメーション用変数
+	AnimationBundle<Vector2> scaleXYAnim_;
 };

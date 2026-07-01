@@ -331,6 +331,7 @@ void Object3d::CreateMaterialData() {
 	material_.shininess = 64.0f;
 	material_.envScale = 0.0f;
 	material_.enableNoise = false;
+	material_.enableLaser = false;
 	material_.time = 0.0f;
 	// GPUへ書き込み
 	*materialData_ = material_;

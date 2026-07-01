@@ -10,6 +10,8 @@ struct Material
     float envScale;
     float time;
     int enableNoise;
+    int enableLaser;
+    float3 padding;
 };
 
 struct DirectionalLight
@@ -207,6 +209,19 @@ PixelShaderOutput main(VertexShaderOutput input)
     
     // 環境光の追加
     output.color.rgb += enviromentColor.rgb * gMaterial.envScale;
+    
+    if (gMaterial.enableLaser)
+    {
+        // Y座標と時間ベースで波を作る
+        float scanline = sin(input.worldPosition.y * 40.0f - gMaterial.time * 15.0f);
+        
+        // 鋭い光の線にするために、0〜1の範囲に変換してから累乗する
+        scanline = pow(saturate(scanline * 0.5f + 0.5f), 10.0f);
+        
+        // ベースの色を発光させつつ、スキャンライン部分を白く強く光らせる
+        float3 laserGlow = gMaterial.color.rgb * 1.5f;
+        output.color.rgb = laserGlow + (float3(1.0f, 1.0f, 1.0f) * scanline * 2.0f);
+    }
     
     return output;
 }

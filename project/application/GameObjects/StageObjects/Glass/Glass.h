@@ -21,6 +21,12 @@ public:
 	// GlassStatusのSetter
 	void SetGlassStatus(GlassStatus glassStatus);
 
+	// アクティブ状態のGetter
+	bool GetIsActive() const { return isActive_; }
+
+	// アクティブ状態のSetter
+	void SetIsActive(bool isActive) { isActive_ = isActive; }
+
 private:
 	// 当たり判定の更新
 	void UpdateCollision();
@@ -34,4 +40,7 @@ private:
 
 	// ガラスのステータス
 	GlassStatus glassStatus_;
+
+	// アクティブ状態
+	bool isActive_ = true;
 };

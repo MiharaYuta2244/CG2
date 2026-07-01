@@ -15,4 +15,6 @@ struct Material {
 	float envScale;
 	float time;
 	int32_t enableNoise;
+	int32_t enableLaser;
+	float padding[3];
 };

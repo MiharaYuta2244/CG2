@@ -73,6 +73,7 @@ public:
 	void SetTime(float time) { material_.time = time; }
 	void SetIsSkinning(bool isSkinning) { isSkinning_ = isSkinning; }
 	bool GetIsSkinning() const { return isSkinning_; }
+	void SetEnableLaser(bool isEnable) { material_.enableLaser = isEnable ? 1 : 0; }
 
 	// getter
 	Vector3& GetScale() { return transform_.scale; }
