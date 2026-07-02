@@ -11,7 +11,8 @@ struct Material
     float time;
     int enableNoise;
     int enableLaser;
-    float3 padding;
+    float shotProgress;
+    float2 padding;
 };
 
 struct DirectionalLight
@@ -221,6 +222,18 @@ PixelShaderOutput main(VertexShaderOutput input)
         // ベースの色を発光させつつ、スキャンライン部分を白く強く光らせる
         float3 laserGlow = gMaterial.color.rgb * 1.5f;
         output.color.rgb = laserGlow + (float3(1.0f, 1.0f, 1.0f) * scanline * 2.0f);
+    }
+    
+    if (gMaterial.shotProgress > 0.0f)
+    {
+        if (input.texcoord.y < gMaterial.shotProgress)
+        {
+            // 警告色
+            float4 warningColor = float4(1.0f, 0.8f, 0.0f, saturate(output.color.a * 1.5f));
+            
+            // 元の色と警告色をブレンド
+            output.color = lerp(output.color, warningColor, 0.8f);
+        }
     }
     
     return output;

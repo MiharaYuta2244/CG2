@@ -76,9 +76,17 @@ void Enemy::Update(float deltaTime, Player* player, EnemyBulletManager* enemyBul
 	if (ai_->GetState() == EnemyAI::State::Vigilance) {
 		// 警戒状態なら赤色
 		visionCone_->SetColor({1.0f, 0.0f, 0.0f, 0.3f});
+		// 射撃ゲージの進行度を渡す
+		visionCone_->SetChargeProgress(ai_->GetShotProgress());
+	} else if (ai_->GetState() == EnemyAI::State::Hold) {
+		// 拘束状態も射撃するのでプログレスを渡す
+		visionCone_->SetColor({1.0f, 0.5f, 0.0f, 0.3f});
+		visionCone_->SetChargeProgress(ai_->GetShotProgress());
 	} else {
 		// 通常状態なら緑色
 		visionCone_->SetColor({0.0f, 1.0f, 0.0f, 0.3f});
+		// プログレスはリセット
+		visionCone_->SetChargeProgress(0.0f);
 	}
 
 	// 視界

@@ -16,5 +16,6 @@ struct Material {
 	float time;
 	int32_t enableNoise;
 	int32_t enableLaser;
-	float padding[3];
+	float chargeProgress;
+	float padding[2];
 };

@@ -51,6 +51,14 @@ public:
 	// 撃たれた瞬間を返すGetter
 	bool GetIsShot() const { return isShotThisFrame_; }
 
+	float GetShotProgress() const {
+		float interval = GetShotInterval();
+		if (interval > 0.0f) {
+			return std::clamp(shotTimer_ / interval, 0.0f, 1.0f);
+		}
+		return 0.0f;
+	}
+
 private:
 	// プレーヤー方向に回転する
 	void LookatPlayer(float deltaTime, Vector3 playerPos, Vector3 enemyPos, float turnSpeed = 6.0f);
