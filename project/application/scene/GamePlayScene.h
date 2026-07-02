@@ -12,6 +12,7 @@
 #include "GameObjects/StageObjects/Goal/Goal.h"
 #include "GameObjects/StageObjects/Ground/Ground.h"
 #include "GameObjects/StageObjects/Wall/WallManager.h"
+#include "GameObjects/StageObjects/Glass/GlassManager.h"
 #include "Object3d.h"
 #include "Particle.h"
 #include "Skybox.h"
@@ -62,6 +63,9 @@ private:
 
 	// ドアの管理クラス
 	std::unique_ptr<DoorManager> doorManager_;
+
+	// ガラスの管理クラス
+	std::unique_ptr<GlassManager> glassManager_;
 
 	// ゴール判定用クラス
 	std::unique_ptr<Goal> goal_;

@@ -44,6 +44,12 @@ public:
 	// ShotTimerのリセット
 	void ResetShotTimer() { shotTimer_ = 0.0f; }
 
+	// 弾が撃たれた瞬間を知らせるGetter
+	float GetShotTimer() const { return shotTimer_; }
+
+	// 撃たれた瞬間を返すGetter
+	bool GetIsShot() const { return isShotThisFrame_; }
+
 private:
 	// プレーヤー方向に回転する
 	void LookatPlayer(float deltaTime, Vector3 playerPos, Vector3 enemyPos, float turnSpeed = 6.0f);

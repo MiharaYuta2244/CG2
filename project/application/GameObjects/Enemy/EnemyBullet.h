@@ -42,7 +42,7 @@ private:
 
 	// 生存時間管理用の変数
 	float deathTimer_ = 0.0f;      // 経過時間タイマー
-	const float kLifeTime_ = 1.0f; // 消滅までの時間
+	const float kLifeTime_ = 0.5f; // 消滅までの時間
 
 	// 敵と弾の余白
 	float margin_ = 6.5f;

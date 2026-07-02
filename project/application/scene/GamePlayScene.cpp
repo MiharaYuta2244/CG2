@@ -55,6 +55,10 @@ void GamePlayScene::Initialize(const SceneContext& ctx) {
 	doorManager_ = std::make_unique<DoorManager>();
 	doorManager_->Initialize(ctx_.engineContext);
 
+	// ガラスの管理インスタンス生成&初期化
+	glassManager_ = std::make_unique<GlassManager>();
+	glassManager_->Initialize(ctx_.engineContext);
+
 	// ゴール判定インスタンス生成&初期化
 	goal_ = std::make_unique<Goal>();
 	goal_->Initialize(ctx_.engineContext);
@@ -164,6 +168,9 @@ void GamePlayScene::Update() {
 
 	// ドアの管理インスタンス更新
 	doorManager_->Update(deltaTime, player_->GetPosition());
+
+	// ガラスの管理インスタンス更新
+	glassManager_->Update();
 
 	// ゴール判定インスタンス更新
 	goal_->Update(deltaTime);
@@ -325,6 +332,9 @@ void GamePlayScene::Draw() {
 
 	// ドアの管理インスタンス描画
 	doorManager_->Draw();
+
+	// ガラスの管理インスタンス描画
+	glassManager_->Draw();
 
 	// 敵の描画処理
 	enemyManager_->Draw();

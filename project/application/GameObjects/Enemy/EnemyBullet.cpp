@@ -2,10 +2,6 @@
 #include <cmath>
 
 void EnemyBullet::Initialize(EngineContext* ctx, Vector2 dir, Vector3 pos) {
-	// 弾の長さを定義
-	float length = 15.0f;
-	float width = 0.5f;
-
 	// 移動方向を受け取る
 	direction_ = dir;
 
@@ -17,13 +13,13 @@ void EnemyBullet::Initialize(EngineContext* ctx, Vector2 dir, Vector3 pos) {
 	transform_.translate = {pos.x + centerOffset.x, pos.y, pos.z + centerOffset.z};
 
 	// スケールを設定
-	transform_.scale = {width, 1.0f, length};
+	transform_.scale = {0.5f, 0.5f, 15.0f};
 
 	// 描画用インスタンス生成&初期化
 	render_ = std::make_unique<ObjectRender>();
 	render_->Initialize(ctx, "Cylinder.obj");
 	render_->SetEnableLaser(true);
-	render_->SetColor({1.0f, 0.0f, 0.0f, 1.0f});
+	render_->SetColor({0.0f, 0.0f, 1.0f, 1.0f});
 
 	// タイマーのリセット
 	deathTimer_ = 0.0f;
@@ -43,9 +39,12 @@ void EnemyBullet::Initialize(EngineContext* ctx, Vector2 dir, Vector3 pos) {
 	// Z軸
 	col_.orientations[2] = {sinY, 0.0f, cosY};
 
+	// 描画用のサイズを定義
+	float width = 0.2f;
+	float height = 0.2f;
+
 	// アニメーション開始処理
-	Vector3 scale = transform_.scale;
-	scaleXYAnim_.anim.Start({scale.x, scale.y}, {0.0f, 0.0f}, kLifeTime_, EaseType::EASEINCUBIC);
+	scaleXYAnim_.anim.Start({width, height}, {0.0f, 0.0f}, kLifeTime_, EaseType::EASEINCUBIC);
 }
 
 void EnemyBullet::Update(float deltaTime, float bulletSpeed) {
