@@ -1,4 +1,5 @@
 #include "Enemy.h"
+#include "ChargeModule.h"
 #include "EnemyBulletManager.h"
 #include "GameObjects/Stageobjects/Door/DoorManager.h"
 #include "GameObjects/Stageobjects/Wall/WallManager.h"
@@ -121,6 +122,43 @@ void Enemy::Update(float deltaTime, Player* player, EnemyBulletManager* enemyBul
 		particle->Update();
 	}
 	std::erase_if(muzzleParticles_, [](const std::unique_ptr<Particle>& p) { return p->IsFinished(); });
+
+	// チャージパーティクルの生成
+	if (!chargeParticle_ && ai_->GetShotTimer() >= 0.01f) {
+		chargeParticle_ = std::make_unique<Particle>();
+		chargeParticle_->Initialize(ctx_, transform_.translate, "AttractEffect.png", std::make_unique<ChargeModule>(), nullptr, ParticleMeshType::Square);
+		chargeParticle_->SetEmitMode(true, 0.1f);
+		chargeParticle_->SetEmitterParam(3, 0.05f);
+
+		// シリンダーパーティクルの生成&初期化
+		if (!chargeCylinderParticle_) {
+			chargeCylinderParticle_ = std::make_unique<Particle>();
+			chargeCylinderParticle_->Initialize(ctx_, transform_.translate, "gradationLine.png", std::make_unique<ChargeCylinderModule>(ai_.get(), &transform_), nullptr, ParticleMeshType::Cylinder);
+			chargeCylinderParticle_->SetEmitMode(false, 0.0f);
+			chargeCylinderParticle_->SetEmitterParam(1, 9999.0f);
+		}
+	}
+
+	// チャージパーティクルの更新
+	if (chargeParticle_) {
+		chargeParticle_->SetTranslate(transform_.translate);
+		chargeParticle_->Update();
+	}
+
+	if (chargeCylinderParticle_ && ai_->GetState() == EnemyAI::State::Vigilance) {
+		chargeCylinderParticle_->Update();
+	}
+
+	// チャージパーティクルの削除
+	if (chargeParticle_ && ai_->GetIsShot()) {
+		chargeParticle_.reset();
+		chargeParticle_ = nullptr;
+
+		if (chargeCylinderParticle_){
+			chargeCylinderParticle_.reset();
+			chargeCylinderParticle_ = nullptr;
+		}
+	}
 }
 
 void Enemy::PostUpdate() {
@@ -151,6 +189,16 @@ void Enemy::Draw() {
 		// マズルフラッシュパーティクルの描画
 		for (auto& particle : muzzleParticles_) {
 			particle->Draw();
+		}
+
+		// チャージパーティクルの描画
+		if (chargeParticle_) {
+			chargeParticle_->Draw();
+		}
+
+		// 描画
+		if (ai_->GetState() == EnemyAI::State::Vigilance && chargeCylinderParticle_) {
+			chargeCylinderParticle_->Draw();
 		}
 	}
 }
@@ -233,7 +281,6 @@ void Enemy::GenerateMuzzleFlash(const Vector3& direction) {
 	smoke->Initialize(ctx_, muzzlePos, "Dust.png", std::make_unique<MuzzleSmokeModule>(direction), nullptr, ParticleMeshType::Square);
 	smoke->SetEmitMode(false, 0.05f);
 	smoke->SetEmitterParam(3, 0.01f);
-	smoke->SetColor({0.4f,0.4f,0.1f,1.0f});
 	muzzleParticles_.push_back(std::move(smoke));
 }
 
@@ -243,8 +290,8 @@ void Enemy::SetAIState(EnemyAI::State state) {
 	}
 }
 
-void Enemy::StopAnimation(){
-	if(knockBackAnim_.anim.GetIsActive()){
+void Enemy::StopAnimation() {
+	if (knockBackAnim_.anim.GetIsActive()) {
 		knockBackAnim_.anim.Reset();
 	}
 }

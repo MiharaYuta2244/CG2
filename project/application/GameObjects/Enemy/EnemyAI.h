@@ -46,6 +46,7 @@ public:
 
 	// 弾が撃たれた瞬間を知らせるGetter
 	float GetShotTimer() const { return shotTimer_; }
+	float GetShotInterval() const { return state_ == State::Hold ? shotIntervalHold_ : shotIntervalNormal_; }
 
 	// 撃たれた瞬間を返すGetter
 	bool GetIsShot() const { return isShotThisFrame_; }

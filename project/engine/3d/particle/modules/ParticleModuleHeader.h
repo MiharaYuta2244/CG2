@@ -5,3 +5,4 @@
 #include "modules/ShockWaveModule.h"
 #include "modules/UVScrollModule.h"
 #include "modules/DustStepModule.h"
+#include "modules/ChargeCylinderModule.h"

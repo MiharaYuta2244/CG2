@@ -118,6 +118,10 @@ private:
 	// マズルフラッシュエフェクト管理用コンテナ
 	std::vector<std::unique_ptr<TinyEngine::Particle>> muzzleParticles_;
 
+	// チャージパーティクル
+	std::unique_ptr<TinyEngine::Particle> chargeParticle_;
+	std::unique_ptr<TinyEngine::Particle> chargeCylinderParticle_;
+
 	// 移動フラグ
 	bool isMove_ = true;
 
