@@ -81,6 +81,9 @@ public:
 	// 掴んでいる敵のポインタGetter
 	Enemy* GetGrabbedEnemy() { return heldEnemy_; }
 
+	// 攻撃フラグGetter
+	bool GetIsAttack() const { return isAttackTriggered_; }
+
 private:
 	// 当たり判定の更新処理
 	void UpdateCollision();
@@ -144,4 +147,7 @@ private:
 
 	// 敵を掴んでいるかどうか
 	bool isGrabTriggered_ = false;
+
+	// 攻撃しているかどうか
+	bool isAttackTriggered_ = false;
 };

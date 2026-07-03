@@ -115,3 +115,12 @@ void GlassManager::SaveToJson(const std::string& filepath) {
 	// JSONファイルへ保存
 	JsonManager::Save(filepath, glassDataList);
 }
+
+void GlassManager::RemoveGlass(Glass* glass) {
+	for (auto it = glasses_.begin(); it != glasses_.end(); ++it) {
+		if (it->get() == glass) {
+			glasses_.erase(it);
+			return;
+		}
+	}
+}

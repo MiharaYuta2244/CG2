@@ -23,6 +23,9 @@ public:
 	// 壁のリストを取得するGetter
 	const std::list<std::unique_ptr<Glass>>& GetGlasses() const { return glasses_; }
 
+	// ガラスの削除処理
+	void RemoveGlass(Glass* glass);
+
 private:
 	// Json読み込み
 	void LoadFromJson(const std::string& filepath);

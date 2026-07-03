@@ -78,19 +78,14 @@ void GamePlayScene::Initialize(const SceneContext& ctx) {
 	// シーン遷移要求制御変数
 	isTransitionRequested_ = false;
 
-	// スカイボックスの生成&初期化
-	skybox_ = std::make_unique<Skybox>();
-	skybox_->Initialize(ctx_.engineContext, "rostock_laage_airport_4k.dds");
-
 	controls_ = std::make_unique<Controls>();
 	controls_->Initialize(ctx_.engineContext);
 
 	// シーンで使うエフェクトの宣言
 	ctx_.engineContext->postEffectPipeline->SetEffects({
-	    //PostEffectType::DepthOutline, // アウトライン
-	    PostEffectType::Vignette,     // ビネット
-	    PostEffectType::Glitch,       // グリッチ
-	    PostEffectType::DeathEffect,  // 死亡時エフェクト
+	    PostEffectType::Vignette,    // ビネット
+	    PostEffectType::Glitch,      // グリッチ
+	    PostEffectType::DeathEffect, // 死亡時エフェクト
 	});
 
 	// パラメータ設定
@@ -174,9 +169,6 @@ void GamePlayScene::Update() {
 
 	// ゴール判定インスタンス更新
 	goal_->Update(deltaTime);
-
-	// スカイボックス更新
-	skybox_->Update(mainCamera_->GetViewMatrix(), mainCamera_->GetProjection());
 
 	// 当たり判定
 	CollisionGameObjects();
@@ -367,7 +359,7 @@ void GamePlayScene::Draw() {
 
 	// 半透明オブジェクトの描画準備
 	ctx_.engineContext->object3dCommon->DrawSettingTransparent(ctx_.engineContext->textureManager);
-	
+
 	// ガラスの管理インスタンス描画
 	glassManager_->Draw();
 }
@@ -436,6 +428,19 @@ void GamePlayScene::CollisionGameObjects() {
 		if (Collision::Intersect(player_->GetAttackCol(), enemy->GetBodyCol())) {
 			// プレイヤーの攻撃フラグを立てる
 			player_->SetEnableAttack(true);
+		}
+	}
+
+	// ==========================================
+	// プレイヤーの攻撃用範囲とガラスの当たり判定
+	// ==========================================
+	if (player_->GetIsAttack()) {
+		for (auto& glass : glassManager_->GetGlasses()) {
+			if (Collision::Intersect(player_->GetAttackCol(), glass->GetCollision())) {
+				// ガラス削除
+				glassManager_->RemoveGlass(glass.get());
+				break;
+			}
 		}
 	}
 

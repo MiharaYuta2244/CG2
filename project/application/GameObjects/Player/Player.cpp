@@ -149,7 +149,7 @@ void Player::Update(float deltaTime, DirectInput* input, GamePad* gamePad, Enemy
 
 	isGrabTriggered_ = input->KeyDown(DIK_J);
 	bool isGrabReleased = input->KeyReleased(DIK_J);
-	bool isAttackTriggered = input->KeyTriggered(DIK_K);
+	isAttackTriggered_ = input->KeyTriggered(DIK_K);
 
 	if (gamePad && gamePad->GetState().connected) {
 		const auto& padState = gamePad->GetState();
@@ -164,7 +164,7 @@ void Player::Update(float deltaTime, DirectInput* input, GamePad* gamePad, Enemy
 		}
 		// Rトリガーで突き飛ばし
 		if (padState.axes.rt > 0.3f) {
-			isAttackTriggered = true;
+			isAttackTriggered_ = true;
 		}
 	}
 
@@ -200,7 +200,7 @@ void Player::Update(float deltaTime, DirectInput* input, GamePad* gamePad, Enemy
 	}
 
 	// 投げる・攻撃処理
-	if (enableAttack_ && isAttackTriggered) {
+	if (enableAttack_ && isAttackTriggered_) {
 		// 投げる対象を決定する（掴んでいる敵がいればそれ、いなければ近くの敵）
 		Enemy* throwTarget = nullptr;
 
@@ -224,7 +224,7 @@ void Player::Update(float deltaTime, DirectInput* input, GamePad* gamePad, Enemy
 	}
 
 	// 攻撃確認用
-	if (isAttackTriggered) {
+	if (isAttackTriggered_) {
 		Vector3 forward = {lastMoveDirection_.x, 0.0f, lastMoveDirection_.y};
 		float offset = 1.5f;
 

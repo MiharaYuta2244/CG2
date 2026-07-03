@@ -94,9 +94,6 @@ private:
 	// 地面
 	std::unique_ptr<Ground> ground_;
 
-	// スカイボックス
-	std::unique_ptr<TinyEngine::Skybox> skybox_;
-
 	// カメラ関連
 	std::unique_ptr<Camera> mainCamera_;  // メインカメラ
 	std::unique_ptr<Camera> debugCamera_; // デバッグカメラ
