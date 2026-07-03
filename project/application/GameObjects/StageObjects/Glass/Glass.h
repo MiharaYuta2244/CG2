@@ -27,6 +27,9 @@ public:
 	// アクティブ状態のSetter
 	void SetIsActive(bool isActive) { isActive_ = isActive; }
 
+	// ギズモ用
+	std::string GetName() const override { return "Glass"; }
+
 private:
 	// 当たり判定の更新
 	void UpdateCollision();

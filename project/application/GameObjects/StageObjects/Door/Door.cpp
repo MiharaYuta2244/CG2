@@ -2,7 +2,7 @@
 #include "MathOperator.h"
 
 void Door::Initialize(EngineContext* ctx, DoorStatus doorStatus) {
-	transform_.scale = {doorStatus.width, 100.0f, doorStatus.depth};
+	transform_.scale = {doorStatus.width, 50.0f, doorStatus.depth};
 	transform_.rotate = {0.0f, doorStatus.rotateY, 0.0f};
 	transform_.translate = {doorStatus.centerX, 0.0f, doorStatus.centerZ};
 	doorStatus_ = doorStatus;

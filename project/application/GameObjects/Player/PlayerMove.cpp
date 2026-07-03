@@ -23,7 +23,7 @@ void PlayerMove::Update(Transform* transform, Vector2 inputDir, Vector2 aimDir, 
 	} else if (inputLength > 0.1f) {
 		currentMaxSpeed = maxSpeedWalk_;
 	}
-
+	
 	currentMaxSpeed *= speedMultiplier;
 
 	if (hasInput) {

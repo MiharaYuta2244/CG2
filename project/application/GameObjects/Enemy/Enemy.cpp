@@ -158,11 +158,11 @@ void Enemy::Update(float deltaTime, Player* player, EnemyBulletManager* enemyBul
 	}
 
 	// チャージパーティクルの削除
-	if (chargeParticle_ && ai_->GetIsShot()) {
+	if (chargeParticle_ && (ai_->GetIsShot() || ai_->GetState() == EnemyAI::State::Normal)) {
 		chargeParticle_.reset();
 		chargeParticle_ = nullptr;
 
-		if (chargeCylinderParticle_){
+		if (chargeCylinderParticle_) {
 			chargeCylinderParticle_.reset();
 			chargeCylinderParticle_ = nullptr;
 		}

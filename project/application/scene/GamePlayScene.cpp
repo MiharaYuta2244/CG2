@@ -28,7 +28,7 @@ void GamePlayScene::Initialize(const SceneContext& ctx) {
 	mainCamera_->Initialize();
 	mainCamera_->SetTranslation({0.0f, 60.0f, 0.0f});
 	mainCamera_->SetPivot(player_->GetPosition());
-	mainCamera_->SetEuler({std::numbers::pi_v<float> / 2.0f, 0.0f, 0.0f});                          
+	mainCamera_->SetEuler({std::numbers::pi_v<float> / 2.0f, 0.0f, 0.0f});
 	currentCameraPivot_ = player_->GetPosition();
 	cameraPosY_ = -14.0f;
 
@@ -87,7 +87,7 @@ void GamePlayScene::Initialize(const SceneContext& ctx) {
 
 	// シーンで使うエフェクトの宣言
 	ctx_.engineContext->postEffectPipeline->SetEffects({
-	    PostEffectType::DepthOutline, // アウトライン
+	    //PostEffectType::DepthOutline, // アウトライン
 	    PostEffectType::Vignette,     // ビネット
 	    PostEffectType::Glitch,       // グリッチ
 	    PostEffectType::DeathEffect,  // 死亡時エフェクト
@@ -174,7 +174,7 @@ void GamePlayScene::Update() {
 
 	// ゴール判定インスタンス更新
 	goal_->Update(deltaTime);
-	
+
 	// スカイボックス更新
 	skybox_->Update(mainCamera_->GetViewMatrix(), mainCamera_->GetProjection());
 
@@ -244,6 +244,9 @@ void GamePlayScene::Update() {
 
 	// ドアの管理インスタンスImGui
 	doorManager_->DrawImGui();
+
+	// ガラスの管理インスタンスImGui
+	glassManager_->DrawImGui();
 
 	// 敵の管理インスタンスImGui
 	enemyManager_->DrawImGui();
@@ -324,6 +327,9 @@ void GamePlayScene::Update() {
 }
 
 void GamePlayScene::Draw() {
+	// 不透明オブジェクトの描画準備
+	ctx_.engineContext->object3dCommon->DrawSettingCommon(ctx_.engineContext->textureManager);
+
 	// 地面の描画
 	ground_->Draw();
 
@@ -332,9 +338,6 @@ void GamePlayScene::Draw() {
 
 	// ドアの管理インスタンス描画
 	doorManager_->Draw();
-
-	// ガラスの管理インスタンス描画
-	glassManager_->Draw();
 
 	// 敵の描画処理
 	enemyManager_->Draw();
@@ -361,6 +364,12 @@ void GamePlayScene::Draw() {
 
 	// 操作方法UI描画
 	controls_->Draw();
+
+	// 半透明オブジェクトの描画準備
+	ctx_.engineContext->object3dCommon->DrawSettingTransparent(ctx_.engineContext->textureManager);
+	
+	// ガラスの管理インスタンス描画
+	glassManager_->Draw();
 }
 
 void GamePlayScene::Finalize() {
@@ -379,7 +388,7 @@ void GamePlayScene::CollisionGameObjects() {
 
 			bool isGuarded = false; // 弾を防げたかどうかのフラグ
 
-			if(!ctx_.currentCamera->GetIsShake()){
+			if (!ctx_.currentCamera->GetIsShake()) {
 				// カメラシェイク
 				ctx_.currentCamera->StartShake(0.2f, 0.2f);
 
@@ -450,6 +459,56 @@ void GamePlayScene::CollisionGameObjects() {
 			// Z軸方向のめり込み量
 			float overlapZ1 = wallAABB.max.z - playerAABB.min.z; // 奥から手前へ押す量
 			float overlapZ2 = playerAABB.max.z - wallAABB.min.z; // 手前から奥へ押す量
+
+			// 最小のめり込み量を選ぶ（正の値にする）
+			float minOverlapX = std::min(overlapX1, overlapX2);
+			float minOverlapZ = std::min(overlapZ1, overlapZ2);
+
+			// めり込みが少ない軸の方向に押し出す
+			if (minOverlapX < minOverlapZ) {
+				// X軸方向に押し出す
+				if (overlapX1 < overlapX2) {
+					playerPos.x += overlapX1; // 右へ押し出す
+				} else {
+					playerPos.x -= overlapX2; // 左へ押し出す
+				}
+			} else {
+				// Z軸方向に押し出す
+				if (overlapZ1 < overlapZ2) {
+					playerPos.z += overlapZ1; // 奥へ押し出す
+				} else {
+					playerPos.z -= overlapZ2; // 手前へ押し出す
+				}
+			}
+
+			// 押し出した結果をプレイヤーの座標に反映
+			player_->SetPosition(playerPos);
+
+			// 複数の壁と連続で当たるケースを考慮し、判定用AABBもその場で更新
+			playerAABB.max.x = playerPos.x + 0.5f;
+			playerAABB.min.x = playerPos.x - 0.5f;
+			playerAABB.max.z = playerPos.z + 0.5f;
+			playerAABB.min.z = playerPos.z - 0.5f;
+		}
+	}
+
+	// ==========================================
+	// プレイヤーとガラスの押し出し判定
+	// ==========================================
+	for (const auto& glass : glassManager_->GetGlasses()) {
+		AABB glassAABB = glass->GetCollision();
+
+		// AABB同士の交差判定
+		if (playerAABB.min.x <= glassAABB.max.x && playerAABB.max.x >= glassAABB.min.x && playerAABB.min.y <= glassAABB.max.y && playerAABB.max.y >= glassAABB.min.y &&
+		    playerAABB.min.z <= glassAABB.max.z && playerAABB.max.z >= glassAABB.min.z) {
+
+			// めり込み量の計算
+			// X軸方向のめり込み量
+			float overlapX1 = glassAABB.max.x - playerAABB.min.x; // 右から左へ押す量
+			float overlapX2 = playerAABB.max.x - glassAABB.min.x; // 左から右へ押す量
+			// Z軸方向のめり込み量
+			float overlapZ1 = glassAABB.max.z - playerAABB.min.z; // 奥から手前へ押す量
+			float overlapZ2 = playerAABB.max.z - glassAABB.min.z; // 手前から奥へ押す量
 
 			// 最小のめり込み量を選ぶ（正の値にする）
 			float minOverlapX = std::min(overlapX1, overlapX2);
@@ -699,6 +758,9 @@ void GamePlayScene::UpdateImGui() {
 	for (auto& door : doorManager_->GetDoors()) {
 		objects_.push_back(door.get()); // ドア
 	}
+	for (auto& glass : glassManager_->GetGlasses()) {
+		objects_.push_back(glass.get()); // ガラス
+	}
 
 	// 選択中のオブジェクトが破棄されていないか検証
 	bool isSelectedValid = false;
@@ -811,6 +873,9 @@ void GamePlayScene::UpdateDebugImGui() {
 	}
 
 	ImGui::DragFloat("CameraPosY", &cameraPosY_, 0.1f);
+	ImGui::DragFloat3("Direction", &ctx_.engineContext->object3dCommon->GetDirectionalLight().direction.x, 0.01f);
+	ImGui::DragFloat3("Color", &ctx_.engineContext->object3dCommon->GetDirectionalLight().color.x, 0.01f);
+	ImGui::DragFloat3("Intensity", &ctx_.engineContext->object3dCommon->GetDirectionalLight().intensity, 0.01f);
 	ImGui::End();
 #endif
 }

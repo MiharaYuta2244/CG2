@@ -1,7 +1,7 @@
 #include "Glass.h"
 
 void Glass::Initialize(EngineContext* ctx, GlassStatus glassStatus) {
-	transform_.scale = {glassStatus.width, 100.0f, glassStatus.depth};
+	transform_.scale = {glassStatus.width, 50.0f, glassStatus.depth};
 	transform_.rotate = {0.0f, 0.0f, 0.0f};
 	transform_.translate = {glassStatus.centerX, 0.0f, glassStatus.centerZ};
 	glassStatus_ = glassStatus;
@@ -9,6 +9,7 @@ void Glass::Initialize(EngineContext* ctx, GlassStatus glassStatus) {
 	// 生成&初期化
 	render_ = std::make_unique<ObjectRender>();
 	render_->Initialize(ctx, "Cube.obj");
+	render_->SetColor({1.0f, 1.0f, 1.0f, 0.2f});
 }
 
 void Glass::Update() {
@@ -16,7 +17,7 @@ void Glass::Update() {
 	UpdateCollision();
 
 	// 更新
-	render_->Update();
+	render_->Update(transform_);
 }
 
 void Glass::Draw() {

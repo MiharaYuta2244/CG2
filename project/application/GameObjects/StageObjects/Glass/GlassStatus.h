@@ -6,6 +6,7 @@ struct GlassStatus {
 	float depth;
 	float centerX;
 	float centerZ;
+	float rotateY;
 };
 
 // セーブ用 GlassStatus -> Jsonへの変換ルール
@@ -14,7 +15,8 @@ inline void to_json(Json& j, const GlassStatus& wState) {
 	    {"width",   wState.width  },
         {"depth",   wState.depth  },
         {"centerX", wState.centerX},
-        {"centerZ", wState.centerZ}
+        {"centerZ", wState.centerZ},
+        {"rotateY", wState.rotateY}
     };
 }
 
@@ -24,4 +26,5 @@ inline void from_json(const Json& j, GlassStatus& wState) {
 	wState.depth = j.value("depth", 0.0f);
 	wState.centerX = j.value("centerX", 0.0f);
 	wState.centerZ = j.value("centerZ", 0.0f);
+	wState.rotateY = j.value("rotateY", 0.0f);
 }

@@ -17,11 +17,21 @@ public:
 	void DrawSettingCommon(TextureManager* textureManager);
 
 	/// <summary>
-	/// アウトライン用の設定を適用するメソッド
+	/// アウトライン用の設定を適用する関数
 	/// </summary>
 	void DrawSettingOutline();
 
+	/// <summary>
+	/// スキニング用の設定を適用する関数
+	/// </summary>
+	/// <param name="textureManager"></param>
 	void DrawSettingSkinning(TextureManager* textureManager);
+
+	/// <summary>
+	/// 半透明用の設定を適用する関数
+	/// </summary>
+	/// <param name="textureManager"></param>
+	void DrawSettingTransparent(TextureManager* textureManager);
 
 	/// <summary>
 	/// 初期化関数
@@ -37,9 +47,14 @@ public:
 	// スキニング用パイプラインの生成関数
 	void CreateSkinningGraphicsPipeline();
 
+	// 半透明用パイプラインの生成関数
+	void CreateTransparentGraphicsPipeline();
+
 	// Setter
 	void SetDefaultCamera(Camera* camera) { defaultCamera_ = camera; }
-	void SetDirectionalLightIntensity(const float& intensity) { globalDirectionalLight_.intensity = intensity; }
+	void SetDirectionalLightParam(DirectionalLight dirLight) { globalDirectionalLight_ = dirLight; }
+	void SetPointLightParam(PointLight pointLight) { globalPointLight_ = pointLight; }
+	void SetSpotLightParam(SpotLight spotLight) { globalSpotLight_ = spotLight; }
 
 	// getter
 	DirectXCommon* GetDxCommon() const { return dxCommon_; }
@@ -50,6 +65,7 @@ public:
 	ID3D12PipelineState* GetOutlinePipelineState() { return outlinePipelineState_.Get(); }
 	ID3D12RootSignature* GetSkinningRootSignature() const { return skinningRootSignature_.Get(); }
 	ID3D12PipelineState* GetSkinningGraphicsPipelineState() const { return skinningGraphicsPipelineState_.Get(); }
+	ID3D12PipelineState* GetTransparentGraphicsPipelineState() const { return transparentPipelineState_.Get(); }
 
 #ifdef USE_IMGUI
 	// Lighting用ImGuiの描画
@@ -92,6 +108,7 @@ private:
 	Microsoft::WRL::ComPtr<ID3D12PipelineState> outlinePipelineState_;
 	Microsoft::WRL::ComPtr<ID3D12RootSignature> skinningRootSignature_;
 	Microsoft::WRL::ComPtr<ID3D12PipelineState> skinningGraphicsPipelineState_;
+	Microsoft::WRL::ComPtr<ID3D12PipelineState> transparentPipelineState_;
 
 	// Shader Compiler
 	Microsoft::WRL::ComPtr<IDxcUtils> dxcUtils_;
