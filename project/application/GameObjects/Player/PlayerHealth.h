@@ -30,6 +30,9 @@ public:
 	// HPの最大値取得Getter
 	float GetMaxHP() const { return maxHP_; }
 
+	// 無敵状態かどうかGetter
+	bool GetIsInvincible() const { return isInvincible_; }
+
 private:
 	float maxHP_ = 3.0f; // 最大HP
 	float hp_ = maxHP_;  // 現在のHP

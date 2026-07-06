@@ -9,6 +9,7 @@
 #include "PlayerHPIcon.h"
 #include "PlayerHealth.h"
 #include "PlayerMove.h"
+#include "BloodDecalManager.h"
 
 class EnemyManager;
 class Enemy;
@@ -19,7 +20,7 @@ class Enemy;
 class Player : public IGameObject {
 public:
 	// 初期化処理
-	void Initialize(EngineContext* ctx);
+	void Initialize(EngineContext* ctx, TinyEngine::BloodDecalManager* bloodDecalManager);
 
 	// 更新処理
 	void Update(float deltaTime, DirectInput* input, GamePad* gamePad, EnemyManager* enemyManager);
@@ -91,6 +92,9 @@ private:
 	// ヒットエフェクト生成関数
 	void GenerateHitEffect();
 
+	// 血痕の生成
+	void AddBloodDecal();
+
 private:
 	Vector2 velocity_;
 	OBB attackCol_;
@@ -150,4 +154,7 @@ private:
 
 	// 攻撃しているかどうか
 	bool isAttackTriggered_ = false;
+
+	// 血痕の管理インスタンスポインタ
+	TinyEngine::BloodDecalManager* bloodDecalManager_ = nullptr;
 };

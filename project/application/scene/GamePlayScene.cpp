@@ -48,7 +48,7 @@ void GamePlayScene::Initialize(const SceneContext& ctx) {
 	}
 
 	// プレイヤーの初期化
-	player_->Initialize(ctx_.engineContext);
+	player_->Initialize(ctx_.engineContext, bloodDecalManager_.get());
 
 	// 敵の生成&初期化
 	enemyManager_ = std::make_unique<EnemyManager>();

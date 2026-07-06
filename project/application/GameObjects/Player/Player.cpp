@@ -7,7 +7,7 @@
 
 using namespace TinyEngine;
 
-void Player::Initialize(EngineContext* ctx) {
+void Player::Initialize(EngineContext* ctx, TinyEngine::BloodDecalManager* bloodDecalManager) {
 	ctx_ = ctx;
 
 	transform_.scale = {3.0f, 3.0f, 3.0f};
@@ -45,6 +45,9 @@ void Player::Initialize(EngineContext* ctx) {
 	// プレイヤーのHPゲージ生成&初期化
 	hpIcon_ = std::make_unique<PlayerHPIcon>();
 	hpIcon_->Initialize(ctx);
+
+	// 血痕の管理インスタンスポインタ
+	bloodDecalManager_ = bloodDecalManager;
 }
 
 void Player::Update(float deltaTime, DirectInput* input, GamePad* gamePad, EnemyManager* enemyManager) {
@@ -323,6 +326,9 @@ void Player::Draw() {
 bool Player::IsDead() const { return hp_->IsDead(); }
 
 void Player::Damage(float value) {
+	if (hp_->GetIsInvincible())
+		return;
+
 	// ダメージ前のHPを保存
 	float beforeHP = hp_->GetCurrentHP();
 
@@ -342,6 +348,9 @@ void Player::Damage(float value) {
 	for (int i = startIdx; i < endIdx; ++i) {
 		hpIcon_->DmageAnimStart(i);
 	}
+
+	// 血痕の生成
+	AddBloodDecal();
 }
 
 void Player::UpdateCollision() {
@@ -395,4 +404,15 @@ void Player::GenerateHitEffect() {
 	hitEffects_.push_back(std::move(ringWave));
 
 	preHP_ = hp_->GetCurrentHP();
+}
+
+void Player::AddBloodDecal() {
+	for (int i = 0; i < 20; ++i) {
+		Vector3 basePos = transform_.translate;
+		Vector3 finalPos;
+		finalPos.x = basePos.x + RandomUtils::RangeFloat(-5, 5);
+		finalPos.y = 0.1f;
+		finalPos.z = basePos.z + RandomUtils::RangeFloat(-5, 5);
+		bloodDecalManager_->AddBlood(finalPos, {std::numbers::pi_v<float> / 2.0f, 0, 0}, {1, 1, 1});
+	}
 }
