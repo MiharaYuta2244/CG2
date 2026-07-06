@@ -27,7 +27,7 @@ void PlayerHPIcon::Update(float deltaTime) {
 		float margin = i * margin_;
 		sprites_[i]->SetPosition({basePos_.x + margin, basePos_.y});
 
-		// アニメーションの更新・適用を各アイコンごとに独立して行う
+		// アニメーションの更新・適用を各アイコンごとに行う
 		bool playing = scaleYAnims_[i].anim.Update(deltaTime, scaleYAnims_[i].temp);
 
 		if (playing) {

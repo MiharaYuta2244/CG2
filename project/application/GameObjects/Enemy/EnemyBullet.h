@@ -14,7 +14,7 @@ public:
 	void Initialize(EngineContext* ctx, Vector2 dir, Vector3 pos);
 
 	// 更新処理
-	void Update(float deltaTime, float bulletSpeed);
+	void Update(float deltaTime);
 
 	// 描画処理
 	void Draw();

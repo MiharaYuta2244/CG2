@@ -256,8 +256,8 @@ void Enemy::Damage() {
 
 void Enemy::UpdateCollision() {
 	Vector3 pos = transform_.translate;
-	bodyCol_.max = {pos.x + 0.5f, pos.y, pos.z + 0.5f};
-	bodyCol_.min = {pos.x - 0.5f, pos.y, pos.z - 0.5f};
+	bodyCol_.max = {pos.x + 0.5f, pos.y + 0.5f, pos.z + 0.5f};
+	bodyCol_.min = {pos.x - 0.5f, pos.y - 0.5f, pos.z - 0.5f};
 }
 
 void Enemy::GenerateExMark() {

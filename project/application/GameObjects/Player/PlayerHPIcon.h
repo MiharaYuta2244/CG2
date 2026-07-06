@@ -10,6 +10,7 @@ public:
 
 	void Draw();
 
+	// 被ダメージ時のアイコンのアニメーション開始処理
 	void DmageAnimStart(int index);
 
 private:

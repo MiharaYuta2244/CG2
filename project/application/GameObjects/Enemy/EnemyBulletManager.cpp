@@ -2,7 +2,7 @@
 
 void EnemyBulletManager::Update(float deltaTime) {
 	for (auto& bullet : bullets_) {
-		bullet->Update(deltaTime, bulletSpeed_);
+		bullet->Update(deltaTime);
 	}
 
 	// 弾の削除

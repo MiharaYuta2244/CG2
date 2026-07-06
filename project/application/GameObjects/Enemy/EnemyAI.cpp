@@ -39,7 +39,6 @@ void EnemyAI::LookatPlayer(float deltaTime, Vector3 playerPos, Vector3 enemyPos,
 		toPlayer = MathUtility::Normalize(toPlayer);
 
 		float angleY = std::atan2(toPlayer.x, toPlayer.z);
-
 		float current = transform_->rotate.y;
 		float target = angleY;
 

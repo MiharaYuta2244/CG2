@@ -47,7 +47,7 @@ void EnemyBullet::Initialize(EngineContext* ctx, Vector2 dir, Vector3 pos) {
 	scaleXYAnim_.anim.Start({width, height}, {0.0f, 0.0f}, kLifeTime_, EaseType::EASEINCUBIC);
 }
 
-void EnemyBullet::Update(float deltaTime, float bulletSpeed) {
+void EnemyBullet::Update(float deltaTime) {
 	deathTimer_ += deltaTime;
 	laserTimer_ += deltaTime;
 
