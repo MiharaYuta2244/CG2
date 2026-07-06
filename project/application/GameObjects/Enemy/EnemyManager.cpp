@@ -5,8 +5,11 @@
 #include "ImGuiManager.h"
 #endif
 
-void EnemyManager::Initialize(EngineContext* ctx) {
+using namespace TinyEngine;
+
+void EnemyManager::Initialize(EngineContext* ctx, BloodDecalManager* bloodDecalManager) {
 	ctx_ = ctx;
+	bloodDecalManager_ = bloodDecalManager;
 
 	// JSON読み込み
 	jsonPath_ = "Enemies.json";
@@ -82,7 +85,7 @@ void EnemyManager::DrawImGui() {
 	// 敵の追加ボタン
 	if (ImGui::Button("Add Enemy")) {
 		auto newEnemy = std::make_unique<Enemy>();
-		newEnemy->Initialize(ctx_, {0.0f, 0.0f, 0.0f}, static_cast<EnemyType>(RandomUtils::RangeInt(0, 1)));
+		newEnemy->Initialize(ctx_, {0.0f, 0.0f, 0.0f}, static_cast<EnemyType>(RandomUtils::RangeInt(0, 1)) ,bloodDecalManager_);
 		newEnemy->SetPos({0.0f, 0.0f, 0.0f});
 		newEnemy->SetRotate({0.0f, 0.0f, 0.0f});
 		enemies_.push_back(std::move(newEnemy));
@@ -119,7 +122,7 @@ void EnemyManager::LoadFromJson(const std::string& filepath) {
 
 	for (const auto& data : enemyDatas) {
 		auto enemy = std::make_unique<Enemy>();
-		enemy->Initialize(ctx_, data.pos, static_cast<EnemyType>(RandomUtils::RangeInt(0, 1)));
+		enemy->Initialize(ctx_, data.pos, static_cast<EnemyType>(RandomUtils::RangeInt(0, 1)), bloodDecalManager_);
 		enemy->SetPos(data.pos);
 		enemy->SetRotate(data.rot);
 		enemies_.push_back(std::move(enemy));

@@ -9,7 +9,7 @@
 
 using namespace TinyEngine;
 
-void Enemy::Initialize(EngineContext* ctx, Vector3 pos, EnemyType type) {
+void Enemy::Initialize(EngineContext* ctx, Vector3 pos, EnemyType type, BloodDecalManager* bloodDecalManager) {
 	ctx_ = ctx;
 
 	type_ = type;
@@ -40,6 +40,9 @@ void Enemy::Initialize(EngineContext* ctx, Vector3 pos, EnemyType type) {
 	visionCone_ = std::make_unique<VisionCone>();
 	Visionparam param = ai_->GetVisionParam();
 	visionCone_->Initialize(ctx, param.radius, param.angle);
+
+	// 血痕
+	bloodDecalManager_ = bloodDecalManager;
 }
 
 void Enemy::Update(float deltaTime, Player* player, EnemyBulletManager* enemyBulletManager, WallManager* wallManager, DoorManager* doorManager) {
@@ -230,6 +233,9 @@ void Enemy::Kill() {
 		return;
 
 	isDead_ = true;
+
+	// 血痕の生成
+	AddBloodDecal();
 }
 
 void Enemy::Damage() {
@@ -247,6 +253,9 @@ void Enemy::Damage() {
 	} else {
 		ai_->SetState(EnemyAI::State::Normal);
 		ai_->ResetShotTimer();
+
+		// 血痕の生成
+		AddBloodDecal();
 	}
 
 	damageBlinkTimer_ = 1.0f; // 点滅させる時間を設定
@@ -301,5 +310,16 @@ void Enemy::SetAIState(EnemyAI::State state) {
 void Enemy::StopAnimation() {
 	if (knockBackAnim_.anim.GetIsActive()) {
 		knockBackAnim_.anim.Reset();
+	}
+}
+
+void Enemy::AddBloodDecal() {
+	for (int i = 0; i < 20; ++i) {
+		Vector3 basePos = transform_.translate;
+		Vector3 finalPos;
+		finalPos.x = basePos.x + RandomUtils::RangeFloat(-5, 5);
+		finalPos.y = 0.1f;
+		finalPos.z = basePos.z + RandomUtils::RangeFloat(-5, 5);
+		bloodDecalManager_->AddBlood(finalPos, {std::numbers::pi_v<float> / 2.0f, 0, 0}, {1, 1, 1});
 	}
 }

@@ -37,12 +37,22 @@ void GamePlayScene::Initialize(const SceneContext& ctx) {
 	ctx_.engineContext->object3dCommon->SetDefaultCamera(ctx_.currentCamera);
 	ctx_.engineContext->particleCommon->SetDefaultCamera(ctx_.currentCamera);
 
+	// 血痕管理インスタンス
+	bloodDecalManager_ = std::make_unique<BloodDecalManager>();
+	bloodDecalManager_->Initialize(ctx.engineContext, "Dust.png");
+
+	for (int i = 0; i < 20; ++i) {
+		float posX = RandomUtils::RangeFloat(-5, 5);
+		float posZ = RandomUtils::RangeFloat(-5, 5);
+		bloodDecalManager_->AddBlood({posX, 0.1f, posZ}, {std ::numbers::pi_v<float> / 2.0f, 0, 0}, {1, 1, 1}, {1, 0, 0, 1});
+	}
+
 	// プレイヤーの初期化
 	player_->Initialize(ctx_.engineContext);
 
 	// 敵の生成&初期化
 	enemyManager_ = std::make_unique<EnemyManager>();
-	enemyManager_->Initialize(ctx_.engineContext);
+	enemyManager_->Initialize(ctx_.engineContext, bloodDecalManager_.get());
 
 	// 敵の弾管理インスタンス生成
 	enemyBulletManager_ = std::make_unique<EnemyBulletManager>();
@@ -316,6 +326,9 @@ void GamePlayScene::Update() {
 	if (ctx_.keyboard->KeyTriggered(DIK_F4)) {
 		enemyManager_->SetStop();
 	}
+
+	bloodDecalManager_->SetCamera(ctx_.currentCamera);
+	bloodDecalManager_->Update();
 }
 
 void GamePlayScene::Draw() {
@@ -362,6 +375,8 @@ void GamePlayScene::Draw() {
 
 	// ガラスの管理インスタンス描画
 	glassManager_->Draw();
+
+	bloodDecalManager_->Draw();
 }
 
 void GamePlayScene::Finalize() {

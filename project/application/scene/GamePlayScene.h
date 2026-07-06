@@ -13,6 +13,7 @@
 #include "GameObjects/StageObjects/Ground/Ground.h"
 #include "GameObjects/StageObjects/Wall/WallManager.h"
 #include "GameObjects/StageObjects/Glass/GlassManager.h"
+#include "BloodDecalManager.h"
 #include "Object3d.h"
 #include "Particle.h"
 #include "Skybox.h"
@@ -128,5 +129,8 @@ private:
 	// プレイヤーの向きに応じたカメラのオフセット量
 	float offsetDistance_ = 0.0f;
 
+	// カメラのY座標
 	float cameraPosY_ = 0.0f;
+
+	std::unique_ptr<TinyEngine::BloodDecalManager> bloodDecalManager_;
 };

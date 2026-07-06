@@ -8,6 +8,7 @@
 #include "GameObjects/ObjectRender/ObjectRender.h"
 #include "Particle.h"
 #include "VisionCone.h"
+#include "BloodDecalManager.h"
 
 class EnemyBulletManager;
 class Player;
@@ -20,7 +21,7 @@ class DoorManager;
 class Enemy : public IGameObject {
 public:
 	// 初期化処理
-	void Initialize(EngineContext* ctx, Vector3 pos, EnemyType type);
+	void Initialize(EngineContext* ctx, Vector3 pos, EnemyType type, TinyEngine::BloodDecalManager* bloodDecalManager);
 
 	// 更新処理
 	void Update(float deltaTime, Player* player, EnemyBulletManager* enemyBulletManager, WallManager* wallManager, DoorManager* doorManager);
@@ -93,6 +94,9 @@ private:
 	// マズルフラッシュ生成関数
 	void GenerateMuzzleFlash(const Vector3& direction);
 
+	// 血痕の生成
+	void AddBloodDecal();
+
 private:
 	AABB bodyCol_; // 本体のAABB
 	bool enableMove_ = true;
@@ -140,4 +144,7 @@ private:
 
 	// 無敵時間用タイマー
 	float invincibleTimer_ = 0.0f;
+
+	// 死亡時の血痕
+	TinyEngine::BloodDecalManager* bloodDecalManager_ = nullptr;
 };
