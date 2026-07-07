@@ -9,6 +9,7 @@
 
 class Door;
 class Wall;
+class Glass;
 
 namespace TinyEngine {
 
@@ -35,7 +36,7 @@ public:
 	/// <summary>
 	/// 更新処理
 	/// </summary>
-	void Update(const std::list<std::unique_ptr<Wall>>& walls, const std::list<std::unique_ptr<Door>>& doors);
+	void Update(const std::list<std::unique_ptr<Wall>>& walls, const std::list<std::unique_ptr<Door>>& doors, const std::list<std::unique_ptr<Glass>>& glasses);
 
 	/// <summary>
 	/// 描画処理

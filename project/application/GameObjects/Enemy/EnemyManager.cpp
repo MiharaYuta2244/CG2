@@ -22,9 +22,7 @@ void EnemyManager::Update(float deltaTime, Player* player, EnemyBulletManager* e
 
 	// 生きている敵をすべて更新
 	for (auto& enemy : enemies_) {
-		if (enemy->GetIsMove()) {
-			enemy->Update(deltaTime, player, enemyBulletManager, wallManager, doorManager, glassManager);
-		}
+		enemy->Update(deltaTime, player, enemyBulletManager, wallManager, doorManager, glassManager);
 	}
 }
 
@@ -66,6 +64,12 @@ void EnemyManager::DrawImGui() {
 			if (ImGui::DragFloat3("Rotation", &rot.x, 0.5f)) {
 				enemy->SetRotate(rot);
 			}
+			
+			// --- isMove ---
+			bool isMove = enemy->GetIsMove();
+			if (ImGui::Checkbox("Is Move", &isMove)) {
+				enemy->SetIsMove(isMove);
+			}
 
 			// 敵の削除ボタン
 			if (ImGui::Button("Delete")) {
@@ -88,6 +92,7 @@ void EnemyManager::DrawImGui() {
 		newEnemy->Initialize(ctx_, {0.0f, 0.0f, 0.0f}, static_cast<EnemyType>(RandomUtils::RangeInt(0, 1)) ,bloodDecalManager_);
 		newEnemy->SetPos({0.0f, 0.0f, 0.0f});
 		newEnemy->SetRotate({0.0f, 0.0f, 0.0f});
+		newEnemy->SetIsMove(false);
 		enemies_.push_back(std::move(newEnemy));
 	}
 
@@ -125,6 +130,7 @@ void EnemyManager::LoadFromJson(const std::string& filepath) {
 		enemy->Initialize(ctx_, data.pos, static_cast<EnemyType>(RandomUtils::RangeInt(0, 1)), bloodDecalManager_);
 		enemy->SetPos(data.pos);
 		enemy->SetRotate(data.rot);
+		enemy->SetIsMove(data.isMove);
 		enemies_.push_back(std::move(enemy));
 	}
 }
@@ -136,6 +142,7 @@ void EnemyManager::SaveToJson(const std::string& filepath) {
 		EnemyData data;
 		data.pos = enemy->GetPos();
 		data.rot = enemy->GetRotate();
+		data.isMove = enemy->GetIsMove();
 		enemyDatas.push_back(data);
 	}
 

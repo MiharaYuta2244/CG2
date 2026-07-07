@@ -12,18 +12,21 @@ class DoorManager;
 struct EnemyData {
 	Vector3 pos;
 	Vector3 rot;
+	bool isMove;
 };
 
 inline void to_json(Json& j, const EnemyData& e) {
 	j = Json{
 	    {"pos", e.pos},
-        {"rot", e.rot}
+        {"rot", e.rot},
+        {"isMove", e.isMove}
     };
 }
 
 inline void from_json(const Json& j, EnemyData& e) {
 	e.pos = j.at("pos").get<Vector3>();
 	e.rot = j.at("rot").get<Vector3>();
+	e.isMove = j.value("isMove", true);
 }
 
 /// <summary>

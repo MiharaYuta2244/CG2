@@ -46,7 +46,17 @@ void Enemy::Initialize(EngineContext* ctx, Vector3 pos, EnemyType type, BloodDec
 }
 
 void Enemy::Update(float deltaTime, Player* player, EnemyBulletManager* enemyBulletManager, WallManager* wallManager, DoorManager* doorManager, GlassManager* glassManager) {
-	if (isDead_ || !isMove_) {
+	if (isDead_) {
+		return;
+	}
+
+	// ノックバックアニメーション
+	if (knockBackAnim_.anim.GetIsActive()) {
+		knockBackAnim_.anim.Update(deltaTime, knockBackAnim_.temp);
+		transform_.translate = knockBackAnim_.temp;
+	}
+
+	if (!isMove_) {
 		return;
 	}
 
@@ -95,12 +105,7 @@ void Enemy::Update(float deltaTime, Player* player, EnemyBulletManager* enemyBul
 	// 視界
 	visionCone_->SetTranslate(transform_.translate);
 	visionCone_->SetRotate(transform_.rotate);
-	visionCone_->Update(wallManager->GetWalls(), doorManager->GetDoors());
-
-	if (knockBackAnim_.anim.GetIsActive()) {
-		knockBackAnim_.anim.Update(deltaTime, knockBackAnim_.temp);
-		transform_.translate = knockBackAnim_.temp;
-	}
+	visionCone_->Update(wallManager->GetWalls(), doorManager->GetDoors(), glassManager->GetGlasses());
 
 	// 「!」マークの更新
 	if (exclamationMark_) {
