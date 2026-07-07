@@ -1,5 +1,6 @@
 #pragma once
 #include "AABB.h"
+#include "BloodDecalManager.h"
 #include "DirectInput.h"
 #include "GameObjects/IGameObject.h"
 #include "GameObjects/ObjectRender/ObjectRender.h"
@@ -9,7 +10,6 @@
 #include "PlayerHPIcon.h"
 #include "PlayerHealth.h"
 #include "PlayerMove.h"
-#include "BloodDecalManager.h"
 
 class EnemyManager;
 class Enemy;
@@ -93,7 +93,10 @@ private:
 	void GenerateHitEffect();
 
 	// 血痕の生成
-	void AddBloodDecal();
+	void AddBloodDecal(Vector3 scale);
+
+	// HPが2以下の時の出血処理
+	void Bleeding(float deltaTime);
 
 private:
 	Vector2 velocity_;
@@ -157,4 +160,10 @@ private:
 
 	// 血痕の管理インスタンスポインタ
 	TinyEngine::BloodDecalManager* bloodDecalManager_ = nullptr;
+
+	// 出血の間隔用タイマー
+	GameTimer bleedingTimer_;
+
+	// 出血の間隔
+	float bleedingInterval_ = 0.2f;
 };

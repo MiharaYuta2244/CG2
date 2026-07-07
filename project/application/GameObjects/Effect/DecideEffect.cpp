@@ -81,3 +81,9 @@ void DecideEffect::StartAnimation() {
 	secondHeightAnim_.anim.Start(startSize_.y, secondEndSize_.y, 0.3f, EaseType::EASEOUTCUBIC);
 	secondAlphaAnim_.anim.Start(1.0f, 0.0f, 0.3f, EaseType::EASEOUTCUBIC);
 }
+
+void DecideEffect::SetPos(Vector2 pos) {
+	Vector2 finalPos = pos + (startSize_ / 2.0f);
+	spriteFirst_->SetPosition(finalPos);
+	spriteSecond_->SetPosition(finalPos);
+}

@@ -16,6 +16,9 @@ public:
 	// アニメーション開始処理
 	void StartAnimation();
 
+	// 座標のSetter
+	void SetPos(Vector2 pos);
+
 private:
 	// スプライト
 	std::unique_ptr<TinyEngine::Sprite> spriteFirst_;  // 1枚目

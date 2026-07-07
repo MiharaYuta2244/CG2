@@ -284,6 +284,9 @@ void Player::Update(float deltaTime, DirectInput* input, GamePad* gamePad, Enemy
 	// プレイヤーのHPゲージ更新
 	hpIcon_->Update(deltaTime);
 
+	// 出血処理
+	Bleeding(deltaTime);
+
 #ifdef USE_IMGUI
 	ImGui::Begin("Player");
 	ImGui::SliderFloat("EnvScale", &envScale_, 0.0f, 1.0f);
@@ -350,7 +353,10 @@ void Player::Damage(float value) {
 	}
 
 	// 血痕の生成
-	AddBloodDecal();
+	AddBloodDecal({4, 4, 1});
+
+	// 出血用のタイマー初期化
+	bleedingTimer_.Initialize(0.5f);
 }
 
 void Player::UpdateCollision() {
@@ -406,11 +412,26 @@ void Player::GenerateHitEffect() {
 	preHP_ = hp_->GetCurrentHP();
 }
 
-void Player::AddBloodDecal() {
+void Player::AddBloodDecal(Vector3 scale) {
 	Vector3 basePos = transform_.translate;
 	Vector3 finalPos;
 	finalPos.x = basePos.x;
 	finalPos.y = 0.1f;
 	finalPos.z = basePos.z;
-	bloodDecalManager_->AddBlood(finalPos, {std::numbers::pi_v<float> / 2.0f, 0, 0}, {4, 4, 1}, {0.94f, 0.35f, 0.13f, 1.0f});
+	bloodDecalManager_->AddBlood(finalPos, {std::numbers::pi_v<float> / 2.0f, 0, 0}, scale, {0.94f, 0.35f, 0.13f, 1.0f});
+}
+
+void Player::Bleeding(float deltaTime) {
+	if (hp_->GetCurrentHP() <= 2 && isMoving_) {
+		if (bleedingTimer_.IsEnd()) {
+			// 出血用のタイマー初期化
+			bleedingTimer_.Initialize(bleedingInterval_);
+
+			// 血痕の生成
+			AddBloodDecal({1, 1, 1});
+		}
+
+		// 出血用タイマー更新
+		bleedingTimer_.Update(deltaTime);
+	}
 }

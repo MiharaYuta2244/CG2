@@ -126,6 +126,10 @@ void MenuList::Update(DirectInput* input, GamePad* gamePad, float deltaTime) {
 
 	// 決定ボタン入力時エフェクト更新
 	decideEffect_->Update(deltaTime);
+
+	// 選択中メニューの座標をエフェクトに適用
+	Vector2 effectPos = {startPos_.x, startPos_.y + offsetY_ * currentIndex_};
+	decideEffect_->SetPos(effectPos);
 }
 
 void MenuList::Draw() {
