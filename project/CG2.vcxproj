@@ -168,6 +168,8 @@ copy "$(windowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="application\Cinematic\CameraDeathZoomController.cpp" />
     <ClCompile Include="application\GameObjects\Effect\DecideEffect.cpp" />
     <ClCompile Include="application\GameObjects\StageObjects\Door\DoorManager.cpp" />
+    <ClCompile Include="application\GameObjects\StageObjects\Cage\Cage.cpp" />
+    <ClCompile Include="application\GameObjects\StageObjects\Cage\CageManager.cpp" />
     <ClCompile Include="engine\3d\decal\BloodDecalManager.cpp" />
     <ClCompile Include="engine\3d\particle\modules\ChargeCylinderModule.cpp" />
     <ClCompile Include="engine\3d\particle\modules\ChargeModule.cpp" />
@@ -366,6 +368,7 @@ copy "$(windowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="application\GameObjects\GameUI\Controls.h" />
     <ClInclude Include="application\GameObjects\CommonData.h" />
     <ClInclude Include="application\GameObjects\IGameObject.h" />
+    <ClInclude Include="application\GameObjects\StageObjects\Cage\CageStatus.h" />
     <ClInclude Include="application\GameObjects\StageObjects\Door\Door.h" />
     <ClInclude Include="application\Cinematic\CameraDeathZoomController.h" />
     <ClInclude Include="application\GameObjects\Effect\DecideEffect.h" />
@@ -373,6 +376,8 @@ copy "$(windowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="application\GameObjects\StageObjects\Door\DoorStatus.h" />
     <ClInclude Include="application\GameObjects\StageObjects\Glass\GlassStatus.h" />
     <ClInclude Include="application\GameObjects\StageObjects\Wall\WallStatus.h" />
+    <ClInclude Include="application\GameObjects\StageObjects\Cage\Cage.h" />
+    <ClInclude Include="application\GameObjects\StageObjects\Cage\CageManager.h" />
     <ClInclude Include="engine\3d\decal\BloodDecalManager.h" />
     <ClInclude Include="engine\3d\particle\modules\ChargeCylinderModule.h" />
     <ClInclude Include="engine\3d\particle\modules\ChargeModule.h" />

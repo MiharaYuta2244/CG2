@@ -107,6 +107,7 @@ private:
 	bool isShotThisFrame_ = false;
 	bool isShotHoldState_ = true;
 	Vector3 shotDirection_ = {0.0f, 0.0f, 1.0f};
+	float shotTimerMultiPlier_ = 0.5f; // 拘束時の発射速度を早めるための変数
 
 	// 経路探索用
 	std::vector<Vector3> currentPath_; // A*で計算した経路

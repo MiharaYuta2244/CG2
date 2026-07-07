@@ -79,9 +79,14 @@ void GamePlayScene::Initialize(const SceneContext& ctx) {
 	ground_ = std::make_unique<Ground>();
 	ground_->Initialize(ctx_.engineContext);
 
+	// 檻
+	cageManager_ = std::make_unique<CageManager>();
+	cageManager_->Initialize(ctx.engineContext);
+
 	// シーン遷移要求制御変数
 	isTransitionRequested_ = false;
 
+	// 操作方法UI
 	controls_ = std::make_unique<Controls>();
 	controls_->Initialize(ctx_.engineContext);
 
@@ -115,6 +120,9 @@ void GamePlayScene::Initialize(const SceneContext& ctx) {
 	}
 	for (auto& door : doorManager_->GetDoors()) {
 		objects_.push_back(door.get()); // ドア
+	}
+	for (auto& cage : cageManager_->GetCages()) {
+		objects_.push_back(cage.get()); // 檻
 	}
 }
 
@@ -170,6 +178,9 @@ void GamePlayScene::Update() {
 
 	// ガラスの管理インスタンス更新
 	glassManager_->Update();
+
+	// 檻の管理インスタンス
+	cageManager_->Update(deltaTime);
 
 	// ゴール判定インスタンス更新
 	goal_->Update(deltaTime);
@@ -247,6 +258,9 @@ void GamePlayScene::Update() {
 	// 敵の管理インスタンスImGui
 	enemyManager_->DrawImGui();
 
+	// 檻の管理インスタンスImGui
+	cageManager_->DrawImGui();
+
 	// ギズモ用ImGui更新
 	UpdateImGui();
 
@@ -323,6 +337,9 @@ void GamePlayScene::Draw() {
 
 	// 敵の描画処理
 	enemyManager_->Draw();
+
+	// 檻の管理インスタンス描画
+	cageManager_->Draw();
 
 	// 敵の弾の描画処理
 	enemyBulletManager_->Draw();
@@ -512,6 +529,56 @@ void GamePlayScene::CollisionGameObjects() {
 			// Z軸方向のめり込み量
 			float overlapZ1 = glassAABB.max.z - playerAABB.min.z; // 奥から手前へ押す量
 			float overlapZ2 = playerAABB.max.z - glassAABB.min.z; // 手前から奥へ押す量
+
+			// 最小のめり込み量を選ぶ（正の値にする）
+			float minOverlapX = std::min(overlapX1, overlapX2);
+			float minOverlapZ = std::min(overlapZ1, overlapZ2);
+
+			// めり込みが少ない軸の方向に押し出す
+			if (minOverlapX < minOverlapZ) {
+				// X軸方向に押し出す
+				if (overlapX1 < overlapX2) {
+					playerPos.x += overlapX1; // 右へ押し出す
+				} else {
+					playerPos.x -= overlapX2; // 左へ押し出す
+				}
+			} else {
+				// Z軸方向に押し出す
+				if (overlapZ1 < overlapZ2) {
+					playerPos.z += overlapZ1; // 奥へ押し出す
+				} else {
+					playerPos.z -= overlapZ2; // 手前へ押し出す
+				}
+			}
+
+			// 押し出した結果をプレイヤーの座標に反映
+			player_->SetPosition(playerPos);
+
+			// 複数の壁と連続で当たるケースを考慮し、判定用AABBもその場で更新
+			playerAABB.max.x = playerPos.x + 0.5f;
+			playerAABB.min.x = playerPos.x - 0.5f;
+			playerAABB.max.z = playerPos.z + 0.5f;
+			playerAABB.min.z = playerPos.z - 0.5f;
+		}
+	}
+
+	// ==========================================
+	// プレイヤーと檻の押し出し判定
+	// ==========================================
+	for (const auto& cage : cageManager_->GetCages()) {
+		AABB cageAABB = cage->GetCollision();
+
+		// AABB同士の交差判定
+		if (playerAABB.min.x <= cageAABB.max.x && playerAABB.max.x >= cageAABB.min.x && playerAABB.min.y <= cageAABB.max.y && playerAABB.max.y >= cageAABB.min.y &&
+		    playerAABB.min.z <= cageAABB.max.z && playerAABB.max.z >= cageAABB.min.z) {
+
+			// めり込み量の計算
+			// X軸方向のめり込み量
+			float overlapX1 = cageAABB.max.x - playerAABB.min.x; // 右から左へ押す量
+			float overlapX2 = playerAABB.max.x - cageAABB.min.x; // 左から右へ押す量
+			// Z軸方向のめり込み量
+			float overlapZ1 = cageAABB.max.z - playerAABB.min.z; // 奥から手前へ押す量
+			float overlapZ2 = playerAABB.max.z - cageAABB.min.z; // 手前から奥へ押す量
 
 			// 最小のめり込み量を選ぶ（正の値にする）
 			float minOverlapX = std::min(overlapX1, overlapX2);
@@ -768,6 +835,9 @@ void GamePlayScene::UpdateImGui() {
 	}
 	for (auto& glass : glassManager_->GetGlasses()) {
 		objects_.push_back(glass.get()); // ガラス
+	}
+	for (auto& cage : cageManager_->GetCages()) {
+		objects_.push_back(cage.get()); // 檻
 	}
 
 	// 選択中のオブジェクトが破棄されていないか検証

@@ -13,6 +13,7 @@
 #include "GameObjects/StageObjects/Ground/Ground.h"
 #include "GameObjects/StageObjects/Wall/WallManager.h"
 #include "GameObjects/StageObjects/Glass/GlassManager.h"
+#include "GameObjects/StageObjects/Cage/CageManager.h"
 #include "BloodDecalManager.h"
 #include "Object3d.h"
 #include "Particle.h"
@@ -59,19 +60,22 @@ private:
 	// 敵
 	std::unique_ptr<EnemyManager> enemyManager_;
 
-	// 敵の弾を管理するクラス
+	// 敵の弾を管理するインスタンス
 	std::unique_ptr<EnemyBulletManager> enemyBulletManager_;
 
-	// 壁の管理クラス
+	// 壁の管理インスタンス
 	std::unique_ptr<WallManager> wallManager_;
 
-	// ドアの管理クラス
+	// ドアの管理インスタンス
 	std::unique_ptr<DoorManager> doorManager_;
 
-	// ガラスの管理クラス
+	// ガラスの管理インスタンス
 	std::unique_ptr<GlassManager> glassManager_;
 
-	// ゴール判定用クラス
+	// 檻の管理インスタンス
+	std::unique_ptr<CageManager> cageManager_;
+
+	// ゴール判定用インスタンス
 	std::unique_ptr<Goal> goal_;
 
 	// 死亡パーティクルリスト
@@ -135,5 +139,6 @@ private:
 	// カメラのY座標
 	float cameraPosY_ = 0.0f;
 
+	// 血痕管理インスタンス
 	std::unique_ptr<TinyEngine::BloodDecalManager> bloodDecalManager_;
 };

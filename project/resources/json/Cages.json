@@ -1,0 +1,30 @@
+[
+    {
+        "centerX": -1.0,
+        "centerZ": 1.5,
+        "depth": 1.0,
+        "rotateY": 1.5499999523162842,
+        "width": 1.0
+    },
+    {
+        "centerX": 0.5,
+        "centerZ": 1.5,
+        "depth": 1.0,
+        "rotateY": 1.5499999523162842,
+        "width": 1.0
+    },
+    {
+        "centerX": -1.0,
+        "centerZ": -1.5,
+        "depth": 1.0,
+        "rotateY": 1.5499999523162842,
+        "width": 1.0
+    },
+    {
+        "centerX": 0.5,
+        "centerZ": -1.5,
+        "depth": 1.0,
+        "rotateY": 1.5499999523162842,
+        "width": 1.0
+    }
+]
