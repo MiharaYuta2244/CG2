@@ -297,32 +297,15 @@ void GamePlayScene::Update() {
 	// 地面の更新
 	ground_->Update();
 
+	// 操作方法UI更新
 	controls_->Update();
 
-	if (ctx_.keyboard->KeyTriggered(DIK_F1)) {
-		ctx_.sceneManager->ChangeScene("EasingEditorScene");
-	}
-
-	if (ctx_.keyboard->KeyTriggered(DIK_F2)) {
-		isDebugCameraActive_ = !isDebugCameraActive_;
-
-		if (isDebugCameraActive_) {
-			ctx_.currentCamera->SetTranslation({0.0f, 250.0f, 0.0f});
-		} else {
-			ctx_.currentCamera->SetTranslation({0.0f, 60.0f, 0.0f});
-		}
-	}
-
-	if (ctx_.keyboard->KeyTriggered(DIK_F3)) {
-		enemyManager_->SetMove();
-	}
-
-	if (ctx_.keyboard->KeyTriggered(DIK_F4)) {
-		enemyManager_->SetStop();
-	}
-
+	// 血痕管理インスタンス更新
 	bloodDecalManager_->SetCamera(ctx_.currentCamera);
 	bloodDecalManager_->Update();
+
+	// 入力系のデバッグ処理
+	DebugInput();
 }
 
 void GamePlayScene::Draw() {
@@ -949,4 +932,31 @@ void GamePlayScene::GenerateEnemyDeathParticle(const Vector3& pos) {
 	ringWave->SetEmitMode(false, 0.05f);
 	ringWave->SetEmitterParam(1, 0.01f);
 	enemyDeathParticle_.push_back(std::move(ringWave));
+}
+
+void GamePlayScene::DebugInput() {
+#if _DEBUG || NDEBUG
+	if (ctx_.keyboard->KeyTriggered(DIK_F1)) {
+		ctx_.sceneManager->ChangeScene("EasingEditorScene");
+	}
+
+	if (ctx_.keyboard->KeyTriggered(DIK_F2)) {
+		isDebugCameraActive_ = !isDebugCameraActive_;
+
+		if (isDebugCameraActive_) {
+			ctx_.currentCamera->SetTranslation({0.0f, 200.0f, 0.0f});
+		} else {
+			ctx_.currentCamera->SetTranslation({player_->GetPosition().x, 60.0f, player_->GetPosition().z});
+			ctx_.currentCamera->SetPivot(currentCameraPivot_);
+		}
+	}
+
+	if (ctx_.keyboard->KeyTriggered(DIK_F3)) {
+		enemyManager_->SetMove();
+	}
+
+	if (ctx_.keyboard->KeyTriggered(DIK_F4)) {
+		enemyManager_->SetStop();
+	}
+#endif
 }

@@ -16,7 +16,7 @@ public:
 private:
 	// 回転スピード
 	float rotationSpeed_ = 4.0f;
-	float rotateMultiplier_ = 0.5f;
+	float rotateMultiplier_ = 1.0f;
 
 	// 加速度移動用のパラメータ
 	Vector2 velocity_ = {0.0f, 0.0f}; // 移動速度

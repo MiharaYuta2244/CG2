@@ -49,6 +49,9 @@ private:
 	// 敵死亡時パーティクル生成
 	void GenerateEnemyDeathParticle(const Vector3& pos);
 
+	// 入力系デバッグ処理
+	void DebugInput();
+
 private:
 	// プレイヤー
 	std::unique_ptr<Player> player_;
