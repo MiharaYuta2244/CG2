@@ -407,12 +407,10 @@ void Player::GenerateHitEffect() {
 }
 
 void Player::AddBloodDecal() {
-	for (int i = 0; i < 20; ++i) {
-		Vector3 basePos = transform_.translate;
-		Vector3 finalPos;
-		finalPos.x = basePos.x + RandomUtils::RangeFloat(-5, 5);
-		finalPos.y = 0.1f;
-		finalPos.z = basePos.z + RandomUtils::RangeFloat(-5, 5);
-		bloodDecalManager_->AddBlood(finalPos, {std::numbers::pi_v<float> / 2.0f, 0, 0}, {1, 1, 1});
-	}
+	Vector3 basePos = transform_.translate;
+	Vector3 finalPos;
+	finalPos.x = basePos.x;
+	finalPos.y = 0.1f;
+	finalPos.z = basePos.z;
+	bloodDecalManager_->AddBlood(finalPos, {std::numbers::pi_v<float> / 2.0f, 0, 0}, {4, 4, 1}, {0.94f, 0.35f, 0.13f, 1.0f});
 }

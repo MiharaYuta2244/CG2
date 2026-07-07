@@ -45,11 +45,17 @@ void EnemyBullet::Initialize(EngineContext* ctx, Vector2 dir, Vector3 pos) {
 
 	// アニメーション開始処理
 	scaleXYAnim_.anim.Start({width, height}, {0.0f, 0.0f}, kLifeTime_, EaseType::EASEINCUBIC);
+
+	// フレーム数のリセット
+	aliveFrameCount_ = 0;
 }
 
 void EnemyBullet::Update(float deltaTime) {
 	deathTimer_ += deltaTime;
 	laserTimer_ += deltaTime;
+
+	// フレーム数の加算
+	aliveFrameCount_++;
 
 	bool isPlaying = scaleXYAnim_.anim.Update(deltaTime, scaleXYAnim_.temp);
 	if (isPlaying) {

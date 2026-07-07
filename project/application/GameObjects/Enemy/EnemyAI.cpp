@@ -2,7 +2,6 @@
 #include "AStarPathfinder.h"
 #include "EnemyBulletManager.h"
 #include "GameObjects/Player/Player.h"
-#include "GameObjects/StageObjects/Wall/WallManager.h"
 #include "MathOperator.h"
 #include "MathUtility.h"
 #include "Random.h"
@@ -14,16 +13,16 @@ void EnemyAI::Initialize(Transform* transform, EngineContext* ctx, EnemyType typ
 	type_ = type;
 }
 
-void EnemyAI::Update(float deltaTime, Player* player, EnemyBulletManager* enemyBulletManager, WallManager* wallManager) {
+void EnemyAI::Update(float deltaTime, Player* player, EnemyBulletManager* enemyBulletManager, WallManager* wallManager, DoorManager* doorManager, GlassManager* glassManager) {
 	isShotThisFrame_ = false;
 
 	// 状態に応じたUpdateを呼ぶ
 	switch (state_) {
 	case State::Normal:
-		UpdateNormal(deltaTime, player, wallManager);
+		UpdateNormal(deltaTime, player, wallManager, doorManager, glassManager);
 		break;
 	case State::Vigilance:
-		UpdateVigilance(deltaTime, player, enemyBulletManager, wallManager);
+		UpdateVigilance(deltaTime, player, enemyBulletManager, wallManager, doorManager, glassManager);
 		break;
 	case State::Hold:
 		UpdateHold(deltaTime, player, enemyBulletManager);
@@ -46,9 +45,9 @@ void EnemyAI::LookatPlayer(float deltaTime, Vector3 playerPos, Vector3 enemyPos,
 	}
 }
 
-void EnemyAI::UpdateNormal(float deltaTime, Player* player, WallManager* wallManager) {
+void EnemyAI::UpdateNormal(float deltaTime, Player* player, WallManager* wallManager, DoorManager* doorManager, GlassManager* glassManager) {
 	// 視界チェックを行い、見つけたら警戒状態へ遷移
-	if (CheckPlayerInVision(player, wallManager)) {
+	if (CheckPlayerInVision(player, wallManager, doorManager, glassManager)) {
 		state_ = State::Vigilance;
 	}
 
@@ -133,12 +132,12 @@ void EnemyAI::UpdateNormal(float deltaTime, Player* player, WallManager* wallMan
 	}
 }
 
-void EnemyAI::UpdateVigilance(float deltaTime, Player* player, EnemyBulletManager* enemyBulletManager, WallManager* wallManager) {
+void EnemyAI::UpdateVigilance(float deltaTime, Player* player, EnemyBulletManager* enemyBulletManager, WallManager* wallManager, DoorManager* doorManager, GlassManager* glassManager) {
 	Vector3 playerPos = player->GetPosition();
 	Vector3 enemyPos = transform_->translate;
 
 	// 現在プレイヤーが見えているかチェック
-	bool canSeePlayer = CheckPlayerInVision(player, wallManager);
+	bool canSeePlayer = CheckPlayerInVision(player, wallManager, doorManager, glassManager);
 
 	if (canSeePlayer) {
 		// 見えている場合、タイマーをリセットし、最後の位置を更新
@@ -233,7 +232,7 @@ void EnemyAI::UpdateHold(float deltaTime, Player* player, EnemyBulletManager* en
 	}
 }
 
-bool EnemyAI::CheckPlayerInVision(Player* player, WallManager* wallManager) {
+bool EnemyAI::CheckPlayerInVision(Player* player, WallManager* wallManager, DoorManager* doorManager, GlassManager* glassManager) {
 	Vector3 playerPos = player->GetPosition();
 	Vector3 enemyPos = transform_->translate;
 
@@ -273,6 +272,24 @@ bool EnemyAI::CheckPlayerInVision(Player* player, WallManager* wallManager) {
 	for (const auto& wall : walls) {
 		AABB wallCol = wall->GetCollision();
 		if (IsSegmentIntersectAABB(enemyPos, playerPos, wallCol)) {
+			return false; // 壁に遮られている
+		}
+	}
+
+	// ドア
+	const auto& doors = doorManager->GetDoors();
+	for (const auto& door : doors) {
+		AABB doorCol = door->GetCollision();
+		if (IsSegmentIntersectAABB(enemyPos, playerPos, doorCol)) {
+			return false; // 壁に遮られている
+		}
+	}
+
+	// ガラス
+	const auto& glasses = glassManager->GetGlasses();
+	for (const auto& glass : glasses) {
+		AABB glassCol = glass->GetCollision();
+		if (IsSegmentIntersectAABB(enemyPos, playerPos, glassCol)) {
 			return false; // 壁に遮られている
 		}
 	}

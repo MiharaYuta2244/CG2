@@ -3,10 +3,12 @@
 #include "EnemyBullet.h"
 #include "EnemyType.h"
 #include "Transform.h"
+#include "GameObjects/StageObjects/Wall/WallManager.h"
+#include "GameObjects/StageObjects/Door/DoorManager.h"
+#include "GameObjects/StageObjects/Glass/GlassManager.h"
 #include <vector>
 
 class EnemyBulletManager;
-class WallManager;
 class Player;
 
 struct Visionparam {
@@ -29,7 +31,7 @@ public:
 	void Initialize(Transform* transform, EngineContext* ctx, EnemyType type);
 
 	// 更新処理
-	void Update(float deltaTime, Player* player, EnemyBulletManager* enemyBulletManager, WallManager* wallManager);
+	void Update(float deltaTime, Player* player, EnemyBulletManager* enemyBulletManager, WallManager* wallManager, DoorManager* doorManager, GlassManager* glassManager);
 
 	// Getter
 	State GetState() const { return state_; }
@@ -64,16 +66,16 @@ private:
 	void LookatPlayer(float deltaTime, Vector3 playerPos, Vector3 enemyPos, float turnSpeed = 6.0f);
 
 	// 通常状態の更新処理
-	void UpdateNormal(float deltaTime, Player* player, WallManager* wallManager);
+	void UpdateNormal(float deltaTime, Player* player, WallManager* wallManager, DoorManager* doorManager, GlassManager* glassManager);
 
 	// 警戒状態の更新処理
-	void UpdateVigilance(float deltaTime, Player* player, EnemyBulletManager* enemyBulletManager, WallManager* wallManager);
+	void UpdateVigilance(float deltaTime, Player* player, EnemyBulletManager* enemyBulletManager, WallManager* wallManager, DoorManager* doorManager, GlassManager* glassManager);
 
 	// 拘束状態の更新処理
 	void UpdateHold(float deltaTime, Player* player, EnemyBulletManager* enemyBulletManager);
 
 	// プレイヤーが視界内にいるか判定する
-	bool CheckPlayerInVision(Player* player, WallManager* wallManager);
+	bool CheckPlayerInVision(Player* player, WallManager* wallManager, DoorManager* doorManager, GlassManager* glassManager);
 
 	// 線分（敵からプレイヤー）とAABB（壁）の交差判定
 	bool IsSegmentIntersectAABB(const Vector3& start, const Vector3& end, const AABB& aabb);

@@ -41,12 +41,6 @@ void GamePlayScene::Initialize(const SceneContext& ctx) {
 	bloodDecalManager_ = std::make_unique<BloodDecalManager>();
 	bloodDecalManager_->Initialize(ctx.engineContext, "Dust.png");
 
-	for (int i = 0; i < 20; ++i) {
-		float posX = RandomUtils::RangeFloat(-5, 5);
-		float posZ = RandomUtils::RangeFloat(-5, 5);
-		bloodDecalManager_->AddBlood({posX, 0.1f, posZ}, {std ::numbers::pi_v<float> / 2.0f, 0, 0}, {1, 1, 1}, {1, 0, 0, 1});
-	}
-
 	// プレイヤーの初期化
 	player_->Initialize(ctx_.engineContext, bloodDecalManager_.get());
 
@@ -163,7 +157,7 @@ void GamePlayScene::Update() {
 	player_->Update(deltaTime, ctx_.keyboard, ctx_.gamePad, enemyManager_.get());
 
 	// 敵の更新処理
-	enemyManager_->Update(deltaTime, player_.get(), enemyBulletManager_.get(), wallManager_.get(), doorManager_.get());
+	enemyManager_->Update(deltaTime, player_.get(), enemyBulletManager_.get(), wallManager_.get(), doorManager_.get(), glassManager_.get());
 
 	// 敵の弾の更新処理
 	enemyBulletManager_->Update(deltaTime);
@@ -358,6 +352,9 @@ void GamePlayScene::Draw() {
 		particle->Draw();
 	}
 
+	// 血痕描画
+	bloodDecalManager_->Draw();
+
 	// ゴール判定インスタンス描画
 	goal_->Draw();
 
@@ -375,8 +372,6 @@ void GamePlayScene::Draw() {
 
 	// ガラスの管理インスタンス描画
 	glassManager_->Draw();
-
-	bloodDecalManager_->Draw();
 }
 
 void GamePlayScene::Finalize() {
@@ -390,6 +385,11 @@ void GamePlayScene::CollisionGameObjects() {
 	// ==========================================
 	AABB playerCol = player_->GetBodyCol();
 	for (auto& bullet : enemyBulletManager_->GetBullets()) {
+		// 発射された1フレーム目以外は判定を行わない
+		if (!bullet->IsCollisionActive()) {
+			continue;
+		}
+
 		// 弾が有効で、かつプレイヤーと接触しているか
 		if (Collision::Intersect(player_->GetBodyCol(), bullet->GetCollision())) {
 
@@ -750,6 +750,11 @@ void GamePlayScene::CollisionGameObjects() {
 	// ==========================================
 	for (const auto& enemy : enemyManager_->GetEnemies()) {
 		for (const auto& bullet : enemyBulletManager_->GetBullets()) {
+			// 発射された1フレーム目以外は判定を行わない
+			if (!bullet->IsCollisionActive()) {
+				continue;
+			}
+
 			// 衝突判定
 			if (Collision::Intersect(enemy->GetBodyCol(), bullet->GetCollision())) {
 				enemy->Damage();

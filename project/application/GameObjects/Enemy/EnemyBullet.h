@@ -28,6 +28,9 @@ public:
 	// 当たり判定Getter
 	OBB GetCollision() const { return col_; }
 
+	// 当たり判定が有効かどうかGetter
+	bool IsCollisionActive() const { return aliveFrameCount_ <= 1; }
+
 private:
 	Transform transform_;
 
@@ -52,4 +55,7 @@ private:
 
 	// スケールアニメーション用変数
 	AnimationBundle<Vector2> scaleXYAnim_;
+
+	// 生成されてからのフレーム数
+	int aliveFrameCount_ = 0;
 };

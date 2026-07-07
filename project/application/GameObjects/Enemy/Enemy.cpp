@@ -45,7 +45,7 @@ void Enemy::Initialize(EngineContext* ctx, Vector3 pos, EnemyType type, BloodDec
 	bloodDecalManager_ = bloodDecalManager;
 }
 
-void Enemy::Update(float deltaTime, Player* player, EnemyBulletManager* enemyBulletManager, WallManager* wallManager, DoorManager* doorManager) {
+void Enemy::Update(float deltaTime, Player* player, EnemyBulletManager* enemyBulletManager, WallManager* wallManager, DoorManager* doorManager, GlassManager* glassManager) {
 	if (isDead_ || !isMove_) {
 		return;
 	}
@@ -56,7 +56,7 @@ void Enemy::Update(float deltaTime, Player* player, EnemyBulletManager* enemyBul
 	}
 
 	// AIインスタンス更新
-	ai_->Update(deltaTime, player, enemyBulletManager, wallManager);
+	ai_->Update(deltaTime, player, enemyBulletManager, wallManager, doorManager, glassManager);
 
 	if (ai_->IsShotThisFrame()) {
 		GenerateMuzzleFlash(ai_->GetShotDirection());
@@ -156,7 +156,7 @@ void Enemy::Update(float deltaTime, Player* player, EnemyBulletManager* enemyBul
 		chargeParticle_->Update();
 	}
 
-	if (chargeCylinderParticle_ && ai_->GetState() == EnemyAI::State::Vigilance) {
+	if (chargeCylinderParticle_ && (ai_->GetState() == EnemyAI::State::Vigilance || ai_->GetState() == EnemyAI::State::Hold)) {
 		chargeCylinderParticle_->Update();
 	}
 
@@ -208,7 +208,7 @@ void Enemy::Draw() {
 		}
 
 		// 描画
-		if (ai_->GetState() == EnemyAI::State::Vigilance && chargeCylinderParticle_) {
+		if ((ai_->GetState() == EnemyAI::State::Vigilance || ai_->GetState() == EnemyAI::State::Hold) && chargeCylinderParticle_) {
 			chargeCylinderParticle_->Draw();
 		}
 	}
@@ -314,12 +314,10 @@ void Enemy::StopAnimation() {
 }
 
 void Enemy::AddBloodDecal() {
-	for (int i = 0; i < 20; ++i) {
-		Vector3 basePos = transform_.translate;
-		Vector3 finalPos;
-		finalPos.x = basePos.x + RandomUtils::RangeFloat(-5, 5);
-		finalPos.y = 0.1f;
-		finalPos.z = basePos.z + RandomUtils::RangeFloat(-5, 5);
-		bloodDecalManager_->AddBlood(finalPos, {std::numbers::pi_v<float> / 2.0f, 0, 0}, {1, 1, 1});
-	}
+	Vector3 basePos = transform_.translate;
+	Vector3 finalPos;
+	finalPos.x = basePos.x;
+	finalPos.y = 0.1f;
+	finalPos.z = basePos.z;
+	bloodDecalManager_->AddBlood(finalPos, {std::numbers::pi_v<float> / 2.0f, 0, 0}, {4, 4, 1});
 }
