@@ -35,7 +35,7 @@ void VisionCone::Initialize(EngineContext* ctx, float radius, float angleDegrees
 	material_.shininess = 1.0f;
 	material_.envScale = 0.0f;
 
-	// メッシュ（扇形ポリゴン）のビルド
+	// メッシュのビルド
 	CreateMesh(radius, angleDegrees, segments);
 
 	// 定数バッファの作成とマッピング

@@ -8,7 +8,7 @@
 class PlayerMove {
 public:
 	// 更新処理
-	void Update(Transform* transform, Vector2 inputDir, Vector2 aimDir, float deltaTime, float speedMultiplier = 1.0f);
+	void Update(Transform* transform, Vector2 inputDir, Vector2 aimDir, float deltaTime, float speedMultiplier = 1.0f, bool isHoldingEnemy = false);
 
 	// 速度の取得
 	Vector2 GetVelocity() const { return velocity_; }
@@ -16,6 +16,7 @@ public:
 private:
 	// 回転スピード
 	float rotationSpeed_ = 4.0f;
+	float rotateMultiplier_ = 0.5f;
 
 	// 加速度移動用のパラメータ
 	Vector2 velocity_ = {0.0f, 0.0f}; // 移動速度

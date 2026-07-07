@@ -3,7 +3,7 @@
 #include <complex>
 #include <numbers>
 
-void PlayerMove::Update(Transform* transform, Vector2 inputDir, Vector2 aimDir, float deltaTime, float speedMultiplier) {
+void PlayerMove::Update(Transform* transform, Vector2 inputDir, Vector2 aimDir, float deltaTime, float speedMultiplier, bool isHoldingEnemy) {
 	Vector3& rotate = transform->rotate;
 
 	// 入力ベクトルの長さを取得
@@ -47,6 +47,11 @@ void PlayerMove::Update(Transform* transform, Vector2 inputDir, Vector2 aimDir, 
 		}
 	}
 
+	float rotSpeed = rotationSpeed_;
+	if (isHoldingEnemy) {
+		rotSpeed *= rotateMultiplier_;
+	}
+
 	// 回転処理
 	if (hasAimInput) {
 		Vector2 aimNorm = {aimDir.x / aimLength, aimDir.y / aimLength};
@@ -59,7 +64,7 @@ void PlayerMove::Update(Transform* transform, Vector2 inputDir, Vector2 aimDir, 
 		while (diff > kPi)
 			diff -= 2.0f * kPi;
 
-		rotate.y += diff * rotationSpeed_ * deltaTime;
+		rotate.y += diff * rotSpeed * deltaTime;
 	} else if (hasInput) {
 		Vector2 dir = {inputDir.x / inputLength, inputDir.y / inputLength};
 		float targetAngle = std::atan2(dir.x, dir.y);
@@ -71,7 +76,7 @@ void PlayerMove::Update(Transform* transform, Vector2 inputDir, Vector2 aimDir, 
 		while (diff > kPi)
 			diff -= 2.0f * kPi;
 
-		rotate.y += diff * rotationSpeed_ * deltaTime;
+		rotate.y += diff * rotSpeed * deltaTime;
 	}
 
 	// 位置更新

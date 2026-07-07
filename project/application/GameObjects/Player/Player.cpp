@@ -108,11 +108,11 @@ void Player::Update(float deltaTime, DirectInput* input, GamePad* gamePad, Enemy
 	}
 
 	// 敵を掴んでいる場合は速度を半減させる
-	speedMultiplier_ = isHold_ ? 0.5f : 1.0f;
+	speedMultiplier_ = isHold_ ? 0.3f : 1.0f;
 
 	if (!hp_->IsDead()) {
 		// 移動更新
-		move_->Update(&transform_, inputDir, aimDir, deltaTime, speedMultiplier_);
+		move_->Update(&transform_, inputDir, aimDir, deltaTime, speedMultiplier_, isHold_);
 
 		// 攻撃等に使うベクトルの更新
 		lastMoveDirection_.x = std::sin(transform_.rotate.y);
