@@ -194,6 +194,7 @@ void VisionCone::Update(const std::list<std::unique_ptr<Wall>>& walls, const std
 
 		// 衝突結果に基づいてローカルの頂点座標を更新
 		vertices[i + 1].position = {localTarget.x * closestT, localTarget.y * closestT, localTarget.z * closestT, 1.0f};
+		vertices[i + 1].texcoord.y = closestT;
 	}
 
 	// 頂点バッファのアンマップ
