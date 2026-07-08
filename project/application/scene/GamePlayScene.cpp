@@ -1038,6 +1038,7 @@ void GamePlayScene::DebugInput() {
 }
 
 void GamePlayScene::UpdatePicking() {
+#ifdef USE_IMGUI
 	// ImGuizmo操作中（ギズモをドラッグ中）はクリック判定を行わない
 	if (ImGuizmo::IsOver() || ImGuizmo::IsUsing()) {
 		return;
@@ -1099,4 +1100,5 @@ void GamePlayScene::UpdatePicking() {
 			selectedGameObject_ = nullptr;
 		}
 	}
+#endif
 }
