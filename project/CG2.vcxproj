@@ -164,6 +164,7 @@ copy "$(windowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="application\GameObjects\Enemy\AStarPathfinder.cpp" />
     <ClCompile Include="application\GameObjects\Enemy\IEnemy.cpp" />
     <ClCompile Include="application\GameObjects\GameUI\Controls.cpp" />
+    <ClCompile Include="application\GameObjects\IGameObject.cpp" />
     <ClCompile Include="application\GameObjects\StageObjects\Door\Door.cpp" />
     <ClCompile Include="application\Cinematic\CameraDeathZoomController.cpp" />
     <ClCompile Include="application\GameObjects\Effect\DecideEffect.cpp" />

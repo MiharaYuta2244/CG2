@@ -18,6 +18,9 @@ void Glass::Update() {
 
 	// 更新
 	render_->Update(transform_);
+
+	// ギズモ用当たり判定更新
+	UpdateAABBForGizmo();
 }
 
 void Glass::Draw() {

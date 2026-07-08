@@ -53,6 +53,9 @@ void Goal::Update(float deltaTime) {
 	// パーティクル削除処理
 	std::erase_if(particle_, [this](const std::unique_ptr<TinyEngine::Particle>& p) { return p->IsFinished(); });
 
+	// ギズモ用当たり判定更新
+	UpdateAABBForGizmo();
+
 	#ifdef USE_IMGUI
 	ImGui::Begin("Goal");
 	ImGui::DragFloat3("Pos", &transform_.translate.x, 0.1f);

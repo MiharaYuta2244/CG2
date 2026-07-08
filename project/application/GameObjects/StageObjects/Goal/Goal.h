@@ -1,9 +1,9 @@
 #pragma once
 #include "AABB.h"
+#include "GameObjects/IGameObject.h"
 #include "GameObjects/ObjectRender/ObjectRender.h"
 #include "GameTimer.h"
 #include "Particle.h"
-#include "GameObjects/IGameObject.h"
 
 /// <summary>
 /// ゴール判定用クラス
@@ -27,6 +27,8 @@ public:
 
 	// ゴールフラグGetter
 	bool GetGoal() const { return isGoal_; }
+
+	std::string GetName() const { return "Goal"; }
 
 private:
 	EngineContext* ctx_ = nullptr;

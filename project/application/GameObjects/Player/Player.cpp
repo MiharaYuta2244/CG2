@@ -287,6 +287,9 @@ void Player::Update(float deltaTime, DirectInput* input, GamePad* gamePad, Enemy
 	// 出血処理
 	Bleeding(deltaTime);
 
+	// ギズモ用当たり判定更新
+	UpdateAABBForGizmo();
+
 #ifdef USE_IMGUI
 	ImGui::Begin("Player");
 	ImGui::SliderFloat("EnvScale", &envScale_, 0.0f, 1.0f);

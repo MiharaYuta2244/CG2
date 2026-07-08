@@ -27,6 +27,9 @@ void Wall::Update(float deltaTime) {
 
 	// 描画用インスタンス更新 
 	render_->Update(transform_);
+
+	// ギズモ用当たり判定更新
+	UpdateAABBForGizmo();
 }
 
 void Wall::Draw() {

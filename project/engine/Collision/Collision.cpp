@@ -180,3 +180,39 @@ bool Collision::Intersect(const Segment& segment, const AABB& aabb, float& outT)
 	outT = tMin;
 	return true;
 }
+
+bool Collision::Intersect(const Ray& ray, const AABB& aabb, float& outDistance) {
+	float tMin = 0.0f;
+	float tMax = FLT_MAX;
+
+	// X軸
+	if (abs(ray.direction.x) > 0.0001f) {
+		float t1 = (aabb.min.x - ray.origin.x) / ray.direction.x;
+		float t2 = (aabb.max.x - ray.origin.x) / ray.direction.x;
+		tMin = std::max(tMin, std::min(t1, t2));
+		tMax = std::min(tMax, std::max(t1, t2));
+	}
+
+	// Y軸
+	if (abs(ray.direction.y) > 0.0001f) {
+		float t1 = (aabb.min.y - ray.origin.y) / ray.direction.y;
+		float t2 = (aabb.max.y - ray.origin.y) / ray.direction.y;
+		tMin = std::max(tMin, std::min(t1, t2));
+		tMax = std::min(tMax, std::max(t1, t2));
+	}
+
+	// Z軸
+	if (abs(ray.direction.z) > 0.0001f) {
+		float t1 = (aabb.min.z - ray.origin.z) / ray.direction.z;
+		float t2 = (aabb.max.z - ray.origin.z) / ray.direction.z;
+		tMin = std::max(tMin, std::min(t1, t2));
+		tMax = std::min(tMax, std::max(t1, t2));
+	}
+
+	if (tMin > tMax) {
+		return false; // 交差していない
+	}
+
+	outDistance = tMin;
+	return true;
+}

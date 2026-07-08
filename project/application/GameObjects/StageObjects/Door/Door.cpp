@@ -78,6 +78,9 @@ void Door::Update(float deltaTime, Vector3 playerPos) {
 	// 描画用インスタンス更新
 	renders_[0]->Update(transform_);
 	renders_[1]->Update(transformSecond_);
+
+	// ギズモ用当たり判定更新
+	UpdateAABBForGizmo();
 }
 
 void Door::Draw() {

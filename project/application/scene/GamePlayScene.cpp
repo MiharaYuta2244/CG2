@@ -111,7 +111,7 @@ void GamePlayScene::Initialize(const SceneContext& ctx) {
 
 	// ギズモで操作する用にリストに追加
 	objects_.push_back(player_.get()); // プレイヤー
-	objects_.push_back(ground_.get()); // 床
+	objects_.push_back(goal_.get());   // ゴール
 	for (auto& enemy : enemyManager_->GetEnemies()) {
 		objects_.push_back(enemy.get()); // 敵
 	}
@@ -260,6 +260,9 @@ void GamePlayScene::Update() {
 
 	// 檻の管理インスタンスImGui
 	cageManager_->DrawImGui();
+
+	// マウスの画面座標をRayに変換して判定を取る処理
+	UpdatePicking();
 
 	// ギズモ用ImGui更新
 	UpdateImGui();
@@ -795,24 +798,26 @@ void GamePlayScene::CollisionGameObjects() {
 	// ==========================================
 	// 敵と敵の弾の当たり判定
 	// ==========================================
-	// for (const auto& enemy : enemyManager_->GetEnemies()) {
-	//	for (const auto& bullet : enemyBulletManager_->GetBullets()) {
-	//		// 発射された1フレーム目以外は判定を行わない
-	//		if (!bullet->IsCollisionActive()) {
-	//			continue;
-	//		}
+	if (player_->GetGrabbedEnemy() != nullptr) {
+		for (const auto& enemy : enemyManager_->GetEnemies()) {
+			for (const auto& bullet : enemyBulletManager_->GetBullets()) {
+				// 発射された1フレーム目以外は判定を行わない
+				if (!bullet->IsCollisionActive()) {
+					continue;
+				}
 
-	//		// 衝突判定
-	//		if (Collision::Intersect(enemy->GetBodyCol(), bullet->GetCollision())) {
-	//			enemy->Damage();
+				// 衝突判定
+				if (Collision::Intersect(enemy->GetBodyCol(), bullet->GetCollision())) {
+					enemy->Damage();
 
-	//			if (enemy->IsDead()) {
-	//				commonData_->killCount += 1;
-	//				GenerateEnemyDeathParticle(enemy->GetPos());
-	//			}
-	//		}
-	//	}
-	//}
+					if (enemy->IsDead()) {
+						commonData_->killCount += 1;
+						GenerateEnemyDeathParticle(enemy->GetPos());
+					}
+				}
+			}
+		}
+	}
 }
 
 void GamePlayScene::UpdateImGui() {
@@ -820,7 +825,7 @@ void GamePlayScene::UpdateImGui() {
 	// 毎フレーム、現在生存しているオブジェクトでリストを再構築
 	objects_.clear();
 	objects_.push_back(player_.get()); // プレイヤー
-	objects_.push_back(ground_.get()); // 床
+	objects_.push_back(goal_.get());   // ゴール
 	for (auto& enemy : enemyManager_->GetEnemies()) {
 		objects_.push_back(enemy.get()); // 敵
 	}
@@ -1030,4 +1035,68 @@ void GamePlayScene::DebugInput() {
 		cameraZoomController_->Skip();
 	}
 #endif
+}
+
+void GamePlayScene::UpdatePicking() {
+	// ImGuizmo操作中（ギズモをドラッグ中）はクリック判定を行わない
+	if (ImGuizmo::IsOver() || ImGuizmo::IsUsing()) {
+		return;
+	}
+
+	// 左クリックされた瞬間を検知
+	if (ctx_.keyboard->MouseButtonTriggered(0)) {
+
+		// マウスのカーソル座標を取得してクライアント座標に変換
+		POINT cursorPos;
+		GetCursorPos(&cursorPos);
+		auto hwnd = ctx_.engineContext->object3dCommon->GetDxCommon()->GetWinApp()->GetHWND();
+		ScreenToClient(hwnd, &cursorPos);
+
+		// 画面座標をNDCに変換
+		float screenWidth = 1280.0f; // 画面幅
+		float screenHeight = 720.0f; // 画面高さ
+		float nx = (2.0f * cursorPos.x) / screenWidth - 1.0f;
+		float ny = 1.0f - (2.0f * cursorPos.y) / screenHeight;
+
+		// ViewProjectionの逆行列を生成
+		Matrix4x4 viewMat = ctx_.currentCamera->GetViewMatrix();
+		Matrix4x4 projMat = ctx_.currentCamera->GetProjection();
+		Matrix4x4 vpMat = MathUtility::Multiply(viewMat, projMat);
+		Matrix4x4 vpInv = MathUtility::Inverse(vpMat);
+
+		// Rayの生成
+		Vector3 a = {nx, ny, 0.0f};
+		Vector3 b = {nx, ny, 1.0f};
+		Vector3 nearPoint = MathUtility::Transform(a, vpInv);
+		Vector3 farPoint = MathUtility::Transform(b, vpInv);
+
+		Ray ray;
+		ray.origin = nearPoint;
+		ray.direction = MathUtility::Normalize(farPoint - nearPoint);
+
+		// オブジェクトとの当たり判定
+		float minDistance = FLT_MAX;
+		IGameObject* hitObject = nullptr;
+
+		for (IGameObject* obj : objects_) {
+			AABB aabb = obj->GetAABBForGizmo();
+			float distance = 0.0f;
+
+			// レイとAABBが交差し、かつ今までのオブジェクトより手前にあるか
+			if (Collision::Intersect(ray, aabb, distance)) {
+				if (distance < minDistance) {
+					minDistance = distance;
+					hitObject = obj;
+				}
+			}
+		}
+
+		// クリックしたオブジェクトを選択状態にする
+		if (hitObject) {
+			selectedGameObject_ = hitObject;
+		} else {
+			// 何もないところをクリックしたら選択解除
+			selectedGameObject_ = nullptr;
+		}
+	}
 }

@@ -175,6 +175,9 @@ void Enemy::Update(float deltaTime, Player* player, EnemyBulletManager* enemyBul
 			chargeCylinderParticle_ = nullptr;
 		}
 	}
+
+	// ギズモ用当たり判定更新
+	UpdateAABBForGizmo();
 }
 
 void Enemy::PostUpdate() {

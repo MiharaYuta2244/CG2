@@ -8,6 +8,11 @@ struct Segment {
 	Vector3 diff;   // 始点から終点へのベクトル
 };
 
+struct Ray {
+	Vector3 origin;    // レイの開始位置
+	Vector3 direction; // レイの方向
+};
+
 namespace Collision {
 
 // 汎用テンプレート
@@ -24,4 +29,5 @@ bool Intersect(const OBB& obb1, const OBB& obb2);
 bool Intersect(const AABB& aabb, const OBB& obb);
 bool Intersect(const OBB& obb, const AABB& aabb);
 bool Intersect(const Segment& segment, const AABB& aabb, float& outT);
+bool Intersect(const Ray& ray, const AABB& aabb, float& outDistance);
 }; // namespace Collision

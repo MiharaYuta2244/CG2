@@ -17,7 +17,6 @@
 #include "BloodDecalManager.h"
 #include "Object3d.h"
 #include "Particle.h"
-#include "Skybox.h"
 #include <memory>
 #include <vector>
 
@@ -52,6 +51,9 @@ private:
 
 	// 入力系デバッグ処理
 	void DebugInput();
+
+	// マウスの画面座標をRayに変換して判定を取る
+	void UpdatePicking();
 
 private:
 	// プレイヤー
