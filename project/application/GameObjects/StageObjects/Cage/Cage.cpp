@@ -1,5 +1,9 @@
 #include "Cage.h"
 
+int Cage::index = 0;
+
+Cage::Cage() { id_ = index++; }
+
 void Cage::Initialize(EngineContext* ctx, CageStatus cageStatus) {
 	transform_.scale = {cageStatus.width, 50.0f, cageStatus.depth};
 	transform_.rotate = {0.0f, cageStatus.rotateY, 0.0f};

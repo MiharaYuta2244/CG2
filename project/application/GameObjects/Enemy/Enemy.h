@@ -20,6 +20,8 @@ class DoorManager;
 /// </summary>
 class Enemy : public IGameObject {
 public:
+	Enemy();
+
 	// 初期化処理
 	void Initialize(EngineContext* ctx, Vector3 pos, EnemyType type, TinyEngine::BloodDecalManager* bloodDecalManager);
 
@@ -71,7 +73,7 @@ public:
 	Transform GetTransform() const { return transform_; }
 
 	// ギズモ用
-	std::string GetName() const override { return "Enemy"; }
+	std::string GetName() const override { return "Enemy(" + std::to_string(id_) + ")"; }
 
 	// 無敵状態かどうか
 	bool IsInvincible() const { return invincibleTimer_ > 0.0f; }
@@ -147,4 +149,8 @@ private:
 
 	// 死亡時の血痕
 	TinyEngine::BloodDecalManager* bloodDecalManager_ = nullptr;
+
+	// オブジェクト数カウント用
+	static int index;
+	int id_ = 0;
 };

@@ -1,5 +1,9 @@
 #include "Wall.h"
 
+int Wall::index = 0;
+
+Wall::Wall() { id_ = index++; }
+
 void Wall::Initialize(EngineContext* ctx, WallStatus wallStatus) {
 	transform_.scale = {wallStatus.width, 50.0f, wallStatus.depth};
 	transform_.rotate = {0.0f, 0.0f, 0.0f};
@@ -25,7 +29,7 @@ void Wall::Update(float deltaTime) {
 	collision_.max = {pos.x + scale.x, pos.y, pos.z + scale.z};
 	collision_.min = {pos.x - scale.x, pos.y, pos.z - scale.z};
 
-	// 描画用インスタンス更新 
+	// 描画用インスタンス更新
 	render_->Update(transform_);
 
 	// ギズモ用当たり判定更新

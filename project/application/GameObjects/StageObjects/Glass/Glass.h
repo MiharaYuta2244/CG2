@@ -6,6 +6,8 @@
 
 class Glass : public IGameObject {
 public:
+	Glass();
+
 	void Initialize(EngineContext* ctx, GlassStatus glassStatus);
 
 	void Update();
@@ -28,7 +30,7 @@ public:
 	void SetIsActive(bool isActive) { isActive_ = isActive; }
 
 	// ギズモ用
-	std::string GetName() const override { return "Glass"; }
+	std::string GetName() const override { return "Glass(" + std::to_string(id_) + ")"; }
 
 private:
 	// 当たり判定の更新
@@ -36,14 +38,18 @@ private:
 
 private:
 	// 描画用インスタンス
-	std::unique_ptr<ObjectRender> render_;
+	std::unique_ptr<ObjectRender> render_ = nullptr;
 
 	// 当たり判定
-	AABB collision_;
+	AABB collision_{};
 
 	// ガラスのステータス
-	GlassStatus glassStatus_;
+	GlassStatus glassStatus_{};
 
 	// アクティブ状態
 	bool isActive_ = true;
+
+	// オブジェクト数カウント用
+	static int index;
+	int id_ = 0;
 };

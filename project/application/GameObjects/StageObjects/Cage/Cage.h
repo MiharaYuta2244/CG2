@@ -9,6 +9,8 @@
 /// </summary>
 class Cage : public IGameObject {
 public:
+	Cage();
+
 	// 初期化処理
 	void Initialize(EngineContext* ctx, CageStatus cageStatus);
 
@@ -28,7 +30,7 @@ public:
 	CageStatus& GetCageStatus() { return cageStatus_; }
 
 	// ギズモ用
-	std::string GetName() const override { return "Cage"; }
+	std::string GetName() const override { return "Cage(" + std::to_string(id_) + ")"; }
 
 private:
 	AABB collision_; // 当たり判定
@@ -37,4 +39,8 @@ private:
 	float time_ = 0.0f;
 
 	std::unique_ptr<ObjectRender> render_; // 描画用インスタンス
+
+	// オブジェクト数カウント用
+	static int index;
+	int id_ = 0;
 };

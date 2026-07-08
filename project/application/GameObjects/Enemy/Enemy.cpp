@@ -9,6 +9,10 @@
 
 using namespace TinyEngine;
 
+int Enemy::index = 0;
+
+Enemy::Enemy() { id_ = index++; }
+
 void Enemy::Initialize(EngineContext* ctx, Vector3 pos, EnemyType type, BloodDecalManager* bloodDecalManager) {
 	ctx_ = ctx;
 

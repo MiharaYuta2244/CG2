@@ -10,6 +10,8 @@
 /// </summary>
 class Door : public IGameObject {
 public:
+	Door();
+
 	// 初期化処理
 	void Initialize(EngineContext* ctx, DoorStatus doorStatus);
 
@@ -29,7 +31,7 @@ public:
 	DoorStatus& GetDoorStatus() { return doorStatus_; }
 
 	// ギズモ用
-	std::string GetName() const override { return "Door"; }
+	std::string GetName() const override { return "Door(" + std::to_string(id_) + ")"; }
 
 	// 開閉状態のGetter
 	bool GetIsOpen() const { return isOpen_; }
@@ -42,13 +44,13 @@ private:
 	void UpdateCollision();
 
 private:
-	AABB collision_; // 当たり判定
-	DoorStatus doorStatus_;
+	AABB collision_{}; // 当たり判定
+	DoorStatus doorStatus_{};
 	Vector4 color_ = {0.1f, 0.1f, 0.18f, 1.0f};
 	float time_ = 0.0f;
 	Vector2 collisionSize_ = {4.0f, 4.0f};
 	Vector3 marginPos_ = {0, 0, 2};
-	Transform transformSecond_;
+	Transform transformSecond_{};
 
 	// 描画用インスタンス
 	std::array<std::unique_ptr<ObjectRender>, 2> renders_;
@@ -63,4 +65,8 @@ private:
 	float maxOpenOffset_ = 2.1f;      // 最大でどれだけ開くか
 	float targetDistance_ = 10.0f;    // プレイヤーがこの距離以内に近づいたら開く
 	float animDuration_ = 0.8f;       // アニメーションにかかる時間
+
+	// オブジェクト数カウント用
+	static int index;
+	int id_ = 0;
 };

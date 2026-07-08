@@ -1,5 +1,9 @@
 #include "Glass.h"
 
+int Glass::index = 0;
+
+Glass::Glass() { id_ = index++; }
+
 void Glass::Initialize(EngineContext* ctx, GlassStatus glassStatus) {
 	transform_.scale = {glassStatus.width, 50.0f, glassStatus.depth};
 	transform_.rotate = {0.0f, 0.0f, 0.0f};

@@ -1,6 +1,10 @@
 #include "Door.h"
 #include "MathOperator.h"
 
+int Door::index = 0;
+
+Door::Door() { id_ = index++; }
+
 void Door::Initialize(EngineContext* ctx, DoorStatus doorStatus) {
 	transform_.scale = {doorStatus.width, 49.0f, doorStatus.depth};
 	transform_.rotate = {0.0f, doorStatus.rotateY, 0.0f};
