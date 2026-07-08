@@ -1,44 +1,44 @@
 [
     {
         "centerX": 25.0,
-        "centerZ": 0.9999998807907104,
+        "centerZ": 1.0000004768371582,
         "depth": 1.0,
         "rotateY": 0.0,
-        "width": 1.0
+        "width": 0.10000000149011612
     },
     {
         "centerX": 15.0,
         "centerZ": 13.0,
         "depth": 1.0,
         "rotateY": 0.0,
-        "width": 1.0
+        "width": 0.10000000149011612
     },
     {
         "centerX": 15.0,
         "centerZ": -11.0,
         "depth": 1.0,
         "rotateY": 0.0,
-        "width": 1.0
+        "width": 0.10000000149011612
     },
     {
         "centerX": 124.5,
         "centerZ": 1.0,
         "depth": 1.0,
         "rotateY": 1.5499999523162842,
-        "width": 1.0
+        "width": 0.10000000149011612
     },
     {
         "centerX": 124.5,
         "centerZ": -6.0,
         "depth": 1.0,
         "rotateY": 1.5499999523162842,
-        "width": 1.0
+        "width": 0.10000000149011612
     },
     {
         "centerX": 258.0,
         "centerZ": 1.5000004768371582,
         "depth": 1.0,
         "rotateY": 0.0,
-        "width": 1.0
+        "width": 0.10000000149011612
     }
 ]

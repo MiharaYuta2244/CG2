@@ -329,11 +329,11 @@ void GamePlayScene::Draw() {
 	// 地面の描画
 	ground_->Draw();
 
-	// 壁の管理インスタンス描画
-	wallManager_->Draw();
-
 	// ドアの管理インスタンス描画
 	doorManager_->Draw();
+
+	// 壁の管理インスタンス描画
+	wallManager_->Draw();
 
 	// 敵の描画処理
 	enemyManager_->Draw();
@@ -397,10 +397,7 @@ void GamePlayScene::CollisionGameObjects() {
 
 			if (!ctx_.currentCamera->GetIsShake()) {
 				// カメラシェイク
-				ctx_.currentCamera->StartShake(0.2f, 0.2f);
-
-				// グリッチノイズタイマー設定
-				glitchTimer_ = 0.5f;
+				ctx_.currentCamera->StartShake(0.1f, 0.1f);
 			}
 
 			// プレイヤーが敵を掴んでいるかチェック
@@ -416,7 +413,7 @@ void GamePlayScene::CollisionGameObjects() {
 				// 内積を計算して、正面から来ているか判定する
 				float dot = playerDir.x * playerToBullet.x + playerDir.y * playerToBullet.z;
 
-				if (dot > 0.0f) {
+				if (dot < 0.0f) {
 					isGuarded = true;
 					Enemy* shieldEnemy = player_->GetGrabbedEnemy();
 					if (shieldEnemy) {
@@ -798,24 +795,24 @@ void GamePlayScene::CollisionGameObjects() {
 	// ==========================================
 	// 敵と敵の弾の当たり判定
 	// ==========================================
-	for (const auto& enemy : enemyManager_->GetEnemies()) {
-		for (const auto& bullet : enemyBulletManager_->GetBullets()) {
-			// 発射された1フレーム目以外は判定を行わない
-			if (!bullet->IsCollisionActive()) {
-				continue;
-			}
+	// for (const auto& enemy : enemyManager_->GetEnemies()) {
+	//	for (const auto& bullet : enemyBulletManager_->GetBullets()) {
+	//		// 発射された1フレーム目以外は判定を行わない
+	//		if (!bullet->IsCollisionActive()) {
+	//			continue;
+	//		}
 
-			// 衝突判定
-			if (Collision::Intersect(enemy->GetBodyCol(), bullet->GetCollision())) {
-				enemy->Damage();
+	//		// 衝突判定
+	//		if (Collision::Intersect(enemy->GetBodyCol(), bullet->GetCollision())) {
+	//			enemy->Damage();
 
-				if (enemy->IsDead()) {
-					commonData_->killCount += 1;
-					GenerateEnemyDeathParticle(enemy->GetPos());
-				}
-			}
-		}
-	}
+	//			if (enemy->IsDead()) {
+	//				commonData_->killCount += 1;
+	//				GenerateEnemyDeathParticle(enemy->GetPos());
+	//			}
+	//		}
+	//	}
+	//}
 }
 
 void GamePlayScene::UpdateImGui() {
@@ -1027,6 +1024,10 @@ void GamePlayScene::DebugInput() {
 
 	if (ctx_.keyboard->KeyTriggered(DIK_F4)) {
 		enemyManager_->SetStop();
+	}
+
+	if (ctx_.keyboard->KeyTriggered(DIK_SPACE) && cameraZoomController_->GetIsActive()) {
+		cameraZoomController_->Skip();
 	}
 #endif
 }

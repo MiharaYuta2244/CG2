@@ -60,7 +60,7 @@ private:
 	bool wasOpen_ = false;            // 1フレーム前の開閉状態
 	float openOffset_ = 0.0f;         // 現在のドアの開き具合
 	float previousOpenOffset_ = 0.0f; // 前回フレームでの開き具合
-	float maxOpenOffset_ = 2.0f;      // 最大でどれだけ開くか
+	float maxOpenOffset_ = 2.1f;      // 最大でどれだけ開くか
 	float targetDistance_ = 10.0f;    // プレイヤーがこの距離以内に近づいたら開く
 	float animDuration_ = 0.8f;       // アニメーションにかかる時間
 };

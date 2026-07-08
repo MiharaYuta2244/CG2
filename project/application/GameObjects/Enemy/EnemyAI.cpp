@@ -224,7 +224,7 @@ void EnemyAI::UpdateHold(float deltaTime, Player* player, EnemyBulletManager* en
 	shotTimer_ += deltaTime;
 
 	// 弾の発射処理 通常の発射より早く撃つ
-	if (shotTimer_ * shotTimerMultiPlier_ >= shotIntervalHold_) {
+	if (shotTimer_ >= shotIntervalHold_ * shotTimerMultiPlier_) {
 		Shot(playerDirection, enemyBulletManager);
 
 		// 拘束時の発射フラグを下す

@@ -18,6 +18,9 @@ public:
 	// 演出が終了したかどうか
 	bool GetIsFinished()const {return isFinished_; }
 
+	// カメラ演出を強制的に終わらせる
+	void Skip();
+
 private:
 	// 切り替わる回数
 	int maxStep_ = 4;

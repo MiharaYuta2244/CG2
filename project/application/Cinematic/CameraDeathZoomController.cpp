@@ -33,3 +33,5 @@ float CameraDeathZoomController::Update(float deltaTime) {
 
 	return currentY_;
 }
+
+void CameraDeathZoomController::Skip() { step_ = maxStep_; }

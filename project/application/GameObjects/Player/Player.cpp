@@ -270,7 +270,7 @@ void Player::Update(float deltaTime, DirectInput* input, GamePad* gamePad, Enemy
 	for (auto& particle : hitEffects_) {
 		particle->Update();
 	}
-
+	
 	// ヒットエフェクト削除
 	std::erase_if(hitEffects_, [](const std::unique_ptr<TinyEngine::Particle>& p) { return p->IsFinished(); });
 
