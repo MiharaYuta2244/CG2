@@ -130,6 +130,7 @@ void SceneEditor::UpdateImGui(const SceneContext& ctx, Player* player, float& ca
 }
 
 void SceneEditor::UpdatePicking(const SceneContext& ctx) {
+#ifdef USE_IMGUI
 	if (ImGuizmo::IsOver() || ImGuizmo::IsUsing()) {
 		return;
 	}
@@ -180,6 +181,7 @@ void SceneEditor::UpdatePicking(const SceneContext& ctx) {
 			selectedGameObject_ = nullptr;
 		}
 	}
+#endif
 }
 
 void SceneEditor::DebugInput(
