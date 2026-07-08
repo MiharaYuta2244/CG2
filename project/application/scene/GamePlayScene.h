@@ -8,17 +8,12 @@
 #include "GameObjects/Enemy/EnemyManager.h"
 #include "GameObjects/GameUI/Controls.h"
 #include "GameObjects/Player/Player.h"
-#include "GameObjects/StageObjects/Door/DoorManager.h"
-#include "GameObjects/StageObjects/Goal/Goal.h"
-#include "GameObjects/StageObjects/Ground/Ground.h"
-#include "GameObjects/StageObjects/Wall/WallManager.h"
-#include "GameObjects/StageObjects/Glass/GlassManager.h"
-#include "GameObjects/StageObjects/Cage/CageManager.h"
+#include "GameObjects/StageObjects/Stage.h"
 #include "BloodDecalManager.h"
-#include "Object3d.h"
+#include "Editor/SceneEditor.h"
 #include "Particle.h"
+#include "Collision/CollisionManager.h"
 #include <memory>
-#include <vector>
 
 /// <summary>
 /// ゲームシーン
@@ -34,26 +29,11 @@ public:
 	void Finalize() override;
 
 private:
-	// 当たり判定
-	void CollisionGameObjects();
-
-	// ギズモ用ImGuiの更新
-	void UpdateImGui();
-
-	// デバッグ用のImGui更新
-	void UpdateDebugImGui();
-
 	// グリッチノイズの更新
 	void UpdateGlitch(float deltaTime);
 
 	// 敵死亡時パーティクル生成
-	void GenerateEnemyDeathParticle(const Vector3& pos);
-
-	// 入力系デバッグ処理
-	void DebugInput();
-
-	// マウスの画面座標をRayに変換して判定を取る
-	void UpdatePicking();
+	void GenerateEnemyDeathEffect(const Vector3& pos);
 
 private:
 	// プレイヤー
@@ -65,35 +45,8 @@ private:
 	// 敵の弾を管理するインスタンス
 	std::unique_ptr<EnemyBulletManager> enemyBulletManager_;
 
-	// 壁の管理インスタンス
-	std::unique_ptr<WallManager> wallManager_;
-
-	// ドアの管理インスタンス
-	std::unique_ptr<DoorManager> doorManager_;
-
-	// ガラスの管理インスタンス
-	std::unique_ptr<GlassManager> glassManager_;
-
-	// 檻の管理インスタンス
-	std::unique_ptr<CageManager> cageManager_;
-
-	// ゴール判定用インスタンス
-	std::unique_ptr<Goal> goal_;
-
 	// 死亡パーティクルリスト
-	std::list<std::unique_ptr<TinyEngine::Particle>> enemyDeathParticle_;
-
-	// オブジェクトのリスト
-	std::vector<IGameObject*> objects_;
-
-	// 選択中のオブジェクトポインタ
-	IGameObject* selectedGameObject_ = nullptr;
-
-	// SRTの内扱うパラメータ
-	ImGuizmo::OPERATION currentGizmoOperation_ = ImGuizmo::TRANSLATE;
-
-	// 座標系の設定
-	ImGuizmo::MODE currentGizmoMode_ = ImGuizmo::LOCAL;
+	std::list<std::unique_ptr<TinyEngine::Particle>> enemyDeathEffect_;
 
 	// フラッシュエフェクト
 	std::unique_ptr<FlashEffect> flashEffect_;
@@ -101,8 +54,20 @@ private:
 	// レターボックス
 	std::unique_ptr<LetterBox> letterBox_;
 
-	// 地面
-	std::unique_ptr<Ground> ground_;
+	// 血痕管理インスタンス
+	std::unique_ptr<TinyEngine::BloodDecalManager> bloodDecalManager_;
+
+	// プレイヤー死亡時カメラ演出用インスタンス
+	std::unique_ptr<CameraDeathZoomController> cameraZoomController_;
+
+	// シーンエディター
+	std::unique_ptr<SceneEditor> sceneEditor_;
+
+	// ステージオブジェクト管理インスタンス
+	std::unique_ptr<Stage> stage_;
+
+	// 当たり判定管理インスタンス
+	std::unique_ptr<CollisionManager> collisionManager_;
 
 	// カメラ関連
 	std::unique_ptr<Camera> mainCamera_;  // メインカメラ
@@ -129,9 +94,6 @@ private:
 	AnimationBundle<float> numSamplesAnim_;
 	bool isDeathAnimStarted_ = false; // アニメーションの開始フラグ
 
-	// プレイヤー死亡時カメラ演出用インスタンス
-	std::unique_ptr<CameraDeathZoomController> cameraZoomController_;
-
 	// カメラのピボット位置保持用の変数
 	Vector3 currentCameraPivot_ = {0.0f, 0.0f, 0.0f};
 
@@ -140,7 +102,4 @@ private:
 
 	// カメラのY座標
 	float cameraPosY_ = 0.0f;
-
-	// 血痕管理インスタンス
-	std::unique_ptr<TinyEngine::BloodDecalManager> bloodDecalManager_;
 };

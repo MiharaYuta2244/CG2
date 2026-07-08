@@ -3,9 +3,7 @@
 #include "EnemyBulletManager.h"
 #include "GameObjects/Stageobjects/Door/DoorManager.h"
 #include "GameObjects/Stageobjects/Wall/WallManager.h"
-#include "MuzzleFlashModule.h"
-#include "MuzzleSmokeModule.h"
-#include "MuzzleSparkModule.h"
+#include "GameObjects/Effect/EffectGenerator.h"
 
 using namespace TinyEngine;
 
@@ -291,26 +289,8 @@ void Enemy::GenerateExMark() {
 void Enemy::GenerateMuzzleFlash(const Vector3& direction) {
 	Vector3 muzzlePos = transform_.translate + direction * 1.2f;
 
-	// 閃光
-	auto flash = std::make_unique<Particle>();
-	flash->Initialize(ctx_, muzzlePos, "AttractEffect.png", std::make_unique<MuzzleFlashModule>(), nullptr, ParticleMeshType::Square);
-	flash->SetEmitMode(false, 0.05f);
-	flash->SetEmitterParam(1, 0.01f);
-	muzzleParticles_.push_back(std::move(flash));
-
-	// 火花
-	auto sparks = std::make_unique<Particle>();
-	sparks->Initialize(ctx_, muzzlePos, "white.png", std::make_unique<MuzzleSparkModule>(direction), nullptr, ParticleMeshType::Square);
-	sparks->SetEmitMode(false, 0.05f);
-	sparks->SetEmitterParam(10, 0.01f);
-	muzzleParticles_.push_back(std::move(sparks));
-
-	// 煙
-	auto smoke = std::make_unique<Particle>();
-	smoke->Initialize(ctx_, muzzlePos, "Dust.png", std::make_unique<MuzzleSmokeModule>(direction), nullptr, ParticleMeshType::Square);
-	smoke->SetEmitMode(false, 0.05f);
-	smoke->SetEmitterParam(3, 0.01f);
-	muzzleParticles_.push_back(std::move(smoke));
+	// エフェクトの生成
+	EffectGenerator::CreateMuzzleFlash(ctx_, muzzlePos, direction, muzzleParticles_);
 }
 
 void Enemy::SetAIState(EnemyAI::State state) {

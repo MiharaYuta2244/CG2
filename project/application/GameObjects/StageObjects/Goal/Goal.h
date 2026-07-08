@@ -20,13 +20,13 @@ public:
 	void Draw();
 
 	// 当たり判定Getter
-	AABB GetCol() const { return col_; }
+	AABB GetCollision() const { return col_; }
 
 	// ゴールフラグSetter
-	void SetGoal(bool isGoal) { isGoal_ = isGoal; }
+	void SetIsGoal(bool isGoal) { isGoal_ = isGoal; }
 
 	// ゴールフラグGetter
-	bool GetGoal() const { return isGoal_; }
+	bool GetIsGoal() const { return isGoal_; }
 
 	std::string GetName() const { return "Goal"; }
 

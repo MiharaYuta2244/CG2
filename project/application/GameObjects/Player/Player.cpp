@@ -1,9 +1,7 @@
 #include "Player.h"
 #include "GameObjects/Enemy/Enemy.h"
 #include "GameObjects/Enemy/EnemyManager.h"
-#include "HitFlashModule.h"
-#include "HitRingModule.h"
-#include "HitSparkModule.h"
+#include "GameObjects/Effect/EffectGenerator.h"
 
 using namespace TinyEngine;
 
@@ -389,28 +387,8 @@ void Player::GenerateHitEffect() {
 	if (preHP_ == hp_->GetCurrentHP())
 		return;
 
-	Vector3 effectPos = transform_.translate;
-
-	// 飛び散る火花
-	auto sparks = std::make_unique<TinyEngine::Particle>();
-	sparks->Initialize(ctx_, effectPos, "white.png", std::make_unique<HitSparkModule>(), nullptr, TinyEngine::ParticleMeshType::Square);
-	sparks->SetEmitMode(false, 0.05f);
-	sparks->SetEmitterParam(50, 0.01f);
-	hitEffects_.push_back(std::move(sparks));
-
-	// 中心の閃光フラッシュ
-	auto flash = std::make_unique<TinyEngine::Particle>();
-	flash->Initialize(ctx_, effectPos, "AttractEffect.png", std::make_unique<HitFlashModule>(), nullptr, TinyEngine::ParticleMeshType::Square);
-	flash->SetEmitMode(false, 0.05f);
-	flash->SetEmitterParam(4, 0.01f);
-	hitEffects_.push_back(std::move(flash));
-
-	// 拡散する衝撃波リング
-	auto ringWave = std::make_unique<TinyEngine::Particle>();
-	ringWave->Initialize(ctx_, effectPos, "gradationLine.png", std::make_unique<HitRingModule>(), nullptr, TinyEngine::ParticleMeshType::Cylinder);
-	ringWave->SetEmitMode(false, 0.05f);
-	ringWave->SetEmitterParam(1, 0.01f);
-	hitEffects_.push_back(std::move(ringWave));
+	// エフェクトの生成
+	EffectGenerator::CreateHitEffect(ctx_, transform_.translate, hitEffects_);
 
 	preHP_ = hp_->GetCurrentHP();
 }
