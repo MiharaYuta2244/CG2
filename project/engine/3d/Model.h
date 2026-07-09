@@ -49,6 +49,12 @@ struct SkinCluster {
 	Microsoft::WRL::ComPtr<ID3D12Resource> paletteResource;
 	std::span<WellForGPU> mappedPalete;
 	std::pair<D3D12_CPU_DESCRIPTOR_HANDLE, D3D12_GPU_DESCRIPTOR_HANDLE> paletteSrvHandle;
+	std::pair<D3D12_CPU_DESCRIPTOR_HANDLE, D3D12_GPU_DESCRIPTOR_HANDLE> inputVertexSrvHandle;
+	std::pair<D3D12_CPU_DESCRIPTOR_HANDLE, D3D12_GPU_DESCRIPTOR_HANDLE> influenceSrvHandle;
+	std::pair<D3D12_CPU_DESCRIPTOR_HANDLE, D3D12_GPU_DESCRIPTOR_HANDLE> outputUavHandle;
+	Microsoft::WRL::ComPtr<ID3D12Resource> outputVertexResource;
+	D3D12_VERTEX_BUFFER_VIEW outputVertexBufferView;
+	uint32_t vertexCount = 0;
 };
 
 /// <summary>
@@ -60,7 +66,7 @@ public:
 	void Initialize(ModelCommon* modelCommon, TextureManager* textureManager, const std::string& filename);
 
 	// 描画関数
-	void Draw(const std::string& textureFilePath = "");
+	void Draw(const std::string& textureFilePath = "", const SkinCluster* skinCluster = nullptr);
 
 	// 更新関数
 	void Update();
@@ -78,7 +84,9 @@ public:
 
 	SkinCluster CreateSkinCluster(
 	    const Microsoft::WRL::ComPtr<ID3D12Device>& device, const Skeleton& skeleton, const ModelData& modelData, const Microsoft::WRL::ComPtr<ID3D12DescriptorHeap>& descriptorHeap,
-	    uint32_t descriptorSize, uint32_t srvIndex);
+	    uint32_t descriptorSize, uint32_t paletteSrvIndex, uint32_t inputVertexSrvIndex, uint32_t influenceSrvIndex, uint32_t outputUavIndex);
+
+	void DispatchSkinning(ID3D12GraphicsCommandList* commandList, const SkinCluster& skinCluster);
 
 	void UpdateSkinCluster(SkinCluster& skinCluster, const Skeleton& skeleton);
 
@@ -137,4 +145,6 @@ private:
 	uint32_t indexCount_;
 
 	D3D12_VERTEX_BUFFER_VIEW skinClusterVertexBufferView_;
+	Microsoft::WRL::ComPtr<ID3D12Resource> skinnedVertexResource_;
+	D3D12_VERTEX_BUFFER_VIEW skinnedVertexBufferView_;
 };

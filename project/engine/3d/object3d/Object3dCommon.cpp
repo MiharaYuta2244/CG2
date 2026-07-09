@@ -30,22 +30,6 @@ void Object3dCommon::DrawSettingOutline() {
 	dxCommon_->GetCommandList()->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 }
 
-void Object3dCommon::DrawSettingSkinning(TextureManager* textureManager) {
-	// スキニング用のRootSignatureとPSOを設定
-	dxCommon_->GetCommandList()->SetGraphicsRootSignature(skinningRootSignature_.Get());
-	dxCommon_->GetCommandList()->SetPipelineState(skinningGraphicsPipelineState_.Get());
-	dxCommon_->GetCommandList()->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-
-	// ライティングCBufferの場所を指定
-	dxCommon_->GetCommandList()->SetGraphicsRootConstantBufferView(3, globalDirectionalLightResource_->GetGPUVirtualAddress());
-	// ポイントライトCBufferの場所を指定
-	dxCommon_->GetCommandList()->SetGraphicsRootConstantBufferView(7, globalPointLightResource_->GetGPUVirtualAddress());
-	// スポットライトCBufferの場所を指定
-	dxCommon_->GetCommandList()->SetGraphicsRootConstantBufferView(8, globalSpotLightResource_->GetGPUVirtualAddress());
-	// 環境マップ
-	dxCommon_->GetCommandList()->SetGraphicsRootDescriptorTable(10, textureManager->GetSrvHandleGPU("resources/textures/rostock_laage_airport_4k.dds"));
-}
-
 void Object3dCommon::DrawSettingTransparent(TextureManager* textureManager){
 	dxCommon_->GetCommandList()->SetGraphicsRootSignature(rootSignature_.Get());
 	// 半透明用のPSOを設定
@@ -66,7 +50,7 @@ void Object3dCommon::Initialize(DirectXCommon* dxCommon) {
 
 	// グラフィックスパイプラインの生成
 	CreateGraphicsPipeline();
-	CreateSkinningGraphicsPipeline();
+	CreateSkinningComputePipeline();
 	CreateTransparentGraphicsPipeline();
 
 	// グローバルライティングリソースの生成
@@ -740,4 +724,53 @@ void Object3dCommon::CreateTransparentGraphicsPipeline(){
 	// 実際に生成
 	hr = dxCommon_->GetDevice()->CreateGraphicsPipelineState(&graphicsPipelineStateDesc, IID_PPV_ARGS(&transparentPipelineState_));
 	assert(SUCCEEDED(hr));
+}
+
+void Object3dCommon::CreateSkinningComputePipeline() {
+	HRESULT hr = S_OK;
+
+	D3D12_DESCRIPTOR_RANGE ranges[4] = {};
+	ranges[0] = {D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 1, 0, 0, D3D12_DESCRIPTOR_RANGE_OFFSET_APPEND};
+	ranges[1] = {D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 1, 1, 0, D3D12_DESCRIPTOR_RANGE_OFFSET_APPEND};
+	ranges[2] = {D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 1, 2, 0, D3D12_DESCRIPTOR_RANGE_OFFSET_APPEND};
+	ranges[3] = {D3D12_DESCRIPTOR_RANGE_TYPE_UAV, 1, 0, 0, D3D12_DESCRIPTOR_RANGE_OFFSET_APPEND};
+
+	D3D12_ROOT_PARAMETER rootParameters[4] = {};
+	for (int i = 0; i < 4; ++i) {
+		rootParameters[i].ParameterType = D3D12_ROOT_PARAMETER_TYPE_DESCRIPTOR_TABLE;
+		rootParameters[i].ShaderVisibility = D3D12_SHADER_VISIBILITY_ALL;
+		rootParameters[i].DescriptorTable.pDescriptorRanges = &ranges[i];
+		rootParameters[i].DescriptorTable.NumDescriptorRanges = 1;
+	}
+
+	D3D12_ROOT_SIGNATURE_DESC rootSigDesc{};
+	rootSigDesc.Flags = D3D12_ROOT_SIGNATURE_FLAG_NONE;
+	rootSigDesc.pParameters = rootParameters;
+	rootSigDesc.NumParameters = _countof(rootParameters);
+
+	ComPtr<ID3DBlob> signatureBlob = nullptr;
+	ComPtr<ID3DBlob> errorBlob = nullptr;
+	hr = D3D12SerializeRootSignature(&rootSigDesc, D3D_ROOT_SIGNATURE_VERSION_1, &signatureBlob, &errorBlob);
+	if (FAILED(hr)) {
+		if (errorBlob)
+			Logger::Log(reinterpret_cast<char*>(errorBlob->GetBufferPointer()), LogLevel::Error);
+		assert(false);
+	}
+	hr = dxCommon_->GetDevice()->CreateRootSignature(0, signatureBlob->GetBufferPointer(), signatureBlob->GetBufferSize(), IID_PPV_ARGS(&skinningComputeRootSignature_));
+	assert(SUCCEEDED(hr));
+
+	ComPtr<IDxcBlob> csBlob = DirectXUtils::CompileShader(L"resources/shaders/Skinning.CS.hlsl", L"cs_6_0", dxcUtils_.Get(), dxcCompiler_.Get(), includeHandler_.Get());
+	assert(csBlob != nullptr);
+
+	D3D12_COMPUTE_PIPELINE_STATE_DESC psoDesc{};
+	psoDesc.pRootSignature = skinningComputeRootSignature_.Get();
+	psoDesc.CS = {csBlob->GetBufferPointer(), csBlob->GetBufferSize()};
+
+	hr = dxCommon_->GetDevice()->CreateComputePipelineState(&psoDesc, IID_PPV_ARGS(&skinningComputePipelineState_));
+	assert(SUCCEEDED(hr));
+}
+
+void Object3dCommon::SetSkinningComputePipeline() {
+	dxCommon_->GetCommandList()->SetComputeRootSignature(skinningComputeRootSignature_.Get());
+	dxCommon_->GetCommandList()->SetPipelineState(skinningComputePipelineState_.Get());
 }

@@ -90,21 +90,24 @@ void Object3d::Update() {
 	}
 
 	if (model_) {
-		// アニメーションが再生されている場合、時間を進めてスケルトンに適用する
 		if (isAnimating_) {
 			animationTimer_ += elapsedTime;
-
-			// アニメーションの最大時間を超えたら最初からループさせる
 			animationTimer_ = std::fmod(animationTimer_, animation_.duration);
-
-			// Skeletonの各JointのTransformをアニメーションの補間値で更新
 			model_->ApplyAnimation(skeleton_, animation_, animationTimer_);
 		}
 
-		// 上書きされたTransformを使って、各骨のローカル行列とグローバル行列を再計算
 		model_->UpdateSkeleton(skeleton_);
-
 		model_->UpdateSkinCluster(skinCluster_, skeleton_);
+
+		if (isSkinning_) {
+			auto commandList = ctx_->object3dCommon->GetDxCommon()->GetCommandList();
+
+			ID3D12DescriptorHeap* descriptorHeaps[] = {ctx_->object3dCommon->GetDxCommon()->GetSrvDescriptorHeap().Get()};
+			commandList->SetDescriptorHeaps(_countof(descriptorHeaps), descriptorHeaps);
+
+			ctx_->object3dCommon->SetSkinningComputePipeline();
+			model_->DispatchSkinning(commandList.Get(), skinCluster_);
+		}
 	}
 
 	// 非均一スケールに対応した逆転置行列の計算
@@ -162,48 +165,23 @@ void Object3d::Update() {
 void Object3d::Draw() {
 	auto commandList = ctx_->object3dCommon->GetDxCommon()->GetCommandList();
 
-	// アウトライン描画準備
 	ctx_->object3dCommon->DrawSettingOutline();
 
-	// wvp用のBufferの場所を設定
 	commandList->SetGraphicsRootConstantBufferView(1, wvpResource_->GetGPUVirtualAddress());
-	// アウトライン用データをセット
 	*outlineData_ = outline_;
 	commandList->SetGraphicsRootConstantBufferView(9, outlineResource_->GetGPUVirtualAddress());
 
-	if (model_) {
-		// model_->Draw(textureFilePath_); // アウトライン描画
-	}
+	// スキニングの有無にかかわらず共通PSOで描画する
+	ctx_->object3dCommon->DrawSettingCommon(ctx_->textureManager);
 
-	// スキニングの有無で描画セットアップを切り替える
-	if (isSkinning_) {
-		// スキニング用のPSOとRootSignatureを適用
-		ctx_->object3dCommon->DrawSettingSkinning(ctx_->textureManager);
-
-		// スキニング特有のデータをシェーダーに渡す
-		if (model_) {
-			ctx_->object3dCommon->DrawSettingSkinning(ctx_->textureManager);
-			commandList->SetGraphicsRootDescriptorTable(11, skinCluster_.paletteSrvHandle.second);
-		}
-	} else {
-		// 通常のPSOとRootSignatureを適用
-		ctx_->object3dCommon->DrawSettingCommon(ctx_->textureManager);
-	}
-
-	// wvp用のBufferの場所を設定
 	commandList->SetGraphicsRootConstantBufferView(1, wvpResource_->GetGPUVirtualAddress());
-	// --- インスタンスのマテリアルを先にセット（root b0） ---
 	commandList->SetGraphicsRootConstantBufferView(0, materialResource_->GetGPUVirtualAddress());
-	// CameraForGPUCBufferの場所を指定
 	commandList->SetGraphicsRootConstantBufferView(4, cameraForGPUResource_->GetGPUVirtualAddress());
-	// FogParamCBufferの場所を指定
 	commandList->SetGraphicsRootConstantBufferView(5, fogParamResource_->GetGPUVirtualAddress());
-	// TimeParamCBufferの場所を指定
 	commandList->SetGraphicsRootConstantBufferView(6, timeParamResource_->GetGPUVirtualAddress());
 
-	// 3Dモデルが割り当てられれば描画する
 	if (model_) {
-		model_->Draw(textureFilePath_);
+		model_->Draw(textureFilePath_, isSkinning_ ? &skinCluster_ : nullptr);
 	}
 }
 
@@ -236,21 +214,22 @@ void TinyEngine::Object3d::PlayAnimation(const Animation& animation) {
 }
 
 void Object3d::SetModel(const std::string& filePath) {
-	// モデルを検索してセットする
 	model_ = ctx_->modelManager->FindModel(filePath);
 
-	// モデルが正常に読み込まれた場合、modelDataをコピー
 	if (model_) {
 		modelData_ = model_->GetModelData();
-
 		skeleton_ = model_->CreateSkeleton(modelData_.rootNode);
 
 		auto device = ctx_->object3dCommon->GetDxCommon()->GetDevice();
-		skinCluster_ = model_->CreateSkinCluster(
-		    device, skeleton_, model_->GetModelData(), ctx_->object3dCommon->GetDxCommon()->GetSrvDescriptorHeap(), ctx_->object3dCommon->GetDxCommon()->GetDescriptorSizeRTV(),
-		    ctx_->srvManager->Allocate());
+		uint32_t paletteSrvIndex = ctx_->srvManager->Allocate();
+		uint32_t inputVertexSrvIndex = ctx_->srvManager->Allocate();
+		uint32_t influenceSrvIndex = ctx_->srvManager->Allocate();
+		uint32_t outputUavIndex = ctx_->srvManager->Allocate();
 
-		// モデルのデフォルトのテクスチャパスを記憶しておく
+		skinCluster_ = model_->CreateSkinCluster(
+		    device, skeleton_, model_->GetModelData(), ctx_->object3dCommon->GetDxCommon()->GetSrvDescriptorHeap(), ctx_->object3dCommon->GetDxCommon()->GetDescriptorSizeSRV(), paletteSrvIndex,
+		    inputVertexSrvIndex, influenceSrvIndex, outputUavIndex);
+
 		textureFilePath_ = modelData_.material.textureFilePath;
 	}
 }

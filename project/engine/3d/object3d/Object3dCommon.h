@@ -5,6 +5,8 @@
 #include "PointLight.h"
 #include "SpotLight.h"
 #include "TextureManager.h"
+#include <d3d12.h>
+#include <wrl/client.h>
 
 /// <summary>
 /// 3Dオブジェクトの共通クラス
@@ -24,8 +26,7 @@ public:
 	/// <summary>
 	/// スキニング用の設定を適用する関数
 	/// </summary>
-	/// <param name="textureManager"></param>
-	void DrawSettingSkinning(TextureManager* textureManager);
+	void SetSkinningComputePipeline();
 
 	/// <summary>
 	/// 半透明用の設定を適用する関数
@@ -50,6 +51,9 @@ public:
 	// 半透明用パイプラインの生成関数
 	void CreateTransparentGraphicsPipeline();
 
+	// スキニング用パイプラインの生成関数
+	void CreateSkinningComputePipeline();
+
 	// Setter
 	void SetDefaultCamera(Camera* camera) { defaultCamera_ = camera; }
 	void SetDirectionalLightParam(DirectionalLight dirLight) { globalDirectionalLight_ = dirLight; }
@@ -66,6 +70,8 @@ public:
 	ID3D12RootSignature* GetSkinningRootSignature() const { return skinningRootSignature_.Get(); }
 	ID3D12PipelineState* GetSkinningGraphicsPipelineState() const { return skinningGraphicsPipelineState_.Get(); }
 	ID3D12PipelineState* GetTransparentGraphicsPipelineState() const { return transparentPipelineState_.Get(); }
+	ID3D12RootSignature* GetSkinningComputeRootSignature() const { return skinningComputeRootSignature_.Get(); }
+	ID3D12PipelineState* GetSkinningComputePipelineState() const { return skinningComputePipelineState_.Get(); }
 
 #ifdef USE_IMGUI
 	// Lighting用ImGuiの描画
@@ -107,7 +113,9 @@ private:
 	Microsoft::WRL::ComPtr<ID3D12PipelineState> graphicsPipelineState_;
 	Microsoft::WRL::ComPtr<ID3D12PipelineState> outlinePipelineState_;
 	Microsoft::WRL::ComPtr<ID3D12RootSignature> skinningRootSignature_;
+	Microsoft::WRL::ComPtr<ID3D12RootSignature> skinningComputeRootSignature_;
 	Microsoft::WRL::ComPtr<ID3D12PipelineState> skinningGraphicsPipelineState_;
+	Microsoft::WRL::ComPtr<ID3D12PipelineState> skinningComputePipelineState_;
 	Microsoft::WRL::ComPtr<ID3D12PipelineState> transparentPipelineState_;
 
 	// Shader Compiler
