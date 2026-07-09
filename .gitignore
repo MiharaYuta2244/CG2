@@ -59,6 +59,7 @@ StyleCopReport.xml
 # Debug symbols
 *.pdb
 *.log
+*.lib
 
 # Executable build outputs
 *.exe
