@@ -279,9 +279,11 @@ bool EnemyAI::CheckPlayerInVision(Player* player, WallManager* wallManager, Door
 	// ドア
 	const auto& doors = doorManager->GetDoors();
 	for (const auto& door : doors) {
-		AABB doorCol = door->GetCollision();
-		if (IsSegmentIntersectAABB(enemyPos, playerPos, doorCol)) {
-			return false; // 壁に遮られている
+		if (!door->GetIsOpen()) {
+			AABB doorCol = door->GetCollision();
+			if (IsSegmentIntersectAABB(enemyPos, playerPos, doorCol)) {
+				return false; // 壁に遮られている
+			}
 		}
 	}
 
