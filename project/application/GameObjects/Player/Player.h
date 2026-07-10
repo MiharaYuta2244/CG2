@@ -44,6 +44,12 @@ public:
 	// ダメージ処理
 	void Damage(float value);
 
+	// 回復処理
+	void Heal(float value);
+
+	// 全回復処理
+	void AllHeal();
+
 	// 攻撃用の当たり判定Getter
 	OBB GetAttackCol() const { return attackCol_; }
 

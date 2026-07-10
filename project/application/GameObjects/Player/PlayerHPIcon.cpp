@@ -57,3 +57,9 @@ void PlayerHPIcon::DmageAnimStart(int index) {
 		scaleYAnims_[index].anim.Start(baseScaleY_, 0.0f, 0.3f, EaseType::EASEINOUTBACK);
 	}
 }
+
+void PlayerHPIcon::HealAnimStart(int index) {
+	if (index >= 0 && index < scaleYAnims_.size()) {
+		scaleYAnims_[index].anim.Start(0.0f, baseScaleY_, 0.3f, EaseType::EASEINOUTBACK);
+	}
+}

@@ -13,6 +13,9 @@ public:
 	// 被ダメージ時のアイコンのアニメーション開始処理
 	void DmageAnimStart(int index);
 
+	// 回復時のアイコンのアニメーション開始処理
+	void HealAnimStart(int index);
+
 private:
 	// HPのUI
 	std::array<std::unique_ptr<TinyEngine::Sprite>, 3> sprites_;

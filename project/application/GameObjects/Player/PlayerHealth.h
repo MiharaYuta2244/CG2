@@ -16,6 +16,9 @@ public:
 	void Damage(float value);
 
 	// 回復処理
+	void Heal(float value);
+
+	// 回復処理
 	void AllHeal();
 
 	// ImGui

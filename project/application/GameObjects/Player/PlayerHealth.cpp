@@ -1,6 +1,6 @@
 #include "PlayerHealth.h"
-#include "imGuiManager/ImGuiManager.h"
 #include "Logger.h"
+#include "imGuiManager/ImGuiManager.h"
 
 void PlayerHealth::Initialize(float maxHP) {
 	// HPの設定
@@ -18,9 +18,9 @@ void PlayerHealth::Update(float deltaTime) {
 	if (invincibleTimer_.IsEnd()) {
 		isInvincible_ = false;
 	}
-	
+
 	// プレイヤーのHPが0なら一度だけログ出力
-	if(preHP_<= 0.0f && hp_ <= 0.0f){
+	if (preHP_ <= 0.0f && hp_ <= 0.0f) {
 		Logger::Log("Player is Dead", LogLevel::Info);
 	}
 
@@ -41,6 +41,11 @@ void PlayerHealth::Damage(float value) {
 
 	// タイマー設定
 	invincibleTimer_.Initialize(invincibleDuration_);
+}
+
+void PlayerHealth::Heal(float value) {
+	hp_ += value;
+	hp_ = std::max(hp_, maxHP_);
 }
 
 void PlayerHealth::AllHeal() {

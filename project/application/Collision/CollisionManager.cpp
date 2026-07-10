@@ -435,4 +435,14 @@ void CollisionManager::CheckCollisions(
 			}
 		}
 	}
+
+	// ==========================================
+	// プレイヤーと回復エリアの当たり判定
+	// ==========================================
+	for(const auto& healArea : stage->GetHealAreaManager()->GetHealAreas()){
+		if(Collision::Intersect(player->GetBodyCol(), healArea->GetCollision())){
+			player->AllHeal();
+			healArea->SetIsActive(false);
+		}
+	}
 }

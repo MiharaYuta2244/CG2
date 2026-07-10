@@ -6,6 +6,7 @@
 #include "Ground/Ground.h"
 #include "SceneContext.h"
 #include "Wall/WallManager.h"
+#include "HealArea/HealAreaManager.h"
 #include <memory>
 
 /// <summary>
@@ -33,6 +34,7 @@ public:
 	DoorManager* GetDoorManager() const { return doorManager_.get(); }
 	GlassManager* GetGlassManager() const { return glassManager_.get(); }
 	CageManager* GetCageManager() const { return cageManager_.get(); }
+	HealAreaManager* GetHealAreaManager() const { return healAreaManager_.get(); }
 	Goal* GetGoal() const { return goal_.get(); }
 	Ground* GetGround() const { return ground_.get(); }
 
@@ -41,6 +43,7 @@ private:
 	std::unique_ptr<DoorManager> doorManager_;
 	std::unique_ptr<GlassManager> glassManager_;
 	std::unique_ptr<CageManager> cageManager_;
+	std::unique_ptr<HealAreaManager> healAreaManager_;
 	std::unique_ptr<Ground> ground_;
 	std::unique_ptr<Goal> goal_;
 };

@@ -245,6 +245,8 @@ copy "$(windowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="engine\3d\particle\modules\HitRingModule.cpp" />
     <ClCompile Include="application\GameObjects\StageObjects\Glass\Glass.cpp" />
     <ClCompile Include="application\GameObjects\StageObjects\Glass\GlassManager.cpp" />
+    <ClCompile Include="engine\3d\particle\GPUParticle.cpp" />
+    <ClCompile Include="application\GameObjects\StageObjects\HealArea\HealAreaManager.cpp" />
     <ClCompile Include="main.cpp">
       <Optimization Condition="'$(Configuration)|$(Platform)'=='Development|x64'">MaxSpeed</Optimization>
       <WholeProgramOptimization Condition="'$(Configuration)|$(Platform)'=='Development|x64'">true</WholeProgramOptimization>
@@ -299,6 +301,7 @@ copy "$(windowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="application\GameObjects\Player\PlayerHPIcon.cpp" />
     <ClCompile Include="application\Editor\SceneEditor.cpp" />
     <ClCompile Include="application\GameObjects\StageObjects\Stage.cpp" />
+    <ClCompile Include="application\GameObjects\StageObjects\HealArea\HealArea.cpp" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="resources\shaders\Object3d.PS.hlsl">
@@ -533,6 +536,9 @@ copy "$(windowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="application\GameObjects\StageObjects\Glass\GlassManager.h" />
     <ClInclude Include="application\Editor\SceneEditor.h" />
     <ClInclude Include="application\GameObjects\StageObjects\Stage.h" />
+    <ClInclude Include="application\GameObjects\StageObjects\HealArea\HealArea.h" />
+    <ClInclude Include="engine\3d\particle\GPUParticle.h" />
+    <ClInclude Include="application\GameObjects\StageObjects\HealArea\HealAreaManager.h" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="externals\imgui\LICENSE.txt" />

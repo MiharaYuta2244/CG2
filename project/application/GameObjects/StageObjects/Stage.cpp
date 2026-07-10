@@ -17,6 +17,10 @@ void Stage::Initialize(const SceneContext& ctx) {
 	cageManager_ = std::make_unique<CageManager>();
 	cageManager_->Initialize(ctx.engineContext);
 
+	// 回復エリアの管理インスタンス生成&初期化
+	healAreaManager_ = std::make_unique<HealAreaManager>();
+	healAreaManager_->Initialize(ctx.engineContext);
+
 	// 地面の生成&初期化
 	ground_ = std::make_unique<Ground>();
 	ground_->Initialize(ctx.engineContext);
@@ -31,6 +35,7 @@ void Stage::Update(float deltaTime, const Vector3& playerPos) {
 	doorManager_->Update(deltaTime, playerPos);
 	glassManager_->Update();
 	cageManager_->Update(deltaTime);
+	healAreaManager_->Update(deltaTime);
 	ground_->Update();
 	goal_->Update(deltaTime);
 }
@@ -43,11 +48,15 @@ void Stage::Draw() {
 	goal_->Draw();
 }
 
-void Stage::DrawTransparent() { glassManager_->Draw(); }
+void Stage::DrawTransparent() { 
+	glassManager_->Draw();
+	healAreaManager_->Draw();
+}
 
 void Stage::DrawImGui() {
 	wallManager_->DrawImGui();
 	doorManager_->DrawImGui();
 	glassManager_->DrawImGui();
 	cageManager_->DrawImGui();
+	healAreaManager_->DrawImGui();
 }

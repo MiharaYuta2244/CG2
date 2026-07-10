@@ -1,7 +1,7 @@
 #include "Player.h"
+#include "GameObjects/Effect/EffectGenerator.h"
 #include "GameObjects/Enemy/Enemy.h"
 #include "GameObjects/Enemy/EnemyManager.h"
-#include "GameObjects/Effect/EffectGenerator.h"
 
 using namespace TinyEngine;
 
@@ -268,7 +268,7 @@ void Player::Update(float deltaTime, DirectInput* input, GamePad* gamePad, Enemy
 	for (auto& particle : hitEffects_) {
 		particle->Update();
 	}
-	
+
 	// ヒットエフェクト削除
 	std::erase_if(hitEffects_, [](const std::unique_ptr<TinyEngine::Particle>& p) { return p->IsFinished(); });
 
@@ -358,6 +358,44 @@ void Player::Damage(float value) {
 
 	// 出血用のタイマー初期化
 	bleedingTimer_.Initialize(0.5f);
+}
+
+void Player::Heal(float value) { 
+	// 回復前のHPを保存
+	float beforeHP = hp_->GetCurrentHP();
+
+	// 回復処理
+	hp_->Heal(value);
+
+	// 回復後のHP
+	float afterHP = hp_->GetCurrentHP();
+
+	// HPIconのアニメーション開始処理
+	int startIdx = static_cast<int>(beforeHP);
+	int endIdx = static_cast<int>(afterHP);
+
+	for (int i = startIdx; i < endIdx; ++i) {
+		hpIcon_->HealAnimStart(i);
+	}
+}
+
+void Player::AllHeal() { 
+	// 回復前のHPを保存
+	float beforeHP = hp_->GetCurrentHP();
+
+	// 全回復処理
+	hp_->AllHeal();
+
+	// 回復後のHP
+	float afterHP = hp_->GetCurrentHP();
+
+	// HPIconのアニメーション開始処理
+	int startIdx = static_cast<int>(beforeHP);
+	int endIdx = static_cast<int>(afterHP);
+
+	for (int i = startIdx; i < endIdx; ++i) {
+		hpIcon_->HealAnimStart(i);
+	}
 }
 
 void Player::UpdateCollision() {

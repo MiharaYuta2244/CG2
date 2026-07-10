@@ -227,6 +227,9 @@ void GamePlayScene::Update() {
 	for (auto& cage : stage_->GetCageManager()->GetCages()) {
 		editObjects.push_back(cage.get());
 	}
+	for (auto& healArea : stage_->GetHealAreaManager()->GetHealAreas()) {
+		editObjects.push_back(healArea.get());
+	}
 
 	// シーンエディターの更新
 	sceneEditor_->Update(ctx_, editObjects, player_.get(), enemyManager_.get(), cameraZoomController_.get(), cameraPosY_, isDebugCameraActive_, currentCameraPivot_);
