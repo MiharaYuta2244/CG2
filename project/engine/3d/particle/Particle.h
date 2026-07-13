@@ -100,6 +100,12 @@ public:
 		materialData_->alphaCutoff = cutoff;
 	}
 
+	// 追従モードの設定
+	void SetFollowTarget(bool isFollow) { isFollowTarget_ = isFollow; }
+
+	// 追従対象の座標を毎フレーム更新する
+	void UpdateTranslate(const Vector3& newPos);
+
 	// getter
 	Vector4& GetColor() { return material_.color; }
 	Matrix4x4& GetWorldMatrix() { return worldMatrix_; }
@@ -229,5 +235,8 @@ private:
 
 	// 確保したSRVインデックスを保持する変数
 	uint32_t srvIndex_ = 0;
+
+	// 追従フラグ
+	bool isFollowTarget_ = false;
 };
 } // namespace TinyEngine

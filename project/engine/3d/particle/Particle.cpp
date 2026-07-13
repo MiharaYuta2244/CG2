@@ -508,3 +508,22 @@ void Particle::WriteParticleToGPU(const ParticleState& p, uint32_t index) {
 	instancingData_[index].color = p.color;
 	instancingData_[index].color.w = alpha;
 }
+
+void Particle::UpdateTranslate(const Vector3& newPos){
+	if (isFollowTarget_) {
+		// 前回のエミッタ座標と新しい座標の差分を計算
+		Vector3 delta;
+		delta.x = newPos.x - emitter_.transform.translate.x;
+		delta.y = newPos.y - emitter_.transform.translate.y;
+		delta.z = newPos.z - emitter_.transform.translate.z;
+
+		// 既に発生しているすべてのパーティクルも移動量分だけ動かす
+		for (auto& p : particles_) {
+			p.transform.translate.x += delta.x;
+			p.transform.translate.y += delta.y;
+			p.transform.translate.z += delta.z;
+		}
+	}
+	// エミッタ座標を更新
+	emitter_.transform.translate = newPos;
+}

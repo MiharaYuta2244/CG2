@@ -98,6 +98,9 @@ private:
 	// ヒットエフェクト生成関数
 	void GenerateHitEffect();
 
+	// 回復エフェクトの生成関数
+	void GenerateHealEffect();
+
 	// 血痕の生成
 	void AddBloodDecal(Vector3 scale);
 
@@ -154,6 +157,9 @@ private:
 	// 被弾時エフェクト
 	std::vector<std::unique_ptr<TinyEngine::Particle>> hitEffects_;
 	float preHP_ = maxHP_;
+
+	// 回復エフェクト
+	std::vector<std::unique_ptr<TinyEngine::Particle>> healEffects_;
 
 	// 攻撃確認用フラグ
 	bool isHandAnimPlaying_ = false;

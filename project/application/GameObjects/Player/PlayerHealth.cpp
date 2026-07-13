@@ -45,7 +45,7 @@ void PlayerHealth::Damage(float value) {
 
 void PlayerHealth::Heal(float value) {
 	hp_ += value;
-	hp_ = std::max(hp_, maxHP_);
+	hp_ = std::min(hp_, maxHP_);
 }
 
 void PlayerHealth::AllHeal() {

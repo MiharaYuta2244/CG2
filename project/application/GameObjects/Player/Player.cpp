@@ -272,6 +272,15 @@ void Player::Update(float deltaTime, DirectInput* input, GamePad* gamePad, Enemy
 	// ヒットエフェクト削除
 	std::erase_if(hitEffects_, [](const std::unique_ptr<TinyEngine::Particle>& p) { return p->IsFinished(); });
 
+	// 回復エフェクトの更新
+	for (auto& particle : healEffects_) {
+		particle->UpdateTranslate(transform_.translate);
+		particle->Update();
+	}
+
+	// 回復エフェクト削除
+	std::erase_if(healEffects_, [](const std::unique_ptr<TinyEngine::Particle>& p) { return p->IsFinished(); });
+
 	// 攻撃確認用
 	hand_->Update();
 
@@ -292,6 +301,12 @@ void Player::Update(float deltaTime, DirectInput* input, GamePad* gamePad, Enemy
 	ImGui::Begin("Player");
 	ImGui::SliderFloat("EnvScale", &envScale_, 0.0f, 1.0f);
 	ImGui::ColorEdit4("Color", &color_.x);
+	if(ImGui::Button("Damage")){
+		Damage(1);
+	}
+	if (ImGui::Button("Heal")) {
+		Heal(1);
+	}
 	ImGui::End();
 	render_->SetEnvScale(envScale_);
 	render_->SetColor(color_);
@@ -314,6 +329,11 @@ void Player::Draw() {
 
 	// ヒットエフェクトパーティクルの描画
 	for (auto& particle : hitEffects_) {
+		particle->Draw();
+	}
+
+	// 回復エフェクトの描画
+	for (auto& particle : healEffects_) {
 		particle->Draw();
 	}
 
@@ -360,7 +380,7 @@ void Player::Damage(float value) {
 	bleedingTimer_.Initialize(0.5f);
 }
 
-void Player::Heal(float value) { 
+void Player::Heal(float value) {
 	// 回復前のHPを保存
 	float beforeHP = hp_->GetCurrentHP();
 
@@ -369,6 +389,11 @@ void Player::Heal(float value) {
 
 	// 回復後のHP
 	float afterHP = hp_->GetCurrentHP();
+
+	if (beforeHP != afterHP) {
+		// エフェクト生成
+		GenerateHealEffect();
+	}
 
 	// HPIconのアニメーション開始処理
 	int startIdx = static_cast<int>(beforeHP);
@@ -379,7 +404,7 @@ void Player::Heal(float value) {
 	}
 }
 
-void Player::AllHeal() { 
+void Player::AllHeal() {
 	// 回復前のHPを保存
 	float beforeHP = hp_->GetCurrentHP();
 
@@ -388,6 +413,11 @@ void Player::AllHeal() {
 
 	// 回復後のHP
 	float afterHP = hp_->GetCurrentHP();
+
+	if (beforeHP != afterHP) {
+		// エフェクト生成
+		GenerateHealEffect();
+	}
 
 	// HPIconのアニメーション開始処理
 	int startIdx = static_cast<int>(beforeHP);
@@ -452,5 +482,15 @@ void Player::Bleeding(float deltaTime) {
 
 		// 出血用タイマー更新
 		bleedingTimer_.Update(deltaTime);
+	}
+}
+
+void Player::GenerateHealEffect() {
+	// エフェクトの生成
+	EffectGenerator::CreateHealEffect(ctx_, transform_.translate, healEffects_);
+
+	// 追従フラグを立てる
+	for(auto& effect : healEffects_){
+		effect->SetFollowTarget(true);
 	}
 }

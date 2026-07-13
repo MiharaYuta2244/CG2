@@ -1,10 +1,5 @@
 #include "EffectGenerator.h"
-#include "HitFlashModule.h"
-#include "HitRingModule.h"
-#include "HitSparkModule.h"
-#include "MuzzleFlashModule.h"
-#include "MuzzleSparkModule.h"
-#include "MuzzleSmokeModule.h"
+#include "ParticleModuleHeader.h"
 
 using namespace TinyEngine;
 
@@ -25,7 +20,7 @@ void EffectGenerator::CreateHitEffect(EngineContext* ctx, const Vector3& pos, st
 
 	// 拡散する衝撃波リング
 	auto ringWave = std::make_unique<Particle>();
-	ringWave->Initialize(ctx, pos, "gradationLine.png", std::make_unique<HitRingModule>(), nullptr, ParticleMeshType::Cylinder);
+	ringWave->Initialize(ctx, pos, "gradationLine.png", std::make_unique<HitRingModule>(Vector4(1.0f, 0.3f, 0.0f, 0.8f), 5.0f), nullptr, ParticleMeshType::Cylinder);
 	ringWave->SetEmitMode(false, 0.05f);
 	ringWave->SetEmitterParam(1, 0.01f);
 	container.push_back(std::move(ringWave));
@@ -71,8 +66,38 @@ void EffectGenerator::CreateEnemyDeathEffect(EngineContext* ctx, const Vector3& 
 
 	// 拡散する衝撃波リング
 	auto ringWave = std::make_unique<Particle>();
-	ringWave->Initialize(ctx, pos, "gradationLine.png", std::make_unique<HitRingModule>(), nullptr, ParticleMeshType::Cylinder);
+	ringWave->Initialize(ctx, pos, "gradationLine.png", std::make_unique<HitRingModule>(Vector4(1.0f, 0.3f, 0.0f, 0.8f), 5.0f), nullptr, ParticleMeshType::Cylinder);
 	ringWave->SetEmitMode(false, 0.05f);
 	ringWave->SetEmitterParam(1, 0.01f);
+	container.push_back(std::move(ringWave));
+}
+
+void EffectGenerator::CreateHealEffect(EngineContext* ctx, const Vector3& pos, std::vector<std::unique_ptr<TinyEngine::Particle>>& container){
+	// 上昇する十字パーティクル
+	auto cross = std::make_unique<Particle>();
+	cross->Initialize(ctx, pos, "Cross.png", std::make_unique<HealCrossModule>(), nullptr, ParticleMeshType::Square);
+	cross->SetEmitMode(false, 0.05f);
+	cross->SetEmitterParam(15, 0.01f);
+	container.push_back(std::move(cross));
+
+	// 上昇するスフィアパーティクル
+	auto sphere = std::make_unique<Particle>();
+	sphere->Initialize(ctx, pos, "white.png", std::make_unique<HealSphereModule>(), nullptr, ParticleMeshType::Square);
+	sphere->SetEmitMode(false, 0.05f);
+	sphere->SetEmitterParam(30, 0.01f);
+	container.push_back(std::move(sphere));
+
+	// 上昇するスラッシュパーティクル
+	auto slash = std::make_unique<Particle>();
+	slash->Initialize(ctx, pos, "white.png", std::make_unique<HealLineModule>(), nullptr, ParticleMeshType::Square);
+	slash->SetEmitMode(false, 0.05f);
+	slash->SetEmitterParam(10, 0.01f);
+	container.push_back(std::move(slash));
+
+	// 地面に配置するリング
+	auto ringWave = std::make_unique<Particle>();
+	ringWave->Initialize(ctx, pos, "gradationLine.png", std::make_unique<HitRingModule>(Vector4(0.8f, 1.0f, 0.8f, 1.0f), 3.0f), nullptr, ParticleMeshType::Cylinder);
+	ringWave->SetEmitMode(false, 0.05f);
+	ringWave->SetEmitterParam(1, 0.0f);
 	container.push_back(std::move(ringWave));
 }

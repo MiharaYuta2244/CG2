@@ -247,6 +247,9 @@ copy "$(windowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="application\GameObjects\StageObjects\Glass\GlassManager.cpp" />
     <ClCompile Include="engine\3d\particle\GPUParticle.cpp" />
     <ClCompile Include="application\GameObjects\StageObjects\HealArea\HealAreaManager.cpp" />
+    <ClCompile Include="engine\3d\particle\modules\HealCrossModule.cpp" />
+    <ClCompile Include="engine\3d\particle\modules\HealLineModule.cpp" />
+    <ClCompile Include="engine\3d\particle\modules\HealSphereModule.cpp" />
     <ClCompile Include="main.cpp">
       <Optimization Condition="'$(Configuration)|$(Platform)'=='Development|x64'">MaxSpeed</Optimization>
       <WholeProgramOptimization Condition="'$(Configuration)|$(Platform)'=='Development|x64'">true</WholeProgramOptimization>
@@ -539,6 +542,9 @@ copy "$(windowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="application\GameObjects\StageObjects\HealArea\HealArea.h" />
     <ClInclude Include="engine\3d\particle\GPUParticle.h" />
     <ClInclude Include="application\GameObjects\StageObjects\HealArea\HealAreaManager.h" />
+    <ClInclude Include="engine\3d\particle\modules\HealCrossModule.h" />
+    <ClInclude Include="engine\3d\particle\modules\HealLineModule.h" />
+    <ClInclude Include="engine\3d\particle\modules\HealSphereModule.h" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="externals\imgui\LICENSE.txt" />

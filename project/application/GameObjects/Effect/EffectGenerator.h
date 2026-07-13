@@ -14,4 +14,7 @@ public:
 
 	// 敵死亡エフェクトの生成
 	static void CreateEnemyDeathEffect(EngineContext* ctx, const Vector3& pos, std::list<std::unique_ptr<TinyEngine::Particle>>& container);
+
+	// 回復エフェクト
+	static void CreateHealEffect(EngineContext* ctx, const Vector3& pos, std::vector<std::unique_ptr<TinyEngine::Particle>>& container);
 };
