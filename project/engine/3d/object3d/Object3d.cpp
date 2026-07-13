@@ -11,6 +11,24 @@ using namespace TinyEngine;
 // 静的変数の定義
 uint32_t Object3d::s_nextID_ = 0;
 
+Object3d::~Object3d() {
+	if (ctx_ && ctx_->srvManager) {
+		// 初期値の0でなければ確保されていると判断して解放する
+		if (paletteSrvIndex_ != 0) {
+			ctx_->srvManager->Free(paletteSrvIndex_);
+		}
+		if (inputVertexSrvIndex_ != 0) {
+			ctx_->srvManager->Free(inputVertexSrvIndex_);
+		}
+		if (influenceSrvIndex_ != 0) {
+			ctx_->srvManager->Free(influenceSrvIndex_);
+		}
+		if (outputUavIndex_ != 0) {
+			ctx_->srvManager->Free(outputUavIndex_);
+		}
+	}
+}
+
 void Object3d::Initialize(EngineContext* ctx, const std::string& name) {
 	ctx_ = ctx;
 
@@ -221,14 +239,14 @@ void Object3d::SetModel(const std::string& filePath) {
 		skeleton_ = model_->CreateSkeleton(modelData_.rootNode);
 
 		auto device = ctx_->object3dCommon->GetDxCommon()->GetDevice();
-		uint32_t paletteSrvIndex = ctx_->srvManager->Allocate();
-		uint32_t inputVertexSrvIndex = ctx_->srvManager->Allocate();
-		uint32_t influenceSrvIndex = ctx_->srvManager->Allocate();
-		uint32_t outputUavIndex = ctx_->srvManager->Allocate();
+		paletteSrvIndex_ = ctx_->srvManager->Allocate();
+		inputVertexSrvIndex_ = ctx_->srvManager->Allocate();
+		influenceSrvIndex_ = ctx_->srvManager->Allocate();
+		outputUavIndex_ = ctx_->srvManager->Allocate();
 
 		skinCluster_ = model_->CreateSkinCluster(
-		    device, skeleton_, model_->GetModelData(), ctx_->object3dCommon->GetDxCommon()->GetSrvDescriptorHeap(), ctx_->object3dCommon->GetDxCommon()->GetDescriptorSizeSRV(), paletteSrvIndex,
-		    inputVertexSrvIndex, influenceSrvIndex, outputUavIndex);
+		    device, skeleton_, model_->GetModelData(), ctx_->object3dCommon->GetDxCommon()->GetSrvDescriptorHeap(), ctx_->object3dCommon->GetDxCommon()->GetDescriptorSizeSRV(), paletteSrvIndex_,
+		    inputVertexSrvIndex_, influenceSrvIndex_, outputUavIndex_);
 
 		textureFilePath_ = modelData_.material.textureFilePath;
 	}

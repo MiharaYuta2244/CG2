@@ -22,6 +22,8 @@ namespace TinyEngine {
 /// </summary>
 class Object3d {
 public:
+	~Object3d();
+
 	/// <summary>
 	/// 初期化関数
 	/// </summary>
@@ -192,5 +194,11 @@ private:
 
 	SkinCluster skinCluster_;
 	bool isSkinning_ = false;
+
+	// 確保したインデックスを保持する変数
+	uint32_t paletteSrvIndex_ = 0;
+	uint32_t inputVertexSrvIndex_ = 0;
+	uint32_t influenceSrvIndex_ = 0;
+	uint32_t outputUavIndex_ = 0;
 };
 } // namespace TinyEngine
