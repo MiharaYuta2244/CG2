@@ -301,7 +301,7 @@ void Player::Update(float deltaTime, DirectInput* input, GamePad* gamePad, Enemy
 	ImGui::Begin("Player");
 	ImGui::SliderFloat("EnvScale", &envScale_, 0.0f, 1.0f);
 	ImGui::ColorEdit4("Color", &color_.x);
-	if(ImGui::Button("Damage")){
+	if (ImGui::Button("Damage")) {
 		Damage(1);
 	}
 	if (ImGui::Button("Heal")) {
@@ -473,11 +473,28 @@ void Player::AddBloodDecal(Vector3 scale) {
 void Player::Bleeding(float deltaTime) {
 	if (hp_->GetCurrentHP() <= 2 && isMoving_) {
 		if (bleedingTimer_.IsEnd()) {
-			// 出血用のタイマー初期化
-			bleedingTimer_.Initialize(bleedingInterval_);
+			// スケールの最大値と最小値
+			Vector3 bloodScaleMin = {0.5f, 0.5f, 0.5f};
+			Vector3 bloodScaleMax = {1.0f, 1.0f, 1.0f};
+
+			// 生成間隔の最大値と最小値
+			float intervalMin = 0.2f;
+			float intervalmax = 0.5f;
+
+			float hp = hp_->GetCurrentHP();
+			float t = hp / 2.0f;
+
+			// スケールの確定
+			Vector3 scale = bloodScaleMax - (bloodScaleMax - bloodScaleMin) * t;
+
+			// 生成間隔の確定
+			float interval = intervalMin + (intervalmax - intervalMin) * t;
 
 			// 血痕の生成
-			AddBloodDecal({1, 1, 1});
+			AddBloodDecal(scale);
+
+			// 出血用のタイマー初期化
+			bleedingTimer_.Initialize(interval);
 		}
 
 		// 出血用タイマー更新
@@ -490,7 +507,7 @@ void Player::GenerateHealEffect() {
 	EffectGenerator::CreateHealEffect(ctx_, transform_.translate, healEffects_);
 
 	// 追従フラグを立てる
-	for(auto& effect : healEffects_){
+	for (auto& effect : healEffects_) {
 		effect->SetFollowTarget(true);
 	}
 }

@@ -1,6 +1,8 @@
 #include "TitleScene.h"
 #include "SceneManager.h"
 
+using namespace TinyEngine;
+
 void TitleScene::Initialize(const SceneContext& ctx) {
 	ctx_ = ctx;
 	commonData_ = ctx_.sceneManager->GetCommonData();
@@ -13,6 +15,11 @@ void TitleScene::Initialize(const SceneContext& ctx) {
 	menu_->AddItem("Play", "Title_Play.png", [this]() { RequestSceneChange("GamePlay"); });
 	menu_->AddItem("Option", "Title_Option.png", [this]() { RequestSceneChange("GamePlay"); });
 	menu_->AddItem("Quit", "Title_Quit.png", [this]() { PostQuitMessage(0); });
+
+	// タイトルロゴの生成&初期化
+	titleLogo_ = std::make_unique<Sprite>();
+	titleLogo_->Initialize(ctx.engineContext, "Title_Logo.png");
+	titleLogo_->SetPosition(titleLogoPos_);
 
 	// シーンで使うエフェクトの宣言
 	ctx_.engineContext->postEffectPipeline->SetEffects({
@@ -33,6 +40,11 @@ void TitleScene::Update() {
 
 	// メニューの更新
 	menu_->Update(ctx_.keyboard, ctx_.gamePad, ctx_.timeManager->GetDeltaTime());
+
+	// タイトルロゴ更新
+	titleLogo_->SetPosition(titleLogoPos_);
+	titleLogo_->SetColor(logoColor_);
+	titleLogo_->Update();
 
 	// 歪みのパラメータにDeltaTime加算
 	glitchParam_.time += deltaTime;
@@ -87,6 +99,8 @@ void TitleScene::Update() {
 void TitleScene::Draw() {
 	// メニューの描画
 	menu_->Draw();
+
+	titleLogo_->Draw();
 }
 
 void TitleScene::Finalize() {}

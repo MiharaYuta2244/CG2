@@ -18,4 +18,5 @@ public:
 
 private:
 	std::unique_ptr<MenuList> menuList_;
+	std::unique_ptr<TinyEngine::Sprite> bgSprite_;
 };

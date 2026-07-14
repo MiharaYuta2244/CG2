@@ -94,7 +94,7 @@ private:
 	EnemyType type_;
 
 	// 視界のパラメータ
-	Visionparam visionParam_ = {30.0f, 30.0f};
+	Visionparam visionParam_ = {20.0f, 30.0f};
 	float lostSightTimer_ = 0.0f;           // プレイヤーを見失ってからの経過時間
 	const float kLostSightDuration_ = 2.0f; // 視界外でも維持する時間
 	Vector3 lastKnownPlayerPos_;            // 最後に見えたプレイヤーの座標

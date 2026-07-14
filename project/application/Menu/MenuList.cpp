@@ -6,11 +6,6 @@ using namespace TinyEngine;
 void MenuList::Initialize(EngineContext* ctx) {
 	ctx_ = ctx;
 
-	// タイトルロゴの生成&初期化
-	titleLogo_ = std::make_unique<Sprite>();
-	titleLogo_->Initialize(ctx, "Title_Logo.png");
-	titleLogo_->SetPosition(titleLogoPos_);
-
 	// 背景の生成&初期化
 	background_ = std::make_unique<Sprite>();
 	background_->Initialize(ctx, "white.png");
@@ -119,11 +114,6 @@ void MenuList::Update(DirectInput* input, GamePad* gamePad, float deltaTime) {
 	background_->SetVoronoiColor(voronoiColor_);
 	background_->Update();
 
-	// タイトルロゴ更新
-	titleLogo_->SetPosition(titleLogoPos_);
-	titleLogo_->SetColor(logoColor_);
-	titleLogo_->Update();
-
 	// 決定ボタン入力時エフェクト更新
 	decideEffect_->Update(deltaTime);
 
@@ -134,7 +124,6 @@ void MenuList::Update(DirectInput* input, GamePad* gamePad, float deltaTime) {
 
 void MenuList::Draw() {
 	background_->Draw();
-	titleLogo_->Draw();
 	decideEffect_->Draw();
 
 	for (int i = 0; i < items_.size(); i++) {

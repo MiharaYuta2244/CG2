@@ -2,7 +2,7 @@
 
 using namespace TinyEngine;
 
-void PauseScene::Initialize(const SceneContext& ctx) { 
+void PauseScene::Initialize(const SceneContext& ctx) {
 	ctx_ = ctx;
 
 	// メニューの生成&初期化
@@ -13,6 +13,12 @@ void PauseScene::Initialize(const SceneContext& ctx) {
 	menuList_->AddItem("Resume", "white.png", [this]() { RequestScenePop(); });
 	menuList_->AddItem("Option", "Title_Option.png", [this]() { RequestSceneChange("Option"); });
 	menuList_->AddItem("Title", "white.png", [this]() { RequestSceneChange("Title"); });
+
+	// 背景スプライト生成&初期化
+	bgSprite_ = std::make_unique<Sprite>();
+	bgSprite_->Initialize(ctx.engineContext, "white.png");
+	bgSprite_->SetColor({0, 0, 0, 0.5f});
+	bgSprite_->SetSize({1280.0f, 720.0f});
 }
 
 void PauseScene::Update() {
@@ -20,10 +26,13 @@ void PauseScene::Update() {
 		RequestScenePop();
 	}
 
-	// メニューの更新 
+	// 背景更新
+	bgSprite_->Update();
+
+	// メニューの更新
 	menuList_->Update(ctx_.keyboard, ctx_.gamePad, ctx_.timeManager->GetDeltaTime());
 
-	#ifdef USE_IMGUI
+#ifdef USE_IMGUI
 	ImGui::Begin("Pause Menu");
 
 	// 音量調整
@@ -47,6 +56,9 @@ void PauseScene::Update() {
 }
 
 void PauseScene::Draw() {
+	// 背景描画
+	bgSprite_->Draw();
+
 	// メニューの描画
 	menuList_->Draw();
 }

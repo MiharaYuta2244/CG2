@@ -38,11 +38,6 @@ private:
 	// 現在のインデックス
 	int currentIndex_ = 0;
 
-	// == タイトルロゴ ==
-	std::unique_ptr<TinyEngine::Sprite> titleLogo_;
-	Vector2 titleLogoPos_ = {0.0f, 100.0f};        // ロゴの座標
-	Vector4 logoColor_ = {1.0f, 0.7f, 0.1f, 1.0f}; // 色
-
 	// == メニュー ==
 	Vector2 startPos_ = {520.0f, 400.0f};            // 座標
 	float offsetY_ = 90.0f;                          // オフセット
