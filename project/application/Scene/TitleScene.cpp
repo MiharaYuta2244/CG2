@@ -21,6 +21,15 @@ void TitleScene::Initialize(const SceneContext& ctx) {
 	titleLogo_->Initialize(ctx.engineContext, "Title_Logo.png");
 	titleLogo_->SetPosition(titleLogoPos_);
 
+	// 背景の生成&初期化
+	background_ = std::make_unique<Sprite>();
+	background_->Initialize(ctx.engineContext, "white.png");
+	background_->SetSize({1280.0f, 720.0f});
+	background_->SetColor(backgroundColor_);
+	background_->SetEnableVoronoi(true);
+	background_->SetVoronoiColor(voronoiColor_);
+	background_->SetZDepth(100.0f);
+
 	// シーンで使うエフェクトの宣言
 	ctx_.engineContext->postEffectPipeline->SetEffects({
 	    PostEffectType::Scanline,         // 走査線
@@ -45,6 +54,13 @@ void TitleScene::Update() {
 	titleLogo_->SetPosition(titleLogoPos_);
 	titleLogo_->SetColor(logoColor_);
 	titleLogo_->Update();
+
+	// 背景更新
+	voronoiTimer_ += deltaTime;
+	background_->SetVoronoiParams(voronoiParams_.x, voronoiParams_.y, voronoiParams_.z, voronoiTimer_);
+	background_->SetColor(backgroundColor_);
+	background_->SetVoronoiColor(voronoiColor_);
+	background_->Update();
 
 	// 歪みのパラメータにDeltaTime加算
 	glitchParam_.time += deltaTime;
@@ -97,9 +113,13 @@ void TitleScene::Update() {
 }
 
 void TitleScene::Draw() {
-	// メニューの描画
+	// 背景描画
+	background_->Draw();
+
+	// メニュー描画
 	menu_->Draw();
 
+	// タイトルロゴ描画
 	titleLogo_->Draw();
 }
 

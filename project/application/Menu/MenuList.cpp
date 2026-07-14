@@ -6,15 +6,6 @@ using namespace TinyEngine;
 void MenuList::Initialize(EngineContext* ctx) {
 	ctx_ = ctx;
 
-	// 背景の生成&初期化
-	background_ = std::make_unique<Sprite>();
-	background_->Initialize(ctx, "white.png");
-	background_->SetSize({1280.0f, 720.0f});
-	background_->SetColor(backgroundColor_);
-	background_->SetEnableVoronoi(true);
-	background_->SetVoronoiColor(voronoiColor_);
-	background_->SetZDepth(100.0f);
-
 	// 決定ボタン入力時のエフェクト
 	decideEffect_ = std::make_unique<DecideEffect>();
 	decideEffect_->Initialize(ctx, startPos_);
@@ -107,13 +98,6 @@ void MenuList::Update(DirectInput* input, GamePad* gamePad, float deltaTime) {
 	ImGui::End();
 #endif
 
-	// 背景更新
-	voronoiTimer_ += deltaTime;
-	background_->SetVoronoiParams(voronoiParams_.x, voronoiParams_.y, voronoiParams_.z, voronoiTimer_);
-	background_->SetColor(backgroundColor_);
-	background_->SetVoronoiColor(voronoiColor_);
-	background_->Update();
-
 	// 決定ボタン入力時エフェクト更新
 	decideEffect_->Update(deltaTime);
 
@@ -123,7 +107,6 @@ void MenuList::Update(DirectInput* input, GamePad* gamePad, float deltaTime) {
 }
 
 void MenuList::Draw() {
-	background_->Draw();
 	decideEffect_->Draw();
 
 	for (int i = 0; i < items_.size(); i++) {

@@ -10,14 +10,14 @@ void PauseScene::Initialize(const SceneContext& ctx) {
 	menuList_->Initialize(ctx.engineContext);
 
 	// メニュー項目の追加
-	menuList_->AddItem("Resume", "white.png", [this]() { RequestScenePop(); });
-	menuList_->AddItem("Option", "Title_Option.png", [this]() { RequestSceneChange("Option"); });
-	menuList_->AddItem("Title", "white.png", [this]() { RequestSceneChange("Title"); });
+	menuList_->AddItem("Resume", "Resume.png", [this]() { RequestScenePop(); });
+	menuList_->AddItem("Option", "Title_Option.png", [this]() { RequestSceneChange("Title"); });
+	menuList_->AddItem("Title", "Title.png", [this]() { RequestSceneChange("Title"); });
 
 	// 背景スプライト生成&初期化
 	bgSprite_ = std::make_unique<Sprite>();
 	bgSprite_->Initialize(ctx.engineContext, "white.png");
-	bgSprite_->SetColor({0, 0, 0, 0.5f});
+	bgSprite_->SetColor({0, 0, 0, 0.8f});
 	bgSprite_->SetSize({1280.0f, 720.0f});
 }
 

@@ -44,13 +44,6 @@ private:
 	Vector4 normalColor_ = {1.0f, 1.0f, 1.0f, 1.0f}; // 非セレクト時の色
 	Vector4 selectColor_ = {1.0f, 0.7f, 0.1f, 1.0f}; // セレクト時の色
 
-	// == 背景 ==
-	std::unique_ptr<TinyEngine::Sprite> background_;
-	Vector3 voronoiParams_ = {5.0f, 2.0f, 1.0f};         // ボロノイノイズのパラメータ
-	float voronoiTimer_ = 0.0f;                          // ボロノイノイズ用タイマー
-	Vector4 voronoiColor_ = {0.0f, 0.2f, 0.2f, 1.0f};    // ボロノイノイズの色
-	Vector4 backgroundColor_ = {0.0f, 0.0f, 0.0f, 1.0f}; // 背景色
-
 	// 決定ボタン入力時のエフェクト
 	std::unique_ptr<DecideEffect> decideEffect_;
 
