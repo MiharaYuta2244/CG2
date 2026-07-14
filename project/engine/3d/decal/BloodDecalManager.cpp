@@ -33,6 +33,16 @@ void BloodDecalManager::Initialize(EngineContext* ctx, const std::string& textur
 
 	// 配列のメモリをあらかじめ最大数分確保しておく
 	bloodList_.reserve(kNumMaxInstance);
+
+	// マテリアルのCBVを作成
+	UINT materialBufferSize = (sizeof(ParticleMaterial) + 255) & ~255;
+	materialResource_ = DirectXUtils::CreateBufferResource(ctx_->particleCommon->GetDxCommon()->GetDevice(), materialBufferSize);
+	materialResource_->Map(0, nullptr, reinterpret_cast<void**>(&materialData_));
+
+	material_.color = {1, 1, 1, 1};
+	material_.uvTransform = MathUtility::MakeIdentity4x4();
+	material_.alphaCutoff = 0.0f;
+	*materialData_ = material_;
 }
 
 void BloodDecalManager::AddBlood(const Vector3& position, const Vector3& rotation, const Vector3& scale, const Vector4& color) {
@@ -79,6 +89,9 @@ void BloodDecalManager::Draw() {
 	ctx_->particleCommon->DrawSettingCommon();
 
 	auto commandList = ctx_->particleCommon->GetDxCommon()->GetCommandList();
+
+	// マテリアル
+	commandList->SetGraphicsRootConstantBufferView(0, materialResource_->GetGPUVirtualAddress());
 
 	// StructuredBufferの場所を設定
 	commandList->SetGraphicsRootDescriptorTable(1, instancingSrvHandleGPU_);

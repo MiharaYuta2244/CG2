@@ -347,7 +347,12 @@ void Player::Draw() {
 	hand_->Draw();
 }
 
-bool Player::IsDead() const { return hp_->IsDead(); }
+bool Player::IsDead() const { 
+	// ゲーム開始から死亡までの時間をログに出力
+	Logger::Log("", LogLevel::Info);
+
+	return hp_->IsDead(); 
+}
 
 void Player::Damage(float value) {
 	if (hp_->GetIsInvincible())

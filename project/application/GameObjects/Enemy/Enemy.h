@@ -100,7 +100,7 @@ private:
 	void AddBloodDecal();
 
 private:
-	AABB bodyCol_; // 本体のAABB
+	AABB bodyCol_{}; // 本体のAABB
 	bool enableMove_ = true;
 	AnimationBundle<Vector3> knockBackAnim_;
 	bool isDead_ = false;
@@ -132,7 +132,7 @@ private:
 	bool isMove_ = true;
 
 	// 敵のタイプ
-	EnemyType type_;
+	EnemyType type_ = EnemyType::Normal;
 
 	// HP
 	int hp_ = 1;

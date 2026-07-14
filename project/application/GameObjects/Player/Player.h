@@ -185,4 +185,7 @@ private:
 
 	// 出血の間隔
 	float bleedingInterval_ = 0.2f;
+
+	// プレイヤーの生存時間
+	float aliveTImer_ = 0.0f;
 };

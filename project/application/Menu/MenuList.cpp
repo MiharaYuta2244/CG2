@@ -78,26 +78,6 @@ void MenuList::Update(DirectInput* input, GamePad* gamePad, float deltaTime) {
 		decideEffect_->StartAnimation();
 	}
 
-#ifdef USE_IMGUI
-	ImGui::Begin("TitleLayout");
-	ImGui::DragFloat2("Pos", &titleLogoPos_.x, 1.0f);
-	ImGui::DragFloat2("StartPos", &startPos_.x, 1.0f);
-	ImGui::DragFloat("OffsetY", &offsetY_, 1.0f);
-	ImGui::End();
-
-	ImGui::Begin("Voronoi");
-	ImGui::DragFloat3("params", &voronoiParams_.x, 0.01f);
-	ImGui::End();
-
-	ImGui::Begin("Color");
-	ImGui::ColorEdit4("Logo", &logoColor_.x);
-	ImGui::ColorEdit4("Normal", &normalColor_.x);
-	ImGui::ColorEdit4("Select", &selectColor_.x);
-	ImGui::ColorEdit4("voronoi", &voronoiColor_.x);
-	ImGui::ColorEdit4("background", &backgroundColor_.x);
-	ImGui::End();
-#endif
-
 	// 決定ボタン入力時エフェクト更新
 	decideEffect_->Update(deltaTime);
 

@@ -4,6 +4,7 @@
 #include "MathUtility.h"
 #include "ModelData.h"
 #include "Transform.h"
+#include "ParticleMaterial.h"
 #include <d3d12.h>
 #include <string>
 #include <vector>
@@ -82,6 +83,10 @@ private:
 	std::vector<BloodData> bloodList_; // 血痕の実データ配列
 	uint32_t bloodIndex_ = 0;          // リングバッファ用のインデックス
 	uint32_t numInstance_ = 0;         // 現在の描画数
+
+	Microsoft::WRL::ComPtr<ID3D12Resource> materialResource_;
+	ParticleMaterial* materialData_ = nullptr;
+	ParticleMaterial material_;
 };
 
 } // namespace TinyEngine

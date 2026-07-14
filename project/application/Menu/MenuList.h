@@ -38,7 +38,7 @@ private:
 	// 現在のインデックス
 	int currentIndex_ = 0;
 
-	// == メニュー ==
+	// メニュー
 	Vector2 startPos_ = {520.0f, 400.0f};            // 座標
 	float offsetY_ = 90.0f;                          // オフセット
 	Vector4 normalColor_ = {1.0f, 1.0f, 1.0f, 1.0f}; // 非セレクト時の色

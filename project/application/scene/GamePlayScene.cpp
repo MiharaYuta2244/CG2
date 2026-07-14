@@ -238,9 +238,14 @@ void GamePlayScene::Update() {
 	for (auto& particle : enemyDeathEffect_) {
 		particle->Update();
 	}
+
 	std::erase_if(enemyDeathEffect_, [this](const std::unique_ptr<TinyEngine::Particle>& p) {
-		ctx_.currentCamera->StartShake(0.2f, 0.2f);
-		return p->IsFinished();
+		bool isFinished = p->IsFinished();
+		if (isFinished) {
+			// パーティクルが終了して削除される瞬間だけカメラを揺らす
+			ctx_.currentCamera->StartShake(0.2f, 0.2f);
+		}
+		return isFinished;
 	});
 
 	// カメラの追従

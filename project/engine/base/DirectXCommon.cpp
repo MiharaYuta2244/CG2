@@ -4,7 +4,7 @@
 #include <format>
 #include <thread>
 
-const uint32_t DirectXCommon::kMaxSRVCount = 512;
+const uint32_t DirectXCommon::kMaxSRVCount = 4096;
 
 using namespace Microsoft::WRL;
 

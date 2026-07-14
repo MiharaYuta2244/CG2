@@ -4,6 +4,7 @@
 #include "EngineContext.h"
 #include "ModelData.h"
 #include "ParticleForGPU.h"
+#include "ParticleMaterial.h"
 #include "ParticleModule.h"
 #include "ParticleState.h"
 #include "TimeManager.h"
@@ -15,13 +16,6 @@
 #include <string>
 #include <unordered_map>
 #include <wrl.h>
-
-struct ParticleMaterial {
-	Vector4 color;
-	Matrix4x4 uvTransform;
-	float alphaCutoff;
-	float padding[3];
-};
 
 namespace TinyEngine {
 enum class ParticleMeshType {
