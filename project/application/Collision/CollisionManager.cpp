@@ -42,6 +42,8 @@ void CollisionManager::CheckCollisions(
 							commonData->killCount += 1;
 							generateParticleCallback(shieldEnemy->GetPos());
 						}
+						player->SetIsGrabReleased(true);
+						player->SetIsHold(false);
 					}
 				}
 			}

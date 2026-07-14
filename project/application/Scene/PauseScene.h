@@ -1,10 +1,12 @@
 #pragma once
 #include "BaseScene.h"
+#include "Sprite.h"
+#include "Menu/MenuList.h"
 
 /// <summary>
 /// ポーズシーン
 /// </summary>
-class PauseScene : public BaseScene{
+class PauseScene : public BaseScene {
 public:
 	void Initialize(const SceneContext& ctx) override;
 
@@ -13,4 +15,7 @@ public:
 	void Draw() override;
 
 	void Finalize() override;
+
+private:
+	std::unique_ptr<MenuList> menuList_;
 };

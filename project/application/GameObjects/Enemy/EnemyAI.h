@@ -94,15 +94,15 @@ private:
 	EnemyType type_;
 
 	// 視界のパラメータ
-	Visionparam visionParam_ = {30.0f, 40.0f};
+	Visionparam visionParam_ = {30.0f, 30.0f};
 	float lostSightTimer_ = 0.0f;           // プレイヤーを見失ってからの経過時間
 	const float kLostSightDuration_ = 2.0f; // 視界外でも維持する時間
 	Vector3 lastKnownPlayerPos_;            // 最後に見えたプレイヤーの座標
 
 	// 射撃用パラメータ
 	float shotTimer_ = 0.0f;          // 射撃までの残り時間タイマー
-	float shotIntervalNormal_ = 2.0f; // 射撃間隔(通常時)
-	float shotIntervalHold_ = 1.5f;   // 射撃間隔(拘束時)
+	float shotIntervalNormal_ = 1.5f; // 射撃間隔(通常時)
+	float shotIntervalHold_ = 1.0f;   // 射撃間隔(拘束時)
 	float bulletMargin_ = 10.0f;      // 敵と弾の間隔
 	bool isShotThisFrame_ = false;
 	bool isShotHoldState_ = true;
@@ -121,6 +121,6 @@ private:
 	const float patrolSpeed_ = 4.0f;         // 徘徊時の移動速度
 
 	// 聴覚用パラメータ
-	float hearingRadius_ = 10.0f; // 足音が聞こえる距離
+	float hearingRadius_ = 8.0f; // 足音が聞こえる距離
 	float hearTurnSpeed_ = 8.0f;  // 足音に反応して振り向く速度
 };

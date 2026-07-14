@@ -85,6 +85,10 @@ public:
 	// 敵を掴んでいるかどうかGetter
 	bool IsGrabbingEnemy() const { return isGrabTriggered_; }
 
+	void SetIsGrabReleased(bool isGrabReleased) { isGrabReleased_ = isGrabReleased; }
+
+	void SetIsHold(bool isHold) { isHold_ = isHold; }
+
 	// 掴んでいる敵のポインタGetter
 	Enemy* GetGrabbedEnemy() { return heldEnemy_; }
 
@@ -169,6 +173,9 @@ private:
 
 	// 攻撃しているかどうか
 	bool isAttackTriggered_ = false;
+
+	// 敵を放したかどうか
+	bool isGrabReleased_ = false;
 
 	// 血痕の管理インスタンスポインタ
 	TinyEngine::BloodDecalManager* bloodDecalManager_ = nullptr;

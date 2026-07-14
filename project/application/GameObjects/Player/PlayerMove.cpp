@@ -88,6 +88,8 @@ void PlayerMove::Update(Transform* transform, Vector2 inputDir, Vector2 aimDir, 
 	ImGui::DragFloat("Walk", &maxSpeedWalk_, 0.01f);
 	ImGui::DragFloat("Run", &maxSpeedRun_, 0.01f);
 	ImGui::DragFloat("Dash", &maxSpeedDash_, 0.01f);
+	ImGui::DragFloat("Acceleration", &acceleration_, 1.0f);
+	ImGui::DragFloat("Friction", &friction_, 1.0f);
 	ImGui::End();
 #endif
 }

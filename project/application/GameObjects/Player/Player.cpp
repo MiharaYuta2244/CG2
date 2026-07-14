@@ -149,7 +149,7 @@ void Player::Update(float deltaTime, DirectInput* input, GamePad* gamePad, Enemy
 	}
 
 	isGrabTriggered_ = input->KeyDown(DIK_J);
-	bool isGrabReleased = input->KeyReleased(DIK_J);
+	isGrabReleased_ = input->KeyReleased(DIK_J);
 	isAttackTriggered_ = input->KeyTriggered(DIK_K);
 
 	if (gamePad && gamePad->GetState().connected) {
@@ -161,7 +161,7 @@ void Player::Update(float deltaTime, DirectInput* input, GamePad* gamePad, Enemy
 		}
 		// 放す
 		if (isHold_ && !isGrabTriggered_) {
-			isGrabReleased = true;
+			isGrabReleased_ = true;
 		}
 		// Rトリガーで突き飛ばし
 		if (padState.axes.rt > 0.3f) {
@@ -191,7 +191,7 @@ void Player::Update(float deltaTime, DirectInput* input, GamePad* gamePad, Enemy
 			heldEnemy_->SetPos(holdPos);
 			heldEnemy_->SetRotate(transform_.rotate);
 		}
-	} else if (isHold_ && isGrabReleased) { // 手放す処理
+	} else if (isHold_ && isGrabReleased_) { // 手放す処理
 		isHold_ = false;
 		if (heldEnemy_) {
 			heldEnemy_->SetEnableAI(true);

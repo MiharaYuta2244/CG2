@@ -20,11 +20,11 @@ private:
 
 	// 加速度移動用のパラメータ
 	Vector2 velocity_ = {0.0f, 0.0f}; // 移動速度
-	float acceleration_ = 80.0f;      // 加速度
-	float friction_ = 50.0f;          // 摩擦
+	float acceleration_ = 30.0f;      // 加速度
+	float friction_ = 35.0f;          // 摩擦
 
 	// スティックの倒し具合に応じた3段階の最大速度
-	float maxSpeedWalk_ = 5.0f;  // 小さく倒した時
-	float maxSpeedRun_ = 10.0f;   // 中くらい倒した時
-	float maxSpeedDash_ = 14.0f; // 最大まで倒した時
+	float maxSpeedWalk_ = 6.0f;  // 小さく倒した時
+	float maxSpeedRun_ = 8.0f;   // 中くらい倒した時
+	float maxSpeedDash_ = 10.0f; // 最大まで倒した時
 };
