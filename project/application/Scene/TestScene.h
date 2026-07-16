@@ -2,6 +2,7 @@
 #include "BaseScene.h"
 #include "GameObjects/ObjectRender/ObjectRender.h"
 #include "Particle.h"
+#include "GPUParticle.h"
 
 class TestScene : public BaseScene {
 public:
@@ -14,21 +15,6 @@ public:
 	void Finalize() override;
 
 private:
-	// オブジェクトデータの読み込み
-	void LoadScene();
-
-private:
-	// オブジェクトのリスト
-	std::vector<std::unique_ptr<ObjectRender>> sceneObjects;
-
-	std::unique_ptr<ObjectRender> plane_;
-
-	std::unique_ptr<ObjectRender> walk_;
-	std::unique_ptr<ObjectRender> sneakWalk_;
-	std::unique_ptr<ObjectRender> testObj_;
-
-	Transform walkTransform_{};
-	Transform sneakWalkTransform_{};
-
-	std::vector<std::unique_ptr<TinyEngine::Particle>> particles_;
+	std::unique_ptr<GPUParticle> gpuParticle_;
+	PerView perView_;
 };

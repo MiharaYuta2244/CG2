@@ -3,6 +3,8 @@
 #include "Matrix4x4.h"
 #include "Vector3.h"
 #include "Vector4.h"
+#include "ParticleMaterial.h"
+#include "EngineContext.h"
 #include <d3d12.h>
 #include <dxcapi.h>
 #include <wrl/client.h>
@@ -25,11 +27,13 @@ class GPUParticle {
 public:
 	static const uint32_t kMaxParticles = 1024;
 
+	~GPUParticle();
+
 	/// <summary>
 	/// 初期化関数
 	/// </summary>
 	/// <param name="dxCommon">DirectX共通クラスのポインタ</param>
-	void Initialize(DirectXCommon* dxCommon);
+	void Initialize(EngineContext* ctx, const std::string& texturepath);
 
 	/// <summary>
 	/// 更新処理
@@ -54,7 +58,10 @@ private:
 	void CreateResources();
 
 private:
+	EngineContext* ctx_ = nullptr;
 	DirectXCommon* dxCommon_ = nullptr;
+	std::string texturePath_;
+	std::string textureFullPath_;
 
 	// ShaderCompiler
 	Microsoft::WRL::ComPtr<IDxcUtils> dxcUtils_;
@@ -73,12 +80,18 @@ private:
 	Microsoft::WRL::ComPtr<ID3D12Resource> particleBuffer_; // StructuredBuffer (SRV/UAV兼用)
 	Microsoft::WRL::ComPtr<ID3D12Resource> perViewBuffer_;  // ConstantBuffer (CBV)
 	PerView* mappedPerView_ = nullptr;
+	Microsoft::WRL::ComPtr<ID3D12Resource> materialBuffer_; // ConstantBuffer (CBV)
+	ParticleMaterial* mappedMaterial_ = nullptr;
+	Microsoft::WRL::ComPtr<ID3D12Resource> texture_; // テクスチャ本体
+	D3D12_GPU_DESCRIPTOR_HANDLE textureSRVHeapHandle{};
 
 	// ディスクリプタヒープとハンドル
-	Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> srvUavHeap_;
 	D3D12_GPU_DESCRIPTOR_HANDLE particleUAVHeapHandle{};
 	D3D12_GPU_DESCRIPTOR_HANDLE particleSRVHeapHandle{};
 
 	// 現在のリソース状態管理
 	D3D12_RESOURCE_STATES particleState_ = D3D12_RESOURCE_STATE_COMMON;
+
+	uint32_t particleUavIndex_ = 0;
+	uint32_t particleSrvIndex_ = 0;
 };

@@ -1,11 +1,22 @@
 #include "GPUParticle.h"
 #include "DirectXUtils.h"
 #include <cassert>
+#include "MathUtility.h"
 
 using namespace Microsoft::WRL;
 
-void GPUParticle::Initialize(DirectXCommon* dxCommon) {
-	dxCommon_ = dxCommon;
+GPUParticle::~GPUParticle() {
+	if (ctx_ && ctx_->srvManager) {
+		ctx_->srvManager->Free(particleUavIndex_);
+		ctx_->srvManager->Free(particleSrvIndex_);
+	}
+}
+
+void GPUParticle::Initialize(EngineContext* ctx, const std::string& texturepath) {
+	ctx_ = ctx;
+	dxCommon_ = ctx->particleCommon->GetDxCommon();
+	texturePath_ = texturepath;
+	textureFullPath_ = "resources/textures/" + texturepath;
 
 	InitializeShaderCompiler();
 	CreateComputePipeline();
@@ -38,14 +49,14 @@ void GPUParticle::Draw() {
 	commandList->SetPipelineState(graphicsPipelineState_.Get());             
 	commandList->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
-	// デスクリプタヒープをコマンドリストにセット
-	ID3D12DescriptorHeap* ppHeaps[] = {srvUavHeap_.Get()};
+	ID3D12DescriptorHeap* ppHeaps[] = {dxCommon_->GetSrvDescriptorHeap().Get()};
 	commandList->SetDescriptorHeaps(_countof(ppHeaps), ppHeaps);
 
 	commandList->SetGraphicsRootConstantBufferView(0, perViewBuffer_->GetGPUVirtualAddress());
 	commandList->SetGraphicsRootDescriptorTable(1, particleSRVHeapHandle);                    
-
-	commandList->DrawInstanced(4, kMaxParticles, 0, 0);
+	commandList->SetGraphicsRootConstantBufferView(2, materialBuffer_->GetGPUVirtualAddress());
+	commandList->SetGraphicsRootDescriptorTable(3, ctx_->textureManager->GetSrvHandleGPU(textureFullPath_));
+	commandList->DrawInstanced(6, kMaxParticles, 0, 0);
 }
 
 void GPUParticle::InitializeShaderCompiler() {
@@ -103,28 +114,60 @@ void GPUParticle::CreateGraphicsPipeline() {
 	HRESULT hr;
 
 	// RootSignatureの作成
-	D3D12_DESCRIPTOR_RANGE srvRange[1] = {};
-	srvRange[0].BaseShaderRegister = 0;
-	srvRange[0].NumDescriptors = 1;
-	srvRange[0].RangeType = D3D12_DESCRIPTOR_RANGE_TYPE_SRV;
-	srvRange[0].OffsetInDescriptorsFromTableStart = D3D12_DESCRIPTOR_RANGE_OFFSET_APPEND;
+	// VS用 t0 (Particle StructuredBuffer)
+	D3D12_DESCRIPTOR_RANGE srvRangeVS[1] = {};
+	srvRangeVS[0].BaseShaderRegister = 0;
+	srvRangeVS[0].NumDescriptors = 1;
+	srvRangeVS[0].RangeType = D3D12_DESCRIPTOR_RANGE_TYPE_SRV;
+	srvRangeVS[0].OffsetInDescriptorsFromTableStart = D3D12_DESCRIPTOR_RANGE_OFFSET_APPEND;
 
-	D3D12_ROOT_PARAMETER rootParameters[2] = {};
-	// b0: PerView
+	// PS用 t0 (Texture2D)
+	D3D12_DESCRIPTOR_RANGE srvRangePS[1] = {};
+	srvRangePS[0].BaseShaderRegister = 0;
+	srvRangePS[0].NumDescriptors = 1;
+	srvRangePS[0].RangeType = D3D12_DESCRIPTOR_RANGE_TYPE_SRV;
+	srvRangePS[0].OffsetInDescriptorsFromTableStart = D3D12_DESCRIPTOR_RANGE_OFFSET_APPEND;
+
+	D3D12_ROOT_PARAMETER rootParameters[4] = {};
+
+	// [0] VS用 b0: PerView
 	rootParameters[0].ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV;
 	rootParameters[0].ShaderVisibility = D3D12_SHADER_VISIBILITY_VERTEX;
 	rootParameters[0].Descriptor.ShaderRegister = 0;
 
-	// t0: Particle StructuredBuffer
+	// [1] VS用 t0: Particle StructuredBuffer
 	rootParameters[1].ParameterType = D3D12_ROOT_PARAMETER_TYPE_DESCRIPTOR_TABLE;
 	rootParameters[1].ShaderVisibility = D3D12_SHADER_VISIBILITY_VERTEX;
-	rootParameters[1].DescriptorTable.pDescriptorRanges = srvRange;
-	rootParameters[1].DescriptorTable.NumDescriptorRanges = _countof(srvRange);
+	rootParameters[1].DescriptorTable.pDescriptorRanges = srvRangeVS;
+	rootParameters[1].DescriptorTable.NumDescriptorRanges = _countof(srvRangeVS);
+
+	// [2] PS用 b0: Material
+	rootParameters[2].ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV;
+	rootParameters[2].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;
+	rootParameters[2].Descriptor.ShaderRegister = 0;
+
+	// [3] PS用 t0: Texture
+	rootParameters[3].ParameterType = D3D12_ROOT_PARAMETER_TYPE_DESCRIPTOR_TABLE;
+	rootParameters[3].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;
+	rootParameters[3].DescriptorTable.pDescriptorRanges = srvRangePS;
+	rootParameters[3].DescriptorTable.NumDescriptorRanges = _countof(srvRangePS);
+
+	D3D12_STATIC_SAMPLER_DESC staticSamplers[1] = {};
+	staticSamplers[0].Filter = D3D12_FILTER_MIN_MAG_MIP_LINEAR;
+	staticSamplers[0].AddressU = D3D12_TEXTURE_ADDRESS_MODE_WRAP;
+	staticSamplers[0].AddressV = D3D12_TEXTURE_ADDRESS_MODE_WRAP;
+	staticSamplers[0].AddressW = D3D12_TEXTURE_ADDRESS_MODE_WRAP;
+	staticSamplers[0].ComparisonFunc = D3D12_COMPARISON_FUNC_NEVER;
+	staticSamplers[0].MaxLOD = D3D12_FLOAT32_MAX;
+	staticSamplers[0].ShaderRegister = 0; // s0
+	staticSamplers[0].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;
 
 	D3D12_ROOT_SIGNATURE_DESC rootSignatureDesc{};
 	rootSignatureDesc.Flags = D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT;
 	rootSignatureDesc.pParameters = rootParameters;
 	rootSignatureDesc.NumParameters = _countof(rootParameters);
+	rootSignatureDesc.pStaticSamplers = staticSamplers;
+	rootSignatureDesc.NumStaticSamplers = _countof(staticSamplers);
 
 	ComPtr<ID3DBlob> signatureBlob;
 	ComPtr<ID3DBlob> errorBlob;
@@ -134,24 +177,9 @@ void GPUParticle::CreateGraphicsPipeline() {
 	hr = dxCommon_->GetDevice()->CreateRootSignature(0, signatureBlob->GetBufferPointer(), signatureBlob->GetBufferSize(), IID_PPV_ARGS(&graphicsRootSignature_));
 	assert(SUCCEEDED(hr));
 
-	// InputLayoutの設定
-	D3D12_INPUT_ELEMENT_DESC inputElementDescs[3] = {};
-	inputElementDescs[0].SemanticName = "POSITION";
-	inputElementDescs[0].SemanticIndex = 0;
-	inputElementDescs[0].Format = DXGI_FORMAT_R32G32B32A32_FLOAT;
-	inputElementDescs[0].AlignedByteOffset = D3D12_APPEND_ALIGNED_ELEMENT;
-	inputElementDescs[1].SemanticName = "TEXCOORD";
-	inputElementDescs[1].SemanticIndex = 0;
-	inputElementDescs[1].Format = DXGI_FORMAT_R32G32_FLOAT;
-	inputElementDescs[1].AlignedByteOffset = D3D12_APPEND_ALIGNED_ELEMENT;
-	inputElementDescs[2].SemanticName = "COLOR";
-	inputElementDescs[2].SemanticIndex = 0;
-	inputElementDescs[2].Format = DXGI_FORMAT_R32G32B32A32_FLOAT;
-	inputElementDescs[2].AlignedByteOffset = D3D12_APPEND_ALIGNED_ELEMENT;
-
 	D3D12_INPUT_LAYOUT_DESC inputLayoutDesc{};
-	inputLayoutDesc.pInputElementDescs = inputElementDescs;
-	inputLayoutDesc.NumElements = _countof(inputElementDescs);
+	inputLayoutDesc.pInputElementDescs = nullptr;
+	inputLayoutDesc.NumElements = 0;
 
 	// ShaderコンパイルとPipelineStateの作成
 	IDxcBlob* vertexShaderBlob = DirectXUtils::CompileShader(L"resources/shaders/GPUParticle.VS.hlsl", L"vs_6_0", dxcUtils_.Get(), dxcCompiler_.Get(), includeHandler_.Get());
@@ -183,12 +211,17 @@ void GPUParticle::CreateGraphicsPipeline() {
 	graphicsPipelineStateDesc.SampleMask = D3D12_DEFAULT_SAMPLE_MASK;
 	graphicsPipelineStateDesc.DepthStencilState = depthStencilDesc;
 	graphicsPipelineStateDesc.DSVFormat = DXGI_FORMAT_D24_UNORM_S8_UINT;
+	graphicsPipelineStateDesc.InputLayout = inputLayoutDesc;
 
 	hr = dxCommon_->GetDevice()->CreateGraphicsPipelineState(&graphicsPipelineStateDesc, IID_PPV_ARGS(&graphicsPipelineState_));
 	assert(SUCCEEDED(hr));
 }
 
 void GPUParticle::CreateResources() {
+	particleUavIndex_ = ctx_->srvManager->Allocate();
+	particleSrvIndex_ = ctx_->srvManager->Allocate();
+
+	auto dxCommon = dxCommon_;
 	auto device = dxCommon_->GetDevice();
 	HRESULT hr;
 
@@ -233,43 +266,48 @@ void GPUParticle::CreateResources() {
 	assert(SUCCEEDED(hr));
 	perViewBuffer_->Map(0, nullptr, reinterpret_cast<void**>(&mappedPerView_));
 
-	// SRVとUAVを格納するDescriptorHeapの作成
-	D3D12_DESCRIPTOR_HEAP_DESC heapDesc{};
-	heapDesc.NumDescriptors = 2; // UAV用とSRV用の2つ
-	heapDesc.Type = D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV;
-	heapDesc.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_SHADER_VISIBLE; // シェーダーからアクセス可能にする
-	hr = device->CreateDescriptorHeap(&heapDesc, IID_PPV_ARGS(&srvUavHeap_));
-	assert(SUCCEEDED(hr));
-
-	// Viewの作成
-	uint32_t incrementSize = device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
-	D3D12_CPU_DESCRIPTOR_HANDLE cpuHandle = srvUavHeap_->GetCPUDescriptorHandleForHeapStart();
-	D3D12_GPU_DESCRIPTOR_HANDLE gpuHandle = srvUavHeap_->GetGPUDescriptorHandleForHeapStart();
-
-	// UAVの作成
+	// UAV/SRVディスクリプタ定義(共有ヒープ上に作る)
 	D3D12_UNORDERED_ACCESS_VIEW_DESC uavDesc{};
 	uavDesc.Format = DXGI_FORMAT_UNKNOWN;
 	uavDesc.ViewDimension = D3D12_UAV_DIMENSION_BUFFER;
 	uavDesc.Buffer.NumElements = kMaxParticles;
 	uavDesc.Buffer.StructureByteStride = sizeof(ParticleCS);
-	device->CreateUnorderedAccessView(particleBuffer_.Get(), nullptr, &uavDesc, cpuHandle);
 
-	particleUAVHeapHandle = gpuHandle;
-
-	// ハンドルを進める
-	cpuHandle.ptr += incrementSize;
-	gpuHandle.ptr += incrementSize;
-
-	// SRVの作成
 	D3D12_SHADER_RESOURCE_VIEW_DESC srvDesc{};
 	srvDesc.Format = DXGI_FORMAT_UNKNOWN;
 	srvDesc.ViewDimension = D3D12_SRV_DIMENSION_BUFFER;
 	srvDesc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
 	srvDesc.Buffer.NumElements = kMaxParticles;
 	srvDesc.Buffer.StructureByteStride = sizeof(ParticleCS);
-	device->CreateShaderResourceView(particleBuffer_.Get(), &srvDesc, cpuHandle);
 
-	particleSRVHeapHandle = gpuHandle;
+	// Material用定数バッファ作成
+	uint32_t materialBufferSize = (sizeof(ParticleMaterial) + 255) & ~255;
+	D3D12_RESOURCE_DESC materialDesc{};
+	materialDesc.Dimension = D3D12_RESOURCE_DIMENSION_BUFFER;
+	materialDesc.Width = materialBufferSize;
+	materialDesc.Height = 1;
+	materialDesc.DepthOrArraySize = 1;
+	materialDesc.MipLevels = 1;
+	materialDesc.SampleDesc.Count = 1;
+	materialDesc.Layout = D3D12_TEXTURE_LAYOUT_ROW_MAJOR;
+
+	D3D12_CPU_DESCRIPTOR_HANDLE uavCpuHandle = dxCommon->GetCPUDescriptorHandle(dxCommon->GetSrvDescriptorHeap(), dxCommon->GetDescriptorSizeSRV(), particleUavIndex_);
+	D3D12_CPU_DESCRIPTOR_HANDLE srvCpuHandle = dxCommon->GetCPUDescriptorHandle(dxCommon->GetSrvDescriptorHeap(), dxCommon->GetDescriptorSizeSRV(), particleSrvIndex_);
+
+	device->CreateUnorderedAccessView(particleBuffer_.Get(), nullptr, &uavDesc, uavCpuHandle);
+	device->CreateShaderResourceView(particleBuffer_.Get(), &srvDesc, srvCpuHandle);
+
+	particleUAVHeapHandle = dxCommon->GetGPUDescriptorHandle(dxCommon->GetSrvDescriptorHeap(), dxCommon->GetDescriptorSizeSRV(), particleUavIndex_);
+	particleSRVHeapHandle = dxCommon->GetGPUDescriptorHandle(dxCommon->GetSrvDescriptorHeap(), dxCommon->GetDescriptorSizeSRV(), particleSrvIndex_);
+
+	hr = device->CreateCommittedResource(&heapPropsUpload, D3D12_HEAP_FLAG_NONE, &materialDesc, D3D12_RESOURCE_STATE_GENERIC_READ, nullptr, IID_PPV_ARGS(&materialBuffer_));
+	assert(SUCCEEDED(hr));
+	materialBuffer_->Map(0, nullptr, reinterpret_cast<void**>(&mappedMaterial_));
+
+	// デフォルト値を入れておく
+	mappedMaterial_->color = {1.0f, 1.0f, 1.0f, 1.0f};
+	mappedMaterial_->uvTransform = MathUtility::MakeIdentity4x4();
+	mappedMaterial_->alphaCutoff = 0.0f;
 }
 
 void GPUParticle::DispatchInitialize() {
@@ -288,12 +326,12 @@ void GPUParticle::DispatchInitialize() {
 	}
 
 	commandList->SetComputeRootSignature(computeRootSignature_.Get());
-	commandList->SetPipelineState(computePipelineState_.Get());       
-
-	// デスクリプタヒープをコマンドリストにセット
-	ID3D12DescriptorHeap* ppHeaps[] = {srvUavHeap_.Get()};
+	commandList->SetPipelineState(computePipelineState_.Get());
+	
+	// 共有SRV/UAVヒープをセット
+	ID3D12DescriptorHeap* ppHeaps[] = {dxCommon_->GetSrvDescriptorHeap().Get()};
 	commandList->SetDescriptorHeaps(_countof(ppHeaps), ppHeaps);
-
+	
 	commandList->SetComputeRootDescriptorTable(0, particleUAVHeapHandle);
 	commandList->Dispatch(1, 1, 1);
 }
