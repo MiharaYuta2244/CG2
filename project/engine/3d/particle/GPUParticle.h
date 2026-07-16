@@ -1,10 +1,10 @@
 #pragma once
 #include "DirectXCommon.h"
+#include "EngineContext.h"
 #include "Matrix4x4.h"
+#include "ParticleMaterial.h"
 #include "Vector3.h"
 #include "Vector4.h"
-#include "ParticleMaterial.h"
-#include "EngineContext.h"
 #include <d3d12.h>
 #include <dxcapi.h>
 #include <wrl/client.h>
@@ -23,6 +23,21 @@ struct PerView {
 	Matrix4x4 billboardMatrix;
 };
 
+struct PerFrame {
+	float time;
+	float deltaTime;
+};
+
+struct EmitterSphere {
+	Vector3 translate;
+	float radius;
+	uint32_t count;
+	float frequency;
+	float frequencyTime;
+	uint32_t emit;
+	uint32_t seed;
+};
+
 class GPUParticle {
 public:
 	static const uint32_t kMaxParticles = 1024;
@@ -39,7 +54,7 @@ public:
 	/// 更新処理
 	/// </summary>
 	/// <param name="viewData"></param>
-	void Update(const PerView& viewData);
+	void Update(const PerView& viewData, float deltaTime);
 
 	/// <summary>
 	/// コンピュートシェーダーによる初期化の実行
@@ -51,11 +66,17 @@ public:
 	/// </summary>
 	void Draw();
 
+	/// <summary>
+	/// エミッター用Dispatch
+	/// </summary>
+	void DispatchEmit();
+
 private:
 	void InitializeShaderCompiler();
 	void CreateComputePipeline();
 	void CreateGraphicsPipeline();
 	void CreateResources();
+	void CreateEmitComputePipeline();
 
 private:
 	EngineContext* ctx_ = nullptr;
@@ -72,6 +93,10 @@ private:
 	Microsoft::WRL::ComPtr<ID3D12RootSignature> computeRootSignature_;
 	Microsoft::WRL::ComPtr<ID3D12PipelineState> computePipelineState_;
 
+	// ComputePipeline (射出用)
+	Microsoft::WRL::ComPtr<ID3D12RootSignature> emitRootSignature_;
+	Microsoft::WRL::ComPtr<ID3D12PipelineState> emitPipelineState_;
+
 	// GraphicsPipeline (描画用)
 	Microsoft::WRL::ComPtr<ID3D12RootSignature> graphicsRootSignature_;
 	Microsoft::WRL::ComPtr<ID3D12PipelineState> graphicsPipelineState_;
@@ -84,6 +109,13 @@ private:
 	ParticleMaterial* mappedMaterial_ = nullptr;
 	Microsoft::WRL::ComPtr<ID3D12Resource> texture_; // テクスチャ本体
 	D3D12_GPU_DESCRIPTOR_HANDLE textureSRVHeapHandle{};
+	Microsoft::WRL::ComPtr<ID3D12Resource> emitterBuffer_;
+	EmitterSphere* mappedEmitter_ = nullptr;
+	Microsoft::WRL::ComPtr<ID3D12Resource> perFrameBuffer_;
+	PerFrame* mappedPerFrame_ = nullptr;
+	Microsoft::WRL::ComPtr<ID3D12Resource> freeCounterBuffer_;
+	D3D12_GPU_DESCRIPTOR_HANDLE freeCounterUAVHeapHandle{};
+	uint32_t freeCounterUavIndex_ = 0;
 
 	// ディスクリプタヒープとハンドル
 	D3D12_GPU_DESCRIPTOR_HANDLE particleUAVHeapHandle{};
@@ -94,4 +126,9 @@ private:
 
 	uint32_t particleUavIndex_ = 0;
 	uint32_t particleSrvIndex_ = 0;
+
+	// エミッター
+	EmitterSphere emitterSphere_;
+
+	PerFrame perFrame_;
 };

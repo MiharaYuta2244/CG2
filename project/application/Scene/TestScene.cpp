@@ -13,8 +13,11 @@ void TestScene::Initialize(const SceneContext& ctx) {
 }
 
 void TestScene::Update() {
+	float deltaTime = ctx_.timeManager->GetDeltaTime();
+
 	perView_ = {ctx_.currentCamera->GetViewProjectionMatrix(), MathUtility::MakeIdentity4x4()};
-	gpuParticle_->Update(perView_);
+	gpuParticle_->Update(perView_, deltaTime);
+	gpuParticle_->DispatchEmit();
 }
 
 void TestScene::Draw() {
