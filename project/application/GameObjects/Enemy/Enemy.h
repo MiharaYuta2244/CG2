@@ -1,6 +1,7 @@
 #pragma once
 #include "AABB.h"
 #include "AnimationBundle.h"
+#include "BloodDecalManager.h"
 #include "EnemyAI.h"
 #include "EnemyType.h"
 #include "ExclamationMark.h"
@@ -8,7 +9,6 @@
 #include "GameObjects/ObjectRender/ObjectRender.h"
 #include "Particle.h"
 #include "VisionCone.h"
-#include "BloodDecalManager.h"
 
 class EnemyBulletManager;
 class Player;
@@ -85,6 +85,12 @@ public:
 
 	// アニメーションを止める処理
 	void StopAnimation();
+
+	// 敵の種類Setter
+	void SetEnemyType(EnemyType type);
+
+	// 敵の種類Getter
+	EnemyType GetEnemyType() const { return type_; }
 
 private:
 	// 当たり判定の更新

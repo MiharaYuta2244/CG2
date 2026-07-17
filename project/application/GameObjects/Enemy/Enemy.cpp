@@ -313,3 +313,28 @@ void Enemy::AddBloodDecal() {
 	finalPos.z = basePos.z;
 	bloodDecalManager_->AddBlood(finalPos, {std::numbers::pi_v<float> / 2.0f, 0, 0}, {4, 4, 1});
 }
+
+void Enemy::SetEnemyType(EnemyType type){
+	type_ = type;
+
+	// タイプに応じてステータスを変更
+	if (type_ == EnemyType::Normal) {
+		hp_ = 1;
+		color_ = {1, 1, 1, 1};
+	} else if (type_ == EnemyType::Shotgun) {
+		hp_ = 2;
+		color_ = {1, 0, 0, 1};
+	}
+
+	// 描画用の色を更新
+	if (render_) {
+		render_->SetColor(color_);
+	}
+
+	// AIと視界を再初期化
+	if (ai_ && visionCone_) {
+		ai_->Initialize(&transform_, ctx_, type_);
+		Visionparam param = ai_->GetVisionParam();
+		visionCone_->Initialize(ctx_, param.radius, param.angle);
+	}
+}

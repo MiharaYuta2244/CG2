@@ -64,11 +64,18 @@ void EnemyManager::DrawImGui() {
 			if (ImGui::DragFloat3("Rotation", &rot.x, 0.5f)) {
 				enemy->SetRotate(rot);
 			}
-			
+
 			// --- isMove ---
 			bool isMove = enemy->GetIsMove();
 			if (ImGui::Checkbox("Is Move", &isMove)) {
 				enemy->SetIsMove(isMove);
+			}
+
+			// --- Type ---
+			int currentType = static_cast<int>(enemy->GetEnemyType());
+			const char* typeNames[] = {"Normal", "Shotgun"};
+			if (ImGui::Combo("Type", &currentType, typeNames, IM_ARRAYSIZE(typeNames))) {
+				enemy->SetEnemyType(static_cast<EnemyType>(currentType));
 			}
 
 			// 敵の削除ボタン
@@ -89,7 +96,7 @@ void EnemyManager::DrawImGui() {
 	// 敵の追加ボタン
 	if (ImGui::Button("Add Enemy")) {
 		auto newEnemy = std::make_unique<Enemy>();
-		newEnemy->Initialize(ctx_, {0.0f, 0.0f, 0.0f}, static_cast<EnemyType>(RandomUtils::RangeInt(0, 1)) ,bloodDecalManager_);
+		newEnemy->Initialize(ctx_, {0.0f, 0.0f, 0.0f}, EnemyType::Normal, bloodDecalManager_);
 		newEnemy->SetPos({0.0f, 0.0f, 0.0f});
 		newEnemy->SetRotate({0.0f, 0.0f, 0.0f});
 		newEnemy->SetIsMove(false);
@@ -127,7 +134,7 @@ void EnemyManager::LoadFromJson(const std::string& filepath) {
 
 	for (const auto& data : enemyDatas) {
 		auto enemy = std::make_unique<Enemy>();
-		enemy->Initialize(ctx_, data.pos, static_cast<EnemyType>(RandomUtils::RangeInt(0, 1)), bloodDecalManager_);
+		enemy->Initialize(ctx_, data.pos, static_cast<EnemyType>(data.type), bloodDecalManager_);
 		enemy->SetPos(data.pos);
 		enemy->SetRotate(data.rot);
 		enemy->SetIsMove(data.isMove);
@@ -143,6 +150,7 @@ void EnemyManager::SaveToJson(const std::string& filepath) {
 		data.pos = enemy->GetPos();
 		data.rot = enemy->GetRotate();
 		data.isMove = enemy->GetIsMove();
+		data.type = static_cast<int>(enemy->GetEnemyType());
 		enemyDatas.push_back(data);
 	}
 
