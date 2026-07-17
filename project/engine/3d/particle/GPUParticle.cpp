@@ -22,6 +22,7 @@ void GPUParticle::Initialize(EngineContext* ctx, const std::string& texturepath)
 	InitializeShaderCompiler();
 	CreateComputePipeline();
 	CreateEmitComputePipeline();
+	CreateUpdateComputePipeline();
 	CreateGraphicsPipeline();
 	CreateResources();
 
@@ -221,7 +222,21 @@ void GPUParticle::CreateGraphicsPipeline() {
 	IDxcBlob* pixelShaderBlob = DirectXUtils::CompileShader(L"resources/shaders/Particle.PS.hlsl", L"ps_6_0", dxcUtils_.Get(), dxcCompiler_.Get(), includeHandler_.Get());
 
 	D3D12_BLEND_DESC blendDesc{};
-	blendDesc.RenderTarget[0].RenderTargetWriteMask = D3D12_COLOR_WRITE_ENABLE_ALL;
+	blendDesc.AlphaToCoverageEnable = FALSE;
+	blendDesc.IndependentBlendEnable = FALSE;
+
+	auto& rt = blendDesc.RenderTarget[0];
+	rt.BlendEnable = TRUE;
+	rt.LogicOpEnable = FALSE;
+
+	// 加算合成
+	rt.SrcBlend = D3D12_BLEND_ONE;
+	rt.DestBlend = D3D12_BLEND_ONE;
+	rt.BlendOp = D3D12_BLEND_OP_ADD;
+	rt.SrcBlendAlpha = D3D12_BLEND_ONE;
+	rt.DestBlendAlpha = D3D12_BLEND_ONE;
+	rt.BlendOpAlpha = D3D12_BLEND_OP_ADD;
+	rt.RenderTargetWriteMask = D3D12_COLOR_WRITE_ENABLE_ALL;
 
 	D3D12_RASTERIZER_DESC rasterizerDesc{};
 	rasterizerDesc.CullMode = D3D12_CULL_MODE_NONE;
@@ -509,4 +524,83 @@ void GPUParticle::DispatchEmit() {
 	commandList->SetComputeRootDescriptorTable(2, particleUAVHeapHandle);
 
 	commandList->Dispatch(1, 1, 1);
+}
+
+void GPUParticle::CreateUpdateComputePipeline() {
+	HRESULT hr;
+
+	// RootSignature: b1 (PerFrame), u0 (Particles)
+	D3D12_DESCRIPTOR_RANGE uavRange[1] = {};
+	uavRange[0].BaseShaderRegister = 0;
+	uavRange[0].NumDescriptors = 1;
+	uavRange[0].RangeType = D3D12_DESCRIPTOR_RANGE_TYPE_UAV;
+	uavRange[0].OffsetInDescriptorsFromTableStart = D3D12_DESCRIPTOR_RANGE_OFFSET_APPEND;
+
+	D3D12_ROOT_PARAMETER rootParameters[2] = {};
+
+	// b1: PerFrame
+	rootParameters[0].ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV;
+	rootParameters[0].ShaderVisibility = D3D12_SHADER_VISIBILITY_ALL;
+	rootParameters[0].Descriptor.ShaderRegister = 1;
+
+	// u0: Particle StructuredBuffer
+	rootParameters[1].ParameterType = D3D12_ROOT_PARAMETER_TYPE_DESCRIPTOR_TABLE;
+	rootParameters[1].ShaderVisibility = D3D12_SHADER_VISIBILITY_ALL;
+	rootParameters[1].DescriptorTable.pDescriptorRanges = uavRange;
+	rootParameters[1].DescriptorTable.NumDescriptorRanges = _countof(uavRange);
+
+	D3D12_ROOT_SIGNATURE_DESC rootSignatureDesc{};
+	rootSignatureDesc.Flags = D3D12_ROOT_SIGNATURE_FLAG_NONE;
+	rootSignatureDesc.pParameters = rootParameters;
+	rootSignatureDesc.NumParameters = _countof(rootParameters);
+
+	ComPtr<ID3DBlob> signatureBlob;
+	ComPtr<ID3DBlob> errorBlob;
+	hr = D3D12SerializeRootSignature(&rootSignatureDesc, D3D_ROOT_SIGNATURE_VERSION_1, &signatureBlob, &errorBlob);
+	assert(SUCCEEDED(hr));
+
+	hr = dxCommon_->GetDevice()->CreateRootSignature(0, signatureBlob->GetBufferPointer(), signatureBlob->GetBufferSize(), IID_PPV_ARGS(&updateRootSignature_));
+	assert(SUCCEEDED(hr));
+
+	// Shader compile
+	IDxcBlob* updateShaderBlob = DirectXUtils::CompileShader(L"resources/shaders/UpdateParticle.CS.hlsl", L"cs_6_0", dxcUtils_.Get(), dxcCompiler_.Get(), includeHandler_.Get());
+	assert(updateShaderBlob != nullptr);
+
+	D3D12_COMPUTE_PIPELINE_STATE_DESC computePipelineDesc{};
+	computePipelineDesc.pRootSignature = updateRootSignature_.Get();
+	computePipelineDesc.CS = {updateShaderBlob->GetBufferPointer(), updateShaderBlob->GetBufferSize()};
+
+	hr = dxCommon_->GetDevice()->CreateComputePipelineState(&computePipelineDesc, IID_PPV_ARGS(&updatePipelineState_));
+	assert(SUCCEEDED(hr));
+}
+
+void GPUParticle::DispatchUpdate() {
+	auto commandList = dxCommon_->GetCommandList();
+
+	// 事前にバッファの状態をUAVに遷移させるか、既にUAVならUAVバリアを張る
+	if (particleState_ != D3D12_RESOURCE_STATE_UNORDERED_ACCESS) {
+		D3D12_RESOURCE_BARRIER barrier{};
+		barrier.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
+		barrier.Transition.pResource = particleBuffer_.Get();
+		barrier.Transition.StateBefore = particleState_;
+		barrier.Transition.StateAfter = D3D12_RESOURCE_STATE_UNORDERED_ACCESS;
+		barrier.Transition.Subresource = D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES;
+		commandList->ResourceBarrier(1, &barrier);
+		particleState_ = D3D12_RESOURCE_STATE_UNORDERED_ACCESS;
+	} else {
+		// 連続してUAVとして使用するため、UAVバリアを張る
+		D3D12_RESOURCE_BARRIER barrier{};
+		barrier.Type = D3D12_RESOURCE_BARRIER_TYPE_UAV;
+		barrier.UAV.pResource = particleBuffer_.Get();
+		commandList->ResourceBarrier(1, &barrier);
+	}
+
+	commandList->SetComputeRootSignature(updateRootSignature_.Get());
+	commandList->SetPipelineState(updatePipelineState_.Get());
+
+	ID3D12DescriptorHeap* ppHeaps[] = {dxCommon_->GetSrvDescriptorHeap().Get()};
+	commandList->SetDescriptorHeaps(_countof(ppHeaps), ppHeaps);
+	commandList->SetComputeRootConstantBufferView(0, perFrameBuffer_->GetGPUVirtualAddress());
+	commandList->SetComputeRootDescriptorTable(1, particleUAVHeapHandle);
+	commandList->Dispatch(kMaxParticles, 1, 1);
 }

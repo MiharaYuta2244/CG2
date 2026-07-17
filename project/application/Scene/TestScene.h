@@ -1,7 +1,5 @@
 #pragma once
 #include "BaseScene.h"
-#include "GameObjects/ObjectRender/ObjectRender.h"
-#include "Particle.h"
 #include "GPUParticle.h"
 
 class TestScene : public BaseScene {

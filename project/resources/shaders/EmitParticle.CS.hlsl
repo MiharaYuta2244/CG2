@@ -11,12 +11,6 @@ struct EmitterSphere
     uint seed;
 };
 
-struct PerFrame
-{
-    float time;
-    float deltaTime;
-};
-
 float3 rand3dTo3d(float3 p)
 {
     p = frac(p * 0.1031);

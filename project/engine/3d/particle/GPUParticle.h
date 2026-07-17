@@ -71,12 +71,18 @@ public:
 	/// </summary>
 	void DispatchEmit();
 
+	/// <summary>
+	/// 更新用Dispatch
+	/// </summary>
+	void DispatchUpdate();
+
 private:
 	void InitializeShaderCompiler();
 	void CreateComputePipeline();
 	void CreateGraphicsPipeline();
 	void CreateResources();
 	void CreateEmitComputePipeline();
+	void CreateUpdateComputePipeline();
 
 private:
 	EngineContext* ctx_ = nullptr;
@@ -100,6 +106,10 @@ private:
 	// GraphicsPipeline (描画用)
 	Microsoft::WRL::ComPtr<ID3D12RootSignature> graphicsRootSignature_;
 	Microsoft::WRL::ComPtr<ID3D12PipelineState> graphicsPipelineState_;
+
+	// GraphicsPipeline (更新用)
+	Microsoft::WRL::ComPtr<ID3D12RootSignature> updateRootSignature_;
+	Microsoft::WRL::ComPtr<ID3D12PipelineState> updatePipelineState_;
 
 	// リソース
 	Microsoft::WRL::ComPtr<ID3D12Resource> particleBuffer_; // StructuredBuffer (SRV/UAV兼用)
