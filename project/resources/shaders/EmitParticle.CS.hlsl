@@ -50,12 +50,13 @@ void main(uint3 DTid : SV_DispatchThreadID)
 
     for (uint countIndex = 0; countIndex < gEmitter.count; ++countIndex)
     {
-        int particleIndex;
-        InterlockedAdd(gFreeCounter[0], 1, particleIndex);
+        int freeListIndex;
+        InterlockedAdd(gFreeCounter[0], -1, freeListIndex);
 
-        // 最大数よりもparticleの数が少なければ射出可能
-        if (particleIndex < (int) kMaxParticles)
+        if (0 <= freeListIndex && freeListIndex < kMaxParticles)
         {
+            uint particleIndex = gFreeCounter[freeListIndex];
+            
             // countIndexごとに異なる乱数になるようseedを分ける
             RandomGenerator generator;
             generator.seed = float3(particleIndex, gEmitter.seed, gPerFrame.time) * 0.6180339887f + float(countIndex);
@@ -70,6 +71,11 @@ void main(uint3 DTid : SV_DispatchThreadID)
             gParticles[particleIndex].lifeTime = 1.0f + generator.Generate1d() * 2.0f;
             gParticles[particleIndex].currentTime = 0.0f;
             gParticles[particleIndex].color = float4(generator.Generate3d(), 1.0f);
+        }
+        else
+        {
+            InterlockedAdd(gFreeCounter[0], 1);
+            break;
         }
     }
 }

@@ -233,6 +233,7 @@ void TinyEngine::Object3d::PlayAnimation(const Animation& animation) {
 
 void Object3d::SetModel(const std::string& filePath) {
 	model_ = ctx_->modelManager->FindModel(filePath);
+	currentFilepath_ = filePath;
 
 	if (model_) {
 		modelData_ = model_->GetModelData();

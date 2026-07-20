@@ -123,9 +123,10 @@ private:
 	EmitterSphere* mappedEmitter_ = nullptr;
 	Microsoft::WRL::ComPtr<ID3D12Resource> perFrameBuffer_;
 	PerFrame* mappedPerFrame_ = nullptr;
-	Microsoft::WRL::ComPtr<ID3D12Resource> freeCounterBuffer_;
-	D3D12_GPU_DESCRIPTOR_HANDLE freeCounterUAVHeapHandle{};
-	uint32_t freeCounterUavIndex_ = 0;
+	Microsoft::WRL::ComPtr<ID3D12Resource> freeListIndexBuffer_;
+	uint32_t freeListIndexUavIndex_ = 0;
+	Microsoft::WRL::ComPtr<ID3D12Resource> freeListBuffer_;
+	uint32_t freeListUavIndex_ = 0;
 
 	// ディスクリプタヒープとハンドル
 	D3D12_GPU_DESCRIPTOR_HANDLE particleUAVHeapHandle{};

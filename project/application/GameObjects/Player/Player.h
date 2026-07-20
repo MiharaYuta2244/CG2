@@ -188,4 +188,8 @@ private:
 
 	// プレイヤーの生存時間
 	float aliveTImer_ = 0.0f;
+
+	// アクション（攻撃・投げ）アニメーションの管理用
+	bool isActionAnimating_ = false;
+	float actionAnimTimer_ = 0.0f;
 };

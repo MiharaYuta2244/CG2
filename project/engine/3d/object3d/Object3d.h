@@ -87,6 +87,7 @@ public:
 	Material& GetMaterial() { return material_; }
 	uint32_t GetID() const { return id_; }
 	const std::string& GetName() const { return name_; }
+	const std::string& GetFilepath() const { return currentFilepath_; }
 
 private:
 	/// <summary>
@@ -200,5 +201,8 @@ private:
 	uint32_t inputVertexSrvIndex_ = 0;
 	uint32_t influenceSrvIndex_ = 0;
 	uint32_t outputUavIndex_ = 0;
+
+	// 現在使用しているモデルのパス
+	std::string currentFilepath_;
 };
 } // namespace TinyEngine

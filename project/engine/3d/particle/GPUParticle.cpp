@@ -9,7 +9,8 @@ GPUParticle::~GPUParticle() {
 	if (ctx_ && ctx_->srvManager) {
 		ctx_->srvManager->Free(particleUavIndex_);
 		ctx_->srvManager->Free(particleSrvIndex_);
-		ctx_->srvManager->Free(freeCounterUavIndex_);
+		ctx_->srvManager->Free(freeListIndexUavIndex_);
+		ctx_->srvManager->Free(freeListUavIndex_);
 	}
 }
 
@@ -111,7 +112,7 @@ void GPUParticle::CreateComputePipeline() {
 	// RootSignatureの作成
 	D3D12_DESCRIPTOR_RANGE uavRange[1] = {};
 	uavRange[0].BaseShaderRegister = 0;
-	uavRange[0].NumDescriptors = 2;
+	uavRange[0].NumDescriptors = 3;
 	uavRange[0].RangeType = D3D12_DESCRIPTOR_RANGE_TYPE_UAV;
 	uavRange[0].OffsetInDescriptorsFromTableStart = D3D12_DESCRIPTOR_RANGE_OFFSET_APPEND;
 
@@ -268,17 +269,18 @@ void GPUParticle::CreateGraphicsPipeline() {
 }
 
 void GPUParticle::CreateResources() {
+	// UAVを連続したインデックスとして確保する (u0, u1, u2 用)
 	particleUavIndex_ = ctx_->srvManager->Allocate();
-	freeCounterUavIndex_ = ctx_->srvManager->Allocate();
+	freeListIndexUavIndex_ = ctx_->srvManager->Allocate();
+	freeListUavIndex_ = ctx_->srvManager->Allocate();
 	particleSrvIndex_ = ctx_->srvManager->Allocate();
 
 	auto dxCommon = dxCommon_;
 	auto device = dxCommon_->GetDevice();
 	HRESULT hr;
 
-	// パーティクル用StructuredBufferの作成
+	// === パーティクル用StructuredBufferの作成 ===
 	uint32_t particleBufferSize = sizeof(ParticleCS) * kMaxParticles;
-
 	D3D12_HEAP_PROPERTIES heapPropsDefault{};
 	heapPropsDefault.Type = D3D12_HEAP_TYPE_DEFAULT;
 
@@ -291,14 +293,13 @@ void GPUParticle::CreateResources() {
 	particleDesc.Format = DXGI_FORMAT_UNKNOWN;
 	particleDesc.SampleDesc.Count = 1;
 	particleDesc.Layout = D3D12_TEXTURE_LAYOUT_ROW_MAJOR;
-	particleDesc.Flags = D3D12_RESOURCE_FLAG_ALLOW_UNORDERED_ACCESS; // UAV用フラグ必須
+	particleDesc.Flags = D3D12_RESOURCE_FLAG_ALLOW_UNORDERED_ACCESS;
 
-	// 初期状態はCOMMONにしておく
 	particleState_ = D3D12_RESOURCE_STATE_COMMON;
 	hr = device->CreateCommittedResource(&heapPropsDefault, D3D12_HEAP_FLAG_NONE, &particleDesc, particleState_, nullptr, IID_PPV_ARGS(&particleBuffer_));
 	assert(SUCCEEDED(hr));
 
-	// PerView用定数バッファの作成
+	// === PerView用定数バッファの作成 ===
 	uint32_t perViewBufferSize = (sizeof(PerView) + 255) & ~255;
 	D3D12_HEAP_PROPERTIES heapPropsUpload{};
 	heapPropsUpload.Type = D3D12_HEAP_TYPE_UPLOAD;
@@ -317,7 +318,7 @@ void GPUParticle::CreateResources() {
 	assert(SUCCEEDED(hr));
 	perViewBuffer_->Map(0, nullptr, reinterpret_cast<void**>(&mappedPerView_));
 
-	// UAV/SRVディスクリプタ定義(共有ヒープ上に作る)
+	// === Particle UAV / SRV の作成 ===
 	D3D12_UNORDERED_ACCESS_VIEW_DESC uavDesc{};
 	uavDesc.Format = DXGI_FORMAT_UNKNOWN;
 	uavDesc.ViewDimension = D3D12_UAV_DIMENSION_BUFFER;
@@ -331,7 +332,56 @@ void GPUParticle::CreateResources() {
 	srvDesc.Buffer.NumElements = kMaxParticles;
 	srvDesc.Buffer.StructureByteStride = sizeof(ParticleCS);
 
-	// Material用定数バッファ作成
+	D3D12_CPU_DESCRIPTOR_HANDLE uavCpuHandle = dxCommon->GetCPUDescriptorHandle(dxCommon->GetSrvDescriptorHeap(), dxCommon->GetDescriptorSizeSRV(), particleUavIndex_);
+	D3D12_CPU_DESCRIPTOR_HANDLE srvCpuHandle = dxCommon->GetCPUDescriptorHandle(dxCommon->GetSrvDescriptorHeap(), dxCommon->GetDescriptorSizeSRV(), particleSrvIndex_);
+
+	device->CreateUnorderedAccessView(particleBuffer_.Get(), nullptr, &uavDesc, uavCpuHandle);
+	device->CreateShaderResourceView(particleBuffer_.Get(), &srvDesc, srvCpuHandle);
+
+	particleUAVHeapHandle = dxCommon->GetGPUDescriptorHandle(dxCommon->GetSrvDescriptorHeap(), dxCommon->GetDescriptorSizeSRV(), particleUavIndex_);
+	particleSRVHeapHandle = dxCommon->GetGPUDescriptorHandle(dxCommon->GetSrvDescriptorHeap(), dxCommon->GetDescriptorSizeSRV(), particleSrvIndex_);
+
+	// === gFreeListIndex 用バッファの作成 (u1) ===
+	D3D12_RESOURCE_DESC freeListIndexDesc{};
+	freeListIndexDesc.Dimension = D3D12_RESOURCE_DIMENSION_BUFFER;
+	freeListIndexDesc.Width = sizeof(int);
+	freeListIndexDesc.Height = 1;
+	freeListIndexDesc.DepthOrArraySize = 1;
+	freeListIndexDesc.MipLevels = 1;
+	freeListIndexDesc.Format = DXGI_FORMAT_UNKNOWN;
+	freeListIndexDesc.SampleDesc.Count = 1;
+	freeListIndexDesc.Layout = D3D12_TEXTURE_LAYOUT_ROW_MAJOR;
+	freeListIndexDesc.Flags = D3D12_RESOURCE_FLAG_ALLOW_UNORDERED_ACCESS;
+
+	hr = device->CreateCommittedResource(&heapPropsDefault, D3D12_HEAP_FLAG_NONE, &freeListIndexDesc, D3D12_RESOURCE_STATE_COMMON, nullptr, IID_PPV_ARGS(&freeListIndexBuffer_));
+	assert(SUCCEEDED(hr));
+
+	D3D12_UNORDERED_ACCESS_VIEW_DESC freeListIndexUavDesc{};
+	freeListIndexUavDesc.Format = DXGI_FORMAT_UNKNOWN;
+	freeListIndexUavDesc.ViewDimension = D3D12_UAV_DIMENSION_BUFFER;
+	freeListIndexUavDesc.Buffer.NumElements = 1;
+	freeListIndexUavDesc.Buffer.StructureByteStride = sizeof(int);
+
+	D3D12_CPU_DESCRIPTOR_HANDLE freeListIndexUavCpuHandle = dxCommon->GetCPUDescriptorHandle(dxCommon->GetSrvDescriptorHeap(), dxCommon->GetDescriptorSizeSRV(), freeListIndexUavIndex_);
+	device->CreateUnorderedAccessView(freeListIndexBuffer_.Get(), nullptr, &freeListIndexUavDesc, freeListIndexUavCpuHandle);
+
+	// === gFreeList 用バッファの作成 (u2) ===
+	D3D12_RESOURCE_DESC freeListDesc = freeListIndexDesc;
+	freeListDesc.Width = sizeof(int) * kMaxParticles; // kMaxParticles分確保
+
+	hr = device->CreateCommittedResource(&heapPropsDefault, D3D12_HEAP_FLAG_NONE, &freeListDesc, D3D12_RESOURCE_STATE_COMMON, nullptr, IID_PPV_ARGS(&freeListBuffer_));
+	assert(SUCCEEDED(hr));
+
+	D3D12_UNORDERED_ACCESS_VIEW_DESC freeListUavDesc{};
+	freeListUavDesc.Format = DXGI_FORMAT_UNKNOWN;
+	freeListUavDesc.ViewDimension = D3D12_UAV_DIMENSION_BUFFER;
+	freeListUavDesc.Buffer.NumElements = kMaxParticles;
+	freeListUavDesc.Buffer.StructureByteStride = sizeof(int);
+
+	D3D12_CPU_DESCRIPTOR_HANDLE freeListUavCpuHandle = dxCommon->GetCPUDescriptorHandle(dxCommon->GetSrvDescriptorHeap(), dxCommon->GetDescriptorSizeSRV(), freeListUavIndex_);
+	device->CreateUnorderedAccessView(freeListBuffer_.Get(), nullptr, &freeListUavDesc, freeListUavCpuHandle);
+
+	// === Material 用定数バッファ作成 ===
 	uint32_t materialBufferSize = (sizeof(ParticleMaterial) + 255) & ~255;
 	D3D12_RESOURCE_DESC materialDesc{};
 	materialDesc.Dimension = D3D12_RESOURCE_DIMENSION_BUFFER;
@@ -342,47 +392,11 @@ void GPUParticle::CreateResources() {
 	materialDesc.SampleDesc.Count = 1;
 	materialDesc.Layout = D3D12_TEXTURE_LAYOUT_ROW_MAJOR;
 
-	D3D12_CPU_DESCRIPTOR_HANDLE uavCpuHandle = dxCommon->GetCPUDescriptorHandle(dxCommon->GetSrvDescriptorHeap(), dxCommon->GetDescriptorSizeSRV(), particleUavIndex_);
-	D3D12_CPU_DESCRIPTOR_HANDLE srvCpuHandle = dxCommon->GetCPUDescriptorHandle(dxCommon->GetSrvDescriptorHeap(), dxCommon->GetDescriptorSizeSRV(), particleSrvIndex_);
-
-	device->CreateUnorderedAccessView(particleBuffer_.Get(), nullptr, &uavDesc, uavCpuHandle);
-	device->CreateShaderResourceView(particleBuffer_.Get(), &srvDesc, srvCpuHandle);
-
-	particleUAVHeapHandle = dxCommon->GetGPUDescriptorHandle(dxCommon->GetSrvDescriptorHeap(), dxCommon->GetDescriptorSizeSRV(), particleUavIndex_);
-	particleSRVHeapHandle = dxCommon->GetGPUDescriptorHandle(dxCommon->GetSrvDescriptorHeap(), dxCommon->GetDescriptorSizeSRV(), particleSrvIndex_);
-
-	// gFreeCounter用バッファの作成
-	D3D12_RESOURCE_DESC freeCounterDesc{};
-	freeCounterDesc.Dimension = D3D12_RESOURCE_DIMENSION_BUFFER;
-	freeCounterDesc.Width = sizeof(int);
-	freeCounterDesc.Height = 1;
-	freeCounterDesc.DepthOrArraySize = 1;
-	freeCounterDesc.MipLevels = 1;
-	freeCounterDesc.Format = DXGI_FORMAT_UNKNOWN;
-	freeCounterDesc.SampleDesc.Count = 1;
-	freeCounterDesc.Layout = D3D12_TEXTURE_LAYOUT_ROW_MAJOR;
-	freeCounterDesc.Flags = D3D12_RESOURCE_FLAG_ALLOW_UNORDERED_ACCESS;
-
-	// 常にUAVとしてのみ使うので初期状態のまま
-	hr = device->CreateCommittedResource(&heapPropsDefault, D3D12_HEAP_FLAG_NONE, &freeCounterDesc, D3D12_RESOURCE_STATE_COMMON, nullptr, IID_PPV_ARGS(&freeCounterBuffer_));
-	assert(SUCCEEDED(hr));
-
-	D3D12_UNORDERED_ACCESS_VIEW_DESC freeCounterUavDesc{};
-	freeCounterUavDesc.Format = DXGI_FORMAT_UNKNOWN;
-	freeCounterUavDesc.ViewDimension = D3D12_UAV_DIMENSION_BUFFER;
-	freeCounterUavDesc.Buffer.NumElements = 1;
-	freeCounterUavDesc.Buffer.StructureByteStride = sizeof(int);
-
-	D3D12_CPU_DESCRIPTOR_HANDLE freeCounterUavCpuHandle = dxCommon->GetCPUDescriptorHandle(dxCommon->GetSrvDescriptorHeap(), dxCommon->GetDescriptorSizeSRV(), freeCounterUavIndex_);
-	device->CreateUnorderedAccessView(freeCounterBuffer_.Get(), nullptr, &freeCounterUavDesc, freeCounterUavCpuHandle);
-
-	freeCounterUAVHeapHandle = dxCommon->GetGPUDescriptorHandle(dxCommon->GetSrvDescriptorHeap(), dxCommon->GetDescriptorSizeSRV(), freeCounterUavIndex_);
-
 	hr = device->CreateCommittedResource(&heapPropsUpload, D3D12_HEAP_FLAG_NONE, &materialDesc, D3D12_RESOURCE_STATE_GENERIC_READ, nullptr, IID_PPV_ARGS(&materialBuffer_));
 	assert(SUCCEEDED(hr));
 	materialBuffer_->Map(0, nullptr, reinterpret_cast<void**>(&mappedMaterial_));
 
-	// Emitter用定数バッファの作成
+	// === Emitter 用定数バッファ作成 ===
 	uint32_t emitterBufferSize = (sizeof(EmitterSphere) + 255) & ~255;
 	D3D12_RESOURCE_DESC emitterDesc{};
 	emitterDesc.Dimension = D3D12_RESOURCE_DIMENSION_BUFFER;
@@ -399,8 +413,8 @@ void GPUParticle::CreateResources() {
 	emitterBuffer_->Map(0, nullptr, reinterpret_cast<void**>(&mappedEmitter_));
 	*mappedEmitter_ = emitterSphere_;
 
+	// === PerFrame 用定数バッファ作成 ===
 	uint32_t perFrameSize = (sizeof(PerFrame) + 255) & ~255;
-
 	D3D12_RESOURCE_DESC perFrameDesc{};
 	perFrameDesc.Dimension = D3D12_RESOURCE_DIMENSION_BUFFER;
 	perFrameDesc.Width = perFrameSize;
@@ -412,10 +426,9 @@ void GPUParticle::CreateResources() {
 	perFrameDesc.Layout = D3D12_TEXTURE_LAYOUT_ROW_MAJOR;
 
 	device->CreateCommittedResource(&heapPropsUpload, D3D12_HEAP_FLAG_NONE, &perFrameDesc, D3D12_RESOURCE_STATE_GENERIC_READ, nullptr, IID_PPV_ARGS(&perFrameBuffer_));
-
 	perFrameBuffer_->Map(0, nullptr, reinterpret_cast<void**>(&mappedPerFrame_));
 
-	// デフォルト値を入れておく
+	// デフォルト値
 	mappedMaterial_->color = {1.0f, 1.0f, 1.0f, 1.0f};
 	mappedMaterial_->uvTransform = MathUtility::MakeIdentity4x4();
 	mappedMaterial_->alphaCutoff = 0.0f;
@@ -452,7 +465,7 @@ void GPUParticle::CreateEmitComputePipeline() {
 
 	D3D12_DESCRIPTOR_RANGE uavRange[1] = {};
 	uavRange[0].BaseShaderRegister = 0;
-	uavRange[0].NumDescriptors = 2;
+	uavRange[0].NumDescriptors = 3;
 	uavRange[0].RangeType = D3D12_DESCRIPTOR_RANGE_TYPE_UAV;
 	uavRange[0].OffsetInDescriptorsFromTableStart = D3D12_DESCRIPTOR_RANGE_OFFSET_APPEND;
 
@@ -532,7 +545,7 @@ void GPUParticle::CreateUpdateComputePipeline() {
 	// RootSignature: b1 (PerFrame), u0 (Particles)
 	D3D12_DESCRIPTOR_RANGE uavRange[1] = {};
 	uavRange[0].BaseShaderRegister = 0;
-	uavRange[0].NumDescriptors = 1;
+	uavRange[0].NumDescriptors = 3;
 	uavRange[0].RangeType = D3D12_DESCRIPTOR_RANGE_TYPE_UAV;
 	uavRange[0].OffsetInDescriptorsFromTableStart = D3D12_DESCRIPTOR_RANGE_OFFSET_APPEND;
 

@@ -14,9 +14,9 @@ void Player::Initialize(EngineContext* ctx, TinyEngine::BloodDecalManager* blood
 
 	// 描画用インスタンス生成&初期化
 	render_ = std::make_unique<ObjectRender>();
-	render_->Initialize(ctx, "Gorilla.gltf");
+	render_->Initialize(ctx, "GorillaIdle.gltf");
 	KeyframeAnimation keyframeAnimation;
-	Animation sneakWalkAnimation = keyframeAnimation.LoadAnimationFile("Gorilla.gltf");
+	Animation sneakWalkAnimation = keyframeAnimation.LoadAnimationFile("GorillaIdle.gltf");
 	render_->GetObject3d()->PlayAnimation(sneakWalkAnimation);
 	render_->SetColor(color_);
 	render_->SetTransform(transform_);
@@ -49,6 +49,14 @@ void Player::Initialize(EngineContext* ctx, TinyEngine::BloodDecalManager* blood
 }
 
 void Player::Update(float deltaTime, DirectInput* input, GamePad* gamePad, EnemyManager* enemyManager) {
+	// アクションアニメーションのタイマー更新
+	if (isActionAnimating_) {
+		actionAnimTimer_ -= deltaTime;
+		if (actionAnimTimer_ <= 0.0f) {
+			isActionAnimating_ = false; // 指定時間経過でアクション終了
+		}
+	}
+
 	// アナログ入力ベクトル
 	Vector2 inputDir = {0.0f, 0.0f};
 	Vector2 aimDir = {0.0f, 0.0f};
@@ -101,8 +109,24 @@ void Player::Update(float deltaTime, DirectInput* input, GamePad* gamePad, Enemy
 		// 正規化して記録（攻撃・投げの方向用）
 		lastMoveDirection_ = {inputDir.x / length, inputDir.y / length};
 		isMoving_ = true;
+
+		// アクションアニメーション中でない場合のみ、歩きモデルに切り替え
+		if (!isActionAnimating_ && render_->GetFilepath() != "Gorilla.gltf") {
+			render_->SetModel("Gorilla.gltf");
+			KeyframeAnimation keyframeAnimation;
+			Animation sneakWalkAnimation = keyframeAnimation.LoadAnimationFile("Gorilla.gltf");
+			render_->GetObject3d()->PlayAnimation(sneakWalkAnimation);
+		}
 	} else {
 		isMoving_ = false;
+
+		// アクションアニメーション中でない場合のみ、待機モデルに切り替え
+		if (!isActionAnimating_ && render_->GetFilepath() != "GorillaIdle.gltf") {
+			render_->SetModel("GorillaIdle.gltf");
+			KeyframeAnimation keyframeAnimation;
+			Animation idleAnimation = keyframeAnimation.LoadAnimationFile("GorillaIdle.gltf");
+			render_->GetObject3d()->PlayAnimation(idleAnimation);
+		}
 	}
 
 	// 敵を掴んでいる場合は速度を半減させる
@@ -217,10 +241,22 @@ void Player::Update(float deltaTime, DirectInput* input, GamePad* gamePad, Enemy
 
 		// 投げる対象がいればノックバック処理を実行
 		if (throwTarget != nullptr) {
-			enableAttack_ = false;
+			//enableAttack_ = false;
 			throwTarget->SetEnableAI(true);
 			throwTarget->StartKnockBack({lastMoveDirection_.x, 0.0f, lastMoveDirection_.y});
 			throwTarget->SetAIState(EnemyAI::State::Normal);
+		}
+
+		// アニメーション切り替え
+		if (render_->GetFilepath() != "GorillaPush.gltf") {
+			render_->SetModel("GorillaPush.gltf");
+			KeyframeAnimation keyframeAnimation;
+			Animation pushAnimation = keyframeAnimation.LoadAnimationFile("GorillaPush.gltf");
+			render_->GetObject3d()->PlayAnimation(pushAnimation);
+
+			// アクションアニメーションの再生開始を記録し、タイマーを設定
+			isActionAnimating_ = true;
+			actionAnimTimer_ = 0.5f;
 		}
 	}
 
@@ -344,14 +380,14 @@ void Player::Draw() {
 	hpIcon_->Draw();
 
 	// 攻撃確認用
-	hand_->Draw();
+	// hand_->Draw();
 }
 
-bool Player::IsDead() const { 
+bool Player::IsDead() const {
 	// ゲーム開始から死亡までの時間をログに出力
 	Logger::Log("", LogLevel::Info);
 
-	return hp_->IsDead(); 
+	return hp_->IsDead();
 }
 
 void Player::Damage(float value) {
