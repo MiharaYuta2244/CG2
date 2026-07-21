@@ -70,8 +70,8 @@ void Enemy::Update(float deltaTime, Player* player, EnemyBulletManager* enemyBul
 	float dz = playerPos.z - enemyPos.z;
 	float distSq = dx * dx + dy * dy + dz * dz;
 
-	// 画面に収まる程度の距離（カメラの視野に合わせて数値を調整してください）
-	const float kActiveDistance = 50.0f;
+	// 画面に収まる程度の距離
+	const float kActiveDistance = 40.0f;
 	bool isWithinActiveRange = (distSq <= (kActiveDistance * kActiveDistance));
 
 	if (isWithinActiveRange) {
