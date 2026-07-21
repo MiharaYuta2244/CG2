@@ -46,6 +46,9 @@ void Enemy::Initialize(EngineContext* ctx, Vector3 pos, EnemyType type, BloodDec
 
 	// 血痕
 	bloodDecalManager_ = bloodDecalManager;
+
+	transform_.rotate.x = 0.0f;
+	transform_.rotate.z = 0.0f;
 }
 
 void Enemy::Update(float deltaTime, Player* player, EnemyBulletManager* enemyBulletManager, WallManager* wallManager, DoorManager* doorManager, GlassManager* glassManager) {

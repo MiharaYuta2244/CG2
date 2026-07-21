@@ -49,6 +49,7 @@ void EnemyAI::UpdateNormal(float deltaTime, Player* player, WallManager* wallMan
 	// 視界チェックを行い、見つけたら警戒状態へ遷移
 	if (CheckPlayerInVision(player, wallManager, doorManager, glassManager)) {
 		state_ = State::Vigilance;
+		return;
 	}
 
 	// 聴覚チェック
