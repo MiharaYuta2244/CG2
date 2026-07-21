@@ -817,7 +817,7 @@
     },
     {
         "centerX": 410.0,
-        "centerZ": -46.5,
+        "centerZ": -47.5,
         "depth": 8.0,
         "width": 1.0
     },
@@ -870,7 +870,7 @@
         "width": 1.0
     },
     {
-        "centerX": 510.5,
+        "centerX": 510.0,
         "centerZ": -22.0,
         "depth": 6.0,
         "width": 6.0
