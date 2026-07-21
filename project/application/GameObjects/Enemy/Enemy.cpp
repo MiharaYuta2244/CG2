@@ -46,9 +46,6 @@ void Enemy::Initialize(EngineContext* ctx, Vector3 pos, EnemyType type, BloodDec
 
 	// 血痕
 	bloodDecalManager_ = bloodDecalManager;
-
-	transform_.rotate.x = 0.0f;
-	transform_.rotate.z = 0.0f;
 }
 
 void Enemy::Update(float deltaTime, Player* player, EnemyBulletManager* enemyBulletManager, WallManager* wallManager, DoorManager* doorManager, GlassManager* glassManager) {
@@ -74,7 +71,7 @@ void Enemy::Update(float deltaTime, Player* player, EnemyBulletManager* enemyBul
 	float distSq = dx * dx + dy * dy + dz * dz;
 
 	// 画面に収まる程度の距離
-	const float kActiveDistance = 40.0f;
+	const float kActiveDistance = 30.0f;
 	bool isWithinActiveRange = (distSq <= (kActiveDistance * kActiveDistance));
 
 	if (isWithinActiveRange) {
@@ -111,14 +108,6 @@ void Enemy::Update(float deltaTime, Player* player, EnemyBulletManager* enemyBul
 			// プログレスはリセット
 			visionCone_->SetChargeProgress(0.0f);
 		}
-
-		// 視界
-		visionCone_->SetTranslate(transform_.translate);
-		visionCone_->SetRotate(transform_.rotate);
-		visionCone_->Update(wallManager->GetWalls(), doorManager->GetDoors(), glassManager->GetGlasses());
-
-		// 敵AIの状態を記録
-		lastState = ai_->GetState();
 	}
 
 	// 「!」マークのアニメーションが終了していれば「!」マークインスタンスを削除
@@ -133,6 +122,14 @@ void Enemy::Update(float deltaTime, Player* player, EnemyBulletManager* enemyBul
 	if (exclamationMark_) {
 		exclamationMark_->Update(deltaTime, transform_.translate);
 	}
+
+	// 視界
+	visionCone_->SetTranslate(transform_.translate);
+	visionCone_->SetRotate(transform_.rotate);
+	visionCone_->Update(wallManager->GetWalls(), doorManager->GetDoors(), glassManager->GetGlasses());
+
+	// 敵AIの状態を記録
+	lastState = ai_->GetState();
 
 	// 当たり判定更新　衝突判定用
 	UpdateCollision();
