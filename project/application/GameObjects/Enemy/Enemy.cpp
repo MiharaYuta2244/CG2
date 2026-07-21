@@ -1,9 +1,10 @@
 #include "Enemy.h"
 #include "ChargeModule.h"
 #include "EnemyBulletManager.h"
+#include "GameObjects/Effect/EffectGenerator.h"
+#include "GameObjects/Player/Player.h"
 #include "GameObjects/Stageobjects/Door/DoorManager.h"
 #include "GameObjects/Stageobjects/Wall/WallManager.h"
-#include "GameObjects/Effect/EffectGenerator.h"
 
 using namespace TinyEngine;
 
@@ -62,21 +63,59 @@ void Enemy::Update(float deltaTime, Player* player, EnemyBulletManager* enemyBul
 		return;
 	}
 
-	// 無敵タイマー更新
-	if (invincibleTimer_ > 0.0f) {
-		invincibleTimer_ -= deltaTime;
-	}
+	Vector3 playerPos = player->GetPosition();
+	Vector3 enemyPos = transform_.translate;
+	float dx = playerPos.x - enemyPos.x;
+	float dy = playerPos.y - enemyPos.y;
+	float dz = playerPos.z - enemyPos.z;
+	float distSq = dx * dx + dy * dy + dz * dz;
 
-	// AIインスタンス更新
-	ai_->Update(deltaTime, player, enemyBulletManager, wallManager, doorManager, glassManager);
+	// 画面に収まる程度の距離（カメラの視野に合わせて数値を調整してください）
+	const float kActiveDistance = 50.0f;
+	bool isWithinActiveRange = (distSq <= (kActiveDistance * kActiveDistance));
 
-	if (ai_->IsShotThisFrame()) {
-		GenerateMuzzleFlash(ai_->GetShotDirection());
-	}
+	if (isWithinActiveRange) {
+		// 無敵タイマー更新
+		if (invincibleTimer_ > 0.0f) {
+			invincibleTimer_ -= deltaTime;
+		}
 
-	// プレイヤー発見時に「!」マークの生成
-	if (lastState != ai_->GetState() && ai_->GetState() == EnemyAI::State::Vigilance) {
-		GenerateExMark();
+		// AIインスタンス更新
+		ai_->Update(deltaTime, player, enemyBulletManager, wallManager, doorManager, glassManager);
+
+		if (ai_->IsShotThisFrame()) {
+			GenerateMuzzleFlash(ai_->GetShotDirection());
+		}
+
+		// プレイヤー発見時に「!」マークの生成
+		if (lastState != ai_->GetState() && ai_->GetState() == EnemyAI::State::Vigilance) {
+			GenerateExMark();
+		}
+
+		// AIの状態を取得して色を変える
+		if (ai_->GetState() == EnemyAI::State::Vigilance) {
+			// 警戒状態なら赤色
+			visionCone_->SetColor({1.0f, 0.0f, 0.0f, 0.3f});
+			// 射撃ゲージの進行度を渡す
+			visionCone_->SetChargeProgress(ai_->GetShotProgress());
+		} else if (ai_->GetState() == EnemyAI::State::Hold) {
+			// 拘束状態も射撃するのでプログレスを渡す
+			visionCone_->SetColor({1.0f, 0.5f, 0.0f, 0.3f});
+			visionCone_->SetChargeProgress(ai_->GetShotProgress());
+		} else {
+			// 通常状態なら緑色
+			visionCone_->SetColor({0.0f, 1.0f, 0.0f, 0.3f});
+			// プログレスはリセット
+			visionCone_->SetChargeProgress(0.0f);
+		}
+
+		// 視界
+		visionCone_->SetTranslate(transform_.translate);
+		visionCone_->SetRotate(transform_.rotate);
+		visionCone_->Update(wallManager->GetWalls(), doorManager->GetDoors(), glassManager->GetGlasses());
+
+		// 敵AIの状態を記録
+		lastState = ai_->GetState();
 	}
 
 	// 「!」マークのアニメーションが終了していれば「!」マークインスタンスを削除
@@ -87,28 +126,6 @@ void Enemy::Update(float deltaTime, Player* player, EnemyBulletManager* enemyBul
 		}
 	}
 
-	// AIの状態を取得して色を変える
-	if (ai_->GetState() == EnemyAI::State::Vigilance) {
-		// 警戒状態なら赤色
-		visionCone_->SetColor({1.0f, 0.0f, 0.0f, 0.3f});
-		// 射撃ゲージの進行度を渡す
-		visionCone_->SetChargeProgress(ai_->GetShotProgress());
-	} else if (ai_->GetState() == EnemyAI::State::Hold) {
-		// 拘束状態も射撃するのでプログレスを渡す
-		visionCone_->SetColor({1.0f, 0.5f, 0.0f, 0.3f});
-		visionCone_->SetChargeProgress(ai_->GetShotProgress());
-	} else {
-		// 通常状態なら緑色
-		visionCone_->SetColor({0.0f, 1.0f, 0.0f, 0.3f});
-		// プログレスはリセット
-		visionCone_->SetChargeProgress(0.0f);
-	}
-
-	// 視界
-	visionCone_->SetTranslate(transform_.translate);
-	visionCone_->SetRotate(transform_.rotate);
-	visionCone_->Update(wallManager->GetWalls(), doorManager->GetDoors(), glassManager->GetGlasses());
-
 	// 「!」マークの更新
 	if (exclamationMark_) {
 		exclamationMark_->Update(deltaTime, transform_.translate);
@@ -116,9 +133,6 @@ void Enemy::Update(float deltaTime, Player* player, EnemyBulletManager* enemyBul
 
 	// 当たり判定更新　衝突判定用
 	UpdateCollision();
-
-	// 敵AIの状態を記録
-	lastState = ai_->GetState();
 
 	// 点滅用タイマーを回す
 	if (damageBlinkTimer_ > 0.0f) {
@@ -314,7 +328,7 @@ void Enemy::AddBloodDecal() {
 	bloodDecalManager_->AddBlood(finalPos, {std::numbers::pi_v<float> / 2.0f, 0, 0}, {4, 4, 1});
 }
 
-void Enemy::SetEnemyType(EnemyType type){
+void Enemy::SetEnemyType(EnemyType type) {
 	type_ = type;
 
 	// タイプに応じてステータスを変更
