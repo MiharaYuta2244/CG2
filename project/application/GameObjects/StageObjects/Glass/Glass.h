@@ -3,12 +3,13 @@
 #include "GameObjects/IGameObject.h"
 #include "GameObjects/ObjectRender/ObjectRender.h"
 #include "GlassStatus.h"
+#include "DecalManager.h"
 
 class Glass : public IGameObject {
 public:
 	Glass();
 
-	void Initialize(EngineContext* ctx, GlassStatus glassStatus);
+	void Initialize(EngineContext* ctx, GlassStatus glassStatus, TinyEngine::DecalManager* decalManager);
 
 	void Update();
 
@@ -32,6 +33,9 @@ public:
 	// ギズモ用
 	std::string GetName() const override { return "Glass(" + std::to_string(id_) + ")"; }
 
+	// ガラスの破片を生成
+	void AddGlassesDecal(Vector3 scale);
+
 private:
 	// 当たり判定の更新
 	void UpdateCollision();
@@ -52,4 +56,7 @@ private:
 	// オブジェクト数カウント用
 	static int index;
 	int id_ = 0;
+
+	// ガラスの破片の管理インスタンスポインタ
+	TinyEngine::DecalManager* glassesDecalManager_ = nullptr;
 };

@@ -15,10 +15,10 @@
 class Stage {
 public:
 	// 初期化
-	void Initialize(const SceneContext& ctx);
+	void Initialize(const SceneContext& ctx, TinyEngine::DecalManager* decalManager);
 
 	// 更新
-	void Update(float deltaTime, const Vector3& playerPos);
+	void Update(float deltaTime, const Vector3& playerPos, Camera* camera);
 
 	// 不透明オブジェクトの描画
 	void Draw();
@@ -46,4 +46,5 @@ private:
 	std::unique_ptr<HealAreaManager> healAreaManager_;
 	std::unique_ptr<Ground> ground_;
 	std::unique_ptr<Goal> goal_;
+	TinyEngine::DecalManager* decalManager_;
 };

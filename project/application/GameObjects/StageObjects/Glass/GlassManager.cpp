@@ -1,8 +1,9 @@
 #include "JsonManager.h"
 #include "GlassManager.h"
 
-void GlassManager::Initialize(EngineContext* ctx) {
+void GlassManager::Initialize(EngineContext* ctx, TinyEngine::DecalManager* decalManager) {
 	ctx_ = ctx;
+	decalManager_ = decalManager;
 
 	// JSON読み込み
 	jsonPath_ = "Glasses.json";
@@ -13,6 +14,8 @@ void GlassManager::Update() {
 	for (auto& wall : glasses_) {
 		wall->Update();
 	}
+
+	decalManager_->Update();
 }
 
 void GlassManager::Draw() {
@@ -71,12 +74,12 @@ void GlassManager::DrawImGui() {
 
 	ImGui::Separator();
 
-	// 壁追加
+	// ガラス追加
 	if (ImGui::Button("Add Glass")) {
 		GlassStatus s = {1.0f, 1.0f, 0.0f, 0.0f};
-		auto wall = std::make_unique<Glass>();
-		wall->Initialize(ctx_, s);
-		glasses_.push_back(std::move(wall));
+		auto glass = std::make_unique<Glass>();
+		glass->Initialize(ctx_, s, decalManager_);
+		glasses_.push_back(std::move(glass));
 	}
 
 	// JSON保存ボタンに変更
@@ -100,7 +103,7 @@ void GlassManager::LoadFromJson(const std::string& filepath) {
 	// 読み込んだステータスからWallを生成
 	for (const auto& s : wallDataList) {
 		auto glass = std::make_unique<Glass>();
-		glass->Initialize(ctx_, s);
+		glass->Initialize(ctx_, s, decalManager_);
 		glasses_.push_back(std::move(glass));
 	}
 }

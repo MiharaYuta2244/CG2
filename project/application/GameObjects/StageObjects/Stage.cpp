@@ -1,6 +1,11 @@
 #include "Stage.h"
 
-void Stage::Initialize(const SceneContext& ctx) {
+using namespace TinyEngine;
+
+void Stage::Initialize(const SceneContext& ctx, TinyEngine::DecalManager* decalManager) {
+	// デカール管理インスタンスの受け渡し
+	decalManager_ = decalManager;
+
 	// 壁の管理インスタンス生成&初期化
 	wallManager_ = std::make_unique<WallManager>();
 	wallManager_->Initialize(ctx.engineContext);
@@ -11,7 +16,7 @@ void Stage::Initialize(const SceneContext& ctx) {
 
 	// ガラスの管理インスタンス生成&初期化
 	glassManager_ = std::make_unique<GlassManager>();
-	glassManager_->Initialize(ctx.engineContext);
+	glassManager_->Initialize(ctx.engineContext, decalManager_);
 
 	// 檻の管理インスタンス生成&初期化
 	cageManager_ = std::make_unique<CageManager>();
@@ -30,7 +35,7 @@ void Stage::Initialize(const SceneContext& ctx) {
 	goal_->Initialize(ctx.engineContext);
 }
 
-void Stage::Update(float deltaTime, const Vector3& playerPos) {
+void Stage::Update(float deltaTime, const Vector3& playerPos, Camera* camera) {
 	wallManager_->Update(deltaTime);
 	doorManager_->Update(deltaTime, playerPos);
 	glassManager_->Update();
@@ -48,7 +53,7 @@ void Stage::Draw() {
 	goal_->Draw();
 }
 
-void Stage::DrawTransparent() { 
+void Stage::DrawTransparent() {
 	glassManager_->Draw();
 	healAreaManager_->Draw();
 }

@@ -2,10 +2,11 @@
 #include "GameObjects/Effect/EffectGenerator.h"
 #include "GameObjects/Enemy/Enemy.h"
 #include "GameObjects/Enemy/EnemyManager.h"
+#include "ColorPalette.h"
 
 using namespace TinyEngine;
 
-void Player::Initialize(EngineContext* ctx, TinyEngine::BloodDecalManager* bloodDecalManager) {
+void Player::Initialize(EngineContext* ctx, TinyEngine::DecalManager* bloodDecalManager) {
 	ctx_ = ctx;
 
 	transform_.scale = {3.0f, 3.0f, 3.0f};
@@ -508,7 +509,7 @@ void Player::AddBloodDecal(Vector3 scale) {
 	finalPos.x = basePos.x;
 	finalPos.y = 0.1f;
 	finalPos.z = basePos.z;
-	bloodDecalManager_->AddBlood(finalPos, {std::numbers::pi_v<float> / 2.0f, 0, 0}, scale, {0.94f, 0.35f, 0.13f, 1.0f});
+	bloodDecalManager_->AddDecal("Bleeding.png", finalPos, {std::numbers::pi_v<float> / 2.0f, 0, 0}, scale, ColorPalette::NeonRed());
 }
 
 void Player::Bleeding(float deltaTime) {

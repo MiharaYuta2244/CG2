@@ -37,7 +37,7 @@ inline void from_json(const Json& j, EnemyData& e) {
 /// </summary>
 class EnemyManager {
 public:
-	void Initialize(EngineContext* ctx, TinyEngine::BloodDecalManager* bloodDecalManager);
+	void Initialize(EngineContext* ctx, TinyEngine::DecalManager* bloodDecalManager);
 	void Update(float deltaTime, Player* player, EnemyBulletManager* enemyBulletManager, WallManager* wallManager, DoorManager* doorManager, GlassManager* glassManager);
 	void PostUpdate();
 	void Draw();
@@ -60,5 +60,5 @@ private:
 	std::list<std::unique_ptr<Enemy>> enemies_;
 
 	// 血痕管理クラスポインタ
-	TinyEngine::BloodDecalManager* bloodDecalManager_ = nullptr;
+	TinyEngine::DecalManager* bloodDecalManager_ = nullptr;
 };

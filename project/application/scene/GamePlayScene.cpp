@@ -1,6 +1,6 @@
 #include "GamePlayScene.h"
-#include "SceneManager.h"
 #include "GameObjects/Effect/EffectGenerator.h"
+#include "SceneManager.h"
 
 using namespace TinyEngine;
 
@@ -33,16 +33,16 @@ void GamePlayScene::Initialize(const SceneContext& ctx) {
 	ctx_.engineContext->object3dCommon->SetDefaultCamera(ctx_.currentCamera);
 	ctx_.engineContext->particleCommon->SetDefaultCamera(ctx_.currentCamera);
 
-	// 血痕管理インスタンス
-	bloodDecalManager_ = std::make_unique<BloodDecalManager>();
-	bloodDecalManager_->Initialize(ctx.engineContext, "Bleeding.png");
+	// デカール管理インスタンス
+	decalManager_ = std::make_unique<DecalManager>();
+	decalManager_->Initialize(ctx.engineContext);
 
 	// プレイヤーの初期化
-	player_->Initialize(ctx_.engineContext, bloodDecalManager_.get());
+	player_->Initialize(ctx_.engineContext, decalManager_.get());
 
 	// 敵の生成&初期化
 	enemyManager_ = std::make_unique<EnemyManager>();
-	enemyManager_->Initialize(ctx_.engineContext, bloodDecalManager_.get());
+	enemyManager_->Initialize(ctx_.engineContext, decalManager_.get());
 
 	// 敵の弾管理インスタンス生成
 	enemyBulletManager_ = std::make_unique<EnemyBulletManager>();
@@ -57,14 +57,10 @@ void GamePlayScene::Initialize(const SceneContext& ctx) {
 
 	// ステージ管理インスタンスの生成&初期化
 	stage_ = std::make_unique<Stage>();
-	stage_->Initialize(ctx);
+	stage_->Initialize(ctx, decalManager_.get());
 
 	// シーン遷移要求制御変数
 	isTransitionRequested_ = false;
-
-	// 操作方法UI
-	controls_ = std::make_unique<Controls>();
-	controls_->Initialize(ctx_.engineContext);
 
 	// シーンで使うエフェクトの宣言
 	ctx_.engineContext->postEffectPipeline->SetEffects({
@@ -91,6 +87,12 @@ void GamePlayScene::Initialize(const SceneContext& ctx) {
 
 	// 当たり判定管理インスタンス生成
 	collisionManager_ = std::make_unique<CollisionManager>();
+
+	// 操作方法UI
+	controlUI_ = std::make_unique<ControlUI>();
+	controlUI_->Initialize(ctx.engineContext, decalManager_.get());
+	controlUI_->AddAttackUIDecal({1, 1, 1});
+	controlUI_->AddHoldUIDecal({1, 1, 1});
 }
 
 void GamePlayScene::Update() {
@@ -138,7 +140,7 @@ void GamePlayScene::Update() {
 	enemyBulletManager_->Update(deltaTime);
 
 	// ステージオブジェクトの更新
-	stage_->Update(deltaTime, player_->GetPosition());
+	stage_->Update(deltaTime, player_->GetPosition(), ctx_.currentCamera);
 
 	// 当たり判定
 	collisionManager_->CheckCollisions(
@@ -207,6 +209,10 @@ void GamePlayScene::Update() {
 
 	// 敵の管理インスタンスImGui
 	enemyManager_->DrawImGui();
+
+	// 操作方法UIの更新&ImGui
+	controlUI_->Update();
+	controlUI_->DrawImGui();
 
 	// 毎フレームオブジェクトリストを生成してシーンエディターに渡す
 	std::vector<IGameObject*> editObjects;
@@ -280,12 +286,9 @@ void GamePlayScene::Update() {
 	// レターボックス更新
 	letterBox_->Update(deltaTime);
 
-	// 操作方法UI更新
-	controls_->Update();
-
 	// 血痕管理インスタンス更新
-	bloodDecalManager_->SetCamera(ctx_.currentCamera);
-	bloodDecalManager_->Update();
+	decalManager_->SetCamera(ctx_.currentCamera);
+	decalManager_->Update();
 }
 
 void GamePlayScene::Draw() {
@@ -310,16 +313,13 @@ void GamePlayScene::Draw() {
 	}
 
 	// 血痕描画
-	bloodDecalManager_->Draw();
+	decalManager_->Draw();
 
 	// フラッシュエフェクト描画
 	flashEffect_->Draw();
 
 	// レターボックス描画
 	letterBox_->Draw();
-
-	// 操作方法UI描画
-	controls_->Draw();
 
 	// 半透明オブジェクトの描画準備
 	ctx_.engineContext->object3dCommon->DrawSettingTransparent(ctx_.engineContext->textureManager);

@@ -1,6 +1,6 @@
 #pragma once
 #include "AABB.h"
-#include "BloodDecalManager.h"
+#include "DecalManager.h"
 #include "DirectInput.h"
 #include "GameObjects/IGameObject.h"
 #include "GameObjects/ObjectRender/ObjectRender.h"
@@ -20,7 +20,7 @@ class Enemy;
 class Player : public IGameObject {
 public:
 	// 初期化処理
-	void Initialize(EngineContext* ctx, TinyEngine::BloodDecalManager* bloodDecalManager);
+	void Initialize(EngineContext* ctx, TinyEngine::DecalManager* bloodDecalManager);
 
 	// 更新処理
 	void Update(float deltaTime, DirectInput* input, GamePad* gamePad, EnemyManager* enemyManager);
@@ -178,7 +178,7 @@ private:
 	bool isGrabReleased_ = false;
 
 	// 血痕の管理インスタンスポインタ
-	TinyEngine::BloodDecalManager* bloodDecalManager_ = nullptr;
+	TinyEngine::DecalManager* bloodDecalManager_ = nullptr;
 
 	// 出血の間隔用タイマー
 	GameTimer bleedingTimer_;

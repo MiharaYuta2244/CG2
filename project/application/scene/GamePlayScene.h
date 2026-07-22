@@ -6,13 +6,13 @@
 #include "GameObjects/Effect/LetterBox.h"
 #include "GameObjects/Enemy/EnemyBulletManager.h"
 #include "GameObjects/Enemy/EnemyManager.h"
-#include "GameObjects/GameUI/Controls.h"
 #include "GameObjects/Player/Player.h"
 #include "GameObjects/StageObjects/Stage.h"
-#include "BloodDecalManager.h"
+#include "DecalManager.h"
 #include "Editor/SceneEditor.h"
 #include "Particle.h"
 #include "Collision/CollisionManager.h"
+#include "GameObjects/ControlUI/ControlUI.h"
 #include <memory>
 
 /// <summary>
@@ -55,7 +55,7 @@ private:
 	std::unique_ptr<LetterBox> letterBox_;
 
 	// 血痕管理インスタンス
-	std::unique_ptr<TinyEngine::BloodDecalManager> bloodDecalManager_;
+	std::unique_ptr<TinyEngine::DecalManager> decalManager_;
 
 	// プレイヤー死亡時カメラ演出用インスタンス
 	std::unique_ptr<CameraDeathZoomController> cameraZoomController_;
@@ -76,9 +76,6 @@ private:
 
 	// シーン遷移の要求を1回だけ通るようにするためのフラグ
 	bool isTransitionRequested_ = false;
-
-	// 操作方法UI
-	std::unique_ptr<Controls> controls_;
 
 	// 経過時間
 	float elapsedTime_ = 0.0f;
@@ -102,4 +99,7 @@ private:
 
 	// カメラのY座標
 	float cameraPosY_ = 0.0f;
+
+	// 操作方法UI
+	std::unique_ptr<ControlUI> controlUI_;
 };

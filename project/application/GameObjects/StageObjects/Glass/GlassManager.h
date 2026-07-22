@@ -9,7 +9,7 @@
 class GlassManager {
 public:
 	// 初期化処理
-	void Initialize(EngineContext* ctx);
+	void Initialize(EngineContext* ctx, TinyEngine::DecalManager* decalManager);
 
 	// 更新処理
 	void Update();
@@ -39,4 +39,7 @@ private:
 
 	// 壁オブジェクトのリスト
 	std::list<std::unique_ptr<Glass>> glasses_;
+
+	// デカール管理インスタンスポインタ
+	TinyEngine::DecalManager* decalManager_ = nullptr;
 };

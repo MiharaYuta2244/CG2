@@ -7,7 +7,7 @@
 
 using namespace TinyEngine;
 
-void EnemyManager::Initialize(EngineContext* ctx, BloodDecalManager* bloodDecalManager) {
+void EnemyManager::Initialize(EngineContext* ctx, DecalManager* bloodDecalManager) {
 	ctx_ = ctx;
 	bloodDecalManager_ = bloodDecalManager;
 

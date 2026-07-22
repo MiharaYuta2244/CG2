@@ -12,16 +12,25 @@ int Enemy::index = 0;
 
 Enemy::Enemy() { id_ = index++; }
 
-void Enemy::Initialize(EngineContext* ctx, Vector3 pos, EnemyType type, BloodDecalManager* bloodDecalManager) {
+void Enemy::Initialize(EngineContext* ctx, Vector3 pos, EnemyType type, DecalManager* bloodDecalManager) {
 	ctx_ = ctx;
-
 	type_ = type;
-	if (type_ == EnemyType::Normal) {
+
+	switch (type_) {
+	case EnemyType::Normal:
 		hp_ = 1;
 		color_ = {1, 1, 1, 1};
-	} else if (type_ == EnemyType::Shotgun) {
+		break;
+
+	case EnemyType::Shotgun:
 		hp_ = 2;
 		color_ = {1, 0, 0, 1};
+		break;
+
+	case EnemyType::Bomber:
+		hp_ = 1;
+		color_ = {0, 0, 1, 1};
+		break;
 	}
 
 	transform_.scale = {1.0f, 1.0f, 1.0f};
@@ -325,19 +334,28 @@ void Enemy::AddBloodDecal() {
 	finalPos.x = basePos.x;
 	finalPos.y = 0.1f;
 	finalPos.z = basePos.z;
-	bloodDecalManager_->AddBlood(finalPos, {std::numbers::pi_v<float> / 2.0f, 0, 0}, {4, 4, 1});
+	bloodDecalManager_->AddDecal("Bleeding.png", finalPos, {std::numbers::pi_v<float> / 2.0f, 0, 0}, {4, 4, 1});
 }
 
 void Enemy::SetEnemyType(EnemyType type) {
 	type_ = type;
 
 	// タイプに応じてステータスを変更
-	if (type_ == EnemyType::Normal) {
+	switch (type_) {
+	case EnemyType::Normal:
 		hp_ = 1;
 		color_ = {1, 1, 1, 1};
-	} else if (type_ == EnemyType::Shotgun) {
+		break;
+
+	case EnemyType::Shotgun:
 		hp_ = 2;
 		color_ = {1, 0, 0, 1};
+		break;
+
+	case EnemyType::Bomber:
+		hp_ = 1;
+		color_ = {0, 0, 1, 1};
+		break;
 	}
 
 	// 描画用の色を更新

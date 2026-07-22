@@ -73,6 +73,7 @@ void CollisionManager::CheckCollisions(
 			if (Collision::Intersect(player->GetAttackCol(), glass->GetCollision())) {
 				// ガラス削除
 				stage->GetGlassManager()->RemoveGlass(glass.get());
+				glass->AddGlassesDecal({1,1,1});
 				break;
 			}
 		}

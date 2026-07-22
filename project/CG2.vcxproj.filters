@@ -354,9 +354,6 @@
     <ClCompile Include="application\GameObjects\Enemy\ExclamationMark.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
-    <ClCompile Include="application\GameObjects\GameUI\Controls.cpp">
-      <Filter>ソース ファイル</Filter>
-    </ClCompile>
     <ClCompile Include="application\GameObjects\StageObjects\Door\Door.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
@@ -411,7 +408,7 @@
     <ClCompile Include="engine\3d\particle\modules\ChargeCylinderModule.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
-    <ClCompile Include="engine\3d\decal\BloodDecalManager.cpp">
+    <ClCompile Include="engine\3d\decal\DecalManager.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
     <ClCompile Include="application\GameObjects\StageObjects\Cage\Cage.cpp">
@@ -451,6 +448,9 @@
       <Filter>ソース ファイル</Filter>
     </ClCompile>
     <ClCompile Include="engine\3d\particle\modules\HealSphereModule.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="application\GameObjects\ControlUI\ControlUI.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
   </ItemGroup>
@@ -874,9 +874,6 @@
     <ClInclude Include="application\GameObjects\Enemy\ExclamationMark.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
-    <ClInclude Include="application\GameObjects\GameUI\Controls.h">
-      <Filter>ヘッダー ファイル</Filter>
-    </ClInclude>
     <ClInclude Include="application\GameObjects\CommonData.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
@@ -955,7 +952,7 @@
     <ClInclude Include="engine\3d\particle\modules\ChargeCylinderModule.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
-    <ClInclude Include="engine\3d\decal\BloodDecalManager.h">
+    <ClInclude Include="engine\3d\decal\DecalManager.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
     <ClInclude Include="application\GameObjects\StageObjects\Cage\Cage.h">
@@ -998,6 +995,12 @@
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
     <ClInclude Include="engine\base\ParticleMaterial.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="engine\base\utility\ColorPalette.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="application\GameObjects\ControlUI\ControlUI.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
   </ItemGroup>
