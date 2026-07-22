@@ -5,6 +5,7 @@
 #include "GameObjects/Player/Player.h"
 #include "GameObjects/Stageobjects/Door/DoorManager.h"
 #include "GameObjects/Stageobjects/Wall/WallManager.h"
+#include "ColorPalette.h"
 
 using namespace TinyEngine;
 
@@ -334,7 +335,7 @@ void Enemy::AddBloodDecal() {
 	finalPos.x = basePos.x;
 	finalPos.y = 0.1f;
 	finalPos.z = basePos.z;
-	bloodDecalManager_->AddDecal("Bleeding.png", finalPos, {std::numbers::pi_v<float> / 2.0f, 0, 0}, {4, 4, 1});
+	bloodDecalManager_->AddDecal("Bleeding.png", finalPos, {std::numbers::pi_v<float> / 2.0f, 0, 0}, {4, 4, 1}, ColorPalette::DarkRed());
 }
 
 void Enemy::SetEnemyType(EnemyType type) {
