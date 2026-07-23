@@ -83,7 +83,7 @@ public:
 	Vector2 GetDirection() const { return lastMoveDirection_; }
 
 	// 敵を掴んでいるかどうかGetter
-	bool IsGrabbingEnemy() const { return isGrabTriggered_; }
+	bool IsGrabbingEnemy() const { return isGrab_; }
 
 	void SetIsGrabReleased(bool isGrabReleased) { isGrabReleased_ = isGrabReleased; }
 
@@ -94,6 +94,10 @@ public:
 
 	// 攻撃フラグGetter
 	bool GetIsAttack() const { return isAttackTriggered_; }
+
+	// プレイヤーが敵を掴んだかどうか
+	bool GetIsGrabTriggerd() const { return isGrabTriggered_; }
+	void SetIsGrabTriggerd(bool isGrabTriggered) { isGrabTriggered_ = isGrabTriggered; }
 
 private:
 	// 当たり判定の更新処理
@@ -165,6 +169,7 @@ private:
 	std::vector<std::unique_ptr<TinyEngine::Particle>> healEffects_;
 
 	// 敵を掴んでいるかどうか
+	bool isGrab_ = false;
 	bool isGrabTriggered_ = false;
 
 	// 攻撃しているかどうか

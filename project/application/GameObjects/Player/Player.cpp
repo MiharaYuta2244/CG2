@@ -1,8 +1,8 @@
 #include "Player.h"
+#include "ColorPalette.h"
 #include "GameObjects/Effect/EffectGenerator.h"
 #include "GameObjects/Enemy/Enemy.h"
 #include "GameObjects/Enemy/EnemyManager.h"
-#include "ColorPalette.h"
 
 using namespace TinyEngine;
 
@@ -166,7 +166,7 @@ void Player::Update(float deltaTime, DirectInput* input, GamePad* gamePad, Enemy
 		}
 	}
 
-	isGrabTriggered_ = input->KeyDown(DIK_J);
+	isGrab_ = input->KeyDown(DIK_J);
 	isGrabReleased_ = input->KeyReleased(DIK_J);
 	isAttackTriggered_ = input->KeyTriggered(DIK_K);
 
@@ -175,10 +175,10 @@ void Player::Update(float deltaTime, DirectInput* input, GamePad* gamePad, Enemy
 
 		// Lトリガーで掴み
 		if (padState.axes.lt > 0.3f) {
-			isGrabTriggered_ = true;
+			isGrab_ = true;
 		}
 		// 放す
-		if (isHold_ && !isGrabTriggered_) {
+		if (isHold_ && !isGrab_) {
 			isGrabReleased_ = true;
 		}
 		// Rトリガーで突き飛ばし
@@ -188,7 +188,7 @@ void Player::Update(float deltaTime, DirectInput* input, GamePad* gamePad, Enemy
 	}
 
 	// 掴み・投げ処理の更新
-	if (enableAttack_ && isGrabTriggered_) {
+	if (enableAttack_ && isGrab_) {
 		if (!isHold_ && targetEnemy != nullptr) {
 			isHold_ = true;
 
@@ -197,6 +197,7 @@ void Player::Update(float deltaTime, DirectInput* input, GamePad* gamePad, Enemy
 			heldEnemy_->SetShotHoldState(true);
 			heldEnemy_->SetAIState(EnemyAI::State::Hold);
 			heldEnemy_->ResetShotTimer();
+			isGrabTriggered_ = true;
 		}
 
 		// 掴んでいる間はプレイヤーの位置に敵を固定
@@ -235,7 +236,7 @@ void Player::Update(float deltaTime, DirectInput* input, GamePad* gamePad, Enemy
 
 		// 投げる対象がいればノックバック処理を実行
 		if (throwTarget != nullptr) {
-			//enableAttack_ = false;
+			// enableAttack_ = false;
 			throwTarget->SetEnableAI(true);
 			throwTarget->StartKnockBack({lastMoveDirection_.x, 0.0f, lastMoveDirection_.y});
 			throwTarget->SetAIState(EnemyAI::State::Normal);

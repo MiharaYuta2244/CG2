@@ -255,7 +255,7 @@ void GamePlayScene::Update() {
 		bool isFinished = p->IsFinished();
 		if (isFinished) {
 			// パーティクルが終了して削除される瞬間だけカメラを揺らす
-			ctx_.currentCamera->StartShake(0.2f, 0.2f);
+			ctx_.currentCamera->StartShake(0.2f, 0.3f);
 		}
 		return isFinished;
 	});
@@ -278,6 +278,12 @@ void GamePlayScene::Update() {
 		currentCameraPivot_.z += (targetPivot.z - currentCameraPivot_.z) * followSpeed * deltaTime;
 
 		ctx_.currentCamera->SetPivot(currentCameraPivot_);
+	}
+
+	// プレイヤーが敵を掴んだらシェイク
+	if(player_->GetIsGrabTriggerd()){
+		ctx_.currentCamera->StartShake(0.2f, 0.2f);
+		player_->SetIsGrabTriggerd(false);
 	}
 
 	// カメラのシェイク更新
