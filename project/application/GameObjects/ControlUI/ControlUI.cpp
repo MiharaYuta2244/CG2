@@ -24,6 +24,7 @@ void ControlUI::AddAttackUIDecal(Vector3 scale) { attackDecal_ = uiDecalManager_
 void ControlUI::AddHoldUIDecal(Vector3 scale) { holdDecal_ = uiDecalManager_->AddDecal("white.png", holdUIPos_, {std::numbers::pi_v<float> / 2.0f, 0, 0}, scale, ColorPalette::White()); }
 
 void ControlUI::DrawImGui() {
+#ifdef USE_IMGUI
 	if (ImGui::Begin("Control UI")) {
 
 		ImGui::Text("Attack UI Position");
@@ -35,4 +36,5 @@ void ControlUI::DrawImGui() {
 		ImGui::DragFloat3("Hold Pos", &holdUIPos_.x, 0.01f);
 	}
 	ImGui::End();
+#endif
 }
