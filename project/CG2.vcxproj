@@ -173,6 +173,8 @@ copy "$(windowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="application\Collision\CollisionManager.cpp" />
     <ClCompile Include="application\GameObjects\Effect\EffectGenerator.cpp" />
     <ClCompile Include="application\GameObjects\ControlUI\ControlUI.cpp" />
+    <ClCompile Include="application\GameObjects\Enemy\EnemyBomb.cpp" />
+    <ClCompile Include="application\GameObjects\Enemy\EnemyBombManager.cpp" />
     <ClCompile Include="engine\3d\decal\DecalManager.cpp" />
     <ClCompile Include="engine\3d\particle\modules\ChargeCylinderModule.cpp" />
     <ClCompile Include="engine\3d\particle\modules\ChargeModule.cpp" />
@@ -391,6 +393,8 @@ copy "$(windowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="application\Collision\CollisionManager.h" />
     <ClInclude Include="application\GameObjects\Effect\EffectGenerator.h" />
     <ClInclude Include="application\GameObjects\ControlUI\ControlUI.h" />
+    <ClInclude Include="application\GameObjects\Enemy\EnemyBomb.h" />
+    <ClInclude Include="application\GameObjects\Enemy\EnemyBombManager.h" />
     <ClInclude Include="engine\3d\decal\DecalManager.h" />
     <ClInclude Include="engine\3d\particle\modules\ChargeCylinderModule.h" />
     <ClInclude Include="engine\3d\particle\modules\ChargeModule.h" />

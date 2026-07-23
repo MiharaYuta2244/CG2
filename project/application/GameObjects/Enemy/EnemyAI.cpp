@@ -1,5 +1,6 @@
 #include "EnemyAI.h"
 #include "AStarPathfinder.h"
+#include "EnemyBombManager.h"
 #include "EnemyBulletManager.h"
 #include "GameObjects/Player/Player.h"
 #include "MathOperator.h"
@@ -13,7 +14,8 @@ void EnemyAI::Initialize(Transform* transform, EngineContext* ctx, EnemyType typ
 	type_ = type;
 }
 
-void EnemyAI::Update(float deltaTime, Player* player, EnemyBulletManager* enemyBulletManager, WallManager* wallManager, DoorManager* doorManager, GlassManager* glassManager) {
+void EnemyAI::Update(
+    float deltaTime, Player* player, EnemyBulletManager* enemyBulletManager, WallManager* wallManager, DoorManager* doorManager, GlassManager* glassManager, EnemyBombManager* enemyBombManager) {
 	isShotThisFrame_ = false;
 
 	// 状態に応じたUpdateを呼ぶ
@@ -22,10 +24,10 @@ void EnemyAI::Update(float deltaTime, Player* player, EnemyBulletManager* enemyB
 		UpdateNormal(deltaTime, player, wallManager, doorManager, glassManager);
 		break;
 	case State::Vigilance:
-		UpdateVigilance(deltaTime, player, enemyBulletManager, wallManager, doorManager, glassManager);
+		UpdateVigilance(deltaTime, player, enemyBulletManager, wallManager, doorManager, glassManager, enemyBombManager);
 		break;
 	case State::Hold:
-		UpdateHold(deltaTime, player, enemyBulletManager);
+		UpdateHold(deltaTime, player, enemyBulletManager, enemyBombManager);
 		break;
 	}
 }
@@ -133,7 +135,8 @@ void EnemyAI::UpdateNormal(float deltaTime, Player* player, WallManager* wallMan
 	}
 }
 
-void EnemyAI::UpdateVigilance(float deltaTime, Player* player, EnemyBulletManager* enemyBulletManager, WallManager* wallManager, DoorManager* doorManager, GlassManager* glassManager) {
+void EnemyAI::UpdateVigilance(
+    float deltaTime, Player* player, EnemyBulletManager* enemyBulletManager, WallManager* wallManager, DoorManager* doorManager, GlassManager* glassManager, EnemyBombManager* enemyBombManager) {
 	Vector3 playerPos = player->GetPosition();
 	Vector3 enemyPos = transform_->translate;
 
@@ -161,7 +164,7 @@ void EnemyAI::UpdateVigilance(float deltaTime, Player* player, EnemyBulletManage
 
 		// 弾の発射処理
 		if (shotTimer_ >= shotIntervalNormal_) {
-			Shot(toTarget, enemyBulletManager);
+			Shot(toTarget, enemyBulletManager, enemyBombManager);
 		}
 
 	} else {
@@ -216,7 +219,7 @@ void EnemyAI::UpdateVigilance(float deltaTime, Player* player, EnemyBulletManage
 	float distSq = toTarget.x * toTarget.x + toTarget.z * toTarget.z;
 }
 
-void EnemyAI::UpdateHold(float deltaTime, Player* player, EnemyBulletManager* enemyBulletManager) {
+void EnemyAI::UpdateHold(float deltaTime, Player* player, EnemyBulletManager* enemyBulletManager, EnemyBombManager* enemyBombManager) {
 	if (!isShotHoldState_)
 		return;
 
@@ -226,7 +229,7 @@ void EnemyAI::UpdateHold(float deltaTime, Player* player, EnemyBulletManager* en
 
 	// 弾の発射処理 通常の発射より早く撃つ
 	if (shotTimer_ >= shotIntervalHold_ * shotTimerMultiPlier_) {
-		Shot(playerDirection, enemyBulletManager);
+		Shot(playerDirection, enemyBulletManager, enemyBombManager);
 
 		// 拘束時の発射フラグを下す
 		isShotHoldState_ = false;
@@ -341,11 +344,16 @@ bool EnemyAI::IsSegmentIntersectAABB(const Vector3& start, const Vector3& end, c
 	return true; // 交差している
 }
 
-void EnemyAI::Shot(Vector3 toTarget, EnemyBulletManager* enemyBulletManager) {
+void EnemyAI::Shot(Vector3 toTarget, EnemyBulletManager* enemyBulletManager, EnemyBombManager* enemyBombManager) {
 	auto bullet = std::make_unique<EnemyBullet>();
 	Vector3 dir3D = MathUtility::Normalize(toTarget);
 	Vector2 dir2D = {dir3D.x, dir3D.z};
 	Vector3 spawnPos = transform_->translate;
+	float baseAngle = std::atan2(dir3D.x, dir3D.z);
+
+	isShotThisFrame_ = true;
+	shotDirection_ = dir3D;
+	shotTimer_ = 0.0f;
 
 	switch (type_) {
 	case EnemyType::Normal:
@@ -358,7 +366,6 @@ void EnemyAI::Shot(Vector3 toTarget, EnemyBulletManager* enemyBulletManager) {
 		break;
 	case EnemyType::Shotgun:
 		// 散弾の実装
-		float baseAngle = std::atan2(dir3D.x, dir3D.z);
 		for (int i = -1; i <= 1; ++i) {
 			auto bullet = std::make_unique<EnemyBullet>();
 			float angle = baseAngle + i * (15.0f * std::numbers::pi_v<float> / 180.0f); // 15度ずつずらす
@@ -372,9 +379,28 @@ void EnemyAI::Shot(Vector3 toTarget, EnemyBulletManager* enemyBulletManager) {
 			enemyBulletManager->AddBullet(std::move(bullet));
 		}
 		break;
-	}
+	case EnemyType::Bomber:
+		float distSq = toTarget.x * toTarget.x + toTarget.z * toTarget.z;
+		const float kThrowBombDistance = 15.0f; // 爆弾を投げる距離の閾値
 
-	isShotThisFrame_ = true;
-	shotDirection_ = dir3D;
-	shotTimer_ = 0.0f;
+		if (distSq <= kThrowBombDistance * kThrowBombDistance && enemyBombManager) {
+			// 一定距離より遠ければ単発弾を撃つ
+			spawnPos.x += dir3D.x * bulletMargin_;
+			spawnPos.z += dir3D.z * bulletMargin_;
+			spawnPos.y += 1.0f;
+			bullet->Initialize(ctx_, dir2D, spawnPos);
+			enemyBulletManager->AddBullet(std::move(bullet));
+		} else {
+			// 一定距離以内なら爆弾を投げる
+			auto bomb = std::make_unique<EnemyBomb>();
+
+			// 爆弾の初速
+			float throwSpeed = 18.0f;
+			Vector3 velocity = {dir3D.x * throwSpeed, 0.0f, dir3D.z * throwSpeed};
+
+			bomb->Initialize(ctx_, spawnPos, velocity);
+			enemyBombManager->AddBomb(std::move(bomb));
+		}
+		break;
+	}
 }

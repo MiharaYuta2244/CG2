@@ -26,7 +26,7 @@ void Camera::SetPivot(const Vector3& p) {
 
 void Camera::SetRotate(const Vector3& rotate) {
 	euler_ = rotate;
-	euler_.z = 0.0f; // roll は常に禁止
+	//euler_.z = 0.0f; // roll は常に禁止
 	UpdateOrientation();
 	UpdateViewMatrix();
 }
@@ -34,9 +34,10 @@ void Camera::SetRotate(const Vector3& rotate) {
 void Camera::UpdateOrientation() {
 	Matrix4x4 pitch = MathUtility::MakePitchRotateMatrix(euler_.x);
 	Matrix4x4 yaw = MathUtility::MakeYawRotateMatrix(euler_.y);
+	Matrix4x4 roll = MathUtility::MakeRollRotateMatrix(euler_.z);
 
-	// roll は使わない
-	orientation_ = MathUtility::Multiply(pitch, yaw);
+	Matrix4x4 pitchYaw = MathUtility::Multiply(pitch, yaw);
+	orientation_ = MathUtility::Multiply(pitchYaw, roll);
 }
 
 void Camera::Update(const DirectInput& input, const GamePad& gamePad) {

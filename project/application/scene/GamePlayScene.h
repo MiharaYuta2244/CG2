@@ -13,6 +13,7 @@
 #include "Particle.h"
 #include "Collision/CollisionManager.h"
 #include "GameObjects/ControlUI/ControlUI.h"
+#include "GameObjects/Enemy/EnemyBombManager.h"
 #include <memory>
 
 /// <summary>
@@ -44,6 +45,9 @@ private:
 
 	// 敵の弾を管理するインスタンス
 	std::unique_ptr<EnemyBulletManager> enemyBulletManager_;
+
+	// 敵の爆弾を管理するインスタンス
+	std::unique_ptr<EnemyBombManager> enemyBombManager_;
 
 	// 死亡パーティクルリスト
 	std::list<std::unique_ptr<TinyEngine::Particle>> enemyDeathEffect_;

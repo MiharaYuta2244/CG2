@@ -16,13 +16,14 @@ void EnemyManager::Initialize(EngineContext* ctx, DecalManager* bloodDecalManage
 	LoadFromJson(jsonPath_);
 }
 
-void EnemyManager::Update(float deltaTime, Player* player, EnemyBulletManager* enemyBulletManager, WallManager* wallManager, DoorManager* doorManager, GlassManager* glassManager) {
+void EnemyManager::Update(
+    float deltaTime, Player* player, EnemyBulletManager* enemyBulletManager, WallManager* wallManager, DoorManager* doorManager, GlassManager* glassManager, EnemyBombManager* enemyBombManager) {
 	// 死亡した敵をリストから削除
 	enemies_.remove_if([](const std::unique_ptr<Enemy>& enemy) { return enemy->IsDead(); });
 
 	// 生きている敵をすべて更新
 	for (auto& enemy : enemies_) {
-		enemy->Update(deltaTime, player, enemyBulletManager, wallManager, doorManager, glassManager);
+		enemy->Update(deltaTime, player, enemyBulletManager, wallManager, doorManager, glassManager, enemyBombManager);
 	}
 }
 
@@ -73,7 +74,7 @@ void EnemyManager::DrawImGui() {
 
 			// --- Type ---
 			int currentType = static_cast<int>(enemy->GetEnemyType());
-			const char* typeNames[] = {"Normal", "Shotgun"};
+			const char* typeNames[] = {"Normal", "Shotgun", "Bomber"};
 			if (ImGui::Combo("Type", &currentType, typeNames, IM_ARRAYSIZE(typeNames))) {
 				enemy->SetEnemyType(static_cast<EnemyType>(currentType));
 			}

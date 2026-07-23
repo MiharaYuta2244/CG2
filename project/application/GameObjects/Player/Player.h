@@ -136,7 +136,6 @@ private:
 	std::unique_ptr<ObjectRender> render_; // 描画用インスタンス
 	std::unique_ptr<PlayerMove> move_;     // 移動用インスタンス
 	std::unique_ptr<PlayerHealth> hp_;     // HP管理用インスタンス
-	std::unique_ptr<ObjectRender> hand_;   // 攻撃確認用
 	std::unique_ptr<PlayerHPIcon> hpIcon_; // HPのUI
 
 	// 環境マップ　強さ
@@ -164,9 +163,6 @@ private:
 
 	// 回復エフェクト
 	std::vector<std::unique_ptr<TinyEngine::Particle>> healEffects_;
-
-	// 攻撃確認用フラグ
-	bool isHandAnimPlaying_ = false;
 
 	// 敵を掴んでいるかどうか
 	bool isGrabTriggered_ = false;

@@ -2,13 +2,14 @@
 #include "AABB.h"
 #include "EnemyBullet.h"
 #include "EnemyType.h"
-#include "Transform.h"
-#include "GameObjects/StageObjects/Wall/WallManager.h"
 #include "GameObjects/StageObjects/Door/DoorManager.h"
 #include "GameObjects/StageObjects/Glass/GlassManager.h"
+#include "GameObjects/StageObjects/Wall/WallManager.h"
+#include "Transform.h"
 #include <vector>
 
 class EnemyBulletManager;
+class EnemyBombManager;
 class Player;
 
 struct Visionparam {
@@ -31,7 +32,8 @@ public:
 	void Initialize(Transform* transform, EngineContext* ctx, EnemyType type);
 
 	// 更新処理
-	void Update(float deltaTime, Player* player, EnemyBulletManager* enemyBulletManager, WallManager* wallManager, DoorManager* doorManager, GlassManager* glassManager);
+	void Update(
+	    float deltaTime, Player* player, EnemyBulletManager* enemyBulletManager, WallManager* wallManager, DoorManager* doorManager, GlassManager* glassManager, EnemyBombManager* enemyBombManager);
 
 	// Getter
 	State GetState() const { return state_; }
@@ -69,10 +71,11 @@ private:
 	void UpdateNormal(float deltaTime, Player* player, WallManager* wallManager, DoorManager* doorManager, GlassManager* glassManager);
 
 	// 警戒状態の更新処理
-	void UpdateVigilance(float deltaTime, Player* player, EnemyBulletManager* enemyBulletManager, WallManager* wallManager, DoorManager* doorManager, GlassManager* glassManager);
+	void UpdateVigilance(
+	    float deltaTime, Player* player, EnemyBulletManager* enemyBulletManager, WallManager* wallManager, DoorManager* doorManager, GlassManager* glassManager, EnemyBombManager* enemyBombManager);
 
 	// 拘束状態の更新処理
-	void UpdateHold(float deltaTime, Player* player, EnemyBulletManager* enemyBulletManager);
+	void UpdateHold(float deltaTime, Player* player, EnemyBulletManager* enemyBulletManager, EnemyBombManager* enemyBombManager);
 
 	// プレイヤーが視界内にいるか判定する
 	bool CheckPlayerInVision(Player* player, WallManager* wallManager, DoorManager* doorManager, GlassManager* glassManager);
@@ -81,7 +84,7 @@ private:
 	bool IsSegmentIntersectAABB(const Vector3& start, const Vector3& end, const AABB& aabb);
 
 	// 弾の発射処理
-	void Shot(Vector3 toTarget, EnemyBulletManager* enemyBulletManager);
+	void Shot(Vector3 toTarget, EnemyBulletManager* enemyBulletManager, EnemyBombManager* enemyBombManager);
 
 private:
 	Transform* transform_ = nullptr;
@@ -122,5 +125,5 @@ private:
 
 	// 聴覚用パラメータ
 	float hearingRadius_ = 8.0f; // 足音が聞こえる距離
-	float hearTurnSpeed_ = 8.0f;  // 足音に反応して振り向く速度
+	float hearTurnSpeed_ = 8.0f; // 足音に反応して振り向く速度
 };

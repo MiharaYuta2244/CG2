@@ -26,7 +26,8 @@ public:
 	void Initialize(EngineContext* ctx, Vector3 pos, EnemyType type, TinyEngine::DecalManager* bloodDecalManager);
 
 	// 更新処理
-	void Update(float deltaTime, Player* player, EnemyBulletManager* enemyBulletManager, WallManager* wallManager, DoorManager* doorManager, GlassManager* glassManager);
+	void Update(
+	    float deltaTime, Player* player, EnemyBulletManager* enemyBulletManager, WallManager* wallManager, DoorManager* doorManager, GlassManager* glassManager, EnemyBombManager* enemyBombManager);
 
 	// 押し戻し完了後に呼ぶ最終更新処理
 	void PostUpdate();

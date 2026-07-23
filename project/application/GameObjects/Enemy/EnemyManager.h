@@ -38,7 +38,8 @@ inline void from_json(const Json& j, EnemyData& e) {
 class EnemyManager {
 public:
 	void Initialize(EngineContext* ctx, TinyEngine::DecalManager* bloodDecalManager);
-	void Update(float deltaTime, Player* player, EnemyBulletManager* enemyBulletManager, WallManager* wallManager, DoorManager* doorManager, GlassManager* glassManager);
+	void Update(
+	    float deltaTime, Player* player, EnemyBulletManager* enemyBulletManager, WallManager* wallManager, DoorManager* doorManager, GlassManager* glassManager, EnemyBombManager* enemyBombManager);
 	void PostUpdate();
 	void Draw();
 	void DrawImGui();

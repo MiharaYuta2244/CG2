@@ -47,6 +47,9 @@ void GamePlayScene::Initialize(const SceneContext& ctx) {
 	// 敵の弾管理インスタンス生成
 	enemyBulletManager_ = std::make_unique<EnemyBulletManager>();
 
+	// 敵の爆弾管理インスタンス生成
+	enemyBombManager_ = std::make_unique<EnemyBombManager>();
+
 	// フラッシュエフェクトの生成&初期化
 	flashEffect_ = std::make_unique<FlashEffect>();
 	flashEffect_->Initialize(ctx_.engineContext);
@@ -134,10 +137,13 @@ void GamePlayScene::Update() {
 	player_->Update(deltaTime, ctx_.keyboard, ctx_.gamePad, enemyManager_.get());
 
 	// 敵の更新処理
-	enemyManager_->Update(deltaTime, player_.get(), enemyBulletManager_.get(), stage_->GetWallManager(), stage_->GetDoorManager(), stage_->GetGlassManager());
+	enemyManager_->Update(deltaTime, player_.get(), enemyBulletManager_.get(), stage_->GetWallManager(), stage_->GetDoorManager(), stage_->GetGlassManager(), enemyBombManager_.get());
 
 	// 敵の弾の更新処理
 	enemyBulletManager_->Update(deltaTime);
+
+	// 敵の爆弾の更新処理
+	enemyBombManager_->Update(deltaTime);
 
 	// ステージオブジェクトの更新
 	stage_->Update(deltaTime, player_->GetPosition(), ctx_.currentCamera);
@@ -303,6 +309,9 @@ void GamePlayScene::Draw() {
 
 	// 敵の弾の描画処理
 	enemyBulletManager_->Draw();
+
+	// 敵の爆弾の描画処理
+	enemyBombManager_->Draw();
 
 	// プレイヤーの描画処理
 	player_->Draw();

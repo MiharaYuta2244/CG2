@@ -34,13 +34,6 @@ void Player::Initialize(EngineContext* ctx, TinyEngine::DecalManager* bloodDecal
 	// パーティクル生成タイマー初期化
 	particleGenerateTimer_.Initialize(0.2f);
 
-	// 攻撃確認用
-	hand_ = std::make_unique<ObjectRender>();
-	hand_->Initialize(ctx, "Cube.obj");
-	Transform handTransform = transform_;
-	handTransform.scale = {0.5f, 0.5f, 0.5f};
-	hand_->SetTransform(handTransform);
-
 	// プレイヤーのHPゲージ生成&初期化
 	hpIcon_ = std::make_unique<PlayerHPIcon>();
 	hpIcon_->Initialize(ctx);
@@ -267,13 +260,6 @@ void Player::Update(float deltaTime, DirectInput* input, GamePad* gamePad, Enemy
 		float offset = 1.5f;
 
 		Vector3 attackPos = {transform_.translate.x + forward.x * offset, transform_.translate.y, transform_.translate.z + forward.z * offset};
-
-		hand_->SetTranslate(attackPos);
-		isHandAnimPlaying_ = true;
-	}
-
-	if (!input->KeyDown(DIK_K) && !(gamePad && gamePad->GetState().axes.rt > 0.3f)) {
-		isHandAnimPlaying_ = false;
 	}
 
 	// パーティクルの生成タイマー更新
@@ -317,13 +303,6 @@ void Player::Update(float deltaTime, DirectInput* input, GamePad* gamePad, Enemy
 
 	// 回復エフェクト削除
 	std::erase_if(healEffects_, [](const std::unique_ptr<TinyEngine::Particle>& p) { return p->IsFinished(); });
-
-	// 攻撃確認用
-	hand_->Update();
-
-	if (!isHandAnimPlaying_) {
-		hand_->SetTranslate(transform_.translate);
-	}
 
 	// プレイヤーのHPゲージ更新
 	hpIcon_->Update(deltaTime);
@@ -379,9 +358,6 @@ void Player::Draw() {
 
 	// プレイヤーHPのUI描画
 	hpIcon_->Draw();
-
-	// 攻撃確認用
-	// hand_->Draw();
 }
 
 bool Player::IsDead() const {

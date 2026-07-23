@@ -58,7 +58,7 @@ void Enemy::Initialize(EngineContext* ctx, Vector3 pos, EnemyType type, DecalMan
 	bloodDecalManager_ = bloodDecalManager;
 }
 
-void Enemy::Update(float deltaTime, Player* player, EnemyBulletManager* enemyBulletManager, WallManager* wallManager, DoorManager* doorManager, GlassManager* glassManager) {
+void Enemy::Update(float deltaTime, Player* player, EnemyBulletManager* enemyBulletManager, WallManager* wallManager, DoorManager* doorManager, GlassManager* glassManager, EnemyBombManager* enemyBombManager) {
 	if (isDead_) {
 		return;
 	}
@@ -91,7 +91,7 @@ void Enemy::Update(float deltaTime, Player* player, EnemyBulletManager* enemyBul
 		}
 
 		// AIインスタンス更新
-		ai_->Update(deltaTime, player, enemyBulletManager, wallManager, doorManager, glassManager);
+		ai_->Update(deltaTime, player, enemyBulletManager, wallManager, doorManager, glassManager, enemyBombManager);
 
 		if (ai_->IsShotThisFrame()) {
 			GenerateMuzzleFlash(ai_->GetShotDirection());
