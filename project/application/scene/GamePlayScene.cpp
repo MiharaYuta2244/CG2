@@ -94,8 +94,8 @@ void GamePlayScene::Initialize(const SceneContext& ctx) {
 	// 操作方法UI
 	controlUI_ = std::make_unique<ControlUI>();
 	controlUI_->Initialize(ctx.engineContext, decalManager_.get());
-	controlUI_->AddAttackUIDecal({1, 1, 1});
-	controlUI_->AddHoldUIDecal({1, 1, 1});
+	controlUI_->AddAttackUIDecal({2, 2, 2});
+	controlUI_->AddHoldUIDecal({2, 2, 2});
 }
 
 void GamePlayScene::Update() {

@@ -19,9 +19,9 @@ void ControlUI::Update() {
 	}
 }
 
-void ControlUI::AddAttackUIDecal(Vector3 scale) { attackDecal_ = uiDecalManager_->AddDecal("white.png", attackUIPos_, {std::numbers::pi_v<float> / 2.0f, 0, 0}, scale, ColorPalette::White()); }
+void ControlUI::AddAttackUIDecal(Vector3 scale) { attackDecal_ = uiDecalManager_->AddDecal("PushUI.png", attackUIPos_, {std::numbers::pi_v<float> / 2.0f, 0, 0}, scale, ColorPalette::Yellow()); }
 
-void ControlUI::AddHoldUIDecal(Vector3 scale) { holdDecal_ = uiDecalManager_->AddDecal("white.png", holdUIPos_, {std::numbers::pi_v<float> / 2.0f, 0, 0}, scale, ColorPalette::White()); }
+void ControlUI::AddHoldUIDecal(Vector3 scale) { holdDecal_ = uiDecalManager_->AddDecal("HoldUI.png", holdUIPos_, {std::numbers::pi_v<float> / 2.0f, 0, 0}, scale, ColorPalette::Yellow()); }
 
 void ControlUI::DrawImGui() {
 #ifdef USE_IMGUI
