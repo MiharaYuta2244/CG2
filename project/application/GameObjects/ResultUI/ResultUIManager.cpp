@@ -83,8 +83,9 @@ void ResultUIManager::Update(float deltaTime, DirectInput* input, GamePad* gameP
 	}
 
 	// 決定ボタンを押したら
-	if (decide) {
+	if (decide && !isDecided_) {
 		OnDecide();
+		isDecided_ = true;
 	}
 
 	// ボタンの更新

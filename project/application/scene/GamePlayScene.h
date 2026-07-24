@@ -106,4 +106,8 @@ private:
 
 	// 操作方法UI
 	std::unique_ptr<ControlUI> controlUI_;
+
+	// カメラ関連
+	float cameraAngle_ = 1.5f; // カメラの傾き
+	float tiltSpeed_ = 7.0f; // 傾くスピード
 };

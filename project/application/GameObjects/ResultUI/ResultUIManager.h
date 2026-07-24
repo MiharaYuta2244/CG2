@@ -56,4 +56,6 @@ private:
 	// スティックでの連続切り換え制御用変数
 	float stickCooldown_ = 0.0f;
 	bool stickInUse_ = false;
+
+	bool isDecided_ = false;
 };

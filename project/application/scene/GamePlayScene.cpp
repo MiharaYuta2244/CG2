@@ -265,23 +265,35 @@ void GamePlayScene::Update() {
 		Vector3 playerPos = player_->GetPosition();
 		Vector3 playerRot = player_->GetRotation();
 
-		// プレイヤーの向いている方向ベクトルを計算
-		Vector3 forward = {std::sin(playerRot.y), 0.0f, std::cos(playerRot.y)};
-
-		// 目標のピボット位置
-		Vector3 targetPivot = {playerPos.x + forward.x * offsetDistance_, playerPos.y, playerPos.z + forward.z * offsetDistance_};
-
-		// 線形補間を使ってカメラを滑らかに追従させる
-		float followSpeed = 5.0f; // 追従の滑らかさ
-		currentCameraPivot_.x += (targetPivot.x - currentCameraPivot_.x) * followSpeed * deltaTime;
+		// ピボット（カメラの位置基準）はプレイヤーにピッタリ合わせる
+		currentCameraPivot_.x = playerPos.x;
 		currentCameraPivot_.y = cameraPosY_;
-		currentCameraPivot_.z += (targetPivot.z - currentCameraPivot_.z) * followSpeed * deltaTime;
-
+		currentCameraPivot_.z = playerPos.z;
 		ctx_.currentCamera->SetPivot(currentCameraPivot_);
+
+		// 進行方向にカメラを傾ける処理
+		float maxTiltAngle = cameraAngle_ * (std::numbers::pi_v<float> / 180.0f);
+
+		// 基準のピッチ角
+		float basePitch = std::numbers::pi_v<float> / 2.0f;
+
+		// プレイヤーの向き(ヨー角)から、カメラのピッチ(X回転)とロール(Z回転)の目標値を計算
+		float targetPitch = basePitch - std::cos(playerRot.y) * maxTiltAngle;
+		float targetRoll = std::sin(playerRot.y) * maxTiltAngle;
+
+		// 現在のカメラの角度を取得
+		Vector3 currentEuler = ctx_.currentCamera->GetEuler();
+
+		currentEuler.x += (targetPitch - currentEuler.x) * tiltSpeed_ * deltaTime;
+		currentEuler.y = 0.0f; 
+		currentEuler.z += (targetRoll - currentEuler.z) * tiltSpeed_ * deltaTime;
+
+		// カメラに角度を適用
+		ctx_.currentCamera->SetRotate(currentEuler);
 	}
 
 	// プレイヤーが敵を掴んだらシェイク
-	if(player_->GetIsGrabTriggerd()){
+	if (player_->GetIsGrabTriggerd()) {
 		ctx_.currentCamera->StartShake(0.2f, 0.2f);
 		player_->SetIsGrabTriggerd(false);
 	}
@@ -301,6 +313,11 @@ void GamePlayScene::Update() {
 	// 血痕管理インスタンス更新
 	decalManager_->SetCamera(ctx_.currentCamera);
 	decalManager_->Update();
+
+	ImGui::Begin("Camera");
+	ImGui::DragFloat("angle", &cameraAngle_, 0.01f);
+	ImGui::DragFloat("speed", &tiltSpeed_, 0.01f);
+	ImGui::End();
 }
 
 void GamePlayScene::Draw() {
