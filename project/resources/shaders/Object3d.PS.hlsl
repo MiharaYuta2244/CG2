@@ -169,7 +169,7 @@ PixelShaderOutput main(VertexShaderOutput input)
     float3 sLightColor = diffuseSpotLight + specularSpotLight;
 
     // 最終色
-    float3 lightFinalColor = dirLightColor + pLightColor;
+    float3 lightFinalColor = dirLightColor + pLightColor + sLightColor;
     
     if (gMaterial.enableLighting)
     {
