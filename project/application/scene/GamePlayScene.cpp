@@ -285,7 +285,7 @@ void GamePlayScene::Update() {
 		Vector3 currentEuler = ctx_.currentCamera->GetEuler();
 
 		currentEuler.x += (targetPitch - currentEuler.x) * tiltSpeed_ * deltaTime;
-		currentEuler.y = 0.0f; 
+		currentEuler.y = 0.0f;
 		currentEuler.z += (targetRoll - currentEuler.z) * tiltSpeed_ * deltaTime;
 
 		// カメラに角度を適用
@@ -314,10 +314,12 @@ void GamePlayScene::Update() {
 	decalManager_->SetCamera(ctx_.currentCamera);
 	decalManager_->Update();
 
+#ifdef USE_IMGUI
 	ImGui::Begin("Camera");
 	ImGui::DragFloat("angle", &cameraAngle_, 0.01f);
 	ImGui::DragFloat("speed", &tiltSpeed_, 0.01f);
 	ImGui::End();
+#endif
 }
 
 void GamePlayScene::Draw() {
