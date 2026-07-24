@@ -1,26 +1,28 @@
 #include "EnemyBomb.h"
 #include "GameObjects/Effect/EffectGenerator.h"
 
-void EnemyBomb::Initialize(EngineContext* ctx, Vector3 pos, Vector3 velocity) {
+void EnemyBomb::Initialize(EngineContext* ctx, Vector3 pos, Vector3 velocity, Vector3 targetPos) {
 	ctx_ = ctx;
 	render_ = std::make_unique<ObjectRender>();
-	render_->Initialize(ctx, "cube.obj");
+	render_->Initialize(ctx, "Cube.obj");
 	transform_.scale = {1, 1, 1};
 	transform_.rotate = {0, 0, 0};
 	transform_.translate = pos;
 
+	Vector3 dir = targetPos - pos;
+	dir = MathUtility::Normalize(dir);
+	velocity_ = dir * speed_;
+
 	// 爆破タイマーの初期化
-	bombTimer_.Initialize(1.0f);
+	bombTimer_.Initialize(2.0f);
 }
 
 void EnemyBomb::Update(float deltaTime) {
 	// 移動処理
-	transform_.translate.x += velocity_.x * deltaTime;
-	transform_.translate.z += velocity_.z * deltaTime;
+	transform_.translate += velocity_ * deltaTime;
 
 	// 摩擦処理
-	velocity_.x -= velocity_.x * damping_ * deltaTime;
-	velocity_.z -= velocity_.z * damping_ * deltaTime;
+	velocity_ -= velocity_ * damping_ * deltaTime;
 
 	// 爆破タイマーの更新
 	if (!isFinished_) {
@@ -58,7 +60,7 @@ void EnemyBomb::Update(float deltaTime) {
 	});
 
 	// 更新
-	render_->Update();
+	render_->Update(transform_);
 }
 
 void EnemyBomb::Draw() {
@@ -77,13 +79,13 @@ void EnemyBomb::UpdateCollsion() {
 	Vector3 pos = transform_.translate;
 	Vector3 scale = transform_.scale;
 	collision_.min = {pos.x - (scale.x / 2.0f), pos.y - (scale.y / 2.0f), pos.z - (scale.z / 2.0f)};
-	collision_.min = {pos.x + (scale.x / 2.0f), pos.y + (scale.y / 2.0f), pos.z + (scale.z / 2.0f)};
+	collision_.max = {pos.x + (scale.x / 2.0f), pos.y + (scale.y / 2.0f), pos.z + (scale.z / 2.0f)};
 }
 
 void EnemyBomb::UpdateBombCollsion() {
 	Vector3 pos = transform_.translate;
-	collision_.min = {pos.x - (bombScale_.x / 2.0f), pos.y - (bombScale_.y / 2.0f), pos.z - (bombScale_.z / 2.0f)};
-	collision_.min = {pos.x + (bombScale_.x / 2.0f), pos.y + (bombScale_.y / 2.0f), pos.z + (bombScale_.z / 2.0f)};
+	bombCollision_.min = {pos.x - (bombScale_.x / 2.0f), pos.y - (bombScale_.y / 2.0f), pos.z - (bombScale_.z / 2.0f)};
+	bombCollision_.max = {pos.x + (bombScale_.x / 2.0f), pos.y + (bombScale_.y / 2.0f), pos.z + (bombScale_.z / 2.0f)};
 }
 
 void EnemyBomb::GenerateBombEffect() {

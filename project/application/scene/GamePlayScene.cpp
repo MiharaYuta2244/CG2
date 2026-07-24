@@ -150,7 +150,7 @@ void GamePlayScene::Update() {
 
 	// 当たり判定
 	collisionManager_->CheckCollisions(
-	    player_.get(), enemyManager_.get(), enemyBulletManager_.get(), stage_.get(), ctx_.currentCamera, commonData_, [this](const Vector3& pos) { GenerateEnemyDeathEffect(pos); }, glitchTimer_);
+	    player_.get(), enemyManager_.get(), enemyBulletManager_.get(), enemyBombManager_.get(), stage_.get(), ctx_.currentCamera, commonData_, [this](const Vector3& pos) { GenerateEnemyDeathEffect(pos); }, glitchTimer_);
 
 	// 押し戻し完了後の最終的な座標で、描画更新&AABB更新
 	player_->PostUpdate();

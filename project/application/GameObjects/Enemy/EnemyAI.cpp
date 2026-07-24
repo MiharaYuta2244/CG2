@@ -398,7 +398,7 @@ void EnemyAI::Shot(Vector3 toTarget, EnemyBulletManager* enemyBulletManager, Ene
 			float throwSpeed = 18.0f;
 			Vector3 velocity = {dir3D.x * throwSpeed, 0.0f, dir3D.z * throwSpeed};
 
-			bomb->Initialize(ctx_, spawnPos, velocity);
+			bomb->Initialize(ctx_, spawnPos, velocity, lastKnownPlayerPos_);
 			enemyBombManager->AddBomb(std::move(bomb));
 		}
 		break;

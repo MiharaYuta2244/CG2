@@ -2,6 +2,7 @@
 #include "Collision.h"
 #include "DebugCamera.h"
 #include "GameObjects/CommonData.h"
+#include "GameObjects/Enemy/EnemyBombManager.h"
 #include "GameObjects/Enemy/EnemyBulletManager.h"
 #include "GameObjects/Enemy/EnemyManager.h"
 #include "GameObjects/Player/Player.h"
@@ -11,7 +12,7 @@
 using namespace TinyEngine;
 
 void CollisionManager::CheckCollisions(
-    Player* player, EnemyManager* enemyManager, EnemyBulletManager* enemyBulletManager, Stage* stage, Camera* camera, CommonData* commonData,
+    Player* player, EnemyManager* enemyManager, EnemyBulletManager* enemyBulletManager, EnemyBombManager* enemyBombManager, Stage* stage, Camera* camera, CommonData* commonData,
     std::function<void(const Vector3&)> generateParticleCallback, float& glitchTimer) {
 
 	// ==========================================
@@ -73,7 +74,7 @@ void CollisionManager::CheckCollisions(
 			if (Collision::Intersect(player->GetAttackCol(), glass->GetCollision())) {
 				// ガラス削除
 				stage->GetGlassManager()->RemoveGlass(glass.get());
-				glass->AddGlassesDecal({1,1,1});
+				glass->AddGlassesDecal({1, 1, 1});
 				break;
 			}
 		}
@@ -442,10 +443,26 @@ void CollisionManager::CheckCollisions(
 	// ==========================================
 	// プレイヤーと回復エリアの当たり判定
 	// ==========================================
-	for(const auto& healArea : stage->GetHealAreaManager()->GetHealAreas()){
-		if(Collision::Intersect(player->GetBodyCol(), healArea->GetCollision())){
+	for (const auto& healArea : stage->GetHealAreaManager()->GetHealAreas()) {
+		if (Collision::Intersect(player->GetBodyCol(), healArea->GetCollision())) {
 			player->AllHeal();
 			healArea->SetIsActive(false);
+		}
+	}
+
+	// ==========================================
+	// プレイヤーと敵の爆弾の当たり判定
+	// ==========================================
+	for (auto& bomb : enemyBombManager->GetBombs()) {
+		if (Collision::Intersect(player->GetBodyCol(), bomb->GetBombCollision())) {
+			if (!camera->GetIsShake()) {
+				camera->StartShake(0.1f, 0.1f);
+			}
+
+			if (bomb->IsExploded()) {
+				// プレイヤー死亡
+				player->Damage(3);
+			}
 		}
 	}
 }

@@ -108,6 +108,6 @@ private:
 	std::unique_ptr<ControlUI> controlUI_;
 
 	// カメラ関連
-	float cameraAngle_ = 1.5f; // カメラの傾き
-	float tiltSpeed_ = 7.0f; // 傾くスピード
+	float cameraAngle_ = 2.0f; // カメラの傾き
+	float tiltSpeed_ = 5.0f; // 傾くスピード
 };

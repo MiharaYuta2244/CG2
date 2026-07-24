@@ -1,5 +1,6 @@
 #include "Glass.h"
 #include "ColorPalette.h"
+#include "Random.h"
 
 using namespace TinyEngine;
 int Glass::index = 0;
@@ -8,8 +9,8 @@ Glass::Glass() { id_ = index++; }
 
 void Glass::Initialize(EngineContext* ctx, GlassStatus glassStatus, TinyEngine::DecalManager* decalManager) {
 	transform_.scale = {glassStatus.width, 50.0f, glassStatus.depth};
-	transform_.rotate = {0.0f, 0.0f, 0.0f};
-	transform_.translate = {glassStatus.centerX, 0.0f, glassStatus.centerZ};
+	transform_.rotate = {0, 0, 0};
+	transform_.translate = {glassStatus.centerX, 0.1f, glassStatus.centerZ};
 	glassStatus_ = glassStatus;
 
 	// 生成&初期化
@@ -52,10 +53,7 @@ void Glass::SetGlassStatus(GlassStatus glassStatus) {
 }
 
 void Glass::AddGlassesDecal(Vector3 scale) {
-	Vector3 basePos = transform_.translate;
-	Vector3 finalPos;
-	finalPos.x = basePos.x;
-	finalPos.y = 0.1f;
-	finalPos.z = basePos.z;
-	glassesDecalManager_->AddDecal("glasses.png", finalPos, {std::numbers::pi_v<float> / 2.0f, 0, 0}, scale, ColorPalette::PastelBlue());
+	Vector3 pos = transform_.translate;
+	Vector3 rotate = {std::numbers::pi_v<float> / 2.0f, RandomUtils::RangeFloat(0.0f, std::numbers::pi_v<float>), 0.0f};
+	glassesDecalManager_->AddDecal("white.png", pos, {rotate.x, rotate.y, rotate.z}, scale, ColorPalette::PastelBlue());
 }

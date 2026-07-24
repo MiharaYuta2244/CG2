@@ -10,7 +10,7 @@
 class EnemyBomb {
 public:
 	// 初期化処理
-	void Initialize(EngineContext* ctx, Vector3 pos, Vector3 velocity);
+	void Initialize(EngineContext* ctx, Vector3 pos, Vector3 velocity, Vector3 targetPos);
 
 	// 更新処理
 	void Update(float deltaTime);
@@ -24,6 +24,9 @@ public:
 
 	// 終了フラグGetter
 	bool IsFinished() const { return isFinished_; }
+
+	// 爆発中かどうかGetter
+	bool IsExploded() const { return bombTimer_.IsEnd(); }
 
 private:
 	// 当たり判定の更新
@@ -41,8 +44,9 @@ private:
 	AABB collision_;                         // 本体当たり判定
 	AABB bombCollision_;                     // 爆発時の当たり判定
 	GameTimer bombTimer_;                    // 爆破タイマー
-	Vector3 bombScale_ = {3.0f, 3.0f, 3.0f}; // 爆発のスケール
-	Vector3 velocity_ = {0.0f, 0.0f, 0.0f};  // 移動速度
+	Vector3 bombScale_ = {6.0f, 6.0f, 6.0f}; // 爆発のスケール
+	Vector3 velocity_ = {0.0f, 0.0f, 10.0f}; // 移動速度
 	float damping_ = 3.0f;                   // 減衰率
+	float speed_ = 60.0f;                    // 速度
 	bool isFinished_ = false;                // 削除用フラグ
 };
