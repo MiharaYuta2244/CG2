@@ -265,10 +265,18 @@ void GamePlayScene::Update() {
 		Vector3 playerPos = player_->GetPosition();
 		Vector3 playerRot = player_->GetRotation();
 
-		// ピボット（カメラの位置基準）はプレイヤーにピッタリ合わせる
-		currentCameraPivot_.x = playerPos.x;
+		// プレイヤーの向いている方向ベクトルを計算
+		Vector3 forward = {std::sin(playerRot.y), 0.0f, std::cos(playerRot.y)};
+
+		// 目標のピボット位置
+		Vector3 targetPivot = {playerPos.x + forward.x * offsetDistance_, playerPos.y, playerPos.z + forward.z * offsetDistance_};
+
+		// 線形補間を使ってカメラを滑らかに追従させる
+		float followSpeed = 5.0f;
+		currentCameraPivot_.x += (targetPivot.x - currentCameraPivot_.x) * followSpeed * deltaTime;
 		currentCameraPivot_.y = cameraPosY_;
-		currentCameraPivot_.z = playerPos.z;
+		currentCameraPivot_.z += (targetPivot.z - currentCameraPivot_.z) * followSpeed * deltaTime;
+
 		ctx_.currentCamera->SetPivot(currentCameraPivot_);
 
 		// 進行方向にカメラを傾ける処理
