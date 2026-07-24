@@ -87,44 +87,51 @@ void SceneEditor::UpdateImGui(const SceneContext& ctx, Player* player, float& ca
 	// ギズモ描画レイヤー
 	// =====================================
 	if (selectedGameObject_ != nullptr) {
-		ImGui::SetNextWindowPos(ImVec2(0, 0), ImGuiCond_Always);
-		ImGui::SetNextWindowSize(ImVec2(1280, 720), ImGuiCond_Always);
+		// ウィンドウが折りたたまれている場合は処理をスキップする
+		if (!ImGui::Begin("Game")) {
+			ImGui::End();
+		} else {
+			// Gameウィンドウ内の描画領域サイズと位置を取得
+			ImVec2 windowPos = ImGui::GetWindowPos();
+			ImVec2 contentMin = ImGui::GetWindowContentRegionMin();
+			ImVec2 contentMax = ImGui::GetWindowContentRegionMax();
+			ImVec2 viewPos = ImVec2(windowPos.x + contentMin.x, windowPos.y + contentMin.y);
+			ImVec2 viewSize = ImVec2(contentMax.x - contentMin.x, contentMax.y - contentMin.y);
 
-		ImGui::PushStyleColor(ImGuiCol_WindowBg, ImVec4(0, 0, 0, 0));
-		ImGui::Begin("GizmoLayer", nullptr, ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoInputs | ImGuiWindowFlags_NoScrollbar);
+			// 描画領域のサイズが正常な場合のみImGuizmoの描画を行う
+			if (viewSize.x > 0.0f && viewSize.y > 0.0f) {
+				ImGuizmo::BeginFrame();
+				ImGuizmo::SetOrthographic(false);
+				ImGuizmo::Enable(true);
+				ImGuizmo::SetDrawlist(ImGui::GetWindowDrawList());
 
-		ImGuizmo::BeginFrame();
-		ImGuizmo::SetOrthographic(false);
-		ImGuizmo::Enable(true);
-		ImGuizmo::SetDrawlist(ImGui::GetWindowDrawList());
+				// ImGuizmoの適用範囲をGameウィンドウのコンテンツエリアに設定
+				ImGuizmo::SetRect(viewPos.x, viewPos.y, viewSize.x, viewSize.y);
 
-		float windowWidth = (float)ImGui::GetWindowWidth();
-		float windowHeight = (float)ImGui::GetWindowHeight();
-		ImGuizmo::SetRect(ImGui::GetWindowPos().x, ImGui::GetWindowPos().y, windowWidth, windowHeight);
+				Transform& transform = selectedGameObject_->GetTransform();
+				float degRot[3] = {
+				    transform.rotate.x * 180.0f / std::numbers::pi_v<float>, transform.rotate.y * 180.0f / std::numbers::pi_v<float>, transform.rotate.z * 180.0f / std::numbers::pi_v<float>};
 
-		Transform& transform = selectedGameObject_->GetTransform();
-		float degRot[3] = {transform.rotate.x * 180.0f / std::numbers::pi_v<float>, transform.rotate.y * 180.0f / std::numbers::pi_v<float>, transform.rotate.z * 180.0f / std::numbers::pi_v<float>};
+				float objectMatrix[16];
+				ImGuizmo::RecomposeMatrixFromComponents(&transform.translate.x, degRot, &transform.scale.x, objectMatrix);
+				Matrix4x4 viewMat = ctx.currentCamera->GetViewMatrix();
+				Matrix4x4 projMat = ctx.currentCamera->GetProjection();
 
-		float objectMatrix[16];
-		ImGuizmo::RecomposeMatrixFromComponents(&transform.translate.x, degRot, &transform.scale.x, objectMatrix);
-		Matrix4x4 viewMat = ctx.currentCamera->GetViewMatrix();
-		Matrix4x4 projMat = ctx.currentCamera->GetProjection();
+				ImGuizmo::Manipulate(&viewMat.m[0][0], &projMat.m[0][0], currentGizmoOperation_, currentGizmoMode_, objectMatrix);
 
-		ImGuizmo::Manipulate(&viewMat.m[0][0], &projMat.m[0][0], currentGizmoOperation_, currentGizmoMode_, objectMatrix);
+				if (ImGuizmo::IsUsing()) {
+					float newTrans[3], newRot[3], newScale[3];
+					ImGuizmo::DecomposeMatrixToComponents(objectMatrix, newTrans, newRot, newScale);
 
-		if (ImGuizmo::IsUsing()) {
-			float newTrans[3], newRot[3], newScale[3];
-			ImGuizmo::DecomposeMatrixToComponents(objectMatrix, newTrans, newRot, newScale);
-
-			float oldY = transform.translate.y;
-			transform.translate = {newTrans[0], newTrans[1], newTrans[2]};
-			transform.translate.y = oldY;
-			transform.scale = {newScale[0], newScale[1], newScale[2]};
-			transform.rotate = {newRot[0] * std::numbers::pi_v<float> / 180.0f, newRot[1] * std::numbers::pi_v<float> / 180.0f, newRot[2] * std::numbers::pi_v<float> / 180.0f};
+					float oldY = transform.translate.y;
+					transform.translate = {newTrans[0], newTrans[1], newTrans[2]};
+					transform.translate.y = oldY;
+					transform.scale = {newScale[0], newScale[1], newScale[2]};
+					transform.rotate = {newRot[0] * std::numbers::pi_v<float> / 180.0f, newRot[1] * std::numbers::pi_v<float> / 180.0f, newRot[2] * std::numbers::pi_v<float> / 180.0f};
+				}
+			}
+			ImGui::End();
 		}
-
-		ImGui::End();
-		ImGui::PopStyleColor();
 	}
 #endif // USE_IMGUI
 }
@@ -136,15 +143,35 @@ void SceneEditor::UpdatePicking(const SceneContext& ctx) {
 	}
 
 	if (ctx.keyboard->MouseButtonTriggered(0)) {
-		POINT cursorPos;
-		GetCursorPos(&cursorPos);
-		auto hwnd = ctx.engineContext->object3dCommon->GetDxCommon()->GetWinApp()->GetHWND();
-		ScreenToClient(hwnd, &cursorPos);
+		// ウィンドウが折りたたまれている場合は取得せず終了
+		if (!ImGui::Begin("Game")) {
+			ImGui::End();
+			return;
+		}
 
-		float screenWidth = 1280.0f;
-		float screenHeight = 720.0f;
-		float nx = (2.0f * cursorPos.x) / screenWidth - 1.0f;
-		float ny = 1.0f - (2.0f * cursorPos.y) / screenHeight;
+		ImGui::Begin("Game");
+		ImVec2 mousePos = ImGui::GetMousePos();
+		ImVec2 windowPos = ImGui::GetWindowPos();
+		ImVec2 contentMin = ImGui::GetWindowContentRegionMin();
+		ImVec2 contentMax = ImGui::GetWindowContentRegionMax();
+		ImGui::End();
+
+		// Gameウィンドウ内の実際の描画領域の左上座標とサイズ
+		ImVec2 viewPos = ImVec2(windowPos.x + contentMin.x, windowPos.y + contentMin.y);
+		ImVec2 viewSize = ImVec2(contentMax.x - contentMin.x, contentMax.y - contentMin.y);
+
+		// ウィンドウ内でのローカルマウス座標
+		float localMouseX = mousePos.x - viewPos.x;
+		float localMouseY = mousePos.y - viewPos.y;
+
+		// マウスカーソルがGameウィンドウの描画領域外にある場合はピッキング処理をしない
+		if (localMouseX < 0.0f || localMouseX > viewSize.x || localMouseY < 0.0f || localMouseY > viewSize.y) {
+			return;
+		}
+
+		// デバイス座標系に正規化
+		float nx = (2.0f * localMouseX) / viewSize.x - 1.0f;
+		float ny = 1.0f - (2.0f * localMouseY) / viewSize.y;
 
 		Matrix4x4 viewMat = ctx.currentCamera->GetViewMatrix();
 		Matrix4x4 projMat = ctx.currentCamera->GetProjection();

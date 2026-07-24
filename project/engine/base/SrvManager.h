@@ -30,6 +30,10 @@ public:
 	// テクスチャ枚数上限チェック
 	bool CheckTextureMax();
 
+	// ImGui用　ヒープとインデックス逆引き
+	Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> GetDescriptorHeap() const { return descriptorHeap_; }
+	uint32_t GetIndexFromHandle(D3D12_CPU_DESCRIPTOR_HANDLE handle) const;
+
 private:
 	DirectXCommon* dxCommon_ = nullptr;
 

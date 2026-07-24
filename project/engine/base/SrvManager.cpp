@@ -96,3 +96,7 @@ void SrvManager::SetGraphicsRootDescriptorTable(UINT rootParameterIndex, uint32_
 bool SrvManager::CheckTextureMax() {
 	return useIndex < kMaxSRVCount;
 }
+uint32_t SrvManager::GetIndexFromHandle(D3D12_CPU_DESCRIPTOR_HANDLE handle) const {
+	D3D12_CPU_DESCRIPTOR_HANDLE start = descriptorHeap_->GetCPUDescriptorHandleForHeapStart();
+	return static_cast<uint32_t>((handle.ptr - start.ptr) / descriptorSize_);
+}

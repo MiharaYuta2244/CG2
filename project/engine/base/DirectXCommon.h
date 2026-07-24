@@ -83,6 +83,8 @@ public:
 	uint32_t GetBackBufferHeight() const { return backBufferHeight_; }
 	D3D12_CPU_DESCRIPTOR_HANDLE GetCurrentBackBufferRTV() const { return rtvHandles_[backBufferIndex_]; }
 
+	Microsoft::WRL::ComPtr<ID3D12CommandQueue> GetCommandQueue() const { return commandQueue_; }
+
 public:
 	// 最大SRV数(最大テクスチャ枚数)
 	static const uint32_t kMaxSRVCount;

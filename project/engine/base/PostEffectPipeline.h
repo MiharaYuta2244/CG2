@@ -4,6 +4,7 @@
 #include "TextureManager.h"
 #include "PostEffectPass.h"
 #include "CopyImage.h"
+#include "RenderTexture.h"
 
 class PostEffectPipeline {
 public:
@@ -11,7 +12,7 @@ public:
 
 	void SetEffects(const std::vector<PostEffectType>& types);
 
-	void Excute(DirectXCommon* dxCommon, SrvManager* srvManager, uint32_t inputColorSrv, uint32_t inputDepthSrv);
+	void Excute(DirectXCommon* dxCommon, SrvManager* srvManager, uint32_t inputColorSrv, uint32_t inputDepthSrv, RenderTexture* outputTarget = nullptr);
 
 	TinyEngine::CopyImage* GetPass(PostEffectType type);
 

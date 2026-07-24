@@ -28,7 +28,7 @@ void PostEffectPipeline::SetEffects(const std::vector<PostEffectType>& types) {
 	}
 }
 
-void PostEffectPipeline::Excute(DirectXCommon* dxCommon, SrvManager* srvManager, uint32_t inputColorSrv, uint32_t inputDepthSrv) {
+void PostEffectPipeline::Excute(DirectXCommon* dxCommon, SrvManager* srvManager, uint32_t inputColorSrv, uint32_t inputDepthSrv, RenderTexture* outputTarget) {
 	uint32_t currentColorSrv = inputColorSrv;
 	uint32_t currentDepthSrv = inputDepthSrv;
 
@@ -39,8 +39,11 @@ void PostEffectPipeline::Excute(DirectXCommon* dxCommon, SrvManager* srvManager,
 		if (!isLast) {
 			// 中間バッファへ書き込み開始
 			pass.renderTexture->BeginRender(dxCommon_);
+		} else if (outputTarget) {
+			// Gameパネル用オフスクリーンへ出力
+			outputTarget->BeginRender(dxCommon_);
 		} else {
-			// 最後のパスはスワップチェーンのバックバッファをRTとして復元する
+			// 従来通りバックバッファへ直接出力
 			auto cmd = dxCommon_->GetCommandList();
 			D3D12_CPU_DESCRIPTOR_HANDLE backBufferRTV = dxCommon_->GetCurrentBackBufferRTV();
 			cmd->OMSetRenderTargets(1, &backBufferRTV, false, nullptr);
@@ -55,9 +58,11 @@ void PostEffectPipeline::Excute(DirectXCommon* dxCommon, SrvManager* srvManager,
 
 		if (!isLast) {
 			pass.renderTexture->EndRender(dxCommon_);
-			// 次のパスへ中間バッファを渡す
 			currentColorSrv = pass.renderTexture->GetSRVIndexColor();
 			currentDepthSrv = pass.renderTexture->GetSRVIndexDepth();
+		} else if (outputTarget) {
+			// SRVとして参照できる状態に戻す
+			outputTarget->EndRender(dxCommon_);
 		}
 	}
 }

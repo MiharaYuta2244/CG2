@@ -59,6 +59,10 @@ void Framework::Initialize() {
 	// RenderTexture
 	renderTexture_->Initialize(dxCommon_.get(), srvManager_.get(), WinApp::kClientWidth, WinApp::kClientHeight);
 
+	// Gameパネル用
+	gameViewRenderTexture_ = std::make_unique<RenderTexture>();
+	gameViewRenderTexture_->Initialize(dxCommon_.get(), srvManager_.get(), WinApp::kClientWidth, WinApp::kClientHeight);
+
 	// PostEffectPipeline
 	postEffectPipeline_ = std::make_unique<PostEffectPipeline>();
 	postEffectPipeline_->Inititlize(dxCommon_.get(), srvManager_.get(), textureManager_.get());
@@ -66,7 +70,8 @@ void Framework::Initialize() {
 
 #ifdef USE_IMGUI
 	// ImGuiManager
-	imGuiManager_->Initialize(dxCommon_->GetWinApp()->GetHWND(), dxCommon_->GetDevice(), dxCommon_->GetSwapChainDescBufferCount(), dxCommon_->GetRtvFormat(), dxCommon_->GetSrvDescriptorHeap().Get());
+	imGuiManager_->Initialize(
+	    dxCommon_->GetWinApp()->GetHWND(), dxCommon_->GetDevice(), dxCommon_->GetCommandQueue(), dxCommon_->GetSwapChainDescBufferCount(), dxCommon_->GetRtvFormat(), srvManager_.get());
 
 	// ImGuiの色変更
 	ImGuiStyle& style = ImGui::GetStyle();
@@ -125,6 +130,14 @@ void Framework::Update() {
 #ifdef USE_IMGUI
 	// ImGui前処理
 	imGuiManager_->BeginFrame();
+	imGuiManager_->BeginDockSpace();
+
+	// 先にGameウィンドウにテクスチャを敷いておく
+	ImGui::Begin("Game");
+	ImVec2 panelSize = ImGui::GetContentRegionAvail();
+	ImTextureID gameTexId = (ImTextureID)srvManager_->GetGPUDescriptorHandle(gameViewRenderTexture_->GetSRVIndexColor()).ptr;
+	ImGui::Image(gameTexId, panelSize);
+	ImGui::End();
 #endif
 
 	// デバッグカメラ更新
@@ -179,11 +192,30 @@ void Framework::PostDraw() {
 	// SRVヒープをコマンドリストにセットするための前処理
 	SRVManagerPreDraw();
 
+#if USE_IMGUI
+	// RenderTextureからSwapChainへコピー
+	postEffectPipeline_->Excute(dxCommon_.get(), srvManager_.get(), renderTexture_->GetSRVIndexColor(), renderTexture_->GetSRVIndexDepth(), gameViewRenderTexture_.get());
+
+	// レンダーターゲットをバックバッファに戻す
+	auto cmd = dxCommon_->GetCommandList();
+	D3D12_CPU_DESCRIPTOR_HANDLE backBufferRTV = dxCommon_->GetCurrentBackBufferRTV();
+	cmd->OMSetRenderTargets(1, &backBufferRTV, false, nullptr);
+
+	// ビューポートとシザー矩形もバックバッファのサイズに合わせる
+	D3D12_VIEWPORT vp = dxCommon_->CreateViewport();
+	D3D12_RECT sc = dxCommon_->CreateScissor();
+	cmd->RSSetViewports(1, &vp);
+	cmd->RSSetScissorRects(1, &sc);
+
+#else
 	// RenderTextureからSwapChainへコピー
 	postEffectPipeline_->Excute(dxCommon_.get(), srvManager_.get(), renderTexture_->GetSRVIndexColor(), renderTexture_->GetSRVIndexDepth());
+#endif
+
 
 	// ImGuiの内部コマンドを生成する
 #ifdef USE_IMGUI
+	imGuiManager_->EndDockSpace();
 	imGuiManager_->Render(dxCommon_->GetCommandList());
 #endif
 

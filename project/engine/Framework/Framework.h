@@ -130,6 +130,9 @@ private:
 	// RenderTexture
 	std::unique_ptr<RenderTexture> renderTexture_;
 
+	// Gameパネル表示用
+	std::unique_ptr<RenderTexture> gameViewRenderTexture_;
+
 	// PostEffectPipeline
 	std::unique_ptr<PostEffectPipeline> postEffectPipeline_;
 
