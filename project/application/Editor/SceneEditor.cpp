@@ -57,7 +57,7 @@ void SceneEditor::UpdateImGui(const SceneContext& ctx, Player* player, float& ca
 	ImGui::Separator();
 
 	ImGui::Text("Objects");
-	ImGui::BeginChild("ObjectList", ImVec2(0, 150), true);
+	ImGui::BeginChild("ObjectList", ImVec2(0, 400), true);
 	for (size_t i = 0; i < objects_.size(); ++i) {
 		IGameObject* obj = objects_[i];
 		std::string label = obj->GetName() + " ##" + std::to_string(i);
@@ -77,10 +77,10 @@ void SceneEditor::UpdateImGui(const SceneContext& ctx, Player* player, float& ca
 	if (ImGui::Button("Kill Player")) {
 		player->Damage(player->GetMaxHP());
 	}
-	ImGui::DragFloat("CameraPosY", &cameraPosY, 0.1f);
+
 	ImGui::DragFloat3("Direction", &ctx.engineContext->object3dCommon->GetDirectionalLight().direction.x, 0.01f);
-	ImGui::DragFloat3("Color", &ctx.engineContext->object3dCommon->GetDirectionalLight().color.x, 0.01f);
-	ImGui::DragFloat3("Intensity", &ctx.engineContext->object3dCommon->GetDirectionalLight().intensity, 0.01f);
+	ImGui::ColorEdit4("Color", &ctx.engineContext->object3dCommon->GetDirectionalLight().color.x);
+	ImGui::DragFloat("Intensity", &ctx.engineContext->object3dCommon->GetDirectionalLight().intensity, 0.01f);
 	ImGui::End();
 
 	// =====================================

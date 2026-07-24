@@ -99,6 +99,9 @@ public:
 	bool GetIsGrabTriggerd() const { return isGrabTriggered_; }
 	void SetIsGrabTriggerd(bool isGrabTriggered) { isGrabTriggered_ = isGrabTriggered; }
 
+	// ImGui描画
+	void DrawImGui();
+
 private:
 	// 当たり判定の更新処理
 	void UpdateCollision();
@@ -193,4 +196,11 @@ private:
 	// アクション（攻撃・投げ）アニメーションの管理用
 	bool isActionAnimating_ = false;
 	float actionAnimTimer_ = 0.0f;
+
+	// ポイントライト調整用パラメータ
+	float pointLightHeightOffset_ = 2.0f;                // プレイヤー中心からの高さ
+	Vector4 pointLightColor_ = {1.0f, 1.0f, 1.0f, 1.0f}; // ライトの色
+	float pointLightIntensity_ = 1.0f;                   // 輝度
+	float pointLightRadius_ = 7.0f;                     // 影響半径
+	float pointLightDecay_ = 0.7f;                       // 減衰率
 };

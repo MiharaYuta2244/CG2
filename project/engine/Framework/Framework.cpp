@@ -69,14 +69,83 @@ void Framework::Initialize() {
 	postEffectPipeline_->SetEffects({PostEffectType::FullScreen});
 
 #ifdef USE_IMGUI
-	// ImGuiManager
+	// ImGuiManagerの初期化
 	imGuiManager_->Initialize(
 	    dxCommon_->GetWinApp()->GetHWND(), dxCommon_->GetDevice(), dxCommon_->GetCommandQueue(), dxCommon_->GetSwapChainDescBufferCount(), dxCommon_->GetRtvFormat(), srvManager_.get());
 
-	// ImGuiの色変更
+	// ====== サイバーパンク風 カスタムスタイル（シアン × イエロー） ======
 	ImGuiStyle& style = ImGui::GetStyle();
-	style.Colors[ImGuiCol_WindowBg] = ImVec4(0.1f, 0.1f, 0.1f, 1.0f);
-	style.Colors[ImGuiCol_Text] = ImVec4(0.9f, 0.9f, 0.9f, 1.0f);
+
+	// 1. エッジをシャープに（ハイテクな無骨さを強調）
+	style.WindowRounding = 0.0f;
+	style.ChildRounding = 0.0f;
+	style.FrameRounding = 0.0f;
+	style.PopupRounding = 0.0f;
+	style.ScrollbarRounding = 0.0f;
+	style.GrabRounding = 0.0f;
+	style.TabRounding = 0.0f;
+
+	// 2. ボーダー（枠線）の太さを設定
+	style.WindowBorderSize = 1.0f;
+	style.FrameBorderSize = 1.0f;
+	style.PopupBorderSize = 1.0f;
+
+	// 3. カラー設定
+	ImVec4* colors = style.Colors;
+
+	// テキスト（少し青みがかった白で視認性を確保）
+	colors[ImGuiCol_Text] = ImVec4(0.9f, 0.95f, 1.0f, 1.0f);
+	colors[ImGuiCol_TextDisabled] = ImVec4(0.3f, 0.4f, 0.5f, 1.0f);
+
+	// 背景（深く沈んだネイビー系ダークグレー）
+	colors[ImGuiCol_WindowBg] = ImVec4(0.03f, 0.04f, 0.05f, 0.95f);
+	colors[ImGuiCol_ChildBg] = ImVec4(0.03f, 0.04f, 0.05f, 0.95f);
+	colors[ImGuiCol_PopupBg] = ImVec4(0.03f, 0.04f, 0.05f, 0.95f);
+
+	// 枠線（メインカラーのシアンで発光させる）
+	colors[ImGuiCol_Border] = ImVec4(0.0f, 0.8f, 0.8f, 0.6f);
+	colors[ImGuiCol_BorderShadow] = ImVec4(0.0f, 0.0f, 0.0f, 0.0f);
+
+	// フレーム（入力欄などの背景）
+	colors[ImGuiCol_FrameBg] = ImVec4(0.0f, 0.2f, 0.3f, 0.8f);
+	colors[ImGuiCol_FrameBgHovered] = ImVec4(0.0f, 0.4f, 0.5f, 0.8f);
+	colors[ImGuiCol_FrameBgActive] = ImVec4(0.8f, 0.8f, 0.0f, 0.6f); // 入力時はイエローのアクセント
+
+	// タイトルバー
+	colors[ImGuiCol_TitleBg] = ImVec4(0.02f, 0.02f, 0.03f, 1.0f);
+	colors[ImGuiCol_TitleBgActive] = ImVec4(0.0f, 0.4f, 0.5f, 1.0f);
+	colors[ImGuiCol_TitleBgCollapsed] = ImVec4(0.0f, 0.0f, 0.0f, 0.5f);
+
+	// スクロールバー
+	colors[ImGuiCol_ScrollbarBg] = ImVec4(0.02f, 0.02f, 0.03f, 0.5f);
+	colors[ImGuiCol_ScrollbarGrab] = ImVec4(0.0f, 0.3f, 0.4f, 1.0f);
+	colors[ImGuiCol_ScrollbarGrabHovered] = ImVec4(0.0f, 0.5f, 0.6f, 1.0f);
+	colors[ImGuiCol_ScrollbarGrabActive] = ImVec4(1.0f, 1.0f, 0.0f, 1.0f); // スクロール中はイエロー
+
+	// ボタン（通常: 暗いシアン、ホバー: 明るいシアン、クリック: イエロー）
+	colors[ImGuiCol_Button] = ImVec4(0.0f, 0.3f, 0.4f, 1.0f);
+	colors[ImGuiCol_ButtonHovered] = ImVec4(0.0f, 0.5f, 0.6f, 1.0f);
+	colors[ImGuiCol_ButtonActive] = ImVec4(1.0f, 1.0f, 0.0f, 1.0f); // クリック時にイエローが弾ける
+
+	// ヘッダー / 選択リスト（SceneEditorのオブジェクトリスト等）
+	colors[ImGuiCol_Header] = ImVec4(0.0f, 0.4f, 0.5f, 1.0f);
+	colors[ImGuiCol_HeaderHovered] = ImVec4(0.0f, 0.6f, 0.7f, 1.0f);
+	colors[ImGuiCol_HeaderActive] = ImVec4(1.0f, 1.0f, 0.0f, 0.8f); // 選択決定時にイエロー
+
+	// タブ
+	colors[ImGuiCol_Tab] = ImVec4(0.0f, 0.2f, 0.3f, 1.0f);
+	colors[ImGuiCol_TabHovered] = ImVec4(0.0f, 0.5f, 0.6f, 1.0f);
+	colors[ImGuiCol_TabActive] = ImVec4(0.0f, 0.4f, 0.5f, 1.0f);
+	colors[ImGuiCol_TabUnfocused] = ImVec4(0.0f, 0.1f, 0.15f, 1.0f);
+	colors[ImGuiCol_TabUnfocusedActive] = ImVec4(0.0f, 0.2f, 0.3f, 1.0f);
+
+	// アクセントパーツ（チェックマークやスライダーのつまみは常にイエロー）
+	colors[ImGuiCol_CheckMark] = ImVec4(1.0f, 1.0f, 0.0f, 1.0f);
+	colors[ImGuiCol_SliderGrab] = ImVec4(0.8f, 0.8f, 0.0f, 1.0f);
+	colors[ImGuiCol_SliderGrabActive] = ImVec4(1.0f, 1.0f, 0.0f, 1.0f);
+	colors[ImGuiCol_ResizeGrip] = ImVec4(1.0f, 1.0f, 0.0f, 0.3f);
+	colors[ImGuiCol_ResizeGripHovered] = ImVec4(1.0f, 1.0f, 0.0f, 0.7f);
+	colors[ImGuiCol_ResizeGripActive] = ImVec4(1.0f, 1.0f, 0.0f, 1.0f);
 #endif
 
 	// テクスチャマネージャー

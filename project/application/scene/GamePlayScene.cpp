@@ -19,6 +19,13 @@ void GamePlayScene::Initialize(const SceneContext& ctx) {
 	// プレイヤーの生成
 	player_ = std::make_unique<Player>();
 
+	// ライトの設定
+	DirectionalLight dirLight;
+	dirLight.color = {1,1,1,1};
+	dirLight.intensity = 2.0f;
+	dirLight.direction = {0.5f, 0.5f, -0.5f};
+	ctx.engineContext->object3dCommon->SetDirectionalLightParam(dirLight);
+
 	// メインカメラ
 	mainCamera_ = std::make_unique<Camera>();
 	mainCamera_->Initialize();
@@ -219,6 +226,9 @@ void GamePlayScene::Update() {
 	// 操作方法UIの更新&ImGui
 	controlUI_->Update();
 	controlUI_->DrawImGui();
+
+	// プレイヤーのImGui
+	player_->DrawImGui();
 
 	// 毎フレームオブジェクトリストを生成してシーンエディターに渡す
 	std::vector<IGameObject*> editObjects;

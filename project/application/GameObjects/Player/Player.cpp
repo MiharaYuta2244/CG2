@@ -141,6 +141,20 @@ void Player::Update(float deltaTime, DirectInput* input, GamePad* gamePad, Enemy
 	// HP管理用インスタンスImGui
 	hp_->DrawImGui();
 
+	if (ctx_ && ctx_->object3dCommon) {
+		PointLight pointLight = ctx_->object3dCommon->GetPointLight();
+
+		// パラメータ
+		pointLight.position = transform_.translate;
+		pointLight.position.y += pointLightHeightOffset_;
+		pointLight.color = pointLightColor_;
+		pointLight.intensity = pointLightIntensity_;
+		pointLight.radius = pointLightRadius_;
+		pointLight.decay = pointLightDecay_;
+
+		ctx_->object3dCommon->SetPointLightParam(pointLight);
+	}
+
 	// 衝突判定のために、移動後の座標で仮のAABBの更新
 	UpdateCollision();
 
@@ -529,4 +543,18 @@ void Player::GenerateHealEffect() {
 	for (auto& effect : healEffects_) {
 		effect->SetFollowTarget(true);
 	}
+}
+
+void Player::DrawImGui() {
+#ifdef USE_IMGUI
+	ImGui::Begin("Player PointLight");
+
+	ImGui::DragFloat("Height Offset", &pointLightHeightOffset_, 0.1f, -5.0f, 10.0f);
+	ImGui::ColorEdit4("Color", &pointLightColor_.x);
+	ImGui::DragFloat("Intensity", &pointLightIntensity_, 0.05f, 0.0f, 20.0f);
+	ImGui::DragFloat("Radius", &pointLightRadius_, 0.5f, 0.0f, 100.0f);
+	ImGui::DragFloat("Decay", &pointLightDecay_, 0.05f, 0.0f, 10.0f);
+
+	ImGui::End();
+#endif
 }
