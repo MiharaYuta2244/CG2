@@ -173,7 +173,6 @@ xcopy /E /I /Y "$(ProjectDir)resources" "$(OutDir)resources"
     <ClCompile Include="application\GameObjects\StageObjects\Door\Door.cpp" />
     <ClCompile Include="application\Cinematic\CameraDeathZoomController.cpp" />
     <ClCompile Include="application\GameObjects\Effect\DecideEffect.cpp" />
-    <ClCompile Include="application\GameObjects\StageObjects\Door\DoorManager.cpp" />
     <ClCompile Include="application\GameObjects\StageObjects\Cage\Cage.cpp" />
     <ClCompile Include="application\GameObjects\StageObjects\Cage\CageManager.cpp" />
     <ClCompile Include="application\Collision\CollisionManager.cpp" />
@@ -258,6 +257,7 @@ xcopy /E /I /Y "$(ProjectDir)resources" "$(OutDir)resources"
     <ClCompile Include="engine\3d\particle\modules\HealCrossModule.cpp" />
     <ClCompile Include="engine\3d\particle\modules\HealLineModule.cpp" />
     <ClCompile Include="engine\3d\particle\modules\HealSphereModule.cpp" />
+    <ClCompile Include="application\GameObjects\GameObjectManager.cpp" />
     <ClCompile Include="main.cpp">
       <Optimization Condition="'$(Configuration)|$(Platform)'=='Development|x64'">MaxSpeed</Optimization>
       <WholeProgramOptimization Condition="'$(Configuration)|$(Platform)'=='Development|x64'">true</WholeProgramOptimization>
@@ -289,7 +289,6 @@ xcopy /E /I /Y "$(ProjectDir)resources" "$(OutDir)resources"
     <ClCompile Include="application\GameObjects\ObjectRender\ObjectRender.cpp" />
     <ClCompile Include="application\GameObjects\Player\PlayerHealth.cpp" />
     <ClCompile Include="application\GameObjects\StageObjects\Wall\Wall.cpp" />
-    <ClCompile Include="application\GameObjects\StageObjects\Wall\WallManager.cpp" />
     <ClCompile Include="application\GameObjects\Player\PlayerHPGauge.cpp" />
     <ClCompile Include="application\Menu\MenuList.cpp" />
     <ClCompile Include="application\Scene\PauseScene.cpp" />
@@ -313,6 +312,7 @@ xcopy /E /I /Y "$(ProjectDir)resources" "$(OutDir)resources"
     <ClCompile Include="application\Editor\SceneEditor.cpp" />
     <ClCompile Include="application\GameObjects\StageObjects\Stage.cpp" />
     <ClCompile Include="application\GameObjects\StageObjects\HealArea\HealArea.cpp" />
+    <ClCompile Include="application\GameObjects\PlaceableObject.cpp" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="resources\shaders\Object3d.PS.hlsl">
@@ -390,10 +390,7 @@ xcopy /E /I /Y "$(ProjectDir)resources" "$(OutDir)resources"
     <ClInclude Include="application\GameObjects\StageObjects\Door\Door.h" />
     <ClInclude Include="application\Cinematic\CameraDeathZoomController.h" />
     <ClInclude Include="application\GameObjects\Effect\DecideEffect.h" />
-    <ClInclude Include="application\GameObjects\StageObjects\Door\DoorManager.h" />
-    <ClInclude Include="application\GameObjects\StageObjects\Door\DoorStatus.h" />
     <ClInclude Include="application\GameObjects\StageObjects\Glass\GlassStatus.h" />
-    <ClInclude Include="application\GameObjects\StageObjects\Wall\WallStatus.h" />
     <ClInclude Include="application\GameObjects\StageObjects\Cage\Cage.h" />
     <ClInclude Include="application\GameObjects\StageObjects\Cage\CageManager.h" />
     <ClInclude Include="application\Collision\CollisionManager.h" />
@@ -517,7 +514,6 @@ xcopy /E /I /Y "$(ProjectDir)resources" "$(OutDir)resources"
     <ClInclude Include="application\GameObjects\Player\PlayerHealth.h" />
     <ClInclude Include="engine\base\utility\gameTimer\GameTimer.h" />
     <ClInclude Include="application\GameObjects\StageObjects\Wall\Wall.h" />
-    <ClInclude Include="application\GameObjects\StageObjects\Wall\WallManager.h" />
     <ClInclude Include="application\GameObjects\StageObjects\Goal\Goal.h" />
     <ClInclude Include="application\GameObjects\Player\PlayerHPGauge.h" />
     <ClInclude Include="engine\tool\json\JsonManager.h" />
@@ -557,6 +553,8 @@ xcopy /E /I /Y "$(ProjectDir)resources" "$(OutDir)resources"
     <ClInclude Include="engine\3d\particle\modules\HealCrossModule.h" />
     <ClInclude Include="engine\3d\particle\modules\HealLineModule.h" />
     <ClInclude Include="engine\3d\particle\modules\HealSphereModule.h" />
+    <ClInclude Include="application\GameObjects\PlaceableObject.h" />
+    <ClInclude Include="application\GameObjects\GameObjectManager.h" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="externals\imgui\LICENSE.txt" />

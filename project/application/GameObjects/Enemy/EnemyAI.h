@@ -2,15 +2,19 @@
 #include "AABB.h"
 #include "EnemyBullet.h"
 #include "EnemyType.h"
-#include "GameObjects/StageObjects/Door/DoorManager.h"
+#include "GameObjects/GameObjectManager.h"
 #include "GameObjects/StageObjects/Glass/GlassManager.h"
-#include "GameObjects/StageObjects/Wall/WallManager.h"
+#include "GameObjects/StageObjects/Wall/Wall.h"
+#include "GameObjects/StageObjects/Door/Door.h"
 #include "Transform.h"
 #include <vector>
 
 class EnemyBulletManager;
 class EnemyBombManager;
 class Player;
+
+using WallManager = GameObjectManager<Wall>;
+using DoorManager = GameObjectManager<Door>;
 
 struct Visionparam {
 	float radius;

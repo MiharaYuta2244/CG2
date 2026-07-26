@@ -19,6 +19,6 @@ public:
 	/// すべての当たり判定をチェックして応答処理を行う
 	/// </summary>
 	void CheckCollisions(
-	    Player* player, EnemyManager* enemyManager, EnemyBulletManager* enemyBulletManager, EnemyBombManager * enemyBombManager, Stage * stage, Camera* camera, CommonData* commonData,
+	    Player* player, EnemyManager* enemyManager, EnemyBulletManager* enemyBulletManager, EnemyBombManager* enemyBombManager, Stage* stage, Camera* camera, CommonData* commonData,
 	    std::function<void(const Vector3&)> generateParticleCallback, float& glitchTimer);
 };

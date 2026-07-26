@@ -5,11 +5,9 @@ int Door::index = 0;
 
 Door::Door() { id_ = index++; }
 
-void Door::Initialize(EngineContext* ctx, DoorStatus doorStatus) {
-	transform_.scale = {doorStatus.width, 49.0f, doorStatus.depth};
-	transform_.rotate = {0.0f, doorStatus.rotateY, 0.0f};
-	transform_.translate = {doorStatus.centerX, 0.0f, doorStatus.centerZ};
-	doorStatus_ = doorStatus;
+void Door::Initialize(EngineContext* ctx, const Transform& transform) {
+	transform_ = transform;
+	transform_.scale.y = 49.0f;
 
 	// 描画用インスタンス生成&初期化
 	for (int i = 0; i < renders_.size(); ++i) {
@@ -91,15 +89,6 @@ void Door::Draw() {
 	for (const auto& render : renders_) {
 		render->Draw();
 	}
-}
-
-void Door::SetDoorStatus(DoorStatus doorStatus) {
-	transform_.scale.x = doorStatus.width;
-	transform_.scale.z = doorStatus.depth;
-	transform_.translate.x = doorStatus.centerX;
-	transform_.translate.z = doorStatus.centerZ;
-	transform_.rotate.y = doorStatus.rotateY;
-	doorStatus_ = doorStatus;
 }
 
 void Door::CulcTransform() {

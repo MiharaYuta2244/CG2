@@ -1,5 +1,4 @@
 #include "AStarPathfinder.h"
-#include "GameObjects/StageObjects/Wall/WallManager.h"
 #include <algorithm>
 #include <cmath>
 
@@ -160,7 +159,7 @@ float AStarPathfinder::GetDistance(PathNode* nodeA, PathNode* nodeB) {
 }
 
 bool AStarPathfinder::CheckWalkable(const Vector3& nodePos, float nodeRadius, WallManager* wallManager) {
-	const auto& walls = wallManager->GetWalls();
+	const auto& walls = wallManager->GetObjects();
 
 	// マス目の2D AABB（Y軸を無視したXとZの四角形）
 	float minX = nodePos.x - nodeRadius;

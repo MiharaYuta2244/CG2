@@ -1,13 +1,16 @@
 #pragma once
 #include "Cage/CageManager.h"
-#include "Door/DoorManager.h"
+#include "GameObjects/GameObjectManager.h"
 #include "Glass/GlassManager.h"
 #include "Goal/Goal.h"
 #include "Ground/Ground.h"
-#include "SceneContext.h"
-#include "Wall/WallManager.h"
 #include "HealArea/HealAreaManager.h"
+#include "SceneContext.h"
+//#include "GameObjects/StageObjects/Door/Door.h"
 #include <memory>
+
+using WallManager = GameObjectManager<Wall>;
+using DoorManager = GameObjectManager<Door>;
 
 /// <summary>
 /// ステージ構成要素を統括するクラス

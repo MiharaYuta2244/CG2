@@ -3,8 +3,6 @@
 #include "EnemyBulletManager.h"
 #include "GameObjects/Effect/EffectGenerator.h"
 #include "GameObjects/Player/Player.h"
-#include "GameObjects/Stageobjects/Door/DoorManager.h"
-#include "GameObjects/Stageobjects/Wall/WallManager.h"
 #include "ColorPalette.h"
 
 using namespace TinyEngine;
@@ -136,7 +134,7 @@ void Enemy::Update(float deltaTime, Player* player, EnemyBulletManager* enemyBul
 	// 視界
 	visionCone_->SetTranslate(transform_.translate);
 	visionCone_->SetRotate(transform_.rotate);
-	visionCone_->Update(wallManager->GetWalls(), doorManager->GetDoors(), glassManager->GetGlasses());
+	visionCone_->Update(wallManager->GetObjects(), doorManager->GetObjects(), glassManager->GetGlasses());
 
 	// 敵AIの状態を記録
 	lastState = ai_->GetState();

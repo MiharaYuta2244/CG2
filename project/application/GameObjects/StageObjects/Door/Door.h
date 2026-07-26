@@ -1,34 +1,27 @@
 #pragma once
 #include "AABB.h"
 #include "AnimationBundle.h"
-#include "GameObjects/IGameObject.h"
 #include "GameObjects/ObjectRender/ObjectRender.h"
-#include "DoorStatus.h"
+#include "GameObjects/PlaceableObject.h"
 
 /// <summary>
 /// ステージに配置するドア
 /// </summary>
-class Door : public IGameObject {
+class Door : public PlaceableObject {
 public:
 	Door();
 
 	// 初期化処理
-	void Initialize(EngineContext* ctx, DoorStatus doorStatus);
+	void Initialize(EngineContext* ctx, const Transform& transform);
 
 	// 更新処理
 	void Update(float deltaTime, Vector3 playerPos);
 
 	// 描画処理
-	void Draw();
+	void Draw() override;
 
 	// 当たり判定Getter
 	AABB GetCollision() const { return collision_; }
-
-	// DoorStatusのSetter
-	void SetDoorStatus(DoorStatus doorStatus);
-
-	// DoorStatusのGetter
-	DoorStatus& GetDoorStatus() { return doorStatus_; }
 
 	// ギズモ用
 	std::string GetName() const override { return "Door(" + std::to_string(id_) + ")"; }
@@ -45,7 +38,6 @@ private:
 
 private:
 	AABB collision_{}; // 当たり判定
-	DoorStatus doorStatus_{};
 	Vector4 color_ = {0.1f, 0.1f, 0.18f, 1.0f};
 	float time_ = 0.0f;
 	Vector2 collisionSize_ = {4.0f, 4.0f};

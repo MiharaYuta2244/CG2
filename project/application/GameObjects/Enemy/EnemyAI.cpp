@@ -110,7 +110,7 @@ void EnemyAI::UpdateNormal(float deltaTime, Player* player, WallManager* wallMan
 			checkPos.z += patrolDir_.z * checkDistance;
 
 			bool isHitWall = false;
-			const auto& walls = wallManager->GetWalls();
+			const auto& walls = wallManager->GetObjects();
 			for (const auto& wall : walls) {
 				if (IsSegmentIntersectAABB(transform_->translate, checkPos, wall->GetCollision())) {
 					isHitWall = true;
@@ -272,7 +272,7 @@ bool EnemyAI::CheckPlayerInVision(Player* player, WallManager* wallManager, Door
 
 	// 遮蔽物判定（レイキャスト / 線分とAABB）
 	// 壁マネージャーから全ての壁を取得し、間に壁がないかチェック
-	const auto& walls = wallManager->GetWalls();
+	const auto& walls = wallManager->GetObjects();
 	for (const auto& wall : walls) {
 		AABB wallCol = wall->GetCollision();
 		if (IsSegmentIntersectAABB(enemyPos, playerPos, wallCol)) {
@@ -281,7 +281,7 @@ bool EnemyAI::CheckPlayerInVision(Player* player, WallManager* wallManager, Door
 	}
 
 	// ドア
-	const auto& doors = doorManager->GetDoors();
+	const auto& doors = doorManager->GetObjects();
 	for (const auto& door : doors) {
 		if (!door->GetIsOpen()) {
 			AABB doorCol = door->GetCollision();

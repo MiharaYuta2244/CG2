@@ -86,7 +86,7 @@ void CollisionManager::CheckCollisions(
 	AABB playerAABB = player->GetBodyCol();
 	Vector3 playerPos = player->GetPosition();
 
-	for (const auto& wall : stage->GetWallManager()->GetWalls()) {
+	for (const auto& wall : stage->GetWallManager()->GetObjects()) {
 		AABB wallAABB = wall->GetCollision();
 
 		// AABB同士の交差判定
@@ -243,7 +243,7 @@ void CollisionManager::CheckCollisions(
 		AABB enemyAABB = enemy->GetBodyCol();
 		Vector3 enemyPos = enemy->GetPos();
 
-		for (const auto& wall : stage->GetWallManager()->GetWalls()) {
+		for (const auto& wall : stage->GetWallManager()->GetObjects()) {
 			AABB wallAABB = wall->GetCollision();
 
 			// AABB同士の交差判定
@@ -304,7 +304,7 @@ void CollisionManager::CheckCollisions(
 	// 敵とドアの当たり判定
 	// =========================================================
 	for (auto& enemy : enemyManager->GetEnemies()) {
-		for (auto& door : stage->GetDoorManager()->GetDoors()) {
+		for (auto& door : stage->GetDoorManager()->GetObjects()) {
 			AABB wallAABB = door->GetCollision();
 			AABB enemyAABB = enemy->GetBodyCol();
 			Vector3 enemyPos = enemy->GetPos();

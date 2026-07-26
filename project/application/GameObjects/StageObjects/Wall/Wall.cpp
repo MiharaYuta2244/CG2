@@ -4,18 +4,15 @@ int Wall::index = 0;
 
 Wall::Wall() { id_ = index++; }
 
-void Wall::Initialize(EngineContext* ctx, WallStatus wallStatus) {
-	transform_.scale = {wallStatus.width, 50.0f, wallStatus.depth};
-	transform_.rotate = {0.0f, 0.0f, 0.0f};
-	transform_.translate = {wallStatus.centerX, 0.0f, wallStatus.centerZ};
-	wallStatus_ = wallStatus;
+void Wall::Initialize(EngineContext* ctx, const Transform& transform) {
+	transform_ = transform;
+	transform_.scale.y = 50.0f;
 
 	// 描画用インスタンス生成&初期化
 	render_ = std::make_unique<ObjectRender>();
 	render_->Initialize(ctx, "Cube.obj");
 	render_->SetTransform(transform_);
 	render_->SetColor(color_);
-	//render_->SetEnableLighting(false);
 	render_->SetEnableNoise(true);
 }
 
@@ -39,12 +36,4 @@ void Wall::Update(float deltaTime) {
 void Wall::Draw() {
 	// 描画
 	render_->Draw();
-}
-
-void Wall::SetWallStatus(WallStatus wallStatus) {
-	transform_.scale.x = wallStatus.width;
-	transform_.scale.z = wallStatus.depth;
-	transform_.translate.x = wallStatus.centerX;
-	transform_.translate.z = wallStatus.centerZ;
-	wallStatus_ = wallStatus;
 }

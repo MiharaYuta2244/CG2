@@ -1,8 +1,10 @@
 #pragma once
 #include "Vector3.h"
 #include <vector>
+#include "GameObjects/GameObjectManager.h"
+#include "GameObjects/StageObjects/Wall/Wall.h"
 
-class WallManager;
+using WallManager = GameObjectManager<Wall>;
 
 // 1つのマス目を表す構造体
 struct PathNode {

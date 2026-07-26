@@ -12,8 +12,8 @@
 
 class EnemyBulletManager;
 class Player;
-class WallManager;
-class DoorManager;
+
+using DoorManager = GameObjectManager<Door>;
 
 /// <summary>
 /// 敵クラス

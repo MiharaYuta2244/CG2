@@ -8,11 +8,23 @@ void Stage::Initialize(const SceneContext& ctx, TinyEngine::DecalManager* decalM
 
 	// 壁の管理インスタンス生成&初期化
 	wallManager_ = std::make_unique<WallManager>();
-	wallManager_->Initialize(ctx.engineContext);
+	wallManager_->Initialize(
+	    ctx.engineContext, "WallEditor", "Walls.json",
+	    Transform{
+	        {1, 50, 1},
+            {0, 0,  0},
+            {0, 0,  0}
+    });
 
 	// ドアの管理インスタンス生成&初期化
 	doorManager_ = std::make_unique<DoorManager>();
-	doorManager_->Initialize(ctx.engineContext);
+	doorManager_->Initialize(
+	    ctx.engineContext, "DoorEditor", "Doors.json",
+	    Transform{
+	        {1, 49, 1},
+            {0, 0,  0},
+            {0, 0,  0}
+    });
 
 	// ガラスの管理インスタンス生成&初期化
 	glassManager_ = std::make_unique<GlassManager>();

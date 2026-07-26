@@ -237,10 +237,10 @@ void GamePlayScene::Update() {
 	for (auto& enemy : enemyManager_->GetEnemies()) {
 		editObjects.push_back(enemy.get());
 	}
-	for (auto& wall : stage_->GetWallManager()->GetWalls()) {
+	for (auto& wall : stage_->GetWallManager()->GetObjects()) {
 		editObjects.push_back(wall.get());
 	}
-	for (auto& door : stage_->GetDoorManager()->GetDoors()) {
+	for (auto& door : stage_->GetDoorManager()->GetObjects()) {
 		editObjects.push_back(door.get());
 	}
 	for (auto& glass : stage_->GetGlassManager()->GetGlasses()) {

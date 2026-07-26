@@ -6,8 +6,8 @@
 
 class Player;
 class EnemyBulletManager;
-class WallManager;
-class DoorManager;
+
+using DoorManager = GameObjectManager<Door>;
 
 struct EnemyData {
 	Vector3 pos;
