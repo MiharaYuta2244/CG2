@@ -95,4 +95,31 @@ void Stage::DrawImGui() {
 	glassManager_->DrawImGui();
 	cageManager_->DrawImGui();
 	healAreaManager_->DrawImGui();
+
+#ifdef USE_IMGUI
+	ImGui::Begin("StageObject Add Buttons");
+	ImGui::Text("Add Objects:");
+
+	if (ImGui::CollapsingHeader("Wall")) {
+		wallManager_->AddButton();
+	}
+
+	if (ImGui::CollapsingHeader("Door")) {
+		doorManager_->AddButton();
+	}
+
+	if (ImGui::CollapsingHeader("Glass")) {
+		glassManager_->AddButton();
+	}
+
+	if (ImGui::CollapsingHeader("Cage")) {
+		cageManager_->AddButton();
+	}
+
+	if (ImGui::CollapsingHeader("HealArea")) {
+		healAreaManager_->AddButton();
+	}
+
+	ImGui::End();
+#endif
 }

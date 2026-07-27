@@ -16,6 +16,11 @@ void SceneEditor::Update(
 	// 毎フレーム最新のオブジェクトリストを保持
 	objects_ = objects;
 
+	// 最初のオブジェクトを選択
+	if (selectedGameObject_ == nullptr && !objects_.empty()) {
+		selectedGameObject_ = objects_.front(); 
+	}
+
 	UpdatePicking(ctx);
 	UpdateImGui(ctx, player, cameraPosY);
 	DebugInput(ctx, player, enemyManager, cameraZoomController, isDebugCameraActive, currentCameraPivot);
@@ -133,6 +138,13 @@ void SceneEditor::UpdateImGui(const SceneContext& ctx, Player* player, float& ca
 			ImGui::End();
 		}
 	}
+
+	// 選択中オブジェクトのSRT
+	ImGui::Begin("Selected GameObject");
+	ImGui::DragFloat3("Scale", &selectedGameObject_->GetTransform().scale.x, 0.01f);
+	ImGui::DragFloat3("Rotate", &selectedGameObject_->GetTransform().rotate.x, 0.01f);
+	ImGui::DragFloat3("Translate", &selectedGameObject_->GetTransform().translate.x, 0.01f);
+	ImGui::End();
 #endif // USE_IMGUI
 }
 

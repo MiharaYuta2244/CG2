@@ -308,7 +308,6 @@ xcopy /E /I /Y "$(ProjectDir)resources" "$(OutDir)resources"
     <ClCompile Include="application\Editor\SceneEditor.cpp" />
     <ClCompile Include="application\GameObjects\StageObjects\Stage.cpp" />
     <ClCompile Include="application\GameObjects\StageObjects\HealArea\HealArea.cpp" />
-    <ClCompile Include="application\GameObjects\PlaceableObject.cpp" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="resources\shaders\Object3d.PS.hlsl">

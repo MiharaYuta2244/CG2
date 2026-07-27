@@ -66,14 +66,18 @@ public:
 		}
 
 		ImGui::Separator();
-		if (ImGui::Button("Add")) {
-			objects_.push_back(CreateObject(defaultTransform_));
-		}
 		if (ImGui::Button("Save JSON")) {
 			SaveToJson(jsonPath_);
 		}
 		ImGui::End();
 #endif
+	}
+
+	// オブジェクトの追加ボタン
+	void AddButton(){
+		if (ImGui::Button("Add")) {
+			objects_.push_back(CreateObject(defaultTransform_));
+		}
 	}
 
 	// オブジェクト削除
