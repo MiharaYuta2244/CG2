@@ -138,9 +138,6 @@ void Player::Update(float deltaTime, DirectInput* input, GamePad* gamePad, Enemy
 	// HP管理インスタンス更新
 	hp_->Update(deltaTime);
 
-	// HP管理用インスタンスImGui
-	hp_->DrawImGui();
-
 	if (ctx_ && ctx_->object3dCommon) {
 		PointLight pointLight = ctx_->object3dCommon->GetPointLight();
 
@@ -327,21 +324,6 @@ void Player::Update(float deltaTime, DirectInput* input, GamePad* gamePad, Enemy
 
 	// ギズモ用当たり判定更新
 	UpdateAABBForGizmo();
-
-#ifdef USE_IMGUI
-	ImGui::Begin("Player");
-	ImGui::SliderFloat("EnvScale", &envScale_, 0.0f, 1.0f);
-	ImGui::ColorEdit4("Color", &color_.x);
-	if (ImGui::Button("Damage")) {
-		Damage(1);
-	}
-	if (ImGui::Button("Heal")) {
-		Heal(1);
-	}
-	ImGui::End();
-	render_->SetEnvScale(envScale_);
-	render_->SetColor(color_);
-#endif // USE_IMGUI
 }
 
 void Player::PostUpdate() {

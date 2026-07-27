@@ -53,15 +53,6 @@ void PlayerHealth::AllHeal() {
 	hp_ = maxHP_;
 }
 
-void PlayerHealth::DrawImGui() {
-#ifdef USE_IMGUI
-	ImGui::Begin("PlayerHP");
-	ImGui::DragFloat("currentHP", &hp_, 1.0f);
-	ImGui::DragFloat("maxHP", &maxHP_, 1.0f);
-	ImGui::End();
-#endif // USE_IMGUI
-}
-
 bool PlayerHealth::IsDead() const {
 	if (hp_ <= 0.0f) {
 		return true;

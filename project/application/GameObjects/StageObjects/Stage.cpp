@@ -100,24 +100,24 @@ void Stage::DrawImGui() {
 	ImGui::Begin("StageObject Add Buttons");
 	ImGui::Text("Add Objects:");
 
-	if (ImGui::CollapsingHeader("Wall")) {
-		wallManager_->AddButton();
+	if (ImGui::Button("Add Wall")) {
+		wallManager_->AddObject();
 	}
 
-	if (ImGui::CollapsingHeader("Door")) {
-		doorManager_->AddButton();
+	if (ImGui::Button("Add Door")) {
+		doorManager_->AddObject();
 	}
 
-	if (ImGui::CollapsingHeader("Glass")) {
-		glassManager_->AddButton();
+	if (ImGui::Button("Add Glass")) {
+		glassManager_->AddObject();
 	}
 
-	if (ImGui::CollapsingHeader("Cage")) {
-		cageManager_->AddButton();
+	if (ImGui::Button("Add Cage")) {
+		cageManager_->AddObject();
 	}
 
-	if (ImGui::CollapsingHeader("HealArea")) {
-		healAreaManager_->AddButton();
+	if (ImGui::Button("Add HealArea")) {
+		healAreaManager_->AddObject();
 	}
 
 	ImGui::End();

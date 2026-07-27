@@ -73,12 +73,8 @@ public:
 #endif
 	}
 
-	// オブジェクトの追加ボタン
-	void AddButton(){
-		if (ImGui::Button("Add")) {
-			objects_.push_back(CreateObject(defaultTransform_));
-		}
-	}
+	// オブジェクトの追加
+	void AddObject() { objects_.push_back(CreateObject(defaultTransform_)); }
 
 	// オブジェクト削除
 	void RemoveObject(T* target) {

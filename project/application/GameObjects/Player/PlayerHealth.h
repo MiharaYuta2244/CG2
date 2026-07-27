@@ -21,9 +21,6 @@ public:
 	// 回復処理
 	void AllHeal();
 
-	// ImGui
-	void DrawImGui();
-
 	// 死亡フラグGetter
 	bool IsDead() const;
 
