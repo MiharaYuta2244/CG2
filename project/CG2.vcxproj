@@ -167,6 +167,7 @@ xcopy /E /I /Y "$(ProjectDir)resources" "$(OutDir)resources"
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="application\Editor\EditorCommand.cpp" />
     <ClCompile Include="application\GameObjects\Enemy\AStarPathfinder.cpp" />
     <ClCompile Include="application\GameObjects\Enemy\IEnemy.cpp" />
     <ClCompile Include="application\GameObjects\IGameObject.cpp" />
@@ -376,6 +377,7 @@ xcopy /E /I /Y "$(ProjectDir)resources" "$(OutDir)resources"
     </FxCompile>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="application\Editor\EditorCommand.h" />
     <ClInclude Include="application\GameObjects\Enemy\AStarPathfinder.h" />
     <ClInclude Include="application\GameObjects\Enemy\EnemyType.h" />
     <ClInclude Include="application\GameObjects\Enemy\IEnemy.h" />

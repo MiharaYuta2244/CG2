@@ -21,6 +21,8 @@ void SceneEditor::Update(
 		selectedGameObject_ = objects_.front(); 
 	}
 
+	HandleUndoRedoInput(ctx);
+
 	UpdatePicking(ctx);
 	UpdateImGui(ctx, player, cameraPosY);
 	DebugInput(ctx, player, enemyManager, cameraZoomController, isDebugCameraActive, currentCameraPivot);
@@ -122,9 +124,15 @@ void SceneEditor::UpdateImGui(const SceneContext& ctx, Player* player, float& ca
 				Matrix4x4 viewMat = ctx.currentCamera->GetViewMatrix();
 				Matrix4x4 projMat = ctx.currentCamera->GetProjection();
 
+				// 操作開始の検知
+				bool isUsingNow = ImGuizmo::IsUsing();
+				if (isUsingNow && !wasGizmoUsing_) {
+					gizmoBeginSnapshot_ = CaptureTransform(transform);
+				}
+
 				ImGuizmo::Manipulate(&viewMat.m[0][0], &projMat.m[0][0], currentGizmoOperation_, currentGizmoMode_, objectMatrix);
 
-				if (ImGuizmo::IsUsing()) {
+				if (isUsingNow) {
 					float newTrans[3], newRot[3], newScale[3];
 					ImGuizmo::DecomposeMatrixToComponents(objectMatrix, newTrans, newRot, newScale);
 
@@ -134,6 +142,13 @@ void SceneEditor::UpdateImGui(const SceneContext& ctx, Player* player, float& ca
 					transform.scale = {newScale[0], newScale[1], newScale[2]};
 					transform.rotate = {newRot[0] * std::numbers::pi_v<float> / 180.0f, newRot[1] * std::numbers::pi_v<float> / 180.0f, newRot[2] * std::numbers::pi_v<float> / 180.0f};
 				}
+
+				// 操作終了の検知
+				if (!isUsingNow && wasGizmoUsing_) {
+					TransformSnapshot afterSnap = CaptureTransform(transform);
+					PushCommand(std::make_unique<TransformCommand>(selectedGameObject_, gizmoBeginSnapshot_, afterSnap));
+				}
+				wasGizmoUsing_ = isUsingNow;
 			}
 			ImGui::End();
 		}
@@ -141,9 +156,29 @@ void SceneEditor::UpdateImGui(const SceneContext& ctx, Player* player, float& ca
 
 	// 選択中オブジェクトのSRT
 	ImGui::Begin("Selected GameObject");
-	ImGui::DragFloat3("Scale", &selectedGameObject_->GetTransform().scale.x, 0.01f);
-	ImGui::DragFloat3("Rotate", &selectedGameObject_->GetTransform().rotate.x, 0.01f);
-	ImGui::DragFloat3("Translate", &selectedGameObject_->GetTransform().translate.x, 0.01f);
+	Transform& selTransform = selectedGameObject_->GetTransform();
+
+	if (ImGui::DragFloat3("Scale", &selTransform.scale.x, 0.01f)) {
+	}
+	if (ImGui::IsItemActivated())
+		dragBeginSnapshot_ = CaptureTransform(selTransform);
+	if (ImGui::IsItemDeactivatedAfterEdit())
+		PushCommand(std::make_unique<TransformCommand>(selectedGameObject_, dragBeginSnapshot_, CaptureTransform(selTransform)));
+
+	if (ImGui::DragFloat3("Rotate", &selTransform.rotate.x, 0.01f)) {
+	}
+	if (ImGui::IsItemActivated())
+		dragBeginSnapshot_ = CaptureTransform(selTransform);
+	if (ImGui::IsItemDeactivatedAfterEdit())
+		PushCommand(std::make_unique<TransformCommand>(selectedGameObject_, dragBeginSnapshot_, CaptureTransform(selTransform)));
+
+	if (ImGui::DragFloat3("Translate", &selTransform.translate.x, 0.01f)) {
+	}
+	if (ImGui::IsItemActivated())
+		dragBeginSnapshot_ = CaptureTransform(selTransform);
+	if (ImGui::IsItemDeactivatedAfterEdit())
+		PushCommand(std::make_unique<TransformCommand>(selectedGameObject_, dragBeginSnapshot_, CaptureTransform(selTransform)));
+
 	ImGui::End();
 #endif // USE_IMGUI
 }
@@ -253,4 +288,71 @@ void SceneEditor::DebugInput(
 		cameraZoomController->Skip();
 	}
 #endif
+}
+
+bool SceneEditor::IsObjectAlive(IGameObject* obj) const {
+	for (IGameObject* o : objects_) {
+		if (o == obj) {
+			return true;
+		}
+	}
+	return false;
+}
+
+void SceneEditor::PushCommand(std::unique_ptr<IEditorCommand> command) {
+	undoStack_.push_back(std::move(command));
+	if (undoStack_.size() > kMaxHistorySize) {
+		undoStack_.pop_front();
+	}
+	// 新しい操作が入ったらRedo履歴は破棄
+	redoStack_.clear();
+}
+
+void SceneEditor::Undo() {
+	while (!undoStack_.empty()) {
+		auto& command = undoStack_.back();
+		if (!IsObjectAlive(command->GetTarget())) {
+			// 対象が既に破棄されている場合は無効化して捨てる
+			undoStack_.pop_back();
+			continue;
+		}
+		command->Undo();
+		redoStack_.push_back(std::move(command));
+		undoStack_.pop_back();
+		break;
+	}
+}
+
+void SceneEditor::Redo() {
+	while (!redoStack_.empty()) {
+		auto& command = redoStack_.back();
+		if (!IsObjectAlive(command->GetTarget())) {
+			redoStack_.pop_back();
+			continue;
+		}
+		command->Redo();
+		undoStack_.push_back(std::move(command));
+		redoStack_.pop_back();
+		break;
+	}
+}
+
+void SceneEditor::HandleUndoRedoInput(const SceneContext& ctx) {
+#ifdef USE_IMGUI
+	// ImGuiがテキスト入力等でキーを消費している場合は無視
+	if (ImGui::GetIO().WantTextInput) {
+		return;
+	}
+#endif
+	bool ctrlHeld = ctx.keyboard->KeyDown(DIK_LCONTROL) || ctx.keyboard->KeyDown(DIK_RCONTROL);
+	if (!ctrlHeld) {
+		return;
+	}
+
+	if (ctx.keyboard->KeyTriggered(DIK_Z)) {
+		Undo();
+	}
+	if (ctx.keyboard->KeyTriggered(DIK_Y)) {
+		Redo();
+	}
 }
