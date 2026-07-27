@@ -174,7 +174,6 @@ xcopy /E /I /Y "$(ProjectDir)resources" "$(OutDir)resources"
     <ClCompile Include="application\Cinematic\CameraDeathZoomController.cpp" />
     <ClCompile Include="application\GameObjects\Effect\DecideEffect.cpp" />
     <ClCompile Include="application\GameObjects\StageObjects\Cage\Cage.cpp" />
-    <ClCompile Include="application\GameObjects\StageObjects\Cage\CageManager.cpp" />
     <ClCompile Include="application\Collision\CollisionManager.cpp" />
     <ClCompile Include="application\GameObjects\Effect\EffectGenerator.cpp" />
     <ClCompile Include="application\GameObjects\ControlUI\ControlUI.cpp" />
@@ -251,13 +250,10 @@ xcopy /E /I /Y "$(ProjectDir)resources" "$(OutDir)resources"
     <ClCompile Include="engine\3d\particle\modules\HitFlashModule.cpp" />
     <ClCompile Include="engine\3d\particle\modules\HitRingModule.cpp" />
     <ClCompile Include="application\GameObjects\StageObjects\Glass\Glass.cpp" />
-    <ClCompile Include="application\GameObjects\StageObjects\Glass\GlassManager.cpp" />
     <ClCompile Include="engine\3d\particle\GPUParticle.cpp" />
-    <ClCompile Include="application\GameObjects\StageObjects\HealArea\HealAreaManager.cpp" />
     <ClCompile Include="engine\3d\particle\modules\HealCrossModule.cpp" />
     <ClCompile Include="engine\3d\particle\modules\HealLineModule.cpp" />
     <ClCompile Include="engine\3d\particle\modules\HealSphereModule.cpp" />
-    <ClCompile Include="application\GameObjects\GameObjectManager.cpp" />
     <ClCompile Include="main.cpp">
       <Optimization Condition="'$(Configuration)|$(Platform)'=='Development|x64'">MaxSpeed</Optimization>
       <WholeProgramOptimization Condition="'$(Configuration)|$(Platform)'=='Development|x64'">true</WholeProgramOptimization>
@@ -386,13 +382,10 @@ xcopy /E /I /Y "$(ProjectDir)resources" "$(OutDir)resources"
     <ClInclude Include="application\GameObjects\Enemy\IEnemy.h" />
     <ClInclude Include="application\GameObjects\CommonData.h" />
     <ClInclude Include="application\GameObjects\IGameObject.h" />
-    <ClInclude Include="application\GameObjects\StageObjects\Cage\CageStatus.h" />
     <ClInclude Include="application\GameObjects\StageObjects\Door\Door.h" />
     <ClInclude Include="application\Cinematic\CameraDeathZoomController.h" />
     <ClInclude Include="application\GameObjects\Effect\DecideEffect.h" />
-    <ClInclude Include="application\GameObjects\StageObjects\Glass\GlassStatus.h" />
     <ClInclude Include="application\GameObjects\StageObjects\Cage\Cage.h" />
-    <ClInclude Include="application\GameObjects\StageObjects\Cage\CageManager.h" />
     <ClInclude Include="application\Collision\CollisionManager.h" />
     <ClInclude Include="application\GameObjects\Effect\EffectGenerator.h" />
     <ClInclude Include="application\GameObjects\ControlUI\ControlUI.h" />
@@ -544,12 +537,10 @@ xcopy /E /I /Y "$(ProjectDir)resources" "$(OutDir)resources"
     <ClInclude Include="engine\3d\particle\modules\MuzzleSmokeModule.h" />
     <ClInclude Include="application\GameObjects\StageObjects\Glass\Glass.h" />
     <ClInclude Include="application\GameObjects\Player\PlayerHPIcon.h" />
-    <ClInclude Include="application\GameObjects\StageObjects\Glass\GlassManager.h" />
     <ClInclude Include="application\Editor\SceneEditor.h" />
     <ClInclude Include="application\GameObjects\StageObjects\Stage.h" />
     <ClInclude Include="application\GameObjects\StageObjects\HealArea\HealArea.h" />
     <ClInclude Include="engine\3d\particle\GPUParticle.h" />
-    <ClInclude Include="application\GameObjects\StageObjects\HealArea\HealAreaManager.h" />
     <ClInclude Include="engine\3d\particle\modules\HealCrossModule.h" />
     <ClInclude Include="engine\3d\particle\modules\HealLineModule.h" />
     <ClInclude Include="engine\3d\particle\modules\HealSphereModule.h" />

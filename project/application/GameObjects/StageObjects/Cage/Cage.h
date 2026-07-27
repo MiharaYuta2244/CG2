@@ -1,40 +1,32 @@
 #pragma once
 #include "AABB.h"
-#include "GameObjects/IGameObject.h"
+#include "GameObjects/PlaceableObject.h"
 #include "GameObjects/ObjectRender/ObjectRender.h"
-#include "CageStatus.h"
 
 /// <summary>
 /// 檻クラス
 /// </summary>
-class Cage : public IGameObject {
+class Cage : public PlaceableObject {
 public:
 	Cage();
 
 	// 初期化処理
-	void Initialize(EngineContext* ctx, CageStatus cageStatus);
+	void Initialize(EngineContext* ctx, const Transform& transform);
 
 	// 更新処理
 	void Update(float deltaTime);
 
 	// 描画処理
-	void Draw();
+	void Draw()override;
 
 	// 当たり判定Getter
 	AABB GetCollision() const { return collision_; }
-
-	// CageStatusのSetter
-	void SetCageStatus(CageStatus cageStatus);
-
-	// CageStatusのGetter
-	CageStatus& GetCageStatus() { return cageStatus_; }
 
 	// ギズモ用
 	std::string GetName() const override { return "Cage(" + std::to_string(id_) + ")"; }
 
 private:
 	AABB collision_; // 当たり判定
-	CageStatus cageStatus_;
 	Vector4 color_ = {0.1f, 0.1f, 0.1f, 1.0f};
 	float time_ = 0.0f;
 

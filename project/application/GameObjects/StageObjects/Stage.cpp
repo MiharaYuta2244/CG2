@@ -28,15 +28,34 @@ void Stage::Initialize(const SceneContext& ctx, TinyEngine::DecalManager* decalM
 
 	// ガラスの管理インスタンス生成&初期化
 	glassManager_ = std::make_unique<GlassManager>();
-	glassManager_->Initialize(ctx.engineContext, decalManager_);
+	glassManager_->Initialize(
+	    ctx.engineContext, "GlassEditor", "Glasses.json",
+	    Transform{
+	        {1, 50, 1},
+            {0, 0,  0},
+            {0, 0,  0}
+    },
+	    decalManager_);
 
 	// 檻の管理インスタンス生成&初期化
 	cageManager_ = std::make_unique<CageManager>();
-	cageManager_->Initialize(ctx.engineContext);
+	cageManager_->Initialize(
+	    ctx.engineContext, "CageEditor", "Cages.json",
+	    Transform{
+	        {1, 50, 1},
+            {0, 0,  0},
+            {0, 0,  0}
+    });
 
 	// 回復エリアの管理インスタンス生成&初期化
 	healAreaManager_ = std::make_unique<HealAreaManager>();
-	healAreaManager_->Initialize(ctx.engineContext);
+	healAreaManager_->Initialize(
+	    ctx.engineContext, "HealAreaEditor", "HealAreas.json",
+	    Transform{
+	        {1, 50, 1},
+            {0, 0,  0},
+            {0, 0,  0}
+    });
 
 	// 地面の生成&初期化
 	ground_ = std::make_unique<Ground>();

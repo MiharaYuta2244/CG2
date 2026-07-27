@@ -6,11 +6,8 @@ int HealArea::index = 0;
 
 HealArea::HealArea() { id_ = index++; }
 
-void HealArea::Initialize(EngineContext* ctx, HealAreaStatus healAreaStatus) {
-	transform_.scale = {healAreaStatus.width, 0.5f, healAreaStatus.depth};
-	transform_.rotate = {0.0f, 0.0f, 0.0f};
-	transform_.translate = {healAreaStatus.centerX, 0.0f, healAreaStatus.centerZ};
-	healAreaStatus_ = healAreaStatus;
+void HealArea::Initialize(EngineContext* ctx, const Transform& transform) {
+	transform_ = transform;
 
 	// 生成&初期化
 	render_ = std::make_unique<ObjectRender>();
@@ -35,12 +32,4 @@ void HealArea::Draw() {
 
 	// 描画
 	render_->Draw();
-}
-
-void HealArea::SetHealAreaStatus(HealAreaStatus HealAreaStatus) {
-	transform_.scale.x = HealAreaStatus.width;
-	transform_.scale.z = HealAreaStatus.depth;
-	transform_.translate.x = HealAreaStatus.centerX;
-	transform_.translate.z = HealAreaStatus.centerZ;
-	healAreaStatus_ = HealAreaStatus;
 }

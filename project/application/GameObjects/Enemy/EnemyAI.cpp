@@ -292,7 +292,7 @@ bool EnemyAI::CheckPlayerInVision(Player* player, WallManager* wallManager, Door
 	}
 
 	// ガラス
-	const auto& glasses = glassManager->GetGlasses();
+	const auto& glasses = glassManager->GetObjects();
 	for (const auto& glass : glasses) {
 		AABB glassCol = glass->GetCollision();
 		if (IsSegmentIntersectAABB(enemyPos, playerPos, glassCol)) {

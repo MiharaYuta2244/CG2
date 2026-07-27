@@ -1,28 +1,21 @@
 #pragma once
 #include "AABB.h"
-#include "GameObjects/IGameObject.h"
-#include "GameObjects/ObjectRender/ObjectRender.h"
-#include "GlassStatus.h"
 #include "DecalManager.h"
+#include "GameObjects/ObjectRender/ObjectRender.h"
+#include "GameObjects/PlaceableObject.h"
 
-class Glass : public IGameObject {
+class Glass : public PlaceableObject {
 public:
 	Glass();
 
-	void Initialize(EngineContext* ctx, GlassStatus glassStatus, TinyEngine::DecalManager* decalManager);
+	void Initialize(EngineContext* ctx, const Transform& transform, TinyEngine::DecalManager* decalManager);
 
 	void Update();
 
-	void Draw();
+	void Draw() override;
 
 	// 当たり判定Getter
 	AABB GetCollision() const { return collision_; }
-
-	// GlassStatusのGetter
-	GlassStatus& GetGlassStatus() { return glassStatus_; }
-
-	// GlassStatusのSetter
-	void SetGlassStatus(GlassStatus glassStatus);
 
 	// アクティブ状態のGetter
 	bool GetIsActive() const { return isActive_; }
@@ -46,9 +39,6 @@ private:
 
 	// 当たり判定
 	AABB collision_{};
-
-	// ガラスのステータス
-	GlassStatus glassStatus_{};
 
 	// アクティブ状態
 	bool isActive_ = true;

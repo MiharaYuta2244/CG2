@@ -4,11 +4,9 @@ int Cage::index = 0;
 
 Cage::Cage() { id_ = index++; }
 
-void Cage::Initialize(EngineContext* ctx, CageStatus cageStatus) {
-	transform_.scale = {cageStatus.width, 50.0f, cageStatus.depth};
-	transform_.rotate = {0.0f, cageStatus.rotateY, 0.0f};
-	transform_.translate = {cageStatus.centerX, 0.0f, cageStatus.centerZ};
-	cageStatus_ = cageStatus;
+void Cage::Initialize(EngineContext* ctx, const Transform& transform) {
+	transform_ = transform;
+	transform_.scale.y = 50.0f;
 
 	// 描画用インスタンス生成&初期化
 	render_ = std::make_unique<ObjectRender>();
@@ -38,13 +36,4 @@ void Cage::Update(float deltaTime) {
 void Cage::Draw() {
 	// 描画
 	render_->Draw();
-}
-
-void Cage::SetCageStatus(CageStatus cageStatus) {
-	transform_.scale.x = cageStatus.width;
-	transform_.scale.z = cageStatus.depth;
-	transform_.translate.x = cageStatus.centerX;
-	transform_.translate.z = cageStatus.centerZ;
-	transform_.rotate.y = cageStatus.rotateY;
-	cageStatus_ = cageStatus;
 }

@@ -67,15 +67,23 @@ public:
 
 		ImGui::Separator();
 		if (ImGui::Button("Add")) {
-			auto obj = std::make_unique<T>();
-			obj->Initialize(ctx_, defaultTransform_);
-			objects_.push_back(std::move(obj));
+			objects_.push_back(CreateObject(defaultTransform_));
 		}
 		if (ImGui::Button("Save JSON")) {
 			SaveToJson(jsonPath_);
 		}
 		ImGui::End();
 #endif
+	}
+
+	// オブジェクト削除
+	void RemoveObject(T* target) {
+		for (auto it = objects_.begin(); it != objects_.end(); ++it) {
+			if (it->get() == target) {
+				objects_.erase(it);
+				break;
+			}
+		}
 	}
 
 	// オブジェクトのリストGetter

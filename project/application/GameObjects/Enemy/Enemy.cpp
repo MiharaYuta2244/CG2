@@ -134,7 +134,7 @@ void Enemy::Update(float deltaTime, Player* player, EnemyBulletManager* enemyBul
 	// 視界
 	visionCone_->SetTranslate(transform_.translate);
 	visionCone_->SetRotate(transform_.rotate);
-	visionCone_->Update(wallManager->GetObjects(), doorManager->GetObjects(), glassManager->GetGlasses());
+	visionCone_->Update(wallManager->GetObjects(), doorManager->GetObjects(), glassManager->GetObjects());
 
 	// 敵AIの状態を記録
 	lastState = ai_->GetState();

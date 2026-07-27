@@ -70,11 +70,13 @@ void CollisionManager::CheckCollisions(
 	// プレイヤーの攻撃用範囲とガラスの当たり判定
 	// ==========================================
 	if (player->GetIsAttack()) {
-		for (auto& glass : stage->GetGlassManager()->GetGlasses()) {
+		for (auto& glass : stage->GetGlassManager()->GetObjects()) {
 			if (Collision::Intersect(player->GetAttackCol(), glass->GetCollision())) {
-				// ガラス削除
+				// ガラス破片生成
 				glass->AddGlassesDecal({1, 1, 1});
-				stage->GetGlassManager()->RemoveGlass(glass.get());
+
+				// ガラス削除
+				stage->GetGlassManager()->RemoveObject(glass.get());
 				break;
 			}
 		}
@@ -136,7 +138,7 @@ void CollisionManager::CheckCollisions(
 	// ==========================================
 	// プレイヤーとガラスの押し出し判定
 	// ==========================================
-	for (const auto& glass : stage->GetGlassManager()->GetGlasses()) {
+	for (const auto& glass : stage->GetGlassManager()->GetObjects()) {
 		AABB glassAABB = glass->GetCollision();
 
 		// AABB同士の交差判定
@@ -186,7 +188,7 @@ void CollisionManager::CheckCollisions(
 	// ==========================================
 	// プレイヤーと檻の押し出し判定
 	// ==========================================
-	for (const auto& cage : stage->GetCageManager()->GetCages()) {
+	for (const auto& cage : stage->GetCageManager()->GetObjects()) {
 		AABB cageAABB = cage->GetCollision();
 
 		// AABB同士の交差判定
@@ -443,7 +445,7 @@ void CollisionManager::CheckCollisions(
 	// ==========================================
 	// プレイヤーと回復エリアの当たり判定
 	// ==========================================
-	for (const auto& healArea : stage->GetHealAreaManager()->GetHealAreas()) {
+	for (const auto& healArea : stage->GetHealAreaManager()->GetObjects()) {
 		if (Collision::Intersect(player->GetBodyCol(), healArea->GetCollision())) {
 			player->AllHeal();
 			healArea->SetIsActive(false);

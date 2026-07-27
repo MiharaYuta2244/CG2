@@ -7,12 +7,8 @@ int Glass::index = 0;
 
 Glass::Glass() { id_ = index++; }
 
-void Glass::Initialize(EngineContext* ctx, GlassStatus glassStatus, TinyEngine::DecalManager* decalManager) {
-	transform_.scale = {glassStatus.width, 50.0f, glassStatus.depth};
-	transform_.rotate = {0, 0, 0};
-	transform_.translate = {glassStatus.centerX, 0.1f, glassStatus.centerZ};
-	glassStatus_ = glassStatus;
-
+void Glass::Initialize(EngineContext* ctx, const Transform& transform, TinyEngine::DecalManager* decalManager) {
+	transform_ = transform;
 	// 生成&初期化
 	render_ = std::make_unique<ObjectRender>();
 	render_->Initialize(ctx, "Cube.obj");
@@ -42,14 +38,6 @@ void Glass::UpdateCollision() {
 	Vector3 scale = transform_.scale;
 	collision_.max = {pos.x + scale.x, pos.y, pos.z + scale.z};
 	collision_.min = {pos.x - scale.x, pos.y, pos.z - scale.z};
-}
-
-void Glass::SetGlassStatus(GlassStatus glassStatus) {
-	transform_.scale.x = glassStatus.width;
-	transform_.scale.z = glassStatus.depth;
-	transform_.translate.x = glassStatus.centerX;
-	transform_.translate.z = glassStatus.centerZ;
-	glassStatus_ = glassStatus;
 }
 
 void Glass::AddGlassesDecal(Vector3 scale) {

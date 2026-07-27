@@ -3,9 +3,9 @@
 #include "EnemyBullet.h"
 #include "EnemyType.h"
 #include "GameObjects/GameObjectManager.h"
-#include "GameObjects/StageObjects/Glass/GlassManager.h"
 #include "GameObjects/StageObjects/Wall/Wall.h"
 #include "GameObjects/StageObjects/Door/Door.h"
+#include "GameObjects/StageObjects/Glass/Glass.h"
 #include "Transform.h"
 #include <vector>
 
@@ -15,6 +15,7 @@ class Player;
 
 using WallManager = GameObjectManager<Wall>;
 using DoorManager = GameObjectManager<Door>;
+using GlassManager = GameObjectManager<Glass, TinyEngine::DecalManager*>;
 
 struct Visionparam {
 	float radius;

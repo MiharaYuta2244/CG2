@@ -243,13 +243,13 @@ void GamePlayScene::Update() {
 	for (auto& door : stage_->GetDoorManager()->GetObjects()) {
 		editObjects.push_back(door.get());
 	}
-	for (auto& glass : stage_->GetGlassManager()->GetGlasses()) {
+	for (auto& glass : stage_->GetGlassManager()->GetObjects()) {
 		editObjects.push_back(glass.get());
 	}
-	for (auto& cage : stage_->GetCageManager()->GetCages()) {
+	for (auto& cage : stage_->GetCageManager()->GetObjects()) {
 		editObjects.push_back(cage.get());
 	}
-	for (auto& healArea : stage_->GetHealAreaManager()->GetHealAreas()) {
+	for (auto& healArea : stage_->GetHealAreaManager()->GetObjects()) {
 		editObjects.push_back(healArea.get());
 	}
 

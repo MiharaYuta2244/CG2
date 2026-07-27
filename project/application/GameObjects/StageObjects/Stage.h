@@ -1,16 +1,18 @@
 #pragma once
-#include "Cage/CageManager.h"
 #include "GameObjects/GameObjectManager.h"
-#include "Glass/GlassManager.h"
+#include "GameObjects/StageObjects/Cage/Cage.h"
+#include "GameObjects/StageObjects/Glass/Glass.h"
+#include "GameObjects/StageObjects/HealArea/HealArea.h"
 #include "Goal/Goal.h"
 #include "Ground/Ground.h"
-#include "HealArea/HealAreaManager.h"
 #include "SceneContext.h"
-//#include "GameObjects/StageObjects/Door/Door.h"
 #include <memory>
 
 using WallManager = GameObjectManager<Wall>;
 using DoorManager = GameObjectManager<Door>;
+using CageManager = GameObjectManager<Cage>;
+using HealAreaManager = GameObjectManager<HealArea>;
+using GlassManager = GameObjectManager<Glass, TinyEngine::DecalManager*>;
 
 /// <summary>
 /// ステージ構成要素を統括するクラス
