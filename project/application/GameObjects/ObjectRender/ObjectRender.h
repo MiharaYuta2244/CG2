@@ -29,6 +29,11 @@ public:
 	void SetIsSkinning(bool isSkinning) { object3d_->SetIsSkinning(isSkinning); }
 	void SetEnableLaser(bool enableLaser) { object3d_->SetEnableLaser(enableLaser); }
 	void SetModel(const std::string& filepath) { object3d_->SetModel(filepath); }
+	void SetEnableOutline(bool isEnable) {
+		if (object3d_) {
+			object3d_->SetEnableOutline(isEnable);
+		}
+	}
 
 	// 描画用オブジェクトを返すGetter
 	TinyEngine::Object3d* GetObject3d() { return object3d_.get(); }

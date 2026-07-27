@@ -22,7 +22,7 @@ void GamePlayScene::Initialize(const SceneContext& ctx) {
 	// ライトの設定
 	DirectionalLight dirLight;
 	dirLight.color = {1,1,1,1};
-	dirLight.intensity = 2.0f;
+	dirLight.intensity = 5.0f;
 	dirLight.direction = {0.5f, 0.5f, -0.5f};
 	ctx.engineContext->object3dCommon->SetDirectionalLightParam(dirLight);
 

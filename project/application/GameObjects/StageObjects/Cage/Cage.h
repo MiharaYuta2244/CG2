@@ -25,6 +25,9 @@ public:
 	// ギズモ用
 	std::string GetName() const override { return "Cage(" + std::to_string(id_) + ")"; }
 
+	// アウトライン有効フラグSetter
+	void SetEnableOutline(bool isEnable) override;
+
 private:
 	AABB collision_; // 当たり判定
 	Vector4 color_ = {0.1f, 0.1f, 0.1f, 1.0f};

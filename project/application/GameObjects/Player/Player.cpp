@@ -105,21 +105,27 @@ void Player::Update(float deltaTime, DirectInput* input, GamePad* gamePad, Enemy
 		isMoving_ = true;
 
 		// アクションアニメーション中でない場合のみ、歩きモデルに切り替え
-		if (!isActionAnimating_ && render_->GetFilepath() != "Gorilla.gltf") {
-			render_->SetModel("Gorilla.gltf");
-			KeyframeAnimation keyframeAnimation;
-			Animation sneakWalkAnimation = keyframeAnimation.LoadAnimationFile("Gorilla.gltf");
-			render_->GetObject3d()->PlayAnimation(sneakWalkAnimation);
+		if (!isActionAnimating_) {
+			std::string targetModel = isHold_ ? "GorillaHoldWalking.gltf" : "Gorilla.gltf";
+			if (render_->GetFilepath() != targetModel) {
+				render_->SetModel(targetModel);
+				KeyframeAnimation keyframeAnimation;
+				Animation walkAnimation = keyframeAnimation.LoadAnimationFile(targetModel);
+				render_->GetObject3d()->PlayAnimation(walkAnimation);
+			}
 		}
 	} else {
 		isMoving_ = false;
 
 		// アクションアニメーション中でない場合のみ、待機モデルに切り替え
-		if (!isActionAnimating_ && render_->GetFilepath() != "GorillaIdle.gltf") {
-			render_->SetModel("GorillaIdle.gltf");
-			KeyframeAnimation keyframeAnimation;
-			Animation idleAnimation = keyframeAnimation.LoadAnimationFile("GorillaIdle.gltf");
-			render_->GetObject3d()->PlayAnimation(idleAnimation);
+		if (!isActionAnimating_) {
+			std::string targetModel = isHold_ ? "GorillaHolding.gltf" : "GorillaIdle.gltf";
+			if (render_->GetFilepath() != targetModel) {
+				render_->SetModel(targetModel);
+				KeyframeAnimation keyframeAnimation;
+				Animation idleAnimation = keyframeAnimation.LoadAnimationFile(targetModel);
+				render_->GetObject3d()->PlayAnimation(idleAnimation);
+			}
 		}
 	}
 
@@ -209,6 +215,15 @@ void Player::Update(float deltaTime, DirectInput* input, GamePad* gamePad, Enemy
 			heldEnemy_->SetAIState(EnemyAI::State::Hold);
 			heldEnemy_->ResetShotTimer();
 			isGrabTriggered_ = true;
+
+			if (render_->GetFilepath() != "GorillaHold.gltf") {
+				render_->SetModel("GorillaHold.gltf");
+				KeyframeAnimation keyframeAnimation;
+				Animation holdAnimation = keyframeAnimation.LoadAnimationFile("GorillaHold.gltf");
+				render_->GetObject3d()->PlayAnimation(holdAnimation);
+				isActionAnimating_ = true;
+				actionAnimTimer_ = 0.2f;
+			}
 		}
 
 		// 掴んでいる間はプレイヤーの位置に敵を固定
@@ -262,7 +277,7 @@ void Player::Update(float deltaTime, DirectInput* input, GamePad* gamePad, Enemy
 
 			// アクションアニメーションの再生開始を記録し、タイマーを設定
 			isActionAnimating_ = true;
-			actionAnimTimer_ = 0.5f;
+			actionAnimTimer_ = 0.3f;
 		}
 	}
 

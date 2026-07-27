@@ -19,6 +19,9 @@ public:
 	// ギズモ用
 	std::string GetName() const override { return "Ground"; }
 
+	// アウトライン有効フラグSetter
+	void SetEnableOutline(bool isEnable) override;
+
 private:
 	std::unique_ptr<ObjectRender> render_;
 	Vector4 color_ = {0.0235f, 0.0392f, 0.0784f, 1.0f};

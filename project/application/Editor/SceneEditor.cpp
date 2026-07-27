@@ -21,6 +21,14 @@ void SceneEditor::Update(
 		selectedGameObject_ = objects_.front(); 
 	}
 
+	for (IGameObject* obj : objects_) {
+		if (obj == selectedGameObject_) {
+			obj->SetEnableOutline(true);
+		} else {
+			obj->SetEnableOutline(false);
+		}
+	}
+
 	HandleUndoRedoInput(ctx);
 
 	UpdatePicking(ctx);

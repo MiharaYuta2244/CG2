@@ -45,3 +45,9 @@ void Glass::AddGlassesDecal(Vector3 scale) {
 	Vector3 rotate = {std::numbers::pi_v<float> / 2.0f, RandomUtils::RangeFloat(0.0f, std::numbers::pi_v<float>), 0.0f};
 	glassesDecalManager_->AddDecal("white.png", pos, {rotate.x, rotate.y, rotate.z}, scale, ColorPalette::PastelBlue());
 }
+
+void Glass::SetEnableOutline(bool isEnable) {
+	if (render_) {
+		render_->SetEnableOutline(isEnable);
+	}
+}

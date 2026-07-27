@@ -16,3 +16,9 @@ void Ground::Update() {
 }
 
 void Ground::Draw() { render_->Draw(); }
+
+void Ground::SetEnableOutline(bool isEnable) {
+	if (render_) {
+		render_->SetEnableOutline(isEnable);
+	}
+}

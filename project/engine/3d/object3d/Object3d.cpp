@@ -183,11 +183,18 @@ void Object3d::Update() {
 void Object3d::Draw() {
 	auto commandList = ctx_->object3dCommon->GetDxCommon()->GetCommandList();
 
-	ctx_->object3dCommon->DrawSettingOutline();
+	// フラグが有効な場合のみアウトラインの描画
+	if (enableOutline_) {
+		ctx_->object3dCommon->DrawSettingOutline();
 
-	commandList->SetGraphicsRootConstantBufferView(1, wvpResource_->GetGPUVirtualAddress());
-	*outlineData_ = outline_;
-	commandList->SetGraphicsRootConstantBufferView(9, outlineResource_->GetGPUVirtualAddress());
+		commandList->SetGraphicsRootConstantBufferView(1, wvpResource_->GetGPUVirtualAddress());
+		*outlineData_ = outline_;
+		commandList->SetGraphicsRootConstantBufferView(9, outlineResource_->GetGPUVirtualAddress());
+
+		if (model_) {
+			model_->Draw(textureFilePath_, isSkinning_ ? &skinCluster_ : nullptr);
+		}
+	}
 
 	// スキニングの有無にかかわらず共通PSOで描画する
 	ctx_->object3dCommon->DrawSettingCommon(ctx_->textureManager);

@@ -3,6 +3,7 @@
 #include "DebugCamera.h"
 #include "EngineContext.h"
 #include "FogParam.h"
+#include "KeyframeAnimation.h"
 #include "Material.h"
 #include "Model.h"
 #include "ModelData.h"
@@ -10,7 +11,6 @@
 #include "TimeParam.h"
 #include "Transform.h"
 #include "TransformationMatrix.h"
-#include "KeyframeAnimation.h"
 #include <ImGuizmo.h>
 #include <d3d12.h>
 #include <string>
@@ -68,7 +68,7 @@ public:
 	void SetWorldMatrix(Matrix4x4 worldMatrix) { worldMatrix_ = worldMatrix; }
 	void SetCamera(Camera* camera) { camera_ = camera; }
 	void SetOutlineColor(const Vector4& color) { outline_.color = color; }
-	void SetOutlineColor(float thickness) { outline_.thickness = thickness; }
+	void SetOutlineThickness(float thickness) { outline_.thickness = thickness; }
 	void SetName(const std::string& name) { name_ = name; }
 	void SetTexture(const std::string& filePath);
 	void SetEnableNoise(bool isEnable) { material_.enableNoise = isEnable ? 1 : 0; }
@@ -76,6 +76,7 @@ public:
 	void SetIsSkinning(bool isSkinning) { isSkinning_ = isSkinning; }
 	bool GetIsSkinning() const { return isSkinning_; }
 	void SetEnableLaser(bool isEnable) { material_.enableLaser = isEnable ? 1 : 0; }
+	void SetEnableOutline(bool isEnable) { enableOutline_ = isEnable; }
 
 	// getter
 	Vector3& GetScale() { return transform_.scale; }
@@ -152,7 +153,7 @@ private:
 	FogParam fogParam_;
 	TimeParam timeParam_;
 	Outline outline_ = {
-	    {0.0f, 0.0f, 0.0f, 1.0f},
+	    {0.1f, 0.1f, 0.0f, 1.0f},
         0.005f
     };
 
@@ -204,5 +205,8 @@ private:
 
 	// 現在使用しているモデルのパス
 	std::string currentFilepath_;
+
+	// アウトラインの有効フラグ
+	bool enableOutline_ = false;
 };
 } // namespace TinyEngine

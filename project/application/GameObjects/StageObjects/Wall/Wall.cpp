@@ -37,3 +37,9 @@ void Wall::Draw() {
 	// 描画
 	render_->Draw();
 }
+
+void Wall::SetEnableOutline(bool isEnable) {
+	if (render_) {
+		render_->SetEnableOutline(isEnable);
+	}
+}

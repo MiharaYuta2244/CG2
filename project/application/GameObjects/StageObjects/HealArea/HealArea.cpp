@@ -8,6 +8,7 @@ HealArea::HealArea() { id_ = index++; }
 
 void HealArea::Initialize(EngineContext* ctx, const Transform& transform) {
 	transform_ = transform;
+	transform_.scale.y = 1.0f;
 
 	// 生成&初期化
 	render_ = std::make_unique<ObjectRender>();
@@ -32,4 +33,10 @@ void HealArea::Draw() {
 
 	// 描画
 	render_->Draw();
+}
+
+void HealArea::SetEnableOutline(bool isEnable) {
+	if (render_) {
+		render_->SetEnableOutline(isEnable);
+	}
 }

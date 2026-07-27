@@ -17,6 +17,9 @@ public:
 	// ギズモ用の当たり判定
 	virtual AABB GetAABBForGizmo() const { return aabbForGizmo_; }
 
+	// アウトラインの有効/無効を切り替える仮想関数
+	virtual void SetEnableOutline(bool isEnable) {}
+
 protected:
 	// ギズモ用の当たり判定の更新
 	void UpdateAABBForGizmo();
