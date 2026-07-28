@@ -5,8 +5,8 @@ using namespace TinyEngine;
 
 void ControlUI::Initialize(EngineContext* ctx, DecalManager* uiDecalManager) {
 	uiDecalManager_ = uiDecalManager;
-	attackUIPos_ = {0.0f, 0.1f, 3.0f};
-	holdUIPos_ = {261.0f, 0.1f, 4.0f};
+	attackUIPos_ = {5.0f, 0.1f, 3.0f};
+	holdUIPos_ = {262.0f, 0.1f, 4.0f};
 }
 
 void ControlUI::Update() {

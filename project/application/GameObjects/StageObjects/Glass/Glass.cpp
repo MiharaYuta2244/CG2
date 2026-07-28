@@ -41,9 +41,16 @@ void Glass::UpdateCollision() {
 }
 
 void Glass::AddGlassesDecal(Vector3 scale) {
-	Vector3 pos = transform_.translate;
-	Vector3 rotate = {std::numbers::pi_v<float> / 2.0f, RandomUtils::RangeFloat(0.0f, std::numbers::pi_v<float>), 0.0f};
-	glassesDecalManager_->AddDecal("white.png", pos, {rotate.x, rotate.y, rotate.z}, scale, ColorPalette::PastelBlue());
+	for (int i = 0; i < 50; ++i) {
+		Vector3 basePos = transform_.translate;
+		Vector3 pos = {
+		    basePos.x + RandomUtils::RangeFloat(0.0f, 4.0f),
+		    0,
+		    basePos.z + RandomUtils::RangeFloat(-2.0f, 2.0f),
+		};
+		Vector3 rotate = {std::numbers::pi_v<float> / 2.0f, RandomUtils::RangeFloat(0.0f, std::numbers::pi_v<float>), 0.0f};
+		glassesDecalManager_->AddDecal("white.png", pos, {rotate.x, rotate.y, rotate.z}, scale, ColorPalette::PastelBlue());
+	}
 }
 
 void Glass::SetEnableOutline(bool isEnable) {

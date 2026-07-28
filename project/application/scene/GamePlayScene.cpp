@@ -22,7 +22,7 @@ void GamePlayScene::Initialize(const SceneContext& ctx) {
 	// ライトの設定
 	DirectionalLight dirLight;
 	dirLight.color = {1,1,1,1};
-	dirLight.intensity = 5.0f;
+	dirLight.intensity = 3.0f;
 	dirLight.direction = {0.5f, 0.5f, -0.5f};
 	ctx.engineContext->object3dCommon->SetDirectionalLightParam(dirLight);
 
@@ -271,44 +271,7 @@ void GamePlayScene::Update() {
 	});
 
 	// カメラの追従
-	if (!isDebugCameraActive_) {
-		Vector3 playerPos = player_->GetPosition();
-		Vector3 playerRot = player_->GetRotation();
-
-		// プレイヤーの向いている方向ベクトルを計算
-		Vector3 forward = {std::sin(playerRot.y), 0.0f, std::cos(playerRot.y)};
-
-		// 目標のピボット位置
-		Vector3 targetPivot = {playerPos.x + forward.x * offsetDistance_, playerPos.y, playerPos.z + forward.z * offsetDistance_};
-
-		// 線形補間を使ってカメラを滑らかに追従させる
-		float followSpeed = 5.0f;
-		currentCameraPivot_.x += (targetPivot.x - currentCameraPivot_.x) * followSpeed * deltaTime;
-		currentCameraPivot_.y = cameraPosY_;
-		currentCameraPivot_.z += (targetPivot.z - currentCameraPivot_.z) * followSpeed * deltaTime;
-
-		ctx_.currentCamera->SetPivot(currentCameraPivot_);
-
-		// 進行方向にカメラを傾ける処理
-		float maxTiltAngle = cameraAngle_ * (std::numbers::pi_v<float> / 180.0f);
-
-		// 基準のピッチ角
-		float basePitch = std::numbers::pi_v<float> / 2.0f;
-
-		// プレイヤーの向き(ヨー角)から、カメラのピッチ(X回転)とロール(Z回転)の目標値を計算
-		float targetPitch = basePitch - std::cos(playerRot.y) * maxTiltAngle;
-		float targetRoll = std::sin(playerRot.y) * maxTiltAngle;
-
-		// 現在のカメラの角度を取得
-		Vector3 currentEuler = ctx_.currentCamera->GetEuler();
-
-		currentEuler.x += (targetPitch - currentEuler.x) * tiltSpeed_ * deltaTime;
-		currentEuler.y = 0.0f;
-		currentEuler.z += (targetRoll - currentEuler.z) * tiltSpeed_ * deltaTime;
-
-		// カメラに角度を適用
-		ctx_.currentCamera->SetRotate(currentEuler);
-	}
+	FollowCamera(deltaTime);
 
 	// プレイヤーが敵を掴んだらシェイク
 	if (player_->GetIsGrabTriggerd()) {
@@ -411,4 +374,46 @@ void GamePlayScene::UpdateGlitch(float deltaTime) {
 void GamePlayScene::GenerateEnemyDeathEffect(const Vector3& pos) {
 	// エフェクトの生成
 	EffectGenerator::CreateEnemyDeathEffect(ctx_.engineContext, pos, enemyDeathEffect_);
+}
+
+void GamePlayScene::FollowCamera(float deltaTime){
+	// カメラの追従
+	if (!isDebugCameraActive_) {
+		Vector3 playerPos = player_->GetPosition();
+		Vector3 playerRot = player_->GetRotation();
+
+		// プレイヤーの向いている方向ベクトルを計算
+		Vector3 forward = {std::sin(playerRot.y), 0.0f, std::cos(playerRot.y)};
+
+		// 目標のピボット位置
+		Vector3 targetPivot = {playerPos.x + forward.x * offsetDistance_, playerPos.y, playerPos.z + forward.z * offsetDistance_};
+
+		// 線形補間を使ってカメラを滑らかに追従させる
+		float followSpeed = 5.0f;
+		currentCameraPivot_.x += (targetPivot.x - currentCameraPivot_.x) * followSpeed * deltaTime;
+		currentCameraPivot_.y = cameraPosY_;
+		currentCameraPivot_.z += (targetPivot.z - currentCameraPivot_.z) * followSpeed * deltaTime;
+
+		ctx_.currentCamera->SetPivot(currentCameraPivot_);
+
+		// 進行方向にカメラを傾ける処理
+		float maxTiltAngle = cameraAngle_ * (std::numbers::pi_v<float> / 180.0f);
+
+		// 基準のピッチ角
+		float basePitch = std::numbers::pi_v<float> / 2.0f;
+
+		// プレイヤーの向き(ヨー角)から、カメラのピッチ(X回転)とロール(Z回転)の目標値を計算
+		float targetPitch = basePitch - std::cos(playerRot.y) * maxTiltAngle;
+		float targetRoll = std::sin(playerRot.y) * maxTiltAngle;
+
+		// 現在のカメラの角度を取得
+		Vector3 currentEuler = ctx_.currentCamera->GetEuler();
+
+		currentEuler.x += (targetPitch - currentEuler.x) * tiltSpeed_ * deltaTime;
+		currentEuler.y = 0.0f;
+		currentEuler.z += (targetRoll - currentEuler.z) * tiltSpeed_ * deltaTime;
+
+		// カメラに角度を適用
+		ctx_.currentCamera->SetRotate(currentEuler);
+	}
 }

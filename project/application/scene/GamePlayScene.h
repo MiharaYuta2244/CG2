@@ -36,6 +36,8 @@ private:
 	// 敵死亡時パーティクル生成
 	void GenerateEnemyDeathEffect(const Vector3& pos);
 
+	void FollowCamera(float deltaTime);
+
 private:
 	// プレイヤー
 	std::unique_ptr<Player> player_;
