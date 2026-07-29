@@ -89,6 +89,7 @@ public:
 	uint32_t GetID() const { return id_; }
 	const std::string& GetName() const { return name_; }
 	const std::string& GetFilepath() const { return currentFilepath_; }
+	const Skeleton& GetSkeleton() const { return skeleton_; }
 
 private:
 	/// <summary>

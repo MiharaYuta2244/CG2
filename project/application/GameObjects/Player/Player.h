@@ -118,6 +118,9 @@ private:
 	// HPが2以下の時の出血処理
 	void Bleeding(float deltaTime);
 
+	// プレイヤーモデルの足の座標を返す関数
+	Vector3 LegPos();
+
 private:
 	Vector2 velocity_;
 	OBB attackCol_;
@@ -201,6 +204,6 @@ private:
 	float pointLightHeightOffset_ = 2.0f;                // プレイヤー中心からの高さ
 	Vector4 pointLightColor_ = {1.0f, 1.0f, 1.0f, 1.0f}; // ライトの色
 	float pointLightIntensity_ = 1.0f;                   // 輝度
-	float pointLightRadius_ = 7.0f;                     // 影響半径
+	float pointLightRadius_ = 7.0f;                      // 影響半径
 	float pointLightDecay_ = 0.7f;                       // 減衰率
 };
