@@ -68,6 +68,9 @@ public:
 	// GlitchShader用に経過時間を設定
 	void SetGlitchTime(float time) { glitchParam_.time = time; }
 
+	// RadialBlurのパラメータ設定
+	void SetRadialBlurParam(RadialBlurParam radialBlurParam) { radialBlurParam_ = radialBlurParam; }
+
 	// RadialBlur用にWidthを設定
 	void SetRadialBlurWidth(float blurWidth) { radialBlurParam_.blurWidth = blurWidth; }
 
@@ -88,6 +91,17 @@ public:
 
 	// DeathEffectのIntensity設定
 	void SetDeathEffectIntensity(float intensity) { deathEffectParam_.intensity = intensity; }
+
+	// Smoothingのパラメータ設定
+	void SetSmoothingParam(const SmoothingParam& param) { smoothingParam_ = param; }
+	void SetSmoothingRadius(int radius) { smoothingParam_.radius = radius; }
+	void SetSmoothingIntensity(float intensity) { smoothingParam_.intensity = intensity; }
+
+	// Gaussianのパラメータ設定
+	void SetGaussianParam(const GaussianParam& param) { gaussianParam_ = param; }
+	void SetGaussianRadius(int radius) { gaussianParam_.radius = radius; }
+	void SetGaussianIntensity(float intensity) { gaussianParam_.intensity = intensity; }
+	void SetGaussianSigma(float sigma) { gaussianParam_.sigma = sigma; }
 
 private:
 	// シェーダコンパイラの初期化

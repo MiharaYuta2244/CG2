@@ -13,7 +13,7 @@ using namespace TinyEngine;
 
 void CollisionManager::CheckCollisions(
     Player* player, EnemyManager* enemyManager, EnemyBulletManager* enemyBulletManager, EnemyBombManager* enemyBombManager, Stage* stage, Camera* camera, CommonData* commonData,
-    std::function<void(const Vector3&)> generateParticleCallback, float& glitchTimer) {
+    std::function<void(const Vector3&)> generateParticleCallback, float& glitchTimer, float& blurTimer) {
 
 	// ==========================================
 	// プレイヤーと敵の弾の当たり判定
@@ -52,6 +52,7 @@ void CollisionManager::CheckCollisions(
 			if (!isGuarded) {
 				player->Damage(1);
 				glitchTimer = 0.5f;
+				blurTimer = 1.0f;
 			}
 		}
 	}

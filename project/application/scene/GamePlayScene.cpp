@@ -21,7 +21,7 @@ void GamePlayScene::Initialize(const SceneContext& ctx) {
 
 	// ライトの設定
 	DirectionalLight dirLight;
-	dirLight.color = {1,1,1,1};
+	dirLight.color = {1, 1, 1, 1};
 	dirLight.intensity = 3.0f;
 	dirLight.direction = {0.5f, 0.5f, -0.5f};
 	ctx.engineContext->object3dCommon->SetDirectionalLightParam(dirLight);
@@ -74,9 +74,15 @@ void GamePlayScene::Initialize(const SceneContext& ctx) {
 
 	// シーンで使うエフェクトの宣言
 	ctx_.engineContext->postEffectPipeline->SetEffects({
-	    PostEffectType::Vignette,    // ビネット
-	    PostEffectType::Glitch,      // グリッチ
-	    PostEffectType::DeathEffect, // 死亡時エフェクト
+	    PostEffectType::Vignette,         // ビネット
+	    PostEffectType::Glitch,           // グリッチ
+	    PostEffectType::DeathEffect,      // 死亡時エフェクト
+	    PostEffectType::Smoothing,        // スムージング
+	    PostEffectType::Gaussian,         // ガウシアン
+	    PostEffectType::LuminanceOutline, // アウトライン
+	    PostEffectType::DepthOutline,     // アウトライン
+	    PostEffectType::RadialBlur,       // ラディアルブラー
+	    // PostEffectType::Dissolve,	         // ディゾルブ
 	});
 
 	// パラメータ設定
@@ -111,6 +117,13 @@ void GamePlayScene::Update() {
 	// グリッチノイズの更新
 	UpdateGlitch(deltaTime);
 
+	if (damageBlurTimer_ > 0.0f) {
+		damageBlurTimer_ -= deltaTime;
+		if (damageBlurTimer_ < 0.0f) {
+			damageBlurTimer_ = 0.0f;
+		}
+	}
+
 	// ポーズ画面
 	if (ctx_.keyboard->KeyTriggered(DIK_TAB) || ctx_.gamePad->GetState().buttonsPressed.start) {
 		RequestScenePush("Pause");
@@ -131,10 +144,32 @@ void GamePlayScene::Update() {
 
 	// HP量に応じてVignetteのパラメータを変更
 	auto* vignette = ctx_.engineContext->postEffectPipeline->GetPass(PostEffectType::Vignette);
+	auto* smoothing = ctx_.engineContext->postEffectPipeline->GetPass(PostEffectType::Smoothing);
+	auto* gaussian = ctx_.engineContext->postEffectPipeline->GetPass(PostEffectType::Gaussian);
+	auto* radialBlur = ctx_.engineContext->postEffectPipeline->GetPass(PostEffectType::RadialBlur);
 	if (!player_->IsDead()) {
 		if (vignette) {
 			float intensity = player_->GetCurrentHP() <= 1.0f ? 0.5f : 0.0f;
 			vignette->SetVignetteIntensity(intensity);
+		}
+
+		if (radialBlur) {
+			RadialBlurParam param;
+			param.blurWidth = player_->GetCurrentHP() <= 1.0f ? 0.01f : 0.0f;
+			param.numSamples = player_->GetCurrentHP() <= 1.0f ? 5.0f : 1.0f;
+			radialBlur->SetRadialBlurParam(param);
+		}
+
+		if (smoothing) {
+			SmoothingParam param;
+			param.radius = (damageBlurTimer_ > 0.0f) ? 2 : 0;
+			smoothing->SetSmoothingParam(param);
+		}
+
+		if (gaussian) {
+			GaussianParam param;
+			param.radius = (damageBlurTimer_ > 0.0f) ? 2 : 0;
+			gaussian->SetGaussianParam(param);
 		}
 	} else {
 		vignette->SetVignetteIntensity(0.0f);
@@ -157,7 +192,8 @@ void GamePlayScene::Update() {
 
 	// 当たり判定
 	collisionManager_->CheckCollisions(
-	    player_.get(), enemyManager_.get(), enemyBulletManager_.get(), enemyBombManager_.get(), stage_.get(), ctx_.currentCamera, commonData_, [this](const Vector3& pos) { GenerateEnemyDeathEffect(pos); }, glitchTimer_);
+	    player_.get(), enemyManager_.get(), enemyBulletManager_.get(), enemyBombManager_.get(), stage_.get(), ctx_.currentCamera, commonData_,
+	    [this](const Vector3& pos) { GenerateEnemyDeathEffect(pos); }, glitchTimer_, damageBlurTimer_);
 
 	// 押し戻し完了後の最終的な座標で、描画更新&AABB更新
 	player_->PostUpdate();
@@ -376,7 +412,7 @@ void GamePlayScene::GenerateEnemyDeathEffect(const Vector3& pos) {
 	EffectGenerator::CreateEnemyDeathEffect(ctx_.engineContext, pos, enemyDeathEffect_);
 }
 
-void GamePlayScene::FollowCamera(float deltaTime){
+void GamePlayScene::FollowCamera(float deltaTime) {
 	// カメラの追従
 	if (!isDebugCameraActive_) {
 		Vector3 playerPos = player_->GetPosition();

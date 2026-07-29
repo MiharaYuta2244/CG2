@@ -14,6 +14,7 @@
 #include "Collision/CollisionManager.h"
 #include "GameObjects/ControlUI/ControlUI.h"
 #include "GameObjects/Enemy/EnemyBombManager.h"
+#include "AnimationBundle.h"
 #include <memory>
 
 /// <summary>
@@ -112,4 +113,6 @@ private:
 	// カメラ関連
 	float cameraAngle_ = 6.0f; // カメラの傾き
 	float tiltSpeed_ = 5.0f; // 傾くスピード
+
+	float damageBlurTimer_ = 0.0f;
 };

@@ -25,13 +25,13 @@ struct SepiaParam {
 struct SmoothingParam {
 	int radius = 2;
 	float intensity = 1.0f;
-	float texelSize[2] = {0.0f, 0.0f};
+	float texelSize[2] = {1.0f / 1280.0f, 1.0f / 720.0f};
 };
 
 struct GaussianParam {
 	float intensity = 1.0f;
 	float sigma = 2.0f;
-	float texelSize[2] = {0.0f, 0.0f};
+	float texelSize[2] = {1.0f / 1280.0f, 1.0f / 720.0f};
 	int radius = 2;
 	float padding[3];
 };
