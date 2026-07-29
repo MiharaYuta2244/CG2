@@ -95,7 +95,6 @@
     <PostBuildEvent>
       <Command>copy "$(windowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxcompiler.dll" "$(TargetDir)dxcompiler.dll"
 copy "$(windowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dxil.dll"
-xcopy /E /I /Y "$(ProjectDir)resources" "$(OutDir)resources"
 </Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
@@ -127,7 +126,6 @@ xcopy /E /I /Y "$(ProjectDir)resources" "$(OutDir)resources"
     <PostBuildEvent>
       <Command>copy "$(windowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxcompiler.dll" "$(TargetDir)dxcompiler.dll"
 copy "$(windowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dxil.dll"
-xcopy /E /I /Y "$(ProjectDir)resources" "$(OutDir)resources"
 </Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
@@ -162,7 +160,6 @@ xcopy /E /I /Y "$(ProjectDir)resources" "$(OutDir)resources"
     <PostBuildEvent>
       <Command>copy "$(windowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxcompiler.dll" "$(TargetDir)dxcompiler.dll"
 copy "$(windowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dxil.dll"
-xcopy /E /I /Y "$(ProjectDir)resources" "$(OutDir)resources"
 </Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
