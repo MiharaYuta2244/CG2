@@ -204,7 +204,6 @@ void SceneEditor::UpdatePicking(const SceneContext& ctx) {
 			return;
 		}
 
-		ImGui::Begin("Game");
 		ImVec2 mousePos = ImGui::GetMousePos();
 		ImVec2 windowPos = ImGui::GetWindowPos();
 		ImVec2 contentMin = ImGui::GetWindowContentRegionMin();

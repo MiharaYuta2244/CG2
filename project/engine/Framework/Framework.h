@@ -6,7 +6,9 @@
 #include "DirectXCommon.h"
 #include "EngineContext.h"
 #include "GamePad.h"
+#ifdef USE_IMGUI
 #include "ImGuiManager.h"
+#endif
 #include "ModelManager.h"
 #include "Object3dCommon.h"
 #include "ParticleCommon.h"
