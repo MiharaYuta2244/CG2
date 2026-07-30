@@ -116,6 +116,7 @@ private:
 	float knockBackPower_ = 15.0f;
 
 	std::unique_ptr<ObjectRender> render_;               // 描画用インスタンス
+	std::unique_ptr<ObjectRender> renderGun_;               // 武器描画用インスタンス
 	std::unique_ptr<EnemyAI> ai_;                        // AI
 	std::unique_ptr<TinyEngine::VisionCone> visionCone_; // 視界
 	std::unique_ptr<ExclamationMark> exclamationMark_;   // 「!」マーク

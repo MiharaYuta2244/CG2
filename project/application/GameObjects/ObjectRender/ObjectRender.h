@@ -38,6 +38,7 @@ public:
 	// 描画用オブジェクトを返すGetter
 	TinyEngine::Object3d* GetObject3d() { return object3d_.get(); }
 	const std::string GetFilepath() { return object3d_->GetFilepath(); }
+	Vector3 GetBonePos(const std::wstring& boneName) { return object3d_->GetBonePos(boneName); }
 
 private:
 	// モデル

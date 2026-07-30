@@ -3,7 +3,6 @@
 #include "GameObjects/Effect/EffectGenerator.h"
 #include "GameObjects/Enemy/Enemy.h"
 #include "GameObjects/Enemy/EnemyManager.h"
-#include "StringUtility.h"
 
 using namespace TinyEngine;
 
@@ -290,7 +289,7 @@ void Player::Update(float deltaTime, DirectInput* input, GamePad* gamePad, Enemy
 	// パーティクルの生成
 	if (particleGenerateTimer_.IsEnd() && !hp_->IsDead()) {
 		auto particle = std::make_unique<Particle>();
-		particle->Initialize(ctx_, LegPos(), "Dust.png", std::make_unique<DustStepModule>(), nullptr, TinyEngine::ParticleMeshType::Square);
+		particle->Initialize(ctx_, render_->GetBonePos(L"ボーン.022"), "Dust.png", std::make_unique<DustStepModule>(), nullptr, TinyEngine::ParticleMeshType::Square);
 		particle->SetEmitMode(false, 0.1f);
 		particle->SetEmitterParam(1, 0.3f);
 		dustParticle_.push_back(std::move(particle));
@@ -547,28 +546,4 @@ void Player::DrawImGui() {
 
 	ImGui::End();
 #endif
-}
-
-Vector3 Player::LegPos() {
-	Vector3 legPos{};
-	Object3d* obj3d = render_->GetObject3d();
-	const Skeleton& skeleton = obj3d->GetSkeleton();
-
-	// ボーンの名前
-	std::wstring targetBoneName = L"ボーン.022";
-
-	auto it = skeleton.jointMap.find(StringUtility::ConvertString(targetBoneName));
-	if(it!=skeleton.jointMap.end()){
-		// ボーンのindexからJoint情報を取得
-		int32_t jointIndex = it->second;
-		const Joint& legJoint = skeleton.joints[jointIndex];
-
-		// 座標の取得
-		Matrix4x4 boneMatrix = legJoint.skeletonSpaceMatrix;
-		Matrix4x4 worldMatrix = obj3d->GetWorldMatrix();
-		Matrix4x4 legWorldMatrix = MathUtility::Multiply(boneMatrix, worldMatrix);
-		legPos = {legWorldMatrix.m[3][0], legWorldMatrix.m[3][1], legWorldMatrix.m[3][2]};
-	}
-
-	return legPos;
 }

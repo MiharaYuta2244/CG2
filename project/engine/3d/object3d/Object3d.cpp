@@ -3,6 +3,7 @@
 #include "MathOperator.h"
 #include "MathUtility.h"
 #include "Model.h"
+#include "StringUtility.h"
 
 using namespace Microsoft::WRL;
 using namespace DirectX;
@@ -284,10 +285,14 @@ void Object3d::SetModel(const std::string& filePath) {
 		skeleton_ = model_->CreateSkeleton(modelData_.rootNode);
 
 		auto device = ctx_->object3dCommon->GetDxCommon()->GetDevice();
-		paletteSrvIndex_ = ctx_->srvManager->Allocate();
-		inputVertexSrvIndex_ = ctx_->srvManager->Allocate();
-		influenceSrvIndex_ = ctx_->srvManager->Allocate();
-		outputUavIndex_ = ctx_->srvManager->Allocate();
+		if (paletteSrvIndex_ == 0)
+			paletteSrvIndex_ = ctx_->srvManager->Allocate();
+		if (inputVertexSrvIndex_ == 0)
+			inputVertexSrvIndex_ = ctx_->srvManager->Allocate();
+		if (influenceSrvIndex_ == 0)
+			influenceSrvIndex_ = ctx_->srvManager->Allocate();
+		if (outputUavIndex_ == 0)
+			outputUavIndex_ = ctx_->srvManager->Allocate();
 
 		skinCluster_ = model_->CreateSkinCluster(
 		    device, skeleton_, model_->GetModelData(), ctx_->object3dCommon->GetDxCommon()->GetSrvDescriptorHeap(), ctx_->object3dCommon->GetDxCommon()->GetDescriptorSizeSRV(), paletteSrvIndex_,
@@ -384,4 +389,27 @@ void Object3d::CreateOutlineData() {
 	outlineResource_ = DirectXUtils::CreateBufferResource(ctx_->object3dCommon->GetDxCommon()->GetDevice(), sizeof(Outline));
 	outlineResource_->Map(0, nullptr, reinterpret_cast<void**>(&outlineData_));
 	*outlineData_ = outline_;
+}
+
+Vector3 Object3d::GetBonePos(const std::wstring boneName) {
+	Vector3 bonePos{};
+	const Skeleton& skeleton = GetSkeleton();
+
+	// ボーンの名前
+	std::wstring targetBoneName = boneName;
+
+	auto it = skeleton.jointMap.find(StringUtility::ConvertString(targetBoneName));
+	if (it != skeleton.jointMap.end()) {
+		// ボーンのindexからJoint情報を取得
+		int32_t jointIndex = it->second;
+		const Joint& legJoint = skeleton.joints[jointIndex];
+
+		// 座標の取得
+		Matrix4x4 boneMatrix = legJoint.skeletonSpaceMatrix;
+		Matrix4x4 worldMatrix = GetWorldMatrix();
+		Matrix4x4 boneWorldMatrix = MathUtility::Multiply(boneMatrix, worldMatrix);
+		bonePos = {boneWorldMatrix.m[3][0], boneWorldMatrix.m[3][1], boneWorldMatrix.m[3][2]};
+	}
+
+	return bonePos;
 }

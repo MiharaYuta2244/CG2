@@ -118,9 +118,6 @@ private:
 	// HPが2以下の時の出血処理
 	void Bleeding(float deltaTime);
 
-	// プレイヤーモデルの足の座標を返す関数
-	Vector3 LegPos();
-
 private:
 	Vector2 velocity_;
 	OBB attackCol_;

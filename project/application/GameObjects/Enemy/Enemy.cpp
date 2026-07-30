@@ -32,16 +32,26 @@ void Enemy::Initialize(EngineContext* ctx, Vector3 pos, EnemyType type, DecalMan
 		break;
 	}
 
-	transform_.scale = {1.0f, 1.0f, 1.0f};
+	transform_.scale = {0.2f, 0.2f, 0.2f};
 	transform_.rotate = {0.0f, 0.0f, 0.0f};
 	transform_.translate = pos;
 
 	// 描画用インスタンスの生成&初期化
 	render_ = std::make_unique<ObjectRender>();
-	render_->Initialize(ctx, "Hiyoko.obj");
+	render_->Initialize(ctx, "HumanIdle.gltf");
 	render_->SetTransform(transform_);
 	render_->SetEnvScale(envScale_);
 	render_->SetColor(color_);
+	render_->SetIsSkinning(true);
+	KeyframeAnimation keyframeAnimation;
+	Animation idleAnimation = keyframeAnimation.LoadAnimationFile("HumanIdle.gltf");
+	render_->GetObject3d()->PlayAnimation(idleAnimation);
+
+	renderGun_ = std::make_unique<ObjectRender>();
+	renderGun_->Initialize(ctx, "scene.gltf");
+	renderGun_->SetTransform(transform_);
+	renderGun_->SetEnvScale(envScale_);
+	renderGun_->SetColor(color_);
 
 	// AIインスタンス生成&初期化
 	ai_ = std::make_unique<EnemyAI>();
@@ -88,8 +98,39 @@ void Enemy::Update(float deltaTime, Player* player, EnemyBulletManager* enemyBul
 			invincibleTimer_ -= deltaTime;
 		}
 
+		// AI更新前の座標を記録
+		Vector3 prevPos = transform_.translate;
+
 		// AIインスタンス更新
 		ai_->Update(deltaTime, player, enemyBulletManager, wallManager, doorManager, glassManager, enemyBombManager);
+
+		// アニメーション遷移処理
+		std::string targetModel = "HumanIdle.gltf"; // 待機
+
+		if (ai_->GetState() == EnemyAI::State::Hold) {
+			// 拘束時
+			targetModel = "HumanIdle.gltf";
+		} else if (ai_->GetState() == EnemyAI::State::Vigilance) {
+			// 警戒時
+			targetModel = "HumanVigilanceWalk.gltf";
+		} else {
+			// 通常時
+			float dx = transform_.translate.x - prevPos.x;
+			float dz = transform_.translate.z - prevPos.z;
+			if ((dx * dx + dz * dz) > 0.0001f) {
+				targetModel = "HumanNormalWalk.gltf"; // 歩き
+			} else {
+				targetModel = "HumanIdle.gltf"; // 待機
+			}
+		}
+
+		// 現在のモデルと違う場合のみ、モデルを切り替えてアニメーション再生
+		if (render_->GetFilepath() != targetModel) {
+			render_->SetModel(targetModel);
+			KeyframeAnimation keyframeAnim;
+			Animation anim = keyframeAnim.LoadAnimationFile(targetModel);
+			render_->GetObject3d()->PlayAnimation(anim);
+		}
 
 		if (ai_->IsShotThisFrame()) {
 			GenerateMuzzleFlash(ai_->GetShotDirection());
@@ -210,6 +251,16 @@ void Enemy::PostUpdate() {
 
 	// 正しい座標で描画用インスタンスの更新
 	render_->Update(transform_);
+
+	Transform gunTransform;
+	gunTransform.scale = {2.0f, 2.0f, 2.0f};
+	float gunYaw = transform_.rotate.y - (std::numbers::pi_v<float> / 2.0f);
+	gunTransform.rotate = {-std::numbers::pi_v<float> / 2.0f, gunYaw, 0.0f};
+
+	// 手のボーン座標に追従
+	gunTransform.translate = render_->GetBonePos(L"ボーン.007");
+
+	renderGun_->Update(gunTransform);
 }
 
 void Enemy::Draw() {
@@ -217,6 +268,7 @@ void Enemy::Draw() {
 		// 描画
 		if (isBlinkVisible_) {
 			render_->Draw();
+			renderGun_->Draw();
 		}
 
 		// 視界

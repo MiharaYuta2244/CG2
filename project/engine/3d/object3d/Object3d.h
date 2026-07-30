@@ -53,7 +53,7 @@ public:
 	/// </summary>
 	/// <param name="animation">アニメーション</param>
 	/// <param name="blendDuration">補間にかける時間</param>
-	void PlayAnimation(const Animation& animation, float blendDuration = 0.2f);
+	void PlayAnimation(const Animation& animation, float blendDuration = 0.1f);
 
 	// setter
 	void SetModel(const std::string& filePath);
@@ -91,6 +91,7 @@ public:
 	const std::string& GetName() const { return name_; }
 	const std::string& GetFilepath() const { return currentFilepath_; }
 	const Skeleton& GetSkeleton() const { return skeleton_; }
+	Vector3 GetBonePos(const std::wstring boneName);
 
 private:
 	/// <summary>
