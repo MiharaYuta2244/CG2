@@ -71,10 +71,6 @@ void Object3d::Initialize(EngineContext* ctx, const std::string& name) {
 
 	// カメラをセットする
 	camera_ = ctx_->object3dCommon->GetDefaultCamera();
-
-	// キーフレームアニメーション
-	keyframeAnimation_ = std::make_unique<KeyframeAnimation>();
-	animation_ = keyframeAnimation_->LoadAnimationFile("AnimatedCube.gltf");
 }
 
 void Object3d::Update() {
@@ -94,18 +90,8 @@ void Object3d::Update() {
 		worldViewProjectionMatrix_ = worldMatrix_;
 	}
 
-	if (name_ == "AnimatedCube.gltf") {
-		// アニメーションモデル
-		Matrix4x4 localMatrix{};
-		localMatrix = keyframeAnimation_->UpdateAnimation(totalTime, &animation_, &modelData_);
-
-		transformMatrixData_->WVP = localMatrix * worldViewProjectionMatrix_;
-		transformMatrixData_->World = localMatrix * worldMatrix_;
-	} else {
-		// 非アニメーションモデル
-		transformMatrixData_->WVP = modelData_.rootNode.localMatrix * worldViewProjectionMatrix_;
-		transformMatrixData_->World = modelData_.rootNode.localMatrix * worldMatrix_;
-	}
+	transformMatrixData_->WVP = modelData_.rootNode.localMatrix * worldViewProjectionMatrix_;
+	transformMatrixData_->World = modelData_.rootNode.localMatrix * worldMatrix_;
 
 	if (model_) {
 		if (isAnimating_) {

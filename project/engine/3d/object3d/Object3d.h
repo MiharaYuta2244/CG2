@@ -187,9 +187,6 @@ private:
 	// 全Object3dで共有する次に割り当てるID
 	static uint32_t s_nextID_;
 
-	// キーフレームアニメーション
-	std::unique_ptr<KeyframeAnimation> keyframeAnimation_;
-
 	Skeleton skeleton_;           // スケルトンデータ
 	Animation animation_;         // 再生中のアニメーションデータ
 	float animationTimer_ = 0.0f; // アニメーションの経過時間
