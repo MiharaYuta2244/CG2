@@ -52,7 +52,8 @@ public:
 	/// アニメーションをセットして再生を開始する関数
 	/// </summary>
 	/// <param name="animation">アニメーション</param>
-	void PlayAnimation(const Animation& animation);
+	/// <param name="blendDuration">補間にかける時間</param>
+	void PlayAnimation(const Animation& animation, float blendDuration = 0.2f);
 
 	// setter
 	void SetModel(const std::string& filePath);
@@ -206,5 +207,12 @@ private:
 
 	// アウトラインの有効フラグ
 	bool enableOutline_ = false;
+
+	// アニメーションブレンド用変数
+	Animation nextAnimation_;         // ブレンド先の新しいアニメーションデータ
+	float nextAnimationTimer_ = 0.0f; // 新しいアニメーションの経過時間
+	bool isBlending_ = false;         // ブレンド中フラグ
+	float blendTimer_ = 0.0f;         // ブレンド経過時間
+	float blendDuration_ = 0.0f;      // ブレンド完了までの時間
 };
 } // namespace TinyEngine

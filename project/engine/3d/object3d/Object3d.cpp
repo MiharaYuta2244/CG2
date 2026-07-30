@@ -96,8 +96,38 @@ void Object3d::Update() {
 	if (model_) {
 		if (isAnimating_) {
 			animationTimer_ += elapsedTime;
-			animationTimer_ = std::fmod(animationTimer_, animation_.duration);
-			model_->ApplyAnimation(skeleton_, animation_, animationTimer_);
+
+			if (isBlending_ && animationTimer_ >= animation_.duration) {
+				animationTimer_ = animation_.duration; // 最後のフレームで固定する
+			} else {
+				animationTimer_ = std::fmod(animationTimer_, animation_.duration);
+			}
+
+			if (isBlending_) {
+				// 次のアニメーションも並行して時間を進める
+				nextAnimationTimer_ += elapsedTime;
+				nextAnimationTimer_ = std::fmod(nextAnimationTimer_, nextAnimation_.duration);
+				blendTimer_ += elapsedTime;
+
+				// ブレンド率を計算
+				float blendFactor = blendTimer_ / blendDuration_;
+				if (blendFactor > 1.0f)
+					blendFactor = 1.0f;
+
+				if (blendFactor >= 1.0f) {
+					// 次のアニメーションに完全移行
+					animation_ = nextAnimation_;
+					animationTimer_ = nextAnimationTimer_;
+					isBlending_ = false;
+					model_->ApplyAnimation(skeleton_, animation_, animationTimer_);
+				} else {
+					// 2つのアニメーションを合成して適用
+					model_->BlendAnimation(skeleton_, animation_, animationTimer_, nextAnimation_, nextAnimationTimer_, blendFactor);
+				}
+			} else {
+				// 通常の単一アニメーション適用
+				model_->ApplyAnimation(skeleton_, animation_, animationTimer_);
+			}
 		}
 
 		model_->UpdateSkeleton(skeleton_);
@@ -218,10 +248,31 @@ void TinyEngine::Object3d::DrawGizmo(const Matrix4x4& viewMatrix, const Matrix4x
 #endif // USE_IMGUI
 }
 
-void TinyEngine::Object3d::PlayAnimation(const Animation& animation) {
-	animation_ = animation;
-	animationTimer_ = 0.0f;
-	isAnimating_ = true;
+void TinyEngine::Object3d::PlayAnimation(const Animation& animation, float blendDuration) {
+	// すでに同じアニメーションが設定されている場合は処理を無視する
+	if (isAnimating_) {
+		if (!isBlending_ && animation_.name == animation.name) {
+			return;
+		}
+		if (isBlending_ && nextAnimation_.name == animation.name) {
+			return;
+		}
+	}
+
+	// すでにアニメーション再生中かつ補間時間が設定されている場合はブレンドを開始
+	if (isAnimating_ && blendDuration > 0.0f) {
+		nextAnimation_ = animation;
+		nextAnimationTimer_ = 0.0f;
+		isBlending_ = true;
+		blendTimer_ = 0.0f;
+		blendDuration_ = blendDuration;
+	} else {
+		// 初回再生や補間なしの場合は即座に切り替え
+		animation_ = animation;
+		animationTimer_ = 0.0f;
+		isAnimating_ = true;
+		isBlending_ = false;
+	}
 }
 
 void Object3d::SetModel(const std::string& filePath) {

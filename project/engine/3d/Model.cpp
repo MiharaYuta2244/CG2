@@ -518,3 +518,44 @@ Node Model::ReadNode(aiNode* node) {
 
 	return result;
 }
+
+void Model::BlendAnimation(Skeleton& skeleton, const Animation& currentAnimation, float currentTime, const Animation& nextAnimation, float nextTime, float blendFactor) {
+	for (Joint& joint : skeleton.joints) {
+		auto itCurrent = currentAnimation.nodeAnimations.find(joint.name);
+		auto itNext = nextAnimation.nodeAnimations.find(joint.name);
+
+		bool hasCurrent = (itCurrent != currentAnimation.nodeAnimations.end());
+		bool hasNext = (itNext != nextAnimation.nodeAnimations.end());
+
+		if (hasCurrent && hasNext) {
+			const NodeAnimation& currentAnim = itCurrent->second;
+			const NodeAnimation& nextAnim = itNext->second;
+
+			// 現在のアニメーションのTransform
+			Vector3 currentTranslate = KeyframeAnimation::CalculateValue<Vector3, KeyframeVector3>(currentAnim.translate, currentTime);
+			Quaternion currentRotate = KeyframeAnimation::CalculateValue<Quaternion, KeyframeQuaternion>(currentAnim.rotate, currentTime);
+			Vector3 currentScale = KeyframeAnimation::CalculateValue<Vector3, KeyframeVector3>(currentAnim.scale, currentTime);
+
+			// 次のアニメーションのTransform
+			Vector3 nextTranslate = KeyframeAnimation::CalculateValue<Vector3, KeyframeVector3>(nextAnim.translate, nextTime);
+			Quaternion nextRotate = KeyframeAnimation::CalculateValue<Quaternion, KeyframeQuaternion>(nextAnim.rotate, nextTime);
+			Vector3 nextScale = KeyframeAnimation::CalculateValue<Vector3, KeyframeVector3>(nextAnim.scale, nextTime);
+
+			joint.transform.translate = MathUtility::Lerp(currentTranslate, nextTranslate, blendFactor);
+			joint.transform.rotate = MathUtility::Lerp(currentRotate, nextRotate, blendFactor);
+			joint.transform.scale = MathUtility::Lerp(currentScale, nextScale, blendFactor);
+		} else if (hasCurrent) {
+			// 現在のアニメーションしか存在しない場合
+			const NodeAnimation& currentAnim = itCurrent->second;
+			joint.transform.translate = KeyframeAnimation::CalculateValue<Vector3, KeyframeVector3>(currentAnim.translate, currentTime);
+			joint.transform.rotate = KeyframeAnimation::CalculateValue<Quaternion, KeyframeQuaternion>(currentAnim.rotate, currentTime);
+			joint.transform.scale = KeyframeAnimation::CalculateValue<Vector3, KeyframeVector3>(currentAnim.scale, currentTime);
+		} else if (hasNext) {
+			// 次のアニメーションしか存在しない場合
+			const NodeAnimation& nextAnim = itNext->second;
+			joint.transform.translate = KeyframeAnimation::CalculateValue<Vector3, KeyframeVector3>(nextAnim.translate, nextTime);
+			joint.transform.rotate = KeyframeAnimation::CalculateValue<Quaternion, KeyframeQuaternion>(nextAnim.rotate, nextTime);
+			joint.transform.scale = KeyframeAnimation::CalculateValue<Vector3, KeyframeVector3>(nextAnim.scale, nextTime);
+		}
+	}
+}

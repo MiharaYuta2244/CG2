@@ -90,6 +90,8 @@ public:
 
 	void UpdateSkinCluster(SkinCluster& skinCluster, const Skeleton& skeleton);
 
+	void BlendAnimation(Skeleton& skeleton, const Animation& currentAnimation, float currentTime, const Animation& nextAnimation, float nextTime, float blendFactor);
+
 private:
 	/// <summary>
 	/// モデルファイルを読み込む

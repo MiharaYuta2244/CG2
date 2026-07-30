@@ -24,6 +24,7 @@ template<typename tValue> struct AnimationCurve {
 };
 
 struct Animation {
+	std::string name;                                    // アニメーションの名前
 	float duration;                                      // アニメーション全体の尺
 	std::map<std::string, NodeAnimation> nodeAnimations; // NodeAnimationの集合。Node名でひけるようにしておく
 };
@@ -41,10 +42,11 @@ public:
 
 public:
 	// 任意の時刻の値を取得する
-	template<typename tValue, typename keyframeType> 
-	static tValue CalculateValue(const std::vector<keyframeType>& keyframes, float time) {
-		assert(!keyframes.empty()); 
-		if (keyframes.size() == 1 || time <= keyframes[0].time) { return keyframes[0].value; }
+	template<typename tValue, typename keyframeType> static tValue CalculateValue(const std::vector<keyframeType>& keyframes, float time) {
+		assert(!keyframes.empty());
+		if (keyframes.size() == 1 || time <= keyframes[0].time) {
+			return keyframes[0].value;
+		}
 
 		for (size_t index = 0; index < keyframes.size() - 1; ++index) {
 			size_t nextIndex = index + 1;

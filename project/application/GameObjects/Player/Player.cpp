@@ -278,7 +278,7 @@ void Player::Update(float deltaTime, DirectInput* input, GamePad* gamePad, Enemy
 
 			// アクションアニメーションの再生開始を記録し、タイマーを設定
 			isActionAnimating_ = true;
-			actionAnimTimer_ = 0.3f;
+			actionAnimTimer_ = 0.2f;
 		}
 	}
 
