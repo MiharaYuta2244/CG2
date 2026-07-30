@@ -61,7 +61,7 @@ void Particle::Initialize(
 	ctx_->textureManager->LoadTexture(texturePath);
 
 	// テクスチャ番号を取得して、メンバ変数に書き込む
-	modelData_.material.textureIndex = ctx_->textureManager->GetSrvIndex(texturePath);
+	modelData_.materials[0].textureIndex = ctx_->textureManager->GetSrvIndex(texturePath);
 
 	// カメラをセットする
 	camera_ = ctx_->particleCommon->GetDefaultCamera();
@@ -158,7 +158,7 @@ void Particle::Draw() {
 	commandList->SetGraphicsRootConstantBufferView(0, materialResource_->GetGPUVirtualAddress());
 
 	// SRVのDescriptorTableの先頭を設定。3はrootParameter[3]（Pixel用テクスチャ）である。
-	commandList->SetGraphicsRootDescriptorTable(2, ctx_->textureManager->GetSrvHandleGPU(modelData_.material.textureFilePath));
+	commandList->SetGraphicsRootDescriptorTable(2, ctx_->textureManager->GetSrvHandleGPU(modelData_.materials[0].textureFilePath));
 
 	// 描画!(DrawCall/ドローコール)。
 	commandList->DrawInstanced(UINT(modelData_.vertices.size()), numInstance_, 0, 0);
@@ -166,6 +166,7 @@ void Particle::Draw() {
 
 ModelData Particle::CreatePrimitive(const std::string& texturePath) {
 	ModelData modelData;
+	modelData.materials.resize(1);
 
 	modelData.vertices.push_back({
 	    .position = {-1.0f, 1.0f, 0.0f, 1.0f},
@@ -198,13 +199,14 @@ ModelData Particle::CreatePrimitive(const std::string& texturePath) {
           .normal = {0.0f, 0.0f, 1.0f}
     }); // 右下
 
-	modelData.material.textureFilePath = "resources/textures/" + texturePath;
+	modelData.materials[0].textureFilePath = "resources/textures/" + texturePath;
 
 	return modelData;
 }
 
 ModelData TinyEngine::Particle::CreateRingPrimitive(const std::string& texturePath, float innerRadius, float outerRadius, uint32_t segments) { 
 	ModelData modelData;
+	modelData.materials.resize(1);
 
 	// 円周の分割角度
 	float angleStep = 2.0f * std::numbers::pi_v<float> / static_cast<float>(segments);
@@ -245,13 +247,14 @@ ModelData TinyEngine::Particle::CreateRingPrimitive(const std::string& texturePa
 		modelData.vertices.push_back({.position = pOut2, .texcoord = uvOut2, .normal = normal});
 	}
 
-	modelData.material.textureFilePath = "resources/textures/" + texturePath;
+	modelData.materials[0].textureFilePath = "resources/textures/" + texturePath;
 
 	return modelData;
 }
 
 ModelData TinyEngine::Particle::CreateCylinderPrimitive(const std::string& texturePath, float topRadius, float bottomRadius, float height, uint32_t segments) {
 	ModelData modelData;
+	modelData.materials.resize(1);
 
 	// 円周の分割角度
 	float radianPerDivide = 2.0f * std::numbers::pi_v<float> / static_cast<float>(segments);
@@ -310,7 +313,7 @@ ModelData TinyEngine::Particle::CreateCylinderPrimitive(const std::string& textu
         });
 	}
 
-	modelData.material.textureFilePath = "resources/textures/" + texturePath;
+	modelData.materials[0].textureFilePath = "resources/textures/" + texturePath;
 	return modelData;
 }
 

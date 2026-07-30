@@ -27,11 +27,11 @@ void Model::Initialize(ModelCommon* modelCommon, TextureManager* textureManager,
 	// インデックスデータの初期化
 	CreateIndexData();
 
-	// テクスチャ読み込み
-	textureManager_->LoadTexture(modelData_.material.textureFilePath);
-
-	// テクスチャ番号を取得して、メンバ変数に書き込む
-	modelData_.material.textureIndex = textureManager_->GetSrvIndex(modelData_.material.textureFilePath);
+	// 全マテリアルのテクスチャ読み込み
+	for (auto& material : modelData_.materials) {
+		textureManager_->LoadTexture(material.textureFilePath);
+		material.textureIndex = textureManager_->GetSrvIndex(material.textureFilePath);
+	}
 }
 
 void Model::Update() {}
@@ -262,10 +262,15 @@ void Model::Draw(const std::string& textureFilePath, const SkinCluster* skinClus
 
 	commandList->IASetIndexBuffer(&indexBufferView_);
 
-	std::string path = textureFilePath.empty() ? modelData_.material.textureFilePath : textureFilePath;
-	commandList->SetGraphicsRootDescriptorTable(2, textureManager_->GetSrvHandleGPU(path));
+	// メッシュごとに描画
+	for (const auto& mesh : modelData_.meshes) {
+		std::string path = textureFilePath.empty() ? modelData_.materials[mesh.materialIndex].textureFilePath : textureFilePath;
 
-	commandList->DrawIndexedInstanced(indexCount_, 1, 0, 0, 0);
+		commandList->SetGraphicsRootDescriptorTable(2, textureManager_->GetSrvHandleGPU(path));
+
+		// メッシュのインデックス数とオフセットを指定して描画
+		commandList->DrawIndexedInstanced(mesh.indexCount, 1, mesh.indexOffset, 0, 0);
+	}
 
 	if (skinCluster) {
 		// 次フレームのCS書き込みに備えてUAV状態に戻す
@@ -286,14 +291,69 @@ ModelData Model::LoadModelFile(const std::string& filename) {
 	std::vector<Vector2> texcoords; // テクスチャ座標
 	std::string line;               // ファイルから読んだ1行を格納するもの
 
-	// デフォルトのテクスチャパスを事前に設定
-	modelData.material.textureFilePath = "resources/models/white.png";
-
 	Assimp::Importer importer;
 	std::string filePath = "resources/models/" + filename;
 	// 三角形化とUV/向きの調整に加えて、法線がない場合の自動生成フラグ（aiProcess_GenNormals）を追加
 	const aiScene* scene = importer.ReadFile(filePath.c_str(), aiProcess_Triangulate | aiProcess_FlipWindingOrder | aiProcess_FlipUVs | aiProcess_GenNormals);
 	assert(scene && scene->HasMeshes()); // シーン・メッシュがないのは対応しない
+
+	// マテリアルの中身を解析していく
+	for (uint32_t materialIndex = 0; materialIndex < scene->mNumMaterials; ++materialIndex) {
+		aiMaterial* material = scene->mMaterials[materialIndex];
+		MaterialData matData;
+		matData.textureFilePath = "resources/models/white.png";
+
+		if (material->GetTextureCount(aiTextureType_DIFFUSE) != 0) {
+			aiString textureFilePath;
+			material->GetTexture(aiTextureType_DIFFUSE, 0, &textureFilePath);
+
+			// テクスチャファイルパスが空でない場合は指定したパスを使用
+			if (textureFilePath.length > 0) {
+				std::string texStr = textureFilePath.C_Str();
+				// 埋め込みテクスチャ参照は "*<index>" の形式になる（例: "*0"）
+				if (!texStr.empty() && texStr[0] == '*') {
+					// "*n" の n を取り出す
+					int texIndex = 0;
+					try {
+						texIndex = std::stoi(texStr.substr(1));
+					} catch (...) {
+						texIndex = -1;
+					}
+
+					if (texIndex >= 0 && scene->mTextures && texIndex < static_cast<int>(scene->mNumTextures)) {
+						aiTexture* atex = scene->mTextures[texIndex];
+						// 圧縮されたイメージデータ（PNG/JPEG 等）は mHeight == 0, pcData に生のバイナリが入る
+						if (atex->mHeight == 0 && atex->pcData) {
+							// 出力ファイル名を作る（モデル名を元に一意化）
+							std::string baseName = filename;
+							auto pos = baseName.find_last_of('.');
+							if (pos != std::string::npos)
+								baseName = baseName.substr(0, pos);
+							std::string outPath = "resources/models/" + baseName + "_embedded" + std::to_string(texIndex) + ".png";
+
+							// バイナリ書き出し
+							std::ofstream ofs(outPath, std::ios::binary);
+							if (ofs) {
+								ofs.write(reinterpret_cast<const char*>(atex->pcData), static_cast<std::streamsize>(atex->mWidth));
+								ofs.close();
+								matData.textureFilePath = outPath;
+							} else {
+								// 書き出し失敗時はデフォルトのままにする（white.png）
+							}
+						} else {
+							// mHeight > 0 の場合は非圧縮RGBA等の生データが入っている。
+							// ここを対応するには生データをPNG等へ変換する処理が必要
+							// 現時点ではデフォルトテクスチャを使用
+						}
+					}
+				} else {
+					// 通常のファイルパスをそのまま利用（既存の処理）
+					matData.textureFilePath = "resources/models/" + texStr;
+				}
+			}
+		}
+		modelData.materials.push_back(matData);
+	}
 
 	for (uint32_t meshIndex = 0; meshIndex < scene->mNumMeshes; ++meshIndex) {
 		aiMesh* mesh = scene->mMeshes[meshIndex];
@@ -302,6 +362,11 @@ ModelData Model::LoadModelFile(const std::string& filename) {
 
 		// 複数メッシュが含まれる場合、インデックスがずれないように現在の頂点数をオフセットとして保持
 		uint32_t vertexOffset = static_cast<uint32_t>(modelData.vertices.size());
+
+		// メッシュ情報の作成
+		MeshInfo meshInfo;
+		meshInfo.materialIndex = mesh->mMaterialIndex;
+		meshInfo.indexOffset = static_cast<uint32_t>(modelData.indices.size());
 
 		// 頂点の解析
 		for (uint32_t vertexIndex = 0; vertexIndex < mesh->mNumVertices; ++vertexIndex) {
@@ -338,6 +403,11 @@ ModelData Model::LoadModelFile(const std::string& filename) {
 			}
 		}
 
+		// インデックス追加後のサイズからオフセットを引いて、このメッシュのインデックス数を計算
+		meshInfo.indexCount = static_cast<uint32_t>(modelData.indices.size()) - meshInfo.indexOffset;
+		modelData.meshes.push_back(meshInfo);
+
+		// ボーン解析
 		for (uint32_t boneIndex = 0; boneIndex < mesh->mNumBones; ++boneIndex) {
 			aiBone* bone = mesh->mBones[boneIndex];
 			std::string jointName = bone->mName.C_Str();
@@ -356,62 +426,7 @@ ModelData Model::LoadModelFile(const std::string& filename) {
 		}
 	}
 
-	// マテリアルの中身を解析していく
-	for (uint32_t materialIndex = 0; materialIndex < scene->mNumMaterials; ++materialIndex) {
-		aiMaterial* material = scene->mMaterials[materialIndex];
-		if (material->GetTextureCount(aiTextureType_DIFFUSE) != 0) {
-			aiString textureFilePath;
-			material->GetTexture(aiTextureType_DIFFUSE, 0, &textureFilePath);
-
-			// テクスチャファイルパスが空でない場合は指定したパスを使用
-			if (textureFilePath.length > 0) {
-				std::string texStr = textureFilePath.C_Str();
-				// 埋め込みテクスチャ参照は "*<index>" の形式になる（例: "*0"）
-				if (!texStr.empty() && texStr[0] == '*') {
-					// "*n" の n を取り出す
-					int texIndex = 0;
-					try {
-						texIndex = std::stoi(texStr.substr(1));
-					} catch (...) {
-						texIndex = -1;
-					}
-
-					if (texIndex >= 0 && scene->mTextures && texIndex < static_cast<int>(scene->mNumTextures)) {
-						aiTexture* atex = scene->mTextures[texIndex];
-						// 圧縮されたイメージデータ（PNG/JPEG 等）は mHeight == 0, pcData に生のバイナリが入る
-						if (atex->mHeight == 0 && atex->pcData) {
-							// 出力ファイル名を作る（モデル名を元に一意化）
-							std::string baseName = filename;
-							auto pos = baseName.find_last_of('.');
-							if (pos != std::string::npos)
-								baseName = baseName.substr(0, pos);
-							std::string outPath = "resources/models/" + baseName + "_embedded" + std::to_string(texIndex) + ".png";
-
-							// バイナリ書き出し
-							std::ofstream ofs(outPath, std::ios::binary);
-							if (ofs) {
-								ofs.write(reinterpret_cast<const char*>(atex->pcData), static_cast<std::streamsize>(atex->mWidth));
-								ofs.close();
-								modelData.material.textureFilePath = outPath;
-							} else {
-								// 書き出し失敗時はデフォルトのままにする（white.png）
-							}
-						} else {
-							// mHeight > 0 の場合は非圧縮RGBA等の生データが入っている。
-							// ここを対応するには生データをPNG等へ変換する処理が必要
-							// 現時点ではデフォルトテクスチャを使用
-						}
-					}
-				} else {
-					// 通常のファイルパスをそのまま利用（既存の処理）
-					modelData.material.textureFilePath = "resources/models/" + texStr;
-				}
-			}
-		}
-	}
-
 	modelData.rootNode = ReadNode(scene->mRootNode);
-
 	return modelData;
 }
 

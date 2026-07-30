@@ -256,7 +256,7 @@ void Object3d::SetModel(const std::string& filePath) {
 		    device, skeleton_, model_->GetModelData(), ctx_->object3dCommon->GetDxCommon()->GetSrvDescriptorHeap(), ctx_->object3dCommon->GetDxCommon()->GetDescriptorSizeSRV(), paletteSrvIndex_,
 		    inputVertexSrvIndex_, influenceSrvIndex_, outputUavIndex_);
 
-		textureFilePath_ = modelData_.material.textureFilePath;
+		textureFilePath_ = "";
 	}
 }
 
