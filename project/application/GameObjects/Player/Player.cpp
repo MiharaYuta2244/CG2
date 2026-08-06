@@ -3,6 +3,7 @@
 #include "GameObjects/Effect/EffectGenerator.h"
 #include "GameObjects/Enemy/Enemy.h"
 #include "GameObjects/Enemy/EnemyManager.h"
+#include "TestFunction/TestFunction.h"
 
 using namespace TinyEngine;
 
@@ -33,10 +34,6 @@ void Player::Initialize(EngineContext* ctx, TinyEngine::DecalManager* bloodDecal
 
 	// パーティクル生成タイマー初期化
 	particleGenerateTimer_.Initialize(0.2f);
-
-	// プレイヤーのHPゲージ生成&初期化
-	hpIcon_ = std::make_unique<PlayerHPIcon>();
-	hpIcon_->Initialize(ctx);
 
 	// 血痕の管理インスタンスポインタ
 	bloodDecalManager_ = bloodDecalManager;
@@ -323,11 +320,10 @@ void Player::Update(float deltaTime, DirectInput* input, GamePad* gamePad, Enemy
 	// 回復エフェクト削除
 	std::erase_if(healEffects_, [](const std::unique_ptr<TinyEngine::Particle>& p) { return p->IsFinished(); });
 
-	// プレイヤーのHPゲージ更新
-	hpIcon_->Update(deltaTime);
-
-	// 出血処理
-	Bleeding(deltaTime);
+	if (TestFunction::GetInstance()->GetIsPlayerBloodDecal()) {
+		// 出血処理
+		Bleeding(deltaTime);
+	}
 
 	// ギズモ用当たり判定更新
 	UpdateAABBForGizmo();
@@ -359,9 +355,6 @@ void Player::Draw() {
 
 	// 描画
 	render_->Draw();
-
-	// プレイヤーHPのUI描画
-	hpIcon_->Draw();
 }
 
 bool Player::IsDead() const {
@@ -375,28 +368,16 @@ void Player::Damage(float value) {
 	if (hp_->GetIsInvincible())
 		return;
 
-	// ダメージ前のHPを保存
-	float beforeHP = hp_->GetCurrentHP();
-
 	// ダメージ処理
 	hp_->Damage(value);
-
-	// ダメージ後のHP
-	float afterHP = hp_->GetCurrentHP();
 
 	// ヒットエフェクト生成
 	GenerateHitEffect();
 
-	// HPIconのアニメーション開始処理
-	int startIdx = static_cast<int>(afterHP);
-	int endIdx = static_cast<int>(beforeHP);
-
-	for (int i = startIdx; i < endIdx; ++i) {
-		hpIcon_->DmageAnimStart(i);
+	if (TestFunction::GetInstance()->GetIsPlayerBloodDecal()) {
+		// 血痕の生成
+		AddBloodDecal({4, 4, 1});
 	}
-
-	// 血痕の生成
-	AddBloodDecal({4, 4, 1});
 
 	// 出血用のタイマー初期化
 	bleedingTimer_.Initialize(0.5f);
@@ -416,14 +397,6 @@ void Player::Heal(float value) {
 		// エフェクト生成
 		GenerateHealEffect();
 	}
-
-	// HPIconのアニメーション開始処理
-	int startIdx = static_cast<int>(beforeHP);
-	int endIdx = static_cast<int>(afterHP);
-
-	for (int i = startIdx; i < endIdx; ++i) {
-		hpIcon_->HealAnimStart(i);
-	}
 }
 
 void Player::AllHeal() {
@@ -439,14 +412,6 @@ void Player::AllHeal() {
 	if (beforeHP != afterHP) {
 		// エフェクト生成
 		GenerateHealEffect();
-	}
-
-	// HPIconのアニメーション開始処理
-	int startIdx = static_cast<int>(beforeHP);
-	int endIdx = static_cast<int>(afterHP);
-
-	for (int i = startIdx; i < endIdx; ++i) {
-		hpIcon_->HealAnimStart(i);
 	}
 }
 

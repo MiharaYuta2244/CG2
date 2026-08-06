@@ -1,10 +1,11 @@
-#include "GamePlayScene.h"
 #include "GameObjects/Effect/EffectGenerator.h"
+#include "PlayTestScene.h"
 #include "SceneManager.h"
+#include "TestFunction/TestFunction.h"
 
 using namespace TinyEngine;
 
-void GamePlayScene::Initialize(const SceneContext& ctx) {
+void PlayTestScene::Initialize(const SceneContext& ctx) {
 	ctx_ = ctx;
 	commonData_ = ctx_.sceneManager->GetCommonData();
 
@@ -108,7 +109,7 @@ void GamePlayScene::Initialize(const SceneContext& ctx) {
 	controlUI_->AddHoldUIDecal({2, 2, 2});
 }
 
-void GamePlayScene::Update() {
+void PlayTestScene::Update() {
 	float deltaTime = ctx_.timeManager->GetDeltaTime();
 
 	// グリッチノイズの更新
@@ -328,6 +329,9 @@ void GamePlayScene::Update() {
 	decalManager_->SetCamera(ctx_.currentCamera);
 	decalManager_->Update();
 
+	// テスト機能ImGui
+	TestFunction::GetInstance()->DrawImGui();
+
 #ifdef USE_IMGUI
 	ImGui::Begin("Camera");
 	ImGui::DragFloat("angle", &cameraAngle_, 0.01f);
@@ -336,7 +340,7 @@ void GamePlayScene::Update() {
 #endif
 }
 
-void GamePlayScene::Draw() {
+void PlayTestScene::Draw() {
 	// 不透明オブジェクトの描画準備
 	ctx_.engineContext->object3dCommon->DrawSettingCommon(ctx_.engineContext->textureManager);
 
@@ -376,12 +380,12 @@ void GamePlayScene::Draw() {
 	stage_->DrawTransparent();
 }
 
-void GamePlayScene::Finalize() {
+void PlayTestScene::Finalize() {
 	// シーン終了時にエフェクトをデフォルトに戻す
 	ctx_.engineContext->postEffectPipeline->SetEffects({PostEffectType::FullScreen});
 }
 
-void GamePlayScene::UpdateGlitch(float deltaTime) {
+void PlayTestScene::UpdateGlitch(float deltaTime) {
 	// グリッチノイズ用タイマーの減算
 	if (glitchTimer_ > 0.0f) {
 		glitchTimer_ -= deltaTime;
@@ -404,12 +408,12 @@ void GamePlayScene::UpdateGlitch(float deltaTime) {
 	}
 }
 
-void GamePlayScene::GenerateEnemyDeathEffect(const Vector3& pos) {
+void PlayTestScene::GenerateEnemyDeathEffect(const Vector3& pos) {
 	// エフェクトの生成
 	EffectGenerator::CreateEnemyDeathEffect(ctx_.engineContext, pos, enemyDeathEffect_);
 }
 
-void GamePlayScene::FollowCamera(float deltaTime) {
+void PlayTestScene::FollowCamera(float deltaTime) {
 	// カメラの追従
 	if (!isDebugCameraActive_) {
 		Vector3 playerPos = player_->GetPosition();

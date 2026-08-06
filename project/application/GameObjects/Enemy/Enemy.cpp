@@ -4,6 +4,7 @@
 #include "GameObjects/Effect/EffectGenerator.h"
 #include "GameObjects/Player/Player.h"
 #include "ColorPalette.h"
+#include "TestFunction/TestFunction.h"
 
 using namespace TinyEngine;
 
@@ -145,12 +146,22 @@ void Enemy::Update(float deltaTime, Player* player, EnemyBulletManager* enemyBul
 		if (ai_->GetState() == EnemyAI::State::Vigilance) {
 			// 警戒状態なら赤色
 			visionCone_->SetColor({1.0f, 0.0f, 0.0f, 0.3f});
-			// 射撃ゲージの進行度を渡す
-			visionCone_->SetChargeProgress(ai_->GetShotProgress());
+			// テスト機能のフラグをチェック
+			if (TestFunction::GetInstance()->GetIsVisionConeColorChange()) {
+				// 射撃ゲージの進行度を渡す
+				visionCone_->SetChargeProgress(ai_->GetShotProgress());
+			} else {
+				visionCone_->SetChargeProgress(0.0f);
+			}
 		} else if (ai_->GetState() == EnemyAI::State::Hold) {
 			// 拘束状態も射撃するのでプログレスを渡す
 			visionCone_->SetColor({1.0f, 0.5f, 0.0f, 0.3f});
-			visionCone_->SetChargeProgress(ai_->GetShotProgress());
+			// テスト機能のフラグをチェック
+			if (TestFunction::GetInstance()->GetIsVisionConeColorChange()) {
+				visionCone_->SetChargeProgress(ai_->GetShotProgress());
+			} else {
+				visionCone_->SetChargeProgress(0.0f);
+			}
 		} else {
 			// 通常状態なら緑色
 			visionCone_->SetColor({0.0f, 1.0f, 0.0f, 0.3f});

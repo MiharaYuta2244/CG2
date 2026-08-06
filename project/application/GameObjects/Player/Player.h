@@ -7,7 +7,6 @@
 #include "GameTimer.h"
 #include "OBB.h"
 #include "Particle.h"
-#include "PlayerHPIcon.h"
 #include "PlayerHealth.h"
 #include "PlayerMove.h"
 
@@ -143,7 +142,6 @@ private:
 	std::unique_ptr<ObjectRender> render_; // 描画用インスタンス
 	std::unique_ptr<PlayerMove> move_;     // 移動用インスタンス
 	std::unique_ptr<PlayerHealth> hp_;     // HP管理用インスタンス
-	std::unique_ptr<PlayerHPIcon> hpIcon_; // HPのUI
 
 	// 環境マップ　強さ
 	float envScale_ = 0.0f;
