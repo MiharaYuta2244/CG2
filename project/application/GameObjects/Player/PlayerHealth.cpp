@@ -28,13 +28,17 @@ void PlayerHealth::Update(float deltaTime) {
 	preHP_ = hp_;
 }
 
-void PlayerHealth::Damage(float value) {
+void PlayerHealth::Damage(float value, int& damageCount) {
 	if (isInvincible_) {
 		return;
 	}
 
 	// ダメージ処理
 	hp_ -= value;
+
+	if (hp_ >= 0) {
+		damageCount++;
+	}
 
 	// 無敵状態へ
 	isInvincible_ = true;

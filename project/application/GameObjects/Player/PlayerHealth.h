@@ -13,7 +13,7 @@ public:
 	void Update(float deltaTime);
 
 	// ダメージ処理
-	void Damage(float value);
+	void Damage(float value, int& damageCount);
 
 	// 回復処理
 	void Heal(float value);

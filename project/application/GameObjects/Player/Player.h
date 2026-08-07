@@ -101,6 +101,8 @@ public:
 	// ImGui描画
 	void DrawImGui();
 
+	int GetDamageCount() const { return damageCount_; }
+
 private:
 	// 当たり判定の更新処理
 	void UpdateCollision();
@@ -201,4 +203,6 @@ private:
 	float pointLightIntensity_ = 1.0f;                   // 輝度
 	float pointLightRadius_ = 7.0f;                      // 影響半径
 	float pointLightDecay_ = 0.7f;                       // 減衰率
+
+	int damageCount_ = 0;
 };

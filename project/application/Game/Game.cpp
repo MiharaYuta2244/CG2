@@ -6,6 +6,7 @@
 #include "Scene/ResultScene.h"
 #include "Scene/TestScene.h"
 #include "Scene/PlayTestScene.h"
+#include "Scene/TestTitle.h"
 
 using namespace TinyEngine;
 
@@ -25,9 +26,10 @@ void Game::Initialize() {
 	sceneManager_->AddScene("Result", std::make_unique<ResultScene>());
 	sceneManager_->AddScene("Test", std::make_unique<TestScene>());
 	sceneManager_->AddScene("PlayTest", std::make_unique<PlayTestScene>());
+	sceneManager_->AddScene("TestTitle", std::make_unique<TestTitle>());
 
 	// 最初のシーンを初期化
-	sceneManager_->ChangeScene("PlayTest");
+	sceneManager_->ChangeScene("TestTitle");
 
 	// フェードマネージャーの生成&初期化
 	fadeManager_ = std::make_unique<FadeManager>();

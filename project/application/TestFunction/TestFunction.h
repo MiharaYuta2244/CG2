@@ -19,6 +19,12 @@ public:
 	bool GetIsVisionConeRayCol() const { return isVisionConeRayCol_; }
 	bool GetIsPlayerBloodDecal() const { return isPlayerBloodDecal_; }
 
+	void SetAllFunctions(bool state) {
+		isVisionConeColorChange_ = state;
+		isVisionConeRayCol_ = state;
+		isPlayerBloodDecal_ = state;
+	}
+
 private:
 	TestFunction() = default;
 	~TestFunction() = default;

@@ -305,6 +305,7 @@ xcopy /Y "$(windowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDi
     <ClCompile Include="application\GameObjects\StageObjects\HealArea\HealArea.cpp" />
     <ClCompile Include="application\Scene\PlayTestScene.cpp" />
     <ClCompile Include="application\TestFunction\TestFunction.cpp" />
+    <ClCompile Include="application\Scene\TestTitle.cpp" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="resources\shaders\Object3d.PS.hlsl">
@@ -545,6 +546,7 @@ xcopy /Y "$(windowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDi
     <ClInclude Include="application\GameObjects\GameObjectManager.h" />
     <ClInclude Include="application\Scene\PlayTestScene.h" />
     <ClInclude Include="application\TestFunction\TestFunction.h" />
+    <ClInclude Include="application\Scene\TestTitle.h" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="externals\imgui\LICENSE.txt" />

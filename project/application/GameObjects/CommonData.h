@@ -4,6 +4,8 @@
 /// シーンをまたいで保持するデータ
 /// </summary>
 struct CommonData {
-	int killCount; // 敵の死亡数
-	float clearTime; // クリアタイム
+	int killCount = 0; // 敵の死亡数
+	float clearTime = 0.0f; // クリアタイム
+	int totalDamageCount = 0;
+	int totalDeathCount = 0;
 };

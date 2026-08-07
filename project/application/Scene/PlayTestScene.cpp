@@ -1,5 +1,5 @@
-#include "GameObjects/Effect/EffectGenerator.h"
 #include "PlayTestScene.h"
+#include "GameObjects/Effect/EffectGenerator.h"
 #include "SceneManager.h"
 #include "TestFunction/TestFunction.h"
 
@@ -75,12 +75,12 @@ void PlayTestScene::Initialize(const SceneContext& ctx) {
 
 	// シーンで使うエフェクトの宣言
 	ctx_.engineContext->postEffectPipeline->SetEffects({
-	    PostEffectType::Vignette,         // ビネット
-	    PostEffectType::Glitch,           // グリッチ
-	    PostEffectType::DeathEffect,      // 死亡時エフェクト
-	    PostEffectType::Smoothing,        // スムージング
-	    PostEffectType::Gaussian,         // ガウシアン
-	    PostEffectType::RadialBlur,       // ラディアルブラー
+	    PostEffectType::Vignette,    // ビネット
+	    PostEffectType::Glitch,      // グリッチ
+	    PostEffectType::DeathEffect, // 死亡時エフェクト
+	    PostEffectType::Smoothing,   // スムージング
+	    PostEffectType::Gaussian,    // ガウシアン
+	    PostEffectType::RadialBlur,  // ラディアルブラー
 	});
 
 	// パラメータ設定
@@ -147,15 +147,17 @@ void PlayTestScene::Update() {
 	auto* radialBlur = ctx_.engineContext->postEffectPipeline->GetPass(PostEffectType::RadialBlur);
 	if (!player_->IsDead()) {
 		if (vignette) {
-			float intensity = player_->GetCurrentHP() <= 1.0f ? 0.5f : 0.0f;
+			float intensity = player_->GetCurrentHP() <= 1.0f ? 1.0f : 0.0f;
 			vignette->SetVignetteIntensity(intensity);
 		}
 
-		if (radialBlur) {
-			RadialBlurParam param;
-			param.blurWidth = player_->GetCurrentHP() <= 1.0f ? 0.01f : 0.0f;
-			param.numSamples = player_->GetCurrentHP() <= 1.0f ? 5.0f : 1.0f;
-			radialBlur->SetRadialBlurParam(param);
+		if (TestFunction::GetInstance()->GetIsPlayerBloodDecal()) {
+			if (radialBlur) {
+				RadialBlurParam param;
+				param.blurWidth = player_->GetCurrentHP() <= 1.0f ? 0.01f : 0.0f;
+				param.numSamples = player_->GetCurrentHP() <= 1.0f ? 5.0f : 1.0f;
+				radialBlur->SetRadialBlurParam(param);
+			}
 		}
 
 		if (smoothing) {
@@ -218,6 +220,7 @@ void PlayTestScene::Update() {
 	// レターボックスの演出が終わったらシーン遷移
 	if (!letterBox_->GetIsActive() && !isPlaying) {
 		if (!isTransitionRequested_) {
+			commonData_->totalDamageCount += player_->GetDamageCount();
 			RequestSceneChange("Result");
 			isTransitionRequested_ = true;
 		}
@@ -246,6 +249,8 @@ void PlayTestScene::Update() {
 		ctx_.currentCamera->SetTranslation(nextPos);
 
 		if (!isTransitionRequested_ && cameraZoomController_->GetIsFinished()) {
+			commonData_->totalDeathCount += 1;
+			commonData_->totalDamageCount += player_->GetDamageCount();
 			RequestSceneChange("Result");
 			isTransitionRequested_ = true;
 		}

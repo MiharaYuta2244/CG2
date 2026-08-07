@@ -369,7 +369,7 @@ void Player::Damage(float value) {
 		return;
 
 	// ダメージ処理
-	hp_->Damage(value);
+	hp_->Damage(value, damageCount_);
 
 	// ヒットエフェクト生成
 	GenerateHitEffect();

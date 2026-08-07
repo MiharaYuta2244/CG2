@@ -5,9 +5,9 @@ using namespace TinyEngine;
 void Goal::Initialize(EngineContext* ctx) {
 	ctx_ = ctx;
 
-	transform_.scale = {0.01f, 1.0f, 3.5f};
+	transform_.scale = {1.0f, 1.0f, 10.0f};
 	transform_.rotate = {0.0f, 0.0f, 0.0f};
-	transform_.translate = {542.0f, 0.0f, -17.0f};
+	transform_.translate = {200.0f, 0.0f, 0.0f};
 
 	// パーティクル生成用のタイマー初期化
 	particleGenerateTimer_.Initialize(0.2f);
