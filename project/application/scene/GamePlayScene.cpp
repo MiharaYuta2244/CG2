@@ -79,10 +79,7 @@ void GamePlayScene::Initialize(const SceneContext& ctx) {
 	    PostEffectType::DeathEffect,      // 死亡時エフェクト
 	    PostEffectType::Smoothing,        // スムージング
 	    PostEffectType::Gaussian,         // ガウシアン
-	    PostEffectType::LuminanceOutline, // アウトライン
-	    PostEffectType::DepthOutline,     // アウトライン
 	    PostEffectType::RadialBlur,       // ラディアルブラー
-	    // PostEffectType::Dissolve,	         // ディゾルブ
 	});
 
 	// パラメータ設定

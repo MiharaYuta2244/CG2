@@ -13,7 +13,6 @@ void Wall::Initialize(EngineContext* ctx, const Transform& transform) {
 	render_->Initialize(ctx, "Cube.obj");
 	render_->SetTransform(transform_);
 	render_->SetColor(color_);
-	render_->SetEnableNoise(true);
 }
 
 void Wall::Update(float deltaTime) {
