@@ -280,7 +280,6 @@ xcopy /Y "$(windowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDi
     <ClCompile Include="application\GameObjects\ObjectRender\ObjectRender.cpp" />
     <ClCompile Include="application\GameObjects\Player\PlayerHealth.cpp" />
     <ClCompile Include="application\GameObjects\StageObjects\Wall\Wall.cpp" />
-    <ClCompile Include="application\GameObjects\Player\PlayerHPGauge.cpp" />
     <ClCompile Include="application\Menu\MenuList.cpp" />
     <ClCompile Include="application\Scene\PauseScene.cpp" />
     <ClCompile Include="application\Scene\ResultScene.cpp" />
@@ -299,7 +298,6 @@ xcopy /Y "$(windowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDi
     <ClCompile Include="engine\3d\particle\modules\MuzzleFlashModule.cpp" />
     <ClCompile Include="engine\3d\particle\modules\MuzzleSparkModule.cpp" />
     <ClCompile Include="engine\3d\particle\modules\MuzzleSmokeModule.cpp" />
-    <ClCompile Include="application\GameObjects\Player\PlayerHPIcon.cpp" />
     <ClCompile Include="application\Editor\SceneEditor.cpp" />
     <ClCompile Include="application\GameObjects\StageObjects\Stage.cpp" />
     <ClCompile Include="application\GameObjects\StageObjects\HealArea\HealArea.cpp" />
@@ -503,7 +501,6 @@ xcopy /Y "$(windowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDi
     <ClInclude Include="engine\base\utility\gameTimer\GameTimer.h" />
     <ClInclude Include="application\GameObjects\StageObjects\Wall\Wall.h" />
     <ClInclude Include="application\GameObjects\StageObjects\Goal\Goal.h" />
-    <ClInclude Include="application\GameObjects\Player\PlayerHPGauge.h" />
     <ClInclude Include="engine\tool\json\JsonManager.h" />
     <ClInclude Include="application\Menu\MenuList.h" />
     <ClInclude Include="application\GameObjects\Effect\FlashEffect.h" />
@@ -531,7 +528,6 @@ xcopy /Y "$(windowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDi
     <ClInclude Include="engine\3d\particle\modules\MuzzleSparkModule.h" />
     <ClInclude Include="engine\3d\particle\modules\MuzzleSmokeModule.h" />
     <ClInclude Include="application\GameObjects\StageObjects\Glass\Glass.h" />
-    <ClInclude Include="application\GameObjects\Player\PlayerHPIcon.h" />
     <ClInclude Include="application\Editor\SceneEditor.h" />
     <ClInclude Include="application\GameObjects\StageObjects\Stage.h" />
     <ClInclude Include="application\GameObjects\StageObjects\HealArea\HealArea.h" />

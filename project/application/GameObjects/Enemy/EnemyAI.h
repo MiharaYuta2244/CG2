@@ -114,6 +114,7 @@ private:
 	float bulletMargin_ = 10.0f;      // 敵と弾の間隔
 	bool isShotThisFrame_ = false;
 	bool isShotHoldState_ = true;
+	bool hasShotInHold_ = false; // 拘束時に1度でも射撃したかどうかのフラグ
 	Vector3 shotDirection_ = {0.0f, 0.0f, 1.0f};
 	float shotTimerMultiPlier_ = 0.5f; // 拘束時の発射速度を早めるための変数
 

@@ -220,7 +220,7 @@ void EnemyAI::UpdateVigilance(
 }
 
 void EnemyAI::UpdateHold(float deltaTime, Player* player, EnemyBulletManager* enemyBulletManager, EnemyBombManager* enemyBombManager) {
-	if (!isShotHoldState_)
+	if (!isShotHoldState_ || hasShotInHold_)
 		return;
 
 	// プレイヤーが向いている方向に一度だけ射撃を行う
@@ -233,6 +233,9 @@ void EnemyAI::UpdateHold(float deltaTime, Player* player, EnemyBulletManager* en
 
 		// 拘束時の発射フラグを下す
 		isShotHoldState_ = false;
+
+		// 射撃済みフラグを立てる
+		hasShotInHold_ = true;
 	}
 }
 

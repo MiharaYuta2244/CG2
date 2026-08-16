@@ -34,10 +34,6 @@ void Player::Initialize(EngineContext* ctx, TinyEngine::DecalManager* bloodDecal
 	// パーティクル生成タイマー初期化
 	particleGenerateTimer_.Initialize(0.2f);
 
-	// プレイヤーのHPゲージ生成&初期化
-	hpIcon_ = std::make_unique<PlayerHPIcon>();
-	hpIcon_->Initialize(ctx);
-
 	// 血痕の管理インスタンスポインタ
 	bloodDecalManager_ = bloodDecalManager;
 }
@@ -187,47 +183,69 @@ void Player::Update(float deltaTime, DirectInput* input, GamePad* gamePad, Enemy
 	isGrabReleased_ = input->KeyReleased(DIK_J);
 	isAttackTriggered_ = input->KeyTriggered(DIK_K);
 
+	// 掴みボタンが押された瞬間のフラグ
+	bool isGrabJustPressed = input->KeyTriggered(DIK_J);
+
 	if (gamePad && gamePad->GetState().connected) {
 		const auto& padState = gamePad->GetState();
 
 		// Lトリガーで掴み
 		if (padState.axes.lt > 0.3f) {
 			isGrab_ = true;
+			// 前フレームの入力が閾値以下だった場合のみ押した瞬間とみなす
+			if (preLt_ <= 0.3f) {
+				isGrabJustPressed = true;
+			}
 		}
+
 		// 放す
 		if (isHold_ && !isGrab_) {
 			isGrabReleased_ = true;
 		}
+
 		// Rトリガーで突き飛ばし
 		if (padState.axes.rt > 0.3f) {
 			isAttackTriggered_ = true;
 		}
+
+		// 現在のLTの値を保存
+		preLt_ = padState.axes.lt;
+	}else{
+		// パッドが繋がっていない場合はリセット
+		preLt_ = 0.0f;
 	}
 
 	// 掴み・投げ処理の更新
-	if (enableAttack_ && isGrab_) {
-		if (!isHold_ && targetEnemy != nullptr) {
-			isHold_ = true;
+	if (enableAttack_ && !isHold_ && isGrabJustPressed) {
 
+		// 敵の有無に関わらず、掴みアニメーションを再生
+		if (render_->GetFilepath() != "GorillaHold.gltf") {
+			render_->SetModel("GorillaHold.gltf");
+			KeyframeAnimation keyframeAnimation;
+			Animation holdAnimation = keyframeAnimation.LoadAnimationFile("GorillaHold.gltf");
+			render_->GetObject3d()->PlayAnimation(holdAnimation);
+
+			// アニメーション再生状態に設定
+			isActionAnimating_ = true;
+			actionAnimTimer_ = 0.2f;
+		}
+
+		// 敵が近くにいた場合は掴み状態に移行する
+		if (targetEnemy != nullptr) {
+			isHold_ = true;
 			heldEnemy_ = targetEnemy;
 			heldEnemy_->SetEnableAI(false);
 			heldEnemy_->SetShotHoldState(true);
 			heldEnemy_->SetAIState(EnemyAI::State::Hold);
 			heldEnemy_->ResetShotTimer();
 			isGrabTriggered_ = true;
-
-			if (render_->GetFilepath() != "GorillaHold.gltf") {
-				render_->SetModel("GorillaHold.gltf");
-				KeyframeAnimation keyframeAnimation;
-				Animation holdAnimation = keyframeAnimation.LoadAnimationFile("GorillaHold.gltf");
-				render_->GetObject3d()->PlayAnimation(holdAnimation);
-				isActionAnimating_ = true;
-				actionAnimTimer_ = 0.2f;
-			}
 		}
+	}
 
+	// 掴んでいる最中の更新処理
+	if (isHold_) {
 		// 掴んでいる間はプレイヤーの位置に敵を固定
-		if (isHold_ && heldEnemy_ != nullptr) {
+		if (isGrab_ && heldEnemy_ != nullptr) {
 			Vector3 forward = {lastMoveDirection_.x, 0.0f, lastMoveDirection_.y};
 
 			// 前方オフセット
@@ -236,12 +254,14 @@ void Player::Update(float deltaTime, DirectInput* input, GamePad* gamePad, Enemy
 			heldEnemy_->SetPos(holdPos);
 			heldEnemy_->SetRotate(transform_.rotate);
 		}
-	} else if (isHold_ && isGrabReleased_) { // 手放す処理
-		isHold_ = false;
-		if (heldEnemy_) {
-			heldEnemy_->SetEnableAI(true);
-			heldEnemy_->SetAIState(EnemyAI::State::Normal);
-			heldEnemy_ = nullptr; // 手放す
+		// 手放す処理
+		else if (isGrabReleased_) {
+			isHold_ = false;
+			if (heldEnemy_) {
+				heldEnemy_->SetEnableAI(true);
+				heldEnemy_->SetAIState(EnemyAI::State::Normal);
+				heldEnemy_ = nullptr; // 手放す
+			}
 		}
 	}
 
@@ -323,9 +343,6 @@ void Player::Update(float deltaTime, DirectInput* input, GamePad* gamePad, Enemy
 	// 回復エフェクト削除
 	std::erase_if(healEffects_, [](const std::unique_ptr<TinyEngine::Particle>& p) { return p->IsFinished(); });
 
-	// プレイヤーのHPゲージ更新
-	hpIcon_->Update(deltaTime);
-
 	// 出血処理
 	Bleeding(deltaTime);
 
@@ -359,9 +376,6 @@ void Player::Draw() {
 
 	// 描画
 	render_->Draw();
-
-	// プレイヤーHPのUI描画
-	hpIcon_->Draw();
 }
 
 bool Player::IsDead() const {
@@ -387,14 +401,6 @@ void Player::Damage(float value) {
 	// ヒットエフェクト生成
 	GenerateHitEffect();
 
-	// HPIconのアニメーション開始処理
-	int startIdx = static_cast<int>(afterHP);
-	int endIdx = static_cast<int>(beforeHP);
-
-	for (int i = startIdx; i < endIdx; ++i) {
-		hpIcon_->DmageAnimStart(i);
-	}
-
 	// 血痕の生成
 	AddBloodDecal({4, 4, 1});
 
@@ -416,14 +422,6 @@ void Player::Heal(float value) {
 		// エフェクト生成
 		GenerateHealEffect();
 	}
-
-	// HPIconのアニメーション開始処理
-	int startIdx = static_cast<int>(beforeHP);
-	int endIdx = static_cast<int>(afterHP);
-
-	for (int i = startIdx; i < endIdx; ++i) {
-		hpIcon_->HealAnimStart(i);
-	}
 }
 
 void Player::AllHeal() {
@@ -439,14 +437,6 @@ void Player::AllHeal() {
 	if (beforeHP != afterHP) {
 		// エフェクト生成
 		GenerateHealEffect();
-	}
-
-	// HPIconのアニメーション開始処理
-	int startIdx = static_cast<int>(beforeHP);
-	int endIdx = static_cast<int>(afterHP);
-
-	for (int i = startIdx; i < endIdx; ++i) {
-		hpIcon_->HealAnimStart(i);
 	}
 }
 
