@@ -26,14 +26,9 @@ void GamePlayScene::Initialize(const SceneContext& ctx) {
 	dirLight.direction = {0.5f, 0.5f, -0.5f};
 	ctx.engineContext->object3dCommon->SetDirectionalLightParam(dirLight);
 
-	// メインカメラ
+	// カメラの生成&初期化
 	mainCamera_ = std::make_unique<Camera>();
 	mainCamera_->Initialize();
-	mainCamera_->SetTranslation({0.0f, 60.0f, 0.0f});
-	mainCamera_->SetPivot(player_->GetPosition());
-	mainCamera_->SetEuler({std::numbers::pi_v<float> / 2.0f, 0.0f, 0.0f});
-	currentCameraPivot_ = player_->GetPosition();
-	cameraPosY_ = -20.0f;
 
 	// カメラの設定
 	ctx_.currentCamera = mainCamera_.get();
@@ -46,6 +41,22 @@ void GamePlayScene::Initialize(const SceneContext& ctx) {
 
 	// プレイヤーの初期化
 	player_->Initialize(ctx_.engineContext, decalManager_.get());
+
+	cameraPosY_ = -20.0f;
+	mainCamera_->SetTranslation({0.0f, 60.0f, 0.0f});
+
+	// カメラのパラメータ初期化
+	Vector3 playerPos = player_->GetPosition();
+	Vector3 playerRot = player_->GetRotation();
+	Vector3 forward = {std::sin(playerRot.y), 0.0f, std::cos(playerRot.y)};
+	currentCameraPivot_ = {playerPos.x + forward.x * offsetDistance_, cameraPosY_, playerPos.z + forward.z * offsetDistance_};
+	mainCamera_->SetPivot(currentCameraPivot_);
+
+	float maxTiltAngle = cameraAngle_ * (std::numbers::pi_v<float> / 180.0f);
+	float basePitch = std::numbers::pi_v<float> / 2.0f;
+	float initialPitch = basePitch - std::cos(playerRot.y) * maxTiltAngle;
+	float initialRoll = std::sin(playerRot.y) * maxTiltAngle;
+	mainCamera_->SetRotate({initialPitch, 0.0f, initialRoll});
 
 	// 敵の生成&初期化
 	enemyManager_ = std::make_unique<EnemyManager>();

@@ -26,7 +26,6 @@ void Camera::SetPivot(const Vector3& p) {
 
 void Camera::SetRotate(const Vector3& rotate) {
 	euler_ = rotate;
-	//euler_.z = 0.0f; // roll は常に禁止
 	UpdateOrientation();
 	UpdateViewMatrix();
 }
