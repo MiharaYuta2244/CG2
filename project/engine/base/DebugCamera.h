@@ -25,6 +25,8 @@ public:
 	Vector3& GetTranslation() { return transform_.translate; }
 	Vector3& GetRotate() { return transform_.rotate; }
 	const Vector3& GetEuler() const { return euler_; }
+	bool GetIsShake() const { return isShake_; }
+	Vector3& GetPivot() { return pivot_; }
 
 	// Setter
 	void SetTranslation(Vector3 translation) { transform_.translate = translation; }
@@ -46,8 +48,11 @@ public:
 	// シェイクの更新処理
 	void ShakeCamera(float deltaTime, float shakePower);
 
-	// シェイクしているかどうかGetter
-	bool GetIsShake() const { return isShake_; }
+	// 追従カメラの初期設定
+	void InitializeFollow(const Vector3& targetPos, const Vector3& targetRot, float offsetDistance, float cameraPosY, float cameraAngle);
+
+	// カメラの追従更新
+	void UpdateFollow(const Vector3& targetPos, const Vector3& targetRot, float offsetDistance, float cameraPosY, float cameraAngle, float tiltSpeed, float deltaTime);
 
 private:
 	void UpdateOrientation();

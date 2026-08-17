@@ -249,6 +249,7 @@ xcopy /Y "$(windowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDi
     <ClCompile Include="engine\3d\particle\modules\HealCrossModule.cpp" />
     <ClCompile Include="engine\3d\particle\modules\HealLineModule.cpp" />
     <ClCompile Include="engine\3d\particle\modules\HealSphereModule.cpp" />
+    <ClCompile Include="application\Cinematic\GamePlayPostEffectController.cpp" />
     <ClCompile Include="main.cpp">
       <Optimization Condition="'$(Configuration)|$(Platform)'=='Development|x64'">MaxSpeed</Optimization>
       <WholeProgramOptimization Condition="'$(Configuration)|$(Platform)'=='Development|x64'">true</WholeProgramOptimization>
@@ -537,6 +538,7 @@ xcopy /Y "$(windowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDi
     <ClInclude Include="engine\3d\particle\modules\HealSphereModule.h" />
     <ClInclude Include="application\GameObjects\PlaceableObject.h" />
     <ClInclude Include="application\GameObjects\GameObjectManager.h" />
+    <ClInclude Include="application\Cinematic\GamePlayPostEffectController.h" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="externals\imgui\LICENSE.txt" />

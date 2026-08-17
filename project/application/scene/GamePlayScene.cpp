@@ -43,20 +43,12 @@ void GamePlayScene::Initialize(const SceneContext& ctx) {
 	player_->Initialize(ctx_.engineContext, decalManager_.get());
 
 	cameraPosY_ = -20.0f;
-	mainCamera_->SetTranslation({0.0f, 60.0f, 0.0f});
+	ctx_.currentCamera->SetTranslation({0.0f, 60.0f, 0.0f});
 
 	// カメラのパラメータ初期化
 	Vector3 playerPos = player_->GetPosition();
 	Vector3 playerRot = player_->GetRotation();
-	Vector3 forward = {std::sin(playerRot.y), 0.0f, std::cos(playerRot.y)};
-	currentCameraPivot_ = {playerPos.x + forward.x * offsetDistance_, cameraPosY_, playerPos.z + forward.z * offsetDistance_};
-	mainCamera_->SetPivot(currentCameraPivot_);
-
-	float maxTiltAngle = cameraAngle_ * (std::numbers::pi_v<float> / 180.0f);
-	float basePitch = std::numbers::pi_v<float> / 2.0f;
-	float initialPitch = basePitch - std::cos(playerRot.y) * maxTiltAngle;
-	float initialRoll = std::sin(playerRot.y) * maxTiltAngle;
-	mainCamera_->SetRotate({initialPitch, 0.0f, initialRoll});
+	ctx_.currentCamera->InitializeFollow(playerPos, playerRot, offsetDistance_, cameraPosY_, cameraAngle_);
 
 	// 敵の生成&初期化
 	enemyManager_ = std::make_unique<EnemyManager>();
@@ -83,24 +75,9 @@ void GamePlayScene::Initialize(const SceneContext& ctx) {
 	// シーン遷移要求制御変数
 	isTransitionRequested_ = false;
 
-	// シーンで使うエフェクトの宣言
-	ctx_.engineContext->postEffectPipeline->SetEffects({
-	    PostEffectType::Vignette,         // ビネット
-	    PostEffectType::Glitch,           // グリッチ
-	    PostEffectType::DeathEffect,      // 死亡時エフェクト
-	    PostEffectType::Smoothing,        // スムージング
-	    PostEffectType::Gaussian,         // ガウシアン
-	    PostEffectType::RadialBlur,       // ラディアルブラー
-	});
-
-	// パラメータ設定
-	auto* vignette = ctx_.engineContext->postEffectPipeline->GetPass(PostEffectType::Vignette);
-	if (vignette) {
-		vignette->SetVignetteColor({1, 0, 0, 1});
-	}
-
-	// RadialBlurのアニメーション開始フラグ
-	isDeathAnimStarted_ = false;
+	// ポストエフェクト管理インスタンス生成&初期化
+	postEffectController_ = std::make_unique<GamePlayPostEffectController>();
+	postEffectController_->Initialize(ctx_);
 
 	// プレイヤー死亡時カメラ演出用インスタンス生成
 	cameraZoomController_ = std::make_unique<CameraDeathZoomController>();
@@ -122,16 +99,6 @@ void GamePlayScene::Initialize(const SceneContext& ctx) {
 void GamePlayScene::Update() {
 	float deltaTime = ctx_.timeManager->GetDeltaTime();
 
-	// グリッチノイズの更新
-	UpdateGlitch(deltaTime);
-
-	if (damageBlurTimer_ > 0.0f) {
-		damageBlurTimer_ -= deltaTime;
-		if (damageBlurTimer_ < 0.0f) {
-			damageBlurTimer_ = 0.0f;
-		}
-	}
-
 	// ポーズ画面
 	if (ctx_.keyboard->KeyTriggered(DIK_TAB) || ctx_.gamePad->GetState().buttonsPressed.start) {
 		RequestScenePush("Pause");
@@ -145,43 +112,7 @@ void GamePlayScene::Update() {
 
 	// Projectionの逆行列をCopyImageに渡す
 	Matrix4x4 projInv = MathUtility::Inverse(ctx_.currentCamera->GetProjection());
-	auto* outline = ctx_.engineContext->postEffectPipeline->GetPass(PostEffectType::DepthOutline);
-	if (outline) {
-		outline->SetProjectionInverse(projInv);
-	}
-
-	// HP量に応じてVignetteのパラメータを変更
-	auto* vignette = ctx_.engineContext->postEffectPipeline->GetPass(PostEffectType::Vignette);
-	auto* smoothing = ctx_.engineContext->postEffectPipeline->GetPass(PostEffectType::Smoothing);
-	auto* gaussian = ctx_.engineContext->postEffectPipeline->GetPass(PostEffectType::Gaussian);
-	auto* radialBlur = ctx_.engineContext->postEffectPipeline->GetPass(PostEffectType::RadialBlur);
-	if (!player_->IsDead()) {
-		if (vignette) {
-			float intensity = player_->GetCurrentHP() <= 1.0f ? 0.5f : 0.0f;
-			vignette->SetVignetteIntensity(intensity);
-		}
-
-		if (radialBlur) {
-			RadialBlurParam param;
-			param.blurWidth = player_->GetCurrentHP() <= 1.0f ? 0.01f : 0.0f;
-			param.numSamples = player_->GetCurrentHP() <= 1.0f ? 5.0f : 1.0f;
-			radialBlur->SetRadialBlurParam(param);
-		}
-
-		if (smoothing) {
-			SmoothingParam param;
-			param.radius = (damageBlurTimer_ > 0.0f) ? 2 : 0;
-			smoothing->SetSmoothingParam(param);
-		}
-
-		if (gaussian) {
-			GaussianParam param;
-			param.radius = (damageBlurTimer_ > 0.0f) ? 2 : 0;
-			gaussian->SetGaussianParam(param);
-		}
-	} else {
-		vignette->SetVignetteIntensity(0.0f);
-	}
+	postEffectController_->Update(deltaTime, player_->GetCurrentHP(), player_->IsDead(), projInv);
 
 	// プレイヤーの更新処理
 	player_->Update(deltaTime, ctx_.keyboard, ctx_.gamePad, enemyManager_.get());
@@ -201,7 +132,7 @@ void GamePlayScene::Update() {
 	// 当たり判定
 	collisionManager_->CheckCollisions(
 	    player_.get(), enemyManager_.get(), enemyBulletManager_.get(), enemyBombManager_.get(), stage_.get(), ctx_.currentCamera, commonData_,
-	    [this](const Vector3& pos) { GenerateEnemyDeathEffect(pos); }, glitchTimer_, damageBlurTimer_);
+	    [this](const Vector3& pos) { GenerateEnemyDeathEffect(pos); }, postEffectController_->GetGlitchTimer(), postEffectController_->GetDamageBlurTimer());
 
 	// 押し戻し完了後の最終的な座標で、描画更新&AABB更新
 	player_->PostUpdate();
@@ -212,36 +143,19 @@ void GamePlayScene::Update() {
 		flashEffect_->Trigger();
 	}
 
-	bool isPlaying = numSamplesAnim_.anim.Update(deltaTime, numSamplesAnim_.temp);
-
 	// フラッシュの演出が終わったらレターボックスの出現
 	if (flashEffect_->Finish()) {
 		letterBox_->Trigger();
 
 		// 死亡演出の開始処理
-		if (!isDeathAnimStarted_) {
-			isDeathAnimStarted_ = true;
-			numSamplesAnim_.anim.Start(0.0f, 1.0f, 1.0f, EaseType::EASEOUTCIRC);
-		}
+		postEffectController_->StartDeathAnimation();
 	}
 
 	// レターボックスの演出が終わったらシーン遷移
-	if (!letterBox_->GetIsActive() && !isPlaying) {
+	if (!letterBox_->GetIsActive() && !postEffectController_->GetIsDeathAnimPlaying()) {
 		if (!isTransitionRequested_) {
 			RequestSceneChange("Result");
 			isTransitionRequested_ = true;
-		}
-	}
-
-	// プレイヤーの生死状態に応じてDeathEffectの強度を制御
-	auto* deathEffect = ctx_.engineContext->postEffectPipeline->GetPass(PostEffectType::DeathEffect);
-	if (deathEffect) {
-		if (player_->IsDead()) {
-			// プレイヤー死亡時はエフェクトを全開にする
-			deathEffect->SetDeathEffectIntensity(1.0f);
-		} else {
-			// 生存時は通常画面
-			deathEffect->SetDeathEffectIntensity(0.0f);
 		}
 	}
 
@@ -298,7 +212,7 @@ void GamePlayScene::Update() {
 	}
 
 	// シーンエディターの更新
-	sceneEditor_->Update(ctx_, editObjects, player_.get(), enemyManager_.get(), cameraZoomController_.get(), cameraPosY_, isDebugCameraActive_, currentCameraPivot_);
+	sceneEditor_->Update(ctx_, editObjects, player_.get(), enemyManager_.get(), cameraZoomController_.get(), cameraPosY_, isDebugCameraActive_, ctx_.currentCamera->GetPivot());
 
 	// パーティクルの更新
 	for (auto& particle : enemyDeathEffect_) {
@@ -315,7 +229,9 @@ void GamePlayScene::Update() {
 	});
 
 	// カメラの追従
-	FollowCamera(deltaTime);
+	if (!isDebugCameraActive_) {
+		ctx_.currentCamera->UpdateFollow(player_->GetPosition(), player_->GetRotation(), offsetDistance_, cameraPosY_, cameraAngle_, tiltSpeed_, deltaTime);
+	}
 
 	// プレイヤーが敵を掴んだらシェイク
 	if (player_->GetIsGrabTriggerd()) {
@@ -389,75 +305,12 @@ void GamePlayScene::Draw() {
 
 void GamePlayScene::Finalize() {
 	// シーン終了時にエフェクトをデフォルトに戻す
-	ctx_.engineContext->postEffectPipeline->SetEffects({PostEffectType::FullScreen});
-}
-
-void GamePlayScene::UpdateGlitch(float deltaTime) {
-	// グリッチノイズ用タイマーの減算
-	if (glitchTimer_ > 0.0f) {
-		glitchTimer_ -= deltaTime;
-		elapsedTime_ += deltaTime;
-		if (glitchTimer_ < 0.0f) {
-			glitchTimer_ = 0.0f;
-			elapsedTime_ = 0.0f;
-		}
-	}
-
-	float intensity = 0.0f;
-	if (glitchTimer_ > 0.0f) {
-		intensity = 1.0f;
-	}
-
-	auto* glitch = ctx_.engineContext->postEffectPipeline->GetPass(PostEffectType::Glitch);
-	if (glitch) {
-		glitch->SetGlitchTime(elapsedTime_);
-		glitch->SetGlitchIntensity(intensity);
+	if (postEffectController_) {
+		postEffectController_->Finalize();
 	}
 }
 
 void GamePlayScene::GenerateEnemyDeathEffect(const Vector3& pos) {
 	// エフェクトの生成
 	EffectGenerator::CreateEnemyDeathEffect(ctx_.engineContext, pos, enemyDeathEffect_);
-}
-
-void GamePlayScene::FollowCamera(float deltaTime) {
-	// カメラの追従
-	if (!isDebugCameraActive_) {
-		Vector3 playerPos = player_->GetPosition();
-		Vector3 playerRot = player_->GetRotation();
-
-		// プレイヤーの向いている方向ベクトルを計算
-		Vector3 forward = {std::sin(playerRot.y), 0.0f, std::cos(playerRot.y)};
-
-		// 目標のピボット位置
-		Vector3 targetPivot = {playerPos.x + forward.x * offsetDistance_, playerPos.y, playerPos.z + forward.z * offsetDistance_};
-
-		// 線形補間を使ってカメラを滑らかに追従させる
-		float followSpeed = 5.0f;
-		currentCameraPivot_.x += (targetPivot.x - currentCameraPivot_.x) * followSpeed * deltaTime;
-		currentCameraPivot_.y = cameraPosY_;
-		currentCameraPivot_.z += (targetPivot.z - currentCameraPivot_.z) * followSpeed * deltaTime;
-
-		ctx_.currentCamera->SetPivot(currentCameraPivot_);
-
-		// 進行方向にカメラを傾ける処理
-		float maxTiltAngle = cameraAngle_ * (std::numbers::pi_v<float> / 180.0f);
-
-		// 基準のピッチ角
-		float basePitch = std::numbers::pi_v<float> / 2.0f;
-
-		// プレイヤーの向き(ヨー角)から、カメラのピッチ(X回転)とロール(Z回転)の目標値を計算
-		float targetPitch = basePitch - std::cos(playerRot.y) * maxTiltAngle;
-		float targetRoll = std::sin(playerRot.y) * maxTiltAngle;
-
-		// 現在のカメラの角度を取得
-		Vector3 currentEuler = ctx_.currentCamera->GetEuler();
-
-		currentEuler.x += (targetPitch - currentEuler.x) * tiltSpeed_ * deltaTime;
-		currentEuler.y = 0.0f;
-		currentEuler.z += (targetRoll - currentEuler.z) * tiltSpeed_ * deltaTime;
-
-		// カメラに角度を適用
-		ctx_.currentCamera->SetRotate(currentEuler);
-	}
 }

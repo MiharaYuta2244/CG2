@@ -144,3 +144,51 @@ void Camera::ShakeCamera(float deltaTime, float shakePower) {
 		shakeTimer_ = 0.0f;
 	}
 }
+
+void Camera::InitializeFollow(const Vector3& targetPos, const Vector3& targetRot, float offsetDistance, float cameraPosY, float cameraAngle) {
+	Vector3 forward = {std::sin(targetRot.y), 0.0f, std::cos(targetRot.y)};
+
+	// ピボットの初期化
+	Vector3 newPivot = {targetPos.x + forward.x * offsetDistance, cameraPosY, targetPos.z + forward.z * offsetDistance};
+	SetPivot(newPivot);
+
+	// 角度の初期化
+	float maxTiltAngle = cameraAngle * (std::numbers::pi_v<float> / 180.0f);
+	float basePitch = std::numbers::pi_v<float> / 2.0f;
+	euler_.x = basePitch - std::cos(targetRot.y) * maxTiltAngle;
+	euler_.y = 0.0f;
+	euler_.z = std::sin(targetRot.y) * maxTiltAngle;
+
+	UpdateOrientation();
+	UpdateViewMatrix();
+}
+
+void Camera::UpdateFollow(const Vector3& targetPos, const Vector3& targetRot, float offsetDistance, float cameraPosY, float cameraAngle, float tiltSpeed, float deltaTime) {
+	// ターゲットの向いている方向ベクトルを計算
+	Vector3 forward = {std::sin(targetRot.y), 0.0f, std::cos(targetRot.y)};
+
+	// 目標のピボット位置
+	Vector3 targetPivot = {targetPos.x + forward.x * offsetDistance, cameraPosY, targetPos.z + forward.z * offsetDistance};
+
+	// 線形補間を使ってカメラを追従させる
+	float followSpeed = 5.0f;
+	Vector3 nextPivot;
+	nextPivot.x = pivot_.x + (targetPivot.x - pivot_.x) * followSpeed * deltaTime;
+	nextPivot.y = cameraPosY;
+	nextPivot.z = pivot_.z + (targetPivot.z - pivot_.z) * followSpeed * deltaTime;
+
+	// 進行方向にカメラを傾ける処理
+	float maxTiltAngle = cameraAngle * (std::numbers::pi_v<float> / 180.0f);
+	float basePitch = std::numbers::pi_v<float> / 2.0f;
+
+	float targetPitch = basePitch - std::cos(targetRot.y) * maxTiltAngle;
+	float targetRoll = std::sin(targetRot.y) * maxTiltAngle;
+
+	euler_.x += (targetPitch - euler_.x) * tiltSpeed * deltaTime;
+	euler_.y = 0.0f;
+	euler_.z += (targetRoll - euler_.z) * tiltSpeed * deltaTime;
+
+	UpdateOrientation();
+	SetPivot(nextPivot);
+	UpdateViewMatrix();
+}
