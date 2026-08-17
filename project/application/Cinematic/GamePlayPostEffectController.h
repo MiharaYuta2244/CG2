@@ -13,7 +13,7 @@ public:
 	void Initialize(const SceneContext& ctx);
 
 	// 更新処理
-	void Update(float deltaTime, float playerHP, bool isPlayerDead, const Matrix4x4& projectionInverse);
+	void Update(float deltaTime, float playerHP, bool isPlayerDead);
 
 	void Finalize();
 

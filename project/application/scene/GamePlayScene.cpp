@@ -110,9 +110,8 @@ void GamePlayScene::Update() {
 		commonData_->clearTime += deltaTime;
 	}
 
-	// Projectionの逆行列をCopyImageに渡す
-	Matrix4x4 projInv = MathUtility::Inverse(ctx_.currentCamera->GetProjection());
-	postEffectController_->Update(deltaTime, player_->GetCurrentHP(), player_->IsDead(), projInv);
+	// ポストエフェクト更新
+	postEffectController_->Update(deltaTime, player_->GetCurrentHP(), player_->IsDead());
 
 	// プレイヤーの更新処理
 	player_->Update(deltaTime, ctx_.keyboard, ctx_.gamePad, enemyManager_.get());

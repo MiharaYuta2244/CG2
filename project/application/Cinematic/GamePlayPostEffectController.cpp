@@ -29,7 +29,7 @@ void GamePlayPostEffectController::Initialize(const SceneContext& ctx) {
 	isAnimPlaying_ = false;
 }
 
-void GamePlayPostEffectController::Update(float deltaTime, float playerHP, bool isPlayerDead, const Matrix4x4& projectionInverse) {
+void GamePlayPostEffectController::Update(float deltaTime, float playerHP, bool isPlayerDead) {
 	// グリッチノイズの更新
 	UpdateGlitch(deltaTime);
 

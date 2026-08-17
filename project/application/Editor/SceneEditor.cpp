@@ -93,6 +93,8 @@ void SceneEditor::UpdateImGui(const SceneContext& ctx, Player* player, float& ca
 		player->Damage(player->GetMaxHP());
 	}
 
+	ImGui::Text("FPS %f", ctx.timeManager->GetFPS());
+	ImGui::Text("DeltaTime %f", ctx.timeManager->GetDeltaTime());
 	ImGui::DragFloat3("Direction", &ctx.engineContext->object3dCommon->GetDirectionalLight().direction.x, 0.01f);
 	ImGui::ColorEdit4("Color", &ctx.engineContext->object3dCommon->GetDirectionalLight().color.x);
 	ImGui::DragFloat("Intensity", &ctx.engineContext->object3dCommon->GetDirectionalLight().intensity, 0.01f);
