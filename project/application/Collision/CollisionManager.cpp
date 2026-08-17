@@ -402,8 +402,8 @@ void CollisionManager::CheckCollisions(
 				if (a->IsKnockBack() || b->IsKnockBack()) {
 					a->Damage();
 					b->Damage();
-					a->StopAnimation();
-					b->StopAnimation();
+					a->StopKnockback();
+					b->StopKnockback();
 
 					// ダメージの結果死亡した場合のみ処理を行う
 					if (a->IsDead()) {

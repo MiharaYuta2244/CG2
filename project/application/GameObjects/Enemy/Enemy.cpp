@@ -71,10 +71,20 @@ void Enemy::Update(float deltaTime, Player* player, EnemyBulletManager* enemyBul
 		return;
 	}
 
-	// ノックバックアニメーション
-	if (knockBackAnim_.anim.GetIsActive()) {
-		knockBackAnim_.anim.Update(deltaTime, knockBackAnim_.temp);
-		transform_.translate = knockBackAnim_.temp;
+	// 速度による移動と減衰
+	if (velocity_.x != 0.0f || velocity_.z != 0.0f) {
+		// 速度による座標の更新
+		transform_.translate.x += velocity_.x * deltaTime;
+		transform_.translate.z += velocity_.z * deltaTime;
+
+		// 摩擦処理
+		velocity_.x = MathUtility::Lerp(velocity_.x, 0.0f, knockBackFriction_ * deltaTime);
+		velocity_.z = MathUtility::Lerp(velocity_.z, 0.0f, knockBackFriction_ * deltaTime);
+
+		// 速度が十分に小さくなったら完全に停止させる
+		if (std::abs(velocity_.x) < 0.1f && std::abs(velocity_.z) < 0.1f) {
+			velocity_ = {0.0f, 0.0f, 0.0f};
+		}
 	}
 
 	if (!isMove_) {
@@ -308,8 +318,8 @@ void Enemy::StartKnockBack(Vector3 dir) {
 		return;
 	}
 
-	Vector3 targetPos = {pos.x + dir.x * knockBackPower_, pos.y, pos.z + dir.z * knockBackPower_};
-	knockBackAnim_.anim.Start(transform_.translate, targetPos, 0.5f, EaseType::EASEOUTCUBIC);
+	// 瞬時に初速を与える
+	velocity_ = {dir.x * knockBackPower_, 0.0f, dir.z * knockBackPower_};
 }
 
 void Enemy::Kill() {
@@ -373,11 +383,7 @@ void Enemy::SetAIState(EnemyAI::State state) {
 	}
 }
 
-void Enemy::StopAnimation() {
-	if (knockBackAnim_.anim.GetIsActive()) {
-		knockBackAnim_.anim.Reset();
-	}
-}
+void Enemy::StopKnockback() { velocity_ = {0.0f, 0.0f, 0.0f}; }
 
 void Enemy::AddBloodDecal() {
 	Vector3 basePos = transform_.translate;

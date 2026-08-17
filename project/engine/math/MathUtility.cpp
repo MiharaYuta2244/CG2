@@ -573,6 +573,15 @@ Vector3 MathUtility::Lerp(const Vector3& start, const Vector3& end, float t) {
 	return result;
 }
 
+Vector2 MathUtility::Lerp(const Vector2& start, const Vector2& end, float t) {
+	Vector2 result;
+	result.x = start.x + (end.x - start.x) * t;
+	result.y = start.y + (end.y - start.y) * t;
+	return result;
+}
+
+float MathUtility::Lerp(float start, float end, float t) { return start + (end - start) * t; }
+
 Quaternion MathUtility::Lerp(const Quaternion& start, const Quaternion& end, float t) {
 	Quaternion result;
 

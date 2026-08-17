@@ -59,7 +59,7 @@ public:
 	void StartKnockBack(Vector3 dir);
 
 	// ノックバック中かどうかを取得
-	bool IsKnockBack() const { return knockBackAnim_.anim.GetIsActive(); }
+	bool IsKnockBack() const { return std::abs(velocity_.x) > 0.1f || std::abs(velocity_.z) > 0.1f; }
 
 	// 死亡させる処理
 	void Kill();
@@ -85,7 +85,7 @@ public:
 	void SetAIState(EnemyAI::State state);
 
 	// アニメーションを止める処理
-	void StopAnimation();
+	void StopKnockback();
 
 	// 敵の種類Setter
 	void SetEnemyType(EnemyType type);
@@ -109,14 +109,19 @@ private:
 private:
 	AABB bodyCol_{}; // 本体のAABB
 	bool enableMove_ = true;
-	AnimationBundle<Vector3> knockBackAnim_;
 	bool isDead_ = false;
 
 	// ノックバックの強さ
-	float knockBackPower_ = 15.0f;
+	float knockBackPower_ = 100.0f;
+
+	// 速度ベクトル
+	Vector3 velocity_ = {0.0f, 0.0f, 0.0f};
+
+	// 摩擦
+	float knockBackFriction_ = 7.0f;
 
 	std::unique_ptr<ObjectRender> render_;               // 描画用インスタンス
-	std::unique_ptr<ObjectRender> renderGun_;               // 武器描画用インスタンス
+	std::unique_ptr<ObjectRender> renderGun_;            // 武器描画用インスタンス
 	std::unique_ptr<EnemyAI> ai_;                        // AI
 	std::unique_ptr<TinyEngine::VisionCone> visionCone_; // 視界
 	std::unique_ptr<ExclamationMark> exclamationMark_;   // 「!」マーク

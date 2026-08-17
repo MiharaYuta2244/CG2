@@ -206,6 +206,10 @@ public:
 
 	static Vector3 Lerp(const Vector3& start, const Vector3& end, float t);
 
+	static Vector2 Lerp(const Vector2& start, const Vector2& end, float t);
+
+	static float Lerp(float start, float end, float t);
+
 	static Quaternion Lerp(const Quaternion& start, const Quaternion& end, float t);
 
 	static float DegreeToRadian(const float& degree);
