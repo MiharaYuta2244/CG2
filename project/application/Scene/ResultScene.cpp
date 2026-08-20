@@ -34,10 +34,19 @@ void ResultScene::Initialize(const SceneContext& ctx) {
 	scanlineParam_.scanlineCount = 150.0f;
 	scanlineParam_.intensity = 0.7f;
 	scanlineParam_.speed = 5.0f;
+
+	// オーディオマネージャーの生成&初期化
+	audioManager_ = std::make_unique<AudioManager>();
+	audioManager_->Initialize();
+	audioManager_->LoadWave("ResultBGM", "resources/sounds/ResultScene.mp3");
+	audioManager_->PlayBGM("ResultBGM");
 }
 
 void ResultScene::Update() {
 	float deltaTime = ctx_.timeManager->GetDeltaTime();
+
+	// 音声更新
+	audioManager_->Update();
 
 	// 歪みのパラメータにDeltaTime加算
 	glitchParam_.time += deltaTime;
@@ -68,4 +77,4 @@ void ResultScene::Draw() {
 	uiManager_->Draw();
 }
 
-void ResultScene::Finalize() {}
+void ResultScene::Finalize() { audioManager_->StopBGM(); }

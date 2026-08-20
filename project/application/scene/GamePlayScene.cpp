@@ -94,10 +94,19 @@ void GamePlayScene::Initialize(const SceneContext& ctx) {
 	controlUI_->Initialize(ctx.engineContext, decalManager_.get());
 	controlUI_->AddAttackUIDecal({2, 2, 2});
 	controlUI_->AddHoldUIDecal({2, 2, 2});
+
+	// オーディオマネージャーの生成&初期化
+	audioManager_ = std::make_unique<AudioManager>();
+	audioManager_->Initialize();
+	audioManager_->LoadWave("GameSceneBGM", "resources/sounds/GameScene.mp3");
+	audioManager_->PlayBGM("GameSceneBGM");
 }
 
 void GamePlayScene::Update() {
 	float deltaTime = ctx_.timeManager->GetDeltaTime();
+
+	// 音声更新
+	audioManager_->Update();
 
 	// ポーズ画面
 	if (ctx_.keyboard->KeyTriggered(DIK_TAB) || ctx_.gamePad->GetState().buttonsPressed.start) {
@@ -307,6 +316,9 @@ void GamePlayScene::Finalize() {
 	if (postEffectController_) {
 		postEffectController_->Finalize();
 	}
+
+	// BGM停止
+	audioManager_->StopBGM();
 }
 
 void GamePlayScene::GenerateEnemyDeathEffect(const Vector3& pos) {

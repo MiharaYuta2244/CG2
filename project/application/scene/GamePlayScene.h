@@ -1,4 +1,5 @@
 #pragma once
+#include "AudioManager.h"
 #include "BaseScene.h"
 #include "Cinematic/CameraDeathZoomController.h"
 #include "Cinematic/GamePlayPostEffectController.h"
@@ -90,4 +91,7 @@ private:
 	float cameraPosY_ = 0.0f;     // カメラのY座標
 	float offsetDistance_ = 0.0f; // プレイヤーの向きに応じたカメラのオフセット量
 	float shakePower_ = 2.0f;     // カメラのシェイク量
+
+	// オーディオマネージャーインスタンス
+	std::unique_ptr<TinyEngine::AudioManager> audioManager_;
 };

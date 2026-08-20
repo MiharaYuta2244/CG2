@@ -42,10 +42,19 @@ void TitleScene::Initialize(const SceneContext& ctx) {
 	scanlineParam_.scanlineCount = 150.0f;
 	scanlineParam_.intensity = 0.7f;
 	scanlineParam_.speed = 5.0f;
+
+	// オーディオマネージャーの生成&初期化
+	audioManager_ = std::make_unique<AudioManager>();
+	audioManager_->Initialize();
+	audioManager_->LoadWave("TitleBGM", "resources/sounds/TitleScene.mp3");
+	audioManager_->PlayBGM("TitleBGM");
 }
 
 void TitleScene::Update() {
 	float deltaTime = ctx_.timeManager->GetDeltaTime();
+
+	// 音声更新
+	audioManager_->Update();
 
 	// メニューの更新
 	menu_->Update(ctx_.keyboard, ctx_.gamePad, ctx_.timeManager->GetDeltaTime());
@@ -123,4 +132,4 @@ void TitleScene::Draw() {
 	titleLogo_->Draw();
 }
 
-void TitleScene::Finalize() {}
+void TitleScene::Finalize() { audioManager_->StopBGM(); }

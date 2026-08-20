@@ -48,7 +48,7 @@ void Enemy::Initialize(EngineContext* ctx, Vector3 pos, EnemyType type, DecalMan
 	render_->GetObject3d()->PlayAnimation(idleAnimation);
 
 	renderGun_ = std::make_unique<ObjectRender>();
-	renderGun_->Initialize(ctx, "scene.gltf");
+	renderGun_->Initialize(ctx, "Cube.obj");
 	renderGun_->SetTransform(transform_);
 	renderGun_->SetEnvScale(envScale_);
 	renderGun_->SetColor(color_);

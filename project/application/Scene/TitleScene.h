@@ -1,6 +1,7 @@
 #pragma once
 #include "BaseScene.h"
 #include "Menu/MenuList.h"
+#include "AudioManager.h"
 
 class TitleScene : public BaseScene {
 public:
@@ -32,4 +33,7 @@ private:
 	ScanlineParam scanlineParam_;                 // 走査線
 	BarrelDistortionParam barrelDistortionParam_; // 魚眼
 	GlitchParam glitchParam_;                     // グリッチ
+
+	// オーディオマネージャーインスタンス
+	std::unique_ptr<TinyEngine::AudioManager> audioManager_;
 };

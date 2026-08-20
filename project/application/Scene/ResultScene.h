@@ -1,7 +1,7 @@
 #pragma once
+#include "AudioManager.h"
 #include "BaseScene.h"
 #include "GameObjects/ResultUI/ResultUIManager.h"
-#include "Object3d.h"
 
 /// <summary>
 /// リザルトシーン
@@ -27,4 +27,7 @@ private:
 	ScanlineParam scanlineParam_;                 // 走査線
 	BarrelDistortionParam barrelDistortionParam_; // 魚眼
 	GlitchParam glitchParam_;                     // グリッチ
+
+	// オーディオマネージャーインスタンス
+	std::unique_ptr<TinyEngine::AudioManager> audioManager_;
 };
