@@ -9,6 +9,12 @@ void MenuList::Initialize(EngineContext* ctx) {
 	// 決定ボタン入力時のエフェクト
 	decideEffect_ = std::make_unique<DecideEffect>();
 	decideEffect_->Initialize(ctx, startPos_);
+
+	// オーディオマネージャー生成&初期化
+	audioManager_ = std::make_unique<AudioManager>();
+	audioManager_->Initialize();
+	audioManager_->LoadWave("Select", "resources/sounds/se/Select.mp3");
+	audioManager_->LoadWave("Decide", "resources/sounds/se/Decide.mp3");
 }
 
 void MenuList::AddItem(const std::string& label, const std::string& texturePath, std::function<void()> onSelect) {
@@ -69,13 +75,22 @@ void MenuList::Update(DirectInput* input, GamePad* gamePad, float deltaTime) {
 
 	if (up) {
 		currentIndex_ = (currentIndex_ - 1 + index) % index;
+
+		// SE再生
+		audioManager_->PlaySE("Select", 0.5f);
 	}
 	if (down) {
 		currentIndex_ = (currentIndex_ + 1) % index;
+
+		// SE再生
+		audioManager_->PlaySE("Select", 0.5f);
 	}
 	if (decide) {
 		items_[currentIndex_].onSelect();
 		decideEffect_->StartAnimation();
+
+		// SE再生
+		audioManager_->PlaySE("Decide", 0.5f);
 	}
 
 	// 決定ボタン入力時エフェクト更新
@@ -84,6 +99,9 @@ void MenuList::Update(DirectInput* input, GamePad* gamePad, float deltaTime) {
 	// 選択中メニューの座標をエフェクトに適用
 	Vector2 effectPos = {startPos_.x, startPos_.y + offsetY_ * currentIndex_};
 	decideEffect_->SetPos(effectPos);
+
+	// 音声更新
+	audioManager_->Update();
 }
 
 void MenuList::Draw() {

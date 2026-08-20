@@ -1,4 +1,5 @@
 #pragma once
+#include "AudioManager.h"
 #include "Button/RetryButton.h"
 #include "Button/ToTitleButton.h"
 #include "GameObjects/CommonData.h"
@@ -58,4 +59,7 @@ private:
 	bool stickInUse_ = false;
 
 	bool isDecided_ = false;
+
+	// オーディオマネージャー
+	std::unique_ptr<TinyEngine::AudioManager> audioManager_;
 };

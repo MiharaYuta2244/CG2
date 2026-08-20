@@ -1,5 +1,7 @@
 #include "ResultUIManager.h"
 
+using namespace TinyEngine;
+
 void ResultUIManager::Initialize(EngineContext* ctx, CommonData* commonData) {
 	// スコアテキスト生成&初期化
 	scoreText_ = std::make_unique<ResultParamText>();
@@ -22,6 +24,12 @@ void ResultUIManager::Initialize(EngineContext* ctx, CommonData* commonData) {
 
 	// クリア時間の受け渡し
 	timerText_->SetParam(commonData->clearTime);
+
+	// オーディオマネージャー生成&初期化
+	audioManager_ = std::make_unique<AudioManager>();
+	audioManager_->Initialize();
+	audioManager_->LoadWave("Select", "resources/sounds/se/Select.mp3");
+	audioManager_->LoadWave("Decide", "resources/sounds/se/Decide.mp3");
 }
 
 void ResultUIManager::Update(float deltaTime, DirectInput* input, GamePad* gamePad) {
@@ -75,17 +83,26 @@ void ResultUIManager::Update(float deltaTime, DirectInput* input, GamePad* gameP
 	}
 
 	int size = static_cast<int>(buttons_.size());
-	if (right) {
+	if (right && !isDecided_) {
 		selectedIndex_ = (selectedIndex_ + 1) % size;
+
+		// SE再生
+		audioManager_->PlaySE("Select", 0.5f);
 	}
-	if (left) {
+	if (left && !isDecided_) {
 		selectedIndex_ = (selectedIndex_ - 1 + size) % size;
+
+		// SE再生
+		audioManager_->PlaySE("Select", 0.5f);
 	}
 
 	// 決定ボタンを押したら
 	if (decide && !isDecided_) {
 		OnDecide();
 		isDecided_ = true;
+
+		// SE再生
+		audioManager_->PlaySE("Decide", 0.5f);
 	}
 
 	// ボタンの更新

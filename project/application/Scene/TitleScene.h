@@ -2,6 +2,7 @@
 #include "BaseScene.h"
 #include "Menu/MenuList.h"
 #include "AudioManager.h"
+#include "GameTimer.h"
 
 class TitleScene : public BaseScene {
 public:
@@ -36,4 +37,7 @@ private:
 
 	// オーディオマネージャーインスタンス
 	std::unique_ptr<TinyEngine::AudioManager> audioManager_;
+
+	// ゲーム終了までのタイマー
+	std::unique_ptr<GameTimer> finishTimer_;
 };

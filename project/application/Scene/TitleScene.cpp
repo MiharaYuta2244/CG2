@@ -14,7 +14,10 @@ void TitleScene::Initialize(const SceneContext& ctx) {
 	menu_->Initialize(ctx.engineContext);
 	menu_->AddItem("Play", "Title_Play.png", [this]() { RequestSceneChange("GamePlay"); });
 	menu_->AddItem("Option", "Title_Option.png", [this]() { RequestSceneChange("GamePlay"); });
-	menu_->AddItem("Quit", "Title_Quit.png", [this]() { PostQuitMessage(0); });
+	menu_->AddItem("Quit", "Title_Quit.png", [this]() {
+		finishTimer_ = std::make_unique<GameTimer>();
+		finishTimer_->Initialize(0.5f);
+	});
 
 	// タイトルロゴの生成&初期化
 	titleLogo_ = std::make_unique<Sprite>();
@@ -74,6 +77,16 @@ void TitleScene::Update() {
 	// 歪みのパラメータにDeltaTime加算
 	glitchParam_.time += deltaTime;
 	scanlineParam_.time += deltaTime;
+
+	// ゲーム終了タイマー更新
+	if (finishTimer_) {
+		finishTimer_->Update(deltaTime);
+
+		if (finishTimer_->IsEnd()) {
+			// ゲーム終了
+			PostQuitMessage(0);
+		}
+	}
 
 #ifdef USE_IMGUI
 	ImGui::Begin("PostEffect");

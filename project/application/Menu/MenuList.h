@@ -1,6 +1,7 @@
 #pragma once
 #include "DirectInput.h"
 #include "GameObjects/Effect/DecideEffect.h"
+#include "AudioManager.h"
 #include <Sprite.h>
 #include <functional>
 #include <string>
@@ -50,4 +51,7 @@ private:
 	// スティックでの連続切り換え制御用変数
 	float stickCooldown_ = 0.0f;
 	bool stickInUse_ = false;
+
+	// オーディオマネージャー
+	std::unique_ptr<TinyEngine::AudioManager> audioManager_;
 };

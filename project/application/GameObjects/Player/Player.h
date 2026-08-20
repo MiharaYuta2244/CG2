@@ -9,6 +9,7 @@
 #include "Particle.h"
 #include "PlayerHealth.h"
 #include "PlayerMove.h"
+#include "AudioManager.h"
 
 class EnemyManager;
 class Enemy;
@@ -204,4 +205,7 @@ private:
 	float pointLightIntensity_ = 1.0f;                   // 輝度
 	float pointLightRadius_ = 7.0f;                      // 影響半径
 	float pointLightDecay_ = 0.7f;                       // 減衰率
+
+	// オーディオマネージャー
+	std::unique_ptr<TinyEngine::AudioManager> audioManager_;
 };

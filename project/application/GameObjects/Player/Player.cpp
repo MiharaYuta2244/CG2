@@ -36,6 +36,11 @@ void Player::Initialize(EngineContext* ctx, TinyEngine::DecalManager* bloodDecal
 
 	// 血痕の管理インスタンスポインタ
 	bloodDecalManager_ = bloodDecalManager;
+
+	// オーディオマネージャー
+	audioManager_ = std::make_unique<AudioManager>();
+	audioManager_->Initialize();
+	audioManager_->LoadWave("Heal", "resources/sounds/se/Heal.mp3");
 }
 
 void Player::Update(float deltaTime, DirectInput* input, GamePad* gamePad, EnemyManager* enemyManager) {
@@ -46,6 +51,9 @@ void Player::Update(float deltaTime, DirectInput* input, GamePad* gamePad, Enemy
 			isActionAnimating_ = false; // 指定時間経過でアクション終了
 		}
 	}
+
+	// 音声更新
+	audioManager_->Update();
 
 	// アナログ入力ベクトル
 	Vector2 inputDir = {0.0f, 0.0f};
@@ -210,7 +218,7 @@ void Player::Update(float deltaTime, DirectInput* input, GamePad* gamePad, Enemy
 
 		// 現在のLTの値を保存
 		preLt_ = padState.axes.lt;
-	}else{
+	} else {
 		// パッドが繋がっていない場合はリセット
 		preLt_ = 0.0f;
 	}
@@ -421,6 +429,9 @@ void Player::Heal(float value) {
 	if (beforeHP != afterHP) {
 		// エフェクト生成
 		GenerateHealEffect();
+
+		// 音声再生
+		audioManager_->PlaySE("Heal", 1.0f);
 	}
 }
 
@@ -437,6 +448,9 @@ void Player::AllHeal() {
 	if (beforeHP != afterHP) {
 		// エフェクト生成
 		GenerateHealEffect();
+
+		// 音声再生
+		audioManager_->PlaySE("Heal", 0.3f);
 	}
 }
 
