@@ -252,8 +252,13 @@ void Player::Update(float deltaTime, DirectInput* input, GamePad* gamePad, Enemy
 
 	// 掴んでいる最中の更新処理
 	if (isHold_) {
+		// 掴んでいる敵が死亡している場合はポインタを破棄して掴み状態を解除
+		if (heldEnemy_ != nullptr && heldEnemy_->IsDead()) {
+			isHold_ = false;
+			heldEnemy_ = nullptr;
+		}
 		// 掴んでいる間はプレイヤーの位置に敵を固定
-		if (isGrab_ && heldEnemy_ != nullptr) {
+		else if (isGrab_ && heldEnemy_ != nullptr) {
 			Vector3 forward = {lastMoveDirection_.x, 0.0f, lastMoveDirection_.y};
 
 			// 前方オフセット
