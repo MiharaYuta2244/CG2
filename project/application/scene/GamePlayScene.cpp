@@ -117,6 +117,9 @@ void GamePlayScene::Update() {
 	// ゴールしていなければクリアタイムを加算
 	if (!stage_->GetGoal()->GetIsGoal() && !player_->IsDead()) {
 		commonData_->clearTime += deltaTime;
+	} else {
+		// 敵をすべて殺す
+		enemyManager_->AllDead();
 	}
 
 	// ポストエフェクト更新

@@ -1,5 +1,6 @@
 #pragma once
 #include "AABB.h"
+#include "AudioManager.h"
 #include "DecalManager.h"
 #include "DirectInput.h"
 #include "GameObjects/IGameObject.h"
@@ -9,7 +10,6 @@
 #include "Particle.h"
 #include "PlayerHealth.h"
 #include "PlayerMove.h"
-#include "AudioManager.h"
 
 class EnemyManager;
 class Enemy;

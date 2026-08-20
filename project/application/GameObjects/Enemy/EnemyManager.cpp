@@ -180,3 +180,9 @@ void EnemyManager::SaveToJson(const std::string& filepath) {
 
 	JsonManager::Save(filepath, enemyDatas);
 }
+
+void EnemyManager::AllDead() {
+	for (auto& enemy : enemies_) {
+		enemy->Dead();
+	}
+}

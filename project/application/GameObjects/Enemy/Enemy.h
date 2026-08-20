@@ -93,6 +93,9 @@ public:
 	// 敵の種類Getter
 	EnemyType GetEnemyType() const { return type_; }
 
+	// 血痕を出さずに敵を消す
+	void Dead() { isDead_ = true; };
+
 private:
 	// 当たり判定の更新
 	void UpdateCollision();

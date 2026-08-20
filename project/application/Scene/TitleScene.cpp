@@ -13,7 +13,6 @@ void TitleScene::Initialize(const SceneContext& ctx) {
 	menu_ = std::make_unique<MenuList>();
 	menu_->Initialize(ctx.engineContext);
 	menu_->AddItem("Play", "Title_Play.png", [this]() { RequestSceneChange("GamePlay"); });
-	menu_->AddItem("Option", "Title_Option.png", [this]() { RequestSceneChange("GamePlay"); });
 	menu_->AddItem("Quit", "Title_Quit.png", [this]() {
 		finishTimer_ = std::make_unique<GameTimer>();
 		finishTimer_->Initialize(0.5f);

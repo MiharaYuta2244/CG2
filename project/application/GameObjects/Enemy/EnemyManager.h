@@ -50,6 +50,9 @@ public:
 	// 敵のリストを取得するGetter
 	std::list<std::unique_ptr<Enemy>>& GetEnemies() { return enemies_; }
 
+	// 敵を全員殺す
+	void AllDead();
+
 private:
 	void LoadFromJson(const std::string& filepath);
 	void SaveToJson(const std::string& filepath);
