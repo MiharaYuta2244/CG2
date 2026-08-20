@@ -109,6 +109,9 @@ private:
 	// 血痕の生成
 	void AddBloodDecal();
 
+	// 爆発エフェクト生成関数
+	void GenerateBombEffect();
+
 private:
 	AABB bodyCol_{}; // 本体のAABB
 	bool enableMove_ = true;
@@ -143,6 +146,9 @@ private:
 	// チャージパーティクル
 	std::unique_ptr<TinyEngine::Particle> chargeParticle_;
 	std::unique_ptr<TinyEngine::Particle> chargeCylinderParticle_;
+
+	// 爆発エフェクト管理用コンテナ
+	std::vector<std::unique_ptr<TinyEngine::Particle>> bombEffects_;
 
 	// 移動フラグ
 	bool isMove_ = true;

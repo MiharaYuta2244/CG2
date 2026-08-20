@@ -69,6 +69,12 @@ void Enemy::Initialize(EngineContext* ctx, Vector3 pos, EnemyType type, DecalMan
 
 void Enemy::Update(float deltaTime, Player* player, EnemyBulletManager* enemyBulletManager, WallManager* wallManager, DoorManager* doorManager, GlassManager* glassManager, EnemyBombManager* enemyBombManager) {
 	if (isDead_) {
+		// 死亡後も爆発エフェクトの更新と終了したエフェクトの削除を行う
+		for (auto& particle : bombEffects_) {
+			particle->Update();
+		}
+		std::erase_if(bombEffects_, [](const std::unique_ptr<Particle>& p) { return p->IsFinished(); });
+
 		return;
 	}
 
@@ -307,6 +313,11 @@ void Enemy::Draw() {
 			chargeCylinderParticle_->Draw();
 		}
 	}
+
+	// 爆発エフェクトの描画
+	for (auto& particle : bombEffects_) {
+		particle->Draw();
+	}
 }
 
 void Enemy::StartKnockBack(Vector3 dir) {
@@ -331,6 +342,11 @@ void Enemy::Kill() {
 
 	// 血痕の生成
 	AddBloodDecal();
+
+	// Bomberタイプなら爆発エフェクトを生成
+	if (type_ == EnemyType::Bomber) {
+		GenerateBombEffect();
+	}
 }
 
 void Enemy::Damage() {
@@ -428,3 +444,5 @@ void Enemy::SetEnemyType(EnemyType type) {
 		visionCone_->Initialize(ctx_, param.radius, param.angle);
 	}
 }
+
+void Enemy::GenerateBombEffect() { EffectGenerator::CreateHitEffect(ctx_, transform_.translate, bombEffects_); }

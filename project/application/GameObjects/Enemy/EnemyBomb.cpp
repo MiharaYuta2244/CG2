@@ -1,10 +1,12 @@
 #include "EnemyBomb.h"
 #include "GameObjects/Effect/EffectGenerator.h"
+#include "ColorPalette.h"
 
 void EnemyBomb::Initialize(EngineContext* ctx, Vector3 pos, Vector3 velocity, Vector3 targetPos) {
 	ctx_ = ctx;
 	render_ = std::make_unique<ObjectRender>();
 	render_->Initialize(ctx, "Cube.obj");
+	render_->SetColor(ColorPalette::Red());
 	transform_.scale = {1, 1, 1};
 	transform_.rotate = {0, 0, 0};
 	transform_.translate = pos;
