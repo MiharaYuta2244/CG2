@@ -320,9 +320,9 @@ void CollisionManager::CheckCollisions(
 			// 衝突判定
 			if (Collision::Intersect(enemy->GetBodyCol(), door->GetCollision())) {
 				// 押し戻し・衝突応答処理
-				// ----------------------------------------
+				// --------------------------------------------------
 				// 壁激突死の判定：もしノックバック中なら死亡させて処理を抜ける
-				// ----------------------------------------
+				// --------------------------------------------------
 				if (enemy->IsKnockBack()) {
 					enemy->Kill();
 					commonData->killCount++;

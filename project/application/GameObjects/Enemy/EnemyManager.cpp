@@ -11,6 +11,13 @@ void EnemyManager::Initialize(EngineContext* ctx, DecalManager* bloodDecalManage
 	ctx_ = ctx;
 	bloodDecalManager_ = bloodDecalManager;
 
+	// オーディオマネージャー生成&初期化
+	audioManager_ = std::make_unique<AudioManager>();
+	audioManager_->Initialize();
+	audioManager_->LoadWave("Cymbal", "resources/sounds/se/Cymbal.mp3");
+	audioManager_->LoadWave("Snare", "resources/sounds/se/Snare.mp3");
+	audioManager_->LoadWave("Shot", "resources/sounds/se/Shot.mp3");
+
 	// JSON読み込み
 	jsonPath_ = "Enemies.json";
 	LoadFromJson(jsonPath_);
@@ -18,13 +25,29 @@ void EnemyManager::Initialize(EngineContext* ctx, DecalManager* bloodDecalManage
 
 void EnemyManager::Update(
     float deltaTime, Player* player, EnemyBulletManager* enemyBulletManager, WallManager* wallManager, DoorManager* doorManager, GlassManager* glassManager, EnemyBombManager* enemyBombManager) {
+
+	// 削除前の敵の数を取得
+	size_t beforeCount = enemies_.size();
+
 	// 死亡した敵をリストから削除
 	enemies_.remove_if([](const std::unique_ptr<Enemy>& enemy) { return enemy->IsDead(); });
+
+	// 削除後の敵の数を取得
+	size_t afterCount = enemies_.size();
+
+	// 数が減ったらSEを再生
+	if (beforeCount > afterCount) {
+		audioManager_->PlaySE("Cymbal", 0.2f);
+		audioManager_->PlaySE("Snare", 0.2f);
+	}
 
 	// 生きている敵をすべて更新
 	for (auto& enemy : enemies_) {
 		enemy->Update(deltaTime, player, enemyBulletManager, wallManager, doorManager, glassManager, enemyBombManager);
 	}
+
+	// 音声更新
+	audioManager_->Update();
 }
 
 void EnemyManager::PostUpdate() {
@@ -97,7 +120,7 @@ void EnemyManager::DrawImGui() {
 	// 敵の追加ボタン
 	if (ImGui::Button("Add Enemy")) {
 		auto newEnemy = std::make_unique<Enemy>();
-		newEnemy->Initialize(ctx_, {0.0f, 0.0f, 0.0f}, EnemyType::Normal, bloodDecalManager_);
+		newEnemy->Initialize(ctx_, {0.0f, 0.0f, 0.0f}, EnemyType::Normal, bloodDecalManager_, audioManager_.get());
 		newEnemy->SetPos({0.0f, 0.0f, 0.0f});
 		newEnemy->SetRotate({0.0f, 0.0f, 0.0f});
 		newEnemy->SetIsMove(false);
@@ -135,7 +158,7 @@ void EnemyManager::LoadFromJson(const std::string& filepath) {
 
 	for (const auto& data : enemyDatas) {
 		auto enemy = std::make_unique<Enemy>();
-		enemy->Initialize(ctx_, data.pos, static_cast<EnemyType>(data.type), bloodDecalManager_);
+		enemy->Initialize(ctx_, data.pos, static_cast<EnemyType>(data.type), bloodDecalManager_, audioManager_.get());
 		enemy->SetPos(data.pos);
 		enemy->SetRotate(data.rot);
 		enemy->SetIsMove(data.isMove);

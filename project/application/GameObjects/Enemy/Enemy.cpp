@@ -11,9 +11,10 @@ int Enemy::index = 0;
 
 Enemy::Enemy() { id_ = index++; }
 
-void Enemy::Initialize(EngineContext* ctx, Vector3 pos, EnemyType type, DecalManager* bloodDecalManager) {
+void Enemy::Initialize(EngineContext* ctx, Vector3 pos, EnemyType type, DecalManager* bloodDecalManager, AudioManager* audioManager) {
 	ctx_ = ctx;
 	type_ = type;
+	audioManager_ = audioManager;
 
 	switch (type_) {
 	case EnemyType::Normal:
@@ -55,7 +56,7 @@ void Enemy::Initialize(EngineContext* ctx, Vector3 pos, EnemyType type, DecalMan
 
 	// AIインスタンス生成&初期化
 	ai_ = std::make_unique<EnemyAI>();
-	ai_->Initialize(&transform_, ctx, type);
+	ai_->Initialize(&transform_, ctx, type, audioManager_);
 
 	// 視界インスタンス生成&初期化
 	visionCone_ = std::make_unique<VisionCone>();
@@ -422,7 +423,7 @@ void Enemy::SetEnemyType(EnemyType type) {
 
 	// AIと視界を再初期化
 	if (ai_ && visionCone_) {
-		ai_->Initialize(&transform_, ctx_, type_);
+		ai_->Initialize(&transform_, ctx_, type_, audioManager_);
 		Visionparam param = ai_->GetVisionParam();
 		visionCone_->Initialize(ctx_, param.radius, param.angle);
 	}

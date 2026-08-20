@@ -1,4 +1,5 @@
 #pragma once
+#include "AudioManager.h"
 #include "Enemy.h"
 #include <list>
 #include <memory>
@@ -18,10 +19,10 @@ struct EnemyData {
 
 inline void to_json(Json& j, const EnemyData& e) {
 	j = Json{
-	    {"pos", e.pos},
-        {"rot", e.rot},
+	    {"pos",    e.pos   },
+        {"rot",    e.rot   },
         {"isMove", e.isMove},
-        {"type", e.type}
+        {"type",   e.type  }
     };
 }
 
@@ -62,4 +63,7 @@ private:
 
 	// 血痕管理クラスポインタ
 	TinyEngine::DecalManager* bloodDecalManager_ = nullptr;
+
+	// オーディオマネージャーインスタンス
+	std::unique_ptr<TinyEngine::AudioManager> audioManager_;
 };

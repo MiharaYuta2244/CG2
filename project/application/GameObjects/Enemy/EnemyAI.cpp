@@ -8,10 +8,13 @@
 #include "Random.h"
 #include <cmath>
 
-void EnemyAI::Initialize(Transform* transform, EngineContext* ctx, EnemyType type) {
+using namespace TinyEngine;
+
+void EnemyAI::Initialize(Transform* transform, EngineContext* ctx, EnemyType type, AudioManager* audioManager) {
 	transform_ = transform;
 	ctx_ = ctx;
 	type_ = type;
+	audioManager_ = audioManager;
 }
 
 void EnemyAI::Update(
@@ -164,7 +167,11 @@ void EnemyAI::UpdateVigilance(
 
 		// 弾の発射処理
 		if (shotTimer_ >= shotIntervalNormal_) {
+			// 射撃
 			Shot(toTarget, enemyBulletManager, enemyBombManager);
+
+			// SE再生
+			audioManager_->PlaySE("Shot", 0.3f);
 		}
 
 	} else {
@@ -229,7 +236,11 @@ void EnemyAI::UpdateHold(float deltaTime, Player* player, EnemyBulletManager* en
 
 	// 弾の発射処理 通常の発射より早く撃つ
 	if (shotTimer_ >= shotIntervalHold_ * shotTimerMultiPlier_) {
+		// 射撃
 		Shot(playerDirection, enemyBulletManager, enemyBombManager);
+
+		// SE再生
+		audioManager_->PlaySE("Shot", 0.3f);
 
 		// 拘束時の発射フラグを下す
 		isShotHoldState_ = false;

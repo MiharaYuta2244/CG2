@@ -1,11 +1,11 @@
 #pragma once
 #include "AABB.h"
-#include "EnemyBullet.h"
+#include "AudioManager.h"
 #include "EnemyType.h"
 #include "GameObjects/GameObjectManager.h"
-#include "GameObjects/StageObjects/Wall/Wall.h"
 #include "GameObjects/StageObjects/Door/Door.h"
 #include "GameObjects/StageObjects/Glass/Glass.h"
+#include "GameObjects/StageObjects/Wall/Wall.h"
 #include "Transform.h"
 #include <vector>
 
@@ -34,7 +34,7 @@ public:
 	};
 
 	// 初期化
-	void Initialize(Transform* transform, EngineContext* ctx, EnemyType type);
+	void Initialize(Transform* transform, EngineContext* ctx, EnemyType type, TinyEngine::AudioManager* audioManager);
 
 	// 更新処理
 	void Update(
@@ -132,4 +132,7 @@ private:
 	// 聴覚用パラメータ
 	float hearingRadius_ = 8.0f; // 足音が聞こえる距離
 	float hearTurnSpeed_ = 8.0f; // 足音に反応して振り向く速度
+
+	// オーディオマネージャーポインタ
+	TinyEngine::AudioManager* audioManager_ = nullptr;
 };

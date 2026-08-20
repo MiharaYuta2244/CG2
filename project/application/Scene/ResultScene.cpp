@@ -38,7 +38,7 @@ void ResultScene::Initialize(const SceneContext& ctx) {
 	// オーディオマネージャーの生成&初期化
 	audioManager_ = std::make_unique<AudioManager>();
 	audioManager_->Initialize();
-	audioManager_->LoadWave("ResultBGM", "resources/sounds/ResultScene.mp3");
+	audioManager_->LoadWave("ResultBGM", "resources/sounds/bgm/ResultScene.mp3");
 	audioManager_->PlayBGM("ResultBGM");
 }
 
