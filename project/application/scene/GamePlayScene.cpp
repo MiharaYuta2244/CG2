@@ -94,8 +94,11 @@ void GamePlayScene::Initialize(const SceneContext& ctx) {
 	// 操作方法UI
 	controlUI_ = std::make_unique<ControlUI>();
 	controlUI_->Initialize(ctx.engineContext, decalManager_.get());
-	controlUI_->AddAttackUIDecal({2, 2, 2});
-	controlUI_->AddHoldUIDecal({2, 2, 2});
+
+	if (stagePath_ == "Stage1") {
+		controlUI_->AddAttackUIDecal({2, 2, 2});
+		controlUI_->AddHoldUIDecal({2, 2, 2});
+	}
 
 	// オーディオマネージャーの生成&初期化
 	audioManager_ = std::make_unique<AudioManager>();

@@ -30,6 +30,8 @@ public:
 
 	std::string GetName() const { return "Goal"; }
 
+	void SetPos(Vector3 pos) { transform_.translate = pos; }
+
 private:
 	EngineContext* ctx_ = nullptr;
 	AABB col_;

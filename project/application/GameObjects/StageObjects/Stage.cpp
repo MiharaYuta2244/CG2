@@ -64,6 +64,10 @@ void Stage::Initialize(const SceneContext& ctx, TinyEngine::DecalManager* decalM
 	// ゴール判定インスタンス生成&初期化
 	goal_ = std::make_unique<Goal>();
 	goal_->Initialize(ctx.engineContext);
+
+	if (stagePath == "Stage2/"){
+		goal_->SetPos({556.0f, 0.0f, 0.0f});
+	}
 }
 
 void Stage::Update(float deltaTime, const Vector3& playerPos, Camera* camera) {
