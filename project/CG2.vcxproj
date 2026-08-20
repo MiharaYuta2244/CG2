@@ -302,6 +302,7 @@ xcopy /Y "$(windowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDi
     <ClCompile Include="application\Editor\SceneEditor.cpp" />
     <ClCompile Include="application\GameObjects\StageObjects\Stage.cpp" />
     <ClCompile Include="application\GameObjects\StageObjects\HealArea\HealArea.cpp" />
+    <ClCompile Include="application\Menu\ResultScoreDisplay.cpp" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="resources\shaders\Object3d.PS.hlsl">
@@ -539,6 +540,7 @@ xcopy /Y "$(windowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDi
     <ClInclude Include="application\GameObjects\PlaceableObject.h" />
     <ClInclude Include="application\GameObjects\GameObjectManager.h" />
     <ClInclude Include="application\Cinematic\GamePlayPostEffectController.h" />
+    <ClInclude Include="application\Menu\ResultScoreDisplay.h" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="externals\imgui\LICENSE.txt" />

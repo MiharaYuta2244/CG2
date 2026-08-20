@@ -51,6 +51,10 @@ void ResultScene::Initialize(const SceneContext& ctx) {
 		resultText_->Initialize(ctx.engineContext, "GameOver.png");
 		resultText_->SetPosition({390, 100});
 	}
+
+	// スコア表示インスタンス生成&初期化
+	scoreDisplay_ = std::make_unique<ResultScoreDisplay>();
+	scoreDisplay_->Initialize(ctx.engineContext, commonData_->isClear, commonData_->clearTime, commonData_->killCount);
 }
 
 void ResultScene::Update() {
@@ -85,14 +89,16 @@ void ResultScene::Update() {
 	// リザルトテキスト更新
 	resultText_->Update();
 
-	ImGui::Begin("Text");
-	ImGui::DragFloat2("Pos", &resultText_->GetPosition().x, 1.0f);
-	ImGui::End();
+	// スコア表示更新
+	scoreDisplay_->Update();
 }
 
 void ResultScene::Draw() {
 	// リザルト
 	resultText_->Draw();
+
+	// スコア表示描画
+	scoreDisplay_->Draw();
 
 	// UI管理クラス描画
 	uiManager_->Draw();

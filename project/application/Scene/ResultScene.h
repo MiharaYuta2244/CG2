@@ -2,6 +2,7 @@
 #include "AudioManager.h"
 #include "BaseScene.h"
 #include "GameObjects/ResultUI/ResultUIManager.h"
+#include "Menu/ResultScoreDisplay.h"
 
 /// <summary>
 /// リザルトシーン
@@ -33,4 +34,7 @@ private:
 
 	// リザルトテキスト
 	std::unique_ptr<TinyEngine::Sprite> resultText_;
+
+	// スコア表示インスタンス
+	std::unique_ptr<ResultScoreDisplay> scoreDisplay_;
 };
