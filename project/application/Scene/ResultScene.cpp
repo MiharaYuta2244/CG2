@@ -90,7 +90,7 @@ void ResultScene::Update() {
 	resultText_->Update();
 
 	// スコア表示更新
-	scoreDisplay_->Update();
+	scoreDisplay_->Update(deltaTime);
 }
 
 void ResultScene::Draw() {

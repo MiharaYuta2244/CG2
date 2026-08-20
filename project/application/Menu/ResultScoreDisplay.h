@@ -1,5 +1,7 @@
 #pragma once
 #include "EngineContext.h"
+#include "GameObjects/ResultUI/Animation/SpriteScaleWipeAnimator.h"
+#include "GameTimer.h"
 #include "Sprite.h"
 #include <array>
 #include <memory>
@@ -15,7 +17,7 @@ public:
 	void Initialize(EngineContext* ctx, bool isClear, float clearTime, int killCount);
 
 	// 更新処理
-	void Update();
+	void Update(float deltaTime);
 
 	// 描画処理
 	void Draw();
@@ -41,4 +43,15 @@ private:
 	const Vector2 kTimeBasePos = {490.0f, 300.0f};
 	const Vector2 kKillCountBasePos = {530.0f, 400.0f};
 	const float kDigitSpacing = 60.0f; // 数字間のスペース
+
+	// ワイプアニメーション用
+	std::unique_ptr<SpriteScaleWipeAnimator> timerWipe_;
+	std::unique_ptr<SpriteScaleWipeAnimator> killCountWipe_;
+
+	// 時間差再生用タイマー
+	float killCountWipeDelay_ = 0.2f; // タイマー側のワイプから少し遅れて開始する
+	bool isKillCountWipeStarted_ = false;
+
+	// ワイプアニメーション開始までのタイマー
+	GameTimer wipeAnimStartTimer_;
 };

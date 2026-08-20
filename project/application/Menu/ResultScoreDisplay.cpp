@@ -9,6 +9,9 @@ void ResultScoreDisplay::Initialize(EngineContext* ctx, bool isClear, float clea
 	// クリアタイム表示の初期化
 	timeSprites_.clear();
 
+	// ワイプアニメ開始タイマー
+	wipeAnimStartTimer_.Initialize(1.0f);
+
 	if (isClear) {
 		// クリア時は時間を分:秒に変換して表示
 		int minutes = static_cast<int>(clearTime) / 60;
@@ -63,9 +66,40 @@ void ResultScoreDisplay::Initialize(EngineContext* ctx, bool isClear, float clea
 		killCountSprites_.push_back(CreateSymbolSprite(ctx, "hyphen.png", {kKillCountBasePos.x + kDigitSpacing, kKillCountBasePos.y}));
 		unitSprite_ = CreateSymbolSprite(ctx, "tai.png", {kKillCountBasePos.x + kDigitSpacing * 2, kKillCountBasePos.y});
 	}
+
+	// ワイプアニメーションの初期化
+	Vector2 wipeSize = {350.0f, 100.0f};
+
+	timerWipe_ = std::make_unique<SpriteScaleWipeAnimator>();
+	timerWipe_->Initialize(ctx, kTimeBasePos, wipeSize);
+
+	killCountWipe_ = std::make_unique<SpriteScaleWipeAnimator>();
+	killCountWipe_->Initialize(ctx, kKillCountBasePos, wipeSize);
+
+	// タイマー側のワイプを即座に開始
+	timerWipe_->StartAnimation();
 }
 
-void ResultScoreDisplay::Update() {
+void ResultScoreDisplay::Update(float deltaTime) {
+	// ワイプアニメ開始タイマー更新
+	wipeAnimStartTimer_.Update(deltaTime);
+
+	// ワイプの更新
+	if (wipeAnimStartTimer_.IsEnd()) {
+		timerWipe_->Update(deltaTime);
+
+		// キル数ワイプを少し遅れて開始させる
+		if (!isKillCountWipeStarted_) {
+			killCountWipeDelay_ -= deltaTime;
+			if (killCountWipeDelay_ <= 0.0f) {
+				killCountWipe_->StartAnimation();
+				isKillCountWipeStarted_ = true;
+			}
+		} else {
+			killCountWipe_->Update(deltaTime);
+		}
+	}
+
 	// スプライトの更新
 	for (auto& sprite : timeSprites_) {
 		sprite->Update();
@@ -81,18 +115,31 @@ void ResultScoreDisplay::Update() {
 }
 
 void ResultScoreDisplay::Draw() {
-	// スプライトの描画
-	for (auto& sprite : timeSprites_) {
-		sprite->Draw();
+	// クリアタイマー描画
+	if (timerWipe_->GetBeforeAnimationFinished()) {
+		for (auto& sprite : timeSprites_) {
+			sprite->Draw();
+		}
+		if (colonSprite_) {
+			colonSprite_->Draw();
+		}
 	}
-	if (colonSprite_)
-		colonSprite_->Draw();
 
-	for (auto& sprite : killCountSprites_) {
-		sprite->Draw();
+	// タイマー用ワイプ描画
+	timerWipe_->Draw();
+
+	// キル数描画
+	if (killCountWipe_->GetBeforeAnimationFinished()) {
+		for (auto& sprite : killCountSprites_) {
+			sprite->Draw();
+		}
+		if (unitSprite_) {
+			unitSprite_->Draw();
+		}
 	}
-	if (unitSprite_)
-		unitSprite_->Draw();
+
+	// スコア用ワイプ描画
+	killCountWipe_->Draw();
 }
 
 std::unique_ptr<Sprite> ResultScoreDisplay::CreateDigitSprite(EngineContext* ctx, const std::string& textureName, const Vector2& pos) {
