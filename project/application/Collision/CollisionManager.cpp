@@ -16,6 +16,37 @@ void CollisionManager::CheckCollisions(
     std::function<void(const Vector3&)> generateParticleCallback, float& glitchTimer, float& blurTimer) {
 
 	// ==========================================
+	// 敵死亡時の共通処理
+	// ==========================================
+	auto ProcessEnemyDeath = [&](Enemy* enemy) {
+		commonData->killCount += 1;
+		generateParticleCallback(enemy->GetPos());
+
+		// Bomberタイプの死亡時の爆発判定
+		if (enemy->GetEnemyType() == EnemyType::Bomber) {
+			Vector3 pPos = player->GetPosition();
+			Vector3 ePos = enemy->GetPos();
+			float dx = pPos.x - ePos.x;
+			float dy = pPos.y - ePos.y;
+			float dz = pPos.z - ePos.z;
+			float distSq = dx * dx + dy * dy + dz * dz;
+
+			// 爆風の範囲
+			const float blastRadius = 5.0f;
+
+			// プレイヤーが爆風範囲内にいた場合
+			if (distSq <= blastRadius * blastRadius) {
+				player->Damage(player->GetMaxHP()); // プレイヤーを一撃死させる
+				glitchTimer = 0.5f;
+				blurTimer = 1.0f;
+				if (!camera->GetIsShake()) {
+					camera->StartShake(0.5f, 0.5f);
+				}
+			}
+		}
+	};
+
+	// ==========================================
 	// プレイヤーと敵の弾の当たり判定
 	// ==========================================
 	for (auto& bullet : enemyBulletManager->GetBullets()) {
@@ -40,8 +71,7 @@ void CollisionManager::CheckCollisions(
 					if (shieldEnemy) {
 						shieldEnemy->Damage();
 						if (shieldEnemy->IsDead()) {
-							commonData->killCount += 1;
-							generateParticleCallback(shieldEnemy->GetPos());
+							ProcessEnemyDeath(shieldEnemy);
 						}
 						player->SetIsGrabReleased(true);
 						player->SetIsHold(false);
@@ -258,10 +288,7 @@ void CollisionManager::CheckCollisions(
 				// ----------------------------------------
 				if (enemy->IsKnockBack()) {
 					enemy->Kill();
-					commonData->killCount++;
-
-					// パーティクルの生成
-					generateParticleCallback(enemy->GetPos());
+					ProcessEnemyDeath(enemy.get());
 
 					break;
 				}
@@ -325,10 +352,7 @@ void CollisionManager::CheckCollisions(
 				// --------------------------------------------------
 				if (enemy->IsKnockBack()) {
 					enemy->Kill();
-					commonData->killCount++;
-
-					// パーティクルの生成
-					generateParticleCallback(enemy->GetPos());
+					ProcessEnemyDeath(enemy.get());
 
 					break;
 				}
@@ -407,12 +431,10 @@ void CollisionManager::CheckCollisions(
 
 					// ダメージの結果死亡した場合のみ処理を行う
 					if (a->IsDead()) {
-						commonData->killCount += 1;
-						generateParticleCallback(a->GetPos());
+						ProcessEnemyDeath(a);
 					}
 					if (b->IsDead()) {
-						commonData->killCount += 1;
-						generateParticleCallback(b->GetPos());
+						ProcessEnemyDeath(a);
 					}
 				}
 			}
@@ -435,8 +457,7 @@ void CollisionManager::CheckCollisions(
 					enemy->Damage();
 
 					if (enemy->IsDead()) {
-						commonData->killCount += 1;
-						generateParticleCallback(enemy->GetPos());
+						ProcessEnemyDeath(enemy.get());
 					}
 				}
 			}
