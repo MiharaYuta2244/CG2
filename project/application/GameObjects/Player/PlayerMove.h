@@ -13,6 +13,9 @@ public:
 	// 速度の取得
 	Vector2 GetVelocity() const { return velocity_; }
 
+	// 速度をリセットする関数
+	void ResetVelocity() { velocity_ = {0.0f, 0.0f}; }
+
 private:
 	// 回転スピード
 	float rotationSpeed_ = 4.0f;

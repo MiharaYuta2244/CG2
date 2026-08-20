@@ -247,6 +247,9 @@ void Player::Update(float deltaTime, DirectInput* input, GamePad* gamePad, Enemy
 			heldEnemy_->SetAIState(EnemyAI::State::Hold);
 			heldEnemy_->ResetShotTimer();
 			isGrabTriggered_ = true;
+
+			// 敵を掴んだ瞬間にプレイヤーの速度を0にする
+			move_->ResetVelocity();
 		}
 	}
 
@@ -312,6 +315,9 @@ void Player::Update(float deltaTime, DirectInput* input, GamePad* gamePad, Enemy
 			isActionAnimating_ = true;
 			actionAnimTimer_ = 0.2f;
 		}
+
+		// 投げアクションを行った瞬間にプレイヤーの速度を0にする
+		move_->ResetVelocity();
 	}
 
 	// パーティクルの生成タイマー更新

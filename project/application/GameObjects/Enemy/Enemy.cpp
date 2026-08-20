@@ -52,7 +52,7 @@ void Enemy::Initialize(EngineContext* ctx, Vector3 pos, EnemyType type, DecalMan
 	renderGun_->Initialize(ctx, "Cube.obj");
 	renderGun_->SetTransform(transform_);
 	renderGun_->SetEnvScale(envScale_);
-	renderGun_->SetColor(color_);
+	renderGun_->SetColor(gunColor_);
 
 	// AIインスタンス生成&初期化
 	ai_ = std::make_unique<EnemyAI>();
@@ -264,7 +264,7 @@ void Enemy::PostUpdate() {
 	render_->Update(transform_);
 
 	Transform gunTransform;
-	gunTransform.scale = {2.0f, 2.0f, 2.0f};
+	gunTransform.scale = {0.7f, 0.2f, 0.1f};
 	float gunYaw = transform_.rotate.y - (std::numbers::pi_v<float> / 2.0f);
 	gunTransform.rotate = {-std::numbers::pi_v<float> / 2.0f, gunYaw, 0.0f};
 

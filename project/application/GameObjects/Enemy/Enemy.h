@@ -172,4 +172,7 @@ private:
 
 	// オーディオマネージャーポインタ
 	TinyEngine::AudioManager* audioManager_ = nullptr;
+
+	// 銃の色
+	Vector4 gunColor_ = {0.0f, 0.1f, 0.5f, 1.0f};
 };
