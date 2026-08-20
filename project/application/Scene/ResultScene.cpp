@@ -40,6 +40,17 @@ void ResultScene::Initialize(const SceneContext& ctx) {
 	audioManager_->Initialize();
 	audioManager_->LoadWave("ResultBGM", "resources/sounds/bgm/ResultScene.mp3");
 	audioManager_->PlayBGM("ResultBGM");
+
+	// リザルトテキスト生成&初期化
+	resultText_ = std::make_unique<Sprite>();
+
+	if (commonData_->isClear) {
+		resultText_->Initialize(ctx.engineContext, "Clear.png");
+		resultText_->SetPosition({515, 100});
+	} else {
+		resultText_->Initialize(ctx.engineContext, "GameOver.png");
+		resultText_->SetPosition({390, 100});
+	}
 }
 
 void ResultScene::Update() {
@@ -70,9 +81,19 @@ void ResultScene::Update() {
 		glitch->SetGlitchTime(glitchParam_.time);
 		glitch->SetGlitchIntensity(glitchParam_.intensity);
 	}
+
+	// リザルトテキスト更新
+	resultText_->Update();
+
+	ImGui::Begin("Text");
+	ImGui::DragFloat2("Pos", &resultText_->GetPosition().x, 1.0f);
+	ImGui::End();
 }
 
 void ResultScene::Draw() {
+	// リザルト
+	resultText_->Draw();
+
 	// UI管理クラス描画
 	uiManager_->Draw();
 }

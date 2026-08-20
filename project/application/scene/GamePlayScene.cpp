@@ -165,6 +165,9 @@ void GamePlayScene::Update() {
 			RequestSceneChange("Result");
 			isTransitionRequested_ = true;
 		}
+
+		// クリアしたかどうかを記録
+		commonData_->isClear = true;
 	}
 
 	// プレイヤーが死亡したらシーン遷移
@@ -180,6 +183,9 @@ void GamePlayScene::Update() {
 		if (!isTransitionRequested_ && cameraZoomController_->GetIsFinished()) {
 			RequestSceneChange("Result");
 			isTransitionRequested_ = true;
+
+			// クリアしたかどうかを記録
+			commonData_->isClear = false;
 		}
 	}
 

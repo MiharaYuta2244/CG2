@@ -30,4 +30,7 @@ private:
 
 	// オーディオマネージャーインスタンス
 	std::unique_ptr<TinyEngine::AudioManager> audioManager_;
+
+	// リザルトテキスト
+	std::unique_ptr<TinyEngine::Sprite> resultText_;
 };
