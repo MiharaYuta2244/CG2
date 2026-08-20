@@ -7,7 +7,7 @@
 
 using namespace TinyEngine;
 
-void EnemyManager::Initialize(EngineContext* ctx, DecalManager* bloodDecalManager) {
+void EnemyManager::Initialize(EngineContext* ctx, DecalManager* bloodDecalManager, const std::string& stagePath) {
 	ctx_ = ctx;
 	bloodDecalManager_ = bloodDecalManager;
 
@@ -19,7 +19,7 @@ void EnemyManager::Initialize(EngineContext* ctx, DecalManager* bloodDecalManage
 	audioManager_->LoadWave("Shot", "resources/sounds/se/Shot.mp3");
 
 	// JSON読み込み
-	jsonPath_ = "Enemies.json";
+	jsonPath_ = stagePath + "Enemies.json";
 	LoadFromJson(jsonPath_);
 }
 

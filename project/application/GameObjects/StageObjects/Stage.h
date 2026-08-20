@@ -20,7 +20,7 @@ using GlassManager = GameObjectManager<Glass, TinyEngine::DecalManager*>;
 class Stage {
 public:
 	// 初期化
-	void Initialize(const SceneContext& ctx, TinyEngine::DecalManager* decalManager);
+	void Initialize(const SceneContext& ctx, TinyEngine::DecalManager* decalManager, const std::string& stagePath);
 
 	// 更新
 	void Update(float deltaTime, const Vector3& playerPos, Camera* camera);

@@ -8,11 +8,13 @@ void TitleScene::Initialize(const SceneContext& ctx) {
 	commonData_ = ctx_.sceneManager->GetCommonData();
 	commonData_->killCount = 0;
 	commonData_->clearTime = 0.0f;
+	commonData_->currentStageNo = 1;
+	commonData_->currentStageKey = "Stage1";
 
 	// メニューの生成&初期化
 	menu_ = std::make_unique<MenuList>();
 	menu_->Initialize(ctx.engineContext);
-	menu_->AddItem("Play", "Title_Play.png", [this]() { RequestSceneChange("GamePlay"); });
+	menu_->AddItem("Play", "Title_Play.png", [this]() { RequestSceneChange(commonData_->currentStageKey); });
 	menu_->AddItem("Quit", "Title_Quit.png", [this]() {
 		finishTimer_ = std::make_unique<GameTimer>();
 		finishTimer_->Initialize(0.5f);

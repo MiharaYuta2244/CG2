@@ -11,6 +11,8 @@ void GamePlayScene::Initialize(const SceneContext& ctx) {
 	// 共通データをリセット
 	commonData_->killCount = 0;
 	commonData_->clearTime = 0.0f;
+	commonData_->currentStageNo = stageNo_;
+	commonData_->currentStageKey = "Stage" + std::to_string(stageNo_);
 
 	// デバッグカメラ
 	debugCamera_ = std::make_unique<Camera>();
@@ -52,7 +54,7 @@ void GamePlayScene::Initialize(const SceneContext& ctx) {
 
 	// 敵の生成&初期化
 	enemyManager_ = std::make_unique<EnemyManager>();
-	enemyManager_->Initialize(ctx_.engineContext, decalManager_.get());
+	enemyManager_->Initialize(ctx_.engineContext, decalManager_.get(), stagePath_);
 
 	// 敵の弾管理インスタンス生成
 	enemyBulletManager_ = std::make_unique<EnemyBulletManager>();
@@ -70,7 +72,7 @@ void GamePlayScene::Initialize(const SceneContext& ctx) {
 
 	// ステージ管理インスタンスの生成&初期化
 	stage_ = std::make_unique<Stage>();
-	stage_->Initialize(ctx, decalManager_.get());
+	stage_->Initialize(ctx, decalManager_.get(), stagePath_);
 
 	// シーン遷移要求制御変数
 	isTransitionRequested_ = false;

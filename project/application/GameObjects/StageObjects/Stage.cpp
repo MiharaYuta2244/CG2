@@ -2,14 +2,14 @@
 
 using namespace TinyEngine;
 
-void Stage::Initialize(const SceneContext& ctx, TinyEngine::DecalManager* decalManager) {
+void Stage::Initialize(const SceneContext& ctx, TinyEngine::DecalManager* decalManager, const std::string& stagePath) {
 	// デカール管理インスタンスの受け渡し
 	decalManager_ = decalManager;
 
 	// 壁の管理インスタンス生成&初期化
 	wallManager_ = std::make_unique<WallManager>();
 	wallManager_->Initialize(
-	    ctx.engineContext, "WallEditor", "Walls.json",
+	    ctx.engineContext, "WallEditor", stagePath + "Walls.json",
 	    Transform{
 	        {1, 50, 1},
             {0, 0,  0},
@@ -19,7 +19,7 @@ void Stage::Initialize(const SceneContext& ctx, TinyEngine::DecalManager* decalM
 	// ドアの管理インスタンス生成&初期化
 	doorManager_ = std::make_unique<DoorManager>();
 	doorManager_->Initialize(
-	    ctx.engineContext, "DoorEditor", "Doors.json",
+	    ctx.engineContext, "DoorEditor", stagePath + "Doors.json",
 	    Transform{
 	        {1, 49, 1},
             {0, 0,  0},
@@ -29,7 +29,7 @@ void Stage::Initialize(const SceneContext& ctx, TinyEngine::DecalManager* decalM
 	// ガラスの管理インスタンス生成&初期化
 	glassManager_ = std::make_unique<GlassManager>();
 	glassManager_->Initialize(
-	    ctx.engineContext, "GlassEditor", "Glasses.json",
+	    ctx.engineContext, "GlassEditor", stagePath + "Glasses.json",
 	    Transform{
 	        {1, 50, 1},
             {0, 0,  0},
@@ -40,7 +40,7 @@ void Stage::Initialize(const SceneContext& ctx, TinyEngine::DecalManager* decalM
 	// 檻の管理インスタンス生成&初期化
 	cageManager_ = std::make_unique<CageManager>();
 	cageManager_->Initialize(
-	    ctx.engineContext, "CageEditor", "Cages.json",
+	    ctx.engineContext, "CageEditor", stagePath + "Cages.json",
 	    Transform{
 	        {1, 50, 1},
             {0, 0,  0},
@@ -50,7 +50,7 @@ void Stage::Initialize(const SceneContext& ctx, TinyEngine::DecalManager* decalM
 	// 回復エリアの管理インスタンス生成&初期化
 	healAreaManager_ = std::make_unique<HealAreaManager>();
 	healAreaManager_->Initialize(
-	    ctx.engineContext, "HealAreaEditor", "HealAreas.json",
+	    ctx.engineContext, "HealAreaEditor", stagePath + "HealAreas.json",
 	    Transform{
 	        {1, 50, 1},
             {0, 0,  0},

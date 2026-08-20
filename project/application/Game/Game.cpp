@@ -18,7 +18,8 @@ void Game::Initialize() {
 
 	// シーン追加
 	sceneManager_->AddScene("Title", std::make_unique<TitleScene>());
-	sceneManager_->AddScene("GamePlay", std::make_unique<GamePlayScene>());
+	sceneManager_->AddScene("Stage1", std::make_unique<GamePlayScene>(1, "Stage1/"));
+	sceneManager_->AddScene("Stage2", std::make_unique<GamePlayScene>(2, "Stage2/"));
 	sceneManager_->AddScene("EasingEditorScene", std::make_unique<EasingEditorScene>());
 	sceneManager_->AddScene("Pause", std::make_unique<PauseScene>());
 	sceneManager_->AddScene("Result", std::make_unique<ResultScene>());

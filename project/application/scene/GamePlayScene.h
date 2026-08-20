@@ -22,6 +22,8 @@
 /// </summary>
 class GamePlayScene : public BaseScene {
 public:
+	GamePlayScene(int stageNo, const std::string& stagePath) : stageNo_(stageNo), stagePath_(stagePath) {}
+
 	void Initialize(const SceneContext& ctx) override;
 
 	void Update() override;
@@ -94,4 +96,10 @@ private:
 
 	// オーディオマネージャーインスタンス
 	std::unique_ptr<TinyEngine::AudioManager> audioManager_;
+
+	// ステージのパス
+	std::string stagePath_;
+
+	// ステージ番号
+	int stageNo_;
 };

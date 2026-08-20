@@ -12,7 +12,7 @@ void ResultScene::Initialize(const SceneContext& ctx) {
 	uiManager_->Initialize(ctx.engineContext, commonData_);
 
 	// コールバック登録
-	uiManager_->GetRetryButton()->SetCallback([this]() { RequestSceneChange("GamePlay"); });
+	uiManager_->GetRetryButton()->SetCallback([this]() { RequestSceneChange(commonData_->currentStageKey); });
 	uiManager_->GetToTitleButton()->SetCallback([this]() { RequestSceneChange("Title"); });
 
 	// 生成したボタンをリストに登録する

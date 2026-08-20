@@ -38,7 +38,7 @@ inline void from_json(const Json& j, EnemyData& e) {
 /// </summary>
 class EnemyManager {
 public:
-	void Initialize(EngineContext* ctx, TinyEngine::DecalManager* bloodDecalManager);
+	void Initialize(EngineContext* ctx, TinyEngine::DecalManager* bloodDecalManager, const std::string& stagePath);
 	void Update(
 	    float deltaTime, Player* player, EnemyBulletManager* enemyBulletManager, WallManager* wallManager, DoorManager* doorManager, GlassManager* glassManager, EnemyBombManager* enemyBombManager);
 	void PostUpdate();
