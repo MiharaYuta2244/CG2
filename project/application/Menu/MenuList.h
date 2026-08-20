@@ -1,7 +1,8 @@
 #pragma once
+#include "AnimationBundle.h"
+#include "AudioManager.h"
 #include "DirectInput.h"
 #include "GameObjects/Effect/DecideEffect.h"
-#include "AudioManager.h"
 #include <Sprite.h>
 #include <functional>
 #include <string>
@@ -30,6 +31,12 @@ public:
 	// 描画処理
 	void Draw();
 
+	// メニューの開始座標を変更する
+	void SetStartPos(const Vector2& pos) { startPos_ = pos; }
+
+	// メニュー項目間の縦の間隔を変更する
+	void SetOffsetY(float offset) { offsetY_ = offset; }
+
 private:
 	EngineContext* ctx_ = nullptr;
 
@@ -54,4 +61,16 @@ private:
 
 	// オーディオマネージャー
 	std::unique_ptr<TinyEngine::AudioManager> audioManager_;
+
+	// 選択中の背後に表示する矩形スプライト
+	std::unique_ptr<TinyEngine::Sprite> selectorBg_;
+
+	// 決定時のスケールアニメーションバンドル
+	AnimationBundle<Vector2> decideScaleAnim_;
+
+	// 決定アニメーション再生中かどうかのフラグ
+	bool isDecided_ = false;
+
+	// 背景サイズ
+	Vector2 selectorBgSize_ = {2000, 60};
 };

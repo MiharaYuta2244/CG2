@@ -72,6 +72,10 @@ public:
 	void SetShineColor(const Vector4& shineColor) { materialData_->shineColor = shineColor; }
 	void SetShineParams(const Vector4& shineParams) { materialData_->shineParams = shineParams; }
 	void SetZDepth(float zDepth) { zDepth_ = zDepth; }
+	void SetUVScale(const Vector3& scale) { uvTransform_.scale = scale; }
+	void SetUVRotate(float rotateZ) { uvTransform_.rotate.z = rotateZ; }
+	void SetUVTranslate(const Vector3& translate) { uvTransform_.translate = translate; }
+	void SetUVTransform(const Transform& uvTransform) { uvTransform_ = uvTransform; }
 
 	// 頂点ごとのオフセットを設定
 	void SetVertexOffset(uint32_t index, const Vector2& offset) {

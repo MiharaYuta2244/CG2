@@ -15,6 +15,18 @@ void MenuList::Initialize(EngineContext* ctx) {
 	audioManager_->Initialize();
 	audioManager_->LoadWave("Select", "resources/sounds/se/Select.mp3");
 	audioManager_->LoadWave("Decide", "resources/sounds/se/Decide.mp3");
+
+	// 選択中背景スプライトの生成&初期化
+	selectorBg_ = std::make_unique<Sprite>();
+	selectorBg_->Initialize(ctx_, "white.png");
+	selectorBg_->SetColor({1.0f, 1.0f, 1.0f, 0.2f});
+	selectorBg_->SetSize(selectorBgSize_);
+	selectorBg_->SetAnchorPoint({0.5f, 0.0f});
+
+	// スケールアニメーションの初期パラメータ設定
+	decideScaleAnim_.start = {1.0f, 1.0f};
+	decideScaleAnim_.end = {1.0f, 0.0f};
+	decideScaleAnim_.temp = decideScaleAnim_.start;
 }
 
 void MenuList::AddItem(const std::string& label, const std::string& texturePath, std::function<void()> onSelect) {
@@ -73,25 +85,36 @@ void MenuList::Update(DirectInput* input, GamePad* gamePad, float deltaTime) {
 		}
 	}
 
-	if (up) {
+	// 決定アニメーション再生中は他の項目へ移動させない
+	if (up && !isDecided_) {
 		currentIndex_ = (currentIndex_ - 1 + index) % index;
-
-		// SE再生
 		audioManager_->PlaySE("Select", 0.5f);
 	}
-	if (down) {
+	if (down && !isDecided_) {
 		currentIndex_ = (currentIndex_ + 1) % index;
-
-		// SE再生
 		audioManager_->PlaySE("Select", 0.5f);
 	}
-	if (decide) {
+
+	// 決定処理にアニメーションの開始処理を追加
+	if (decide && !isDecided_) {
 		items_[currentIndex_].onSelect();
 		decideEffect_->StartAnimation();
-
-		// SE再生
 		audioManager_->PlaySE("Decide", 0.5f);
+		decideScaleAnim_.anim.Start(decideScaleAnim_.start, decideScaleAnim_.end, 0.2f, EaseType::EASEOUTEXPO);
+		isDecided_ = true;
 	}
+
+	// アニメーションの更新
+	if (decideScaleAnim_.anim.GetIsActive()) {
+		decideScaleAnim_.anim.Update(deltaTime, decideScaleAnim_.temp);
+	} else if (!isDecided_) {
+		// アニメーション非再生時はデフォルトの倍率に戻しておく
+		decideScaleAnim_.temp = decideScaleAnim_.start;
+	}
+
+	// 背景スプライトの座標を選択中アイテムに合わせる
+	selectorBg_->SetPosition({startPos_.x, startPos_.y + offsetY_ * currentIndex_});
+	selectorBg_->Update();
 
 	// 決定ボタン入力時エフェクト更新
 	decideEffect_->Update(deltaTime);
@@ -105,6 +128,10 @@ void MenuList::Update(DirectInput* input, GamePad* gamePad, float deltaTime) {
 }
 
 void MenuList::Draw() {
+	// 背景
+	selectorBg_->Draw();
+
+	// 決定時エフェクト
 	decideEffect_->Draw();
 
 	for (int i = 0; i < items_.size(); i++) {
@@ -113,7 +140,8 @@ void MenuList::Draw() {
 		// 選択中は色を変える
 		if (i == currentIndex_) {
 			sprite->SetColor(selectColor_);
-			sprite->SetSize(items_[i].originalSize * 1.1f);
+			Vector2 currentScale = {items_[i].originalSize.x * decideScaleAnim_.temp.x, items_[i].originalSize.y * decideScaleAnim_.temp.y};
+			sprite->SetSize(currentScale);
 		} else {
 			sprite->SetColor(normalColor_);
 			sprite->SetSize(items_[i].originalSize);

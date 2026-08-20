@@ -14,7 +14,7 @@ void TitleScene::Initialize(const SceneContext& ctx) {
 	// メニューの生成&初期化
 	menu_ = std::make_unique<MenuList>();
 	menu_->Initialize(ctx.engineContext);
-	menu_->AddItem("Play", "Title_Play.png", [this]() { RequestSceneChange(commonData_->currentStageKey); });
+	menu_->AddItem("Play", "Title_Play.png", [this]() { RequestSceneChange("StageSelect"); });
 	menu_->AddItem("Quit", "Title_Quit.png", [this]() {
 		finishTimer_ = std::make_unique<GameTimer>();
 		finishTimer_->Initialize(0.5f);
