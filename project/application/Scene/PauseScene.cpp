@@ -11,7 +11,6 @@ void PauseScene::Initialize(const SceneContext& ctx) {
 
 	// メニュー項目の追加
 	menuList_->AddItem("Resume", "Resume.png", [this]() { RequestScenePop(); });
-	menuList_->AddItem("Option", "Title_Option.png", [this]() { RequestSceneChange("Title"); });
 	menuList_->AddItem("Title", "Title.png", [this]() { RequestSceneChange("Title"); });
 
 	// 背景スプライト生成&初期化
