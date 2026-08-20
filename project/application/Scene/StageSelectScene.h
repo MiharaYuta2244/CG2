@@ -27,4 +27,9 @@ private:
 	std::array<std::unique_ptr<TinyEngine::Sprite>, 2> stageSelectText_;
 	Vector3 stageSelectUvTranslate_{};
 	float uvMoveSpeed_ = 0.2f;
+
+	// ポストエフェクトパラメータ
+	ScanlineParam scanlineParam_;                 // 走査線
+	BarrelDistortionParam barrelDistortionParam_; // 魚眼
+	GlitchParam glitchParam_;                     // グリッチ
 };

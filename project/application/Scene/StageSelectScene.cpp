@@ -45,6 +45,19 @@ void StageSelectScene::Initialize(const SceneContext& ctx) {
 	stageSelectText_[1]->SetAnchorPoint({0.5f, 0.5f});
 	stageSelectText_[1]->SetPosition({640, 680});
 	stageSelectText_[1]->SetRotation(std::numbers::pi_v<float>);
+
+	// シーンで使うエフェクトの宣言
+	ctx_.engineContext->postEffectPipeline->SetEffects({
+	    PostEffectType::Scanline,         // 走査線
+	    PostEffectType::BarrelDistortion, // 魚眼
+	    PostEffectType::Glitch,           // グリッチ
+	});
+
+	barrelDistortionParam_.strength = 0.05f;
+	glitchParam_.intensity = 0.1f;
+	scanlineParam_.scanlineCount = 150.0f;
+	scanlineParam_.intensity = 0.7f;
+	scanlineParam_.speed = 5.0f;
 }
 
 void StageSelectScene::Update() {
@@ -63,6 +76,22 @@ void StageSelectScene::Update() {
 	for (auto& text : stageSelectText_) {
 		text->Update();
 		text->SetUVTranslate(stageSelectUvTranslate_);
+	}
+
+	auto* scanline = ctx_.engineContext->postEffectPipeline->GetPass(PostEffectType::Scanline);
+	if (scanline) {
+		scanline->SetScanlineParam(scanlineParam_);
+	}
+
+	auto* barrelDistortionParam = ctx_.engineContext->postEffectPipeline->GetPass(PostEffectType::BarrelDistortion);
+	if (barrelDistortionParam) {
+		barrelDistortionParam->SetFisheyeParam(barrelDistortionParam_);
+	}
+
+	auto* glitch = ctx_.engineContext->postEffectPipeline->GetPass(PostEffectType::Glitch);
+	if (glitch) {
+		glitch->SetGlitchTime(glitchParam_.time);
+		glitch->SetGlitchIntensity(glitchParam_.intensity);
 	}
 }
 
