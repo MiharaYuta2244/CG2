@@ -96,6 +96,12 @@ public:
 	// 血痕を出さずに敵を消す
 	void Dead() { isDead_ = true; };
 
+	// アクティブ状態のGetter
+	bool IsActive() const { return isActive_; }
+
+	// アクティブ状態のSetter
+	void SetActive(bool isActive) { isActive_ = isActive; }
+
 private:
 	// 当たり判定の更新
 	void UpdateCollision();
@@ -181,4 +187,7 @@ private:
 
 	// 銃の色
 	Vector4 gunColor_ = {0.0f, 0.1f, 0.5f, 1.0f};
+
+	// アクティブフラグ
+	bool isActive_ = true;
 };

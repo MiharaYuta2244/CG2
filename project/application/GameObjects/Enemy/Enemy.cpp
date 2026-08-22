@@ -1,9 +1,9 @@
 #include "Enemy.h"
 #include "ChargeModule.h"
+#include "ColorPalette.h"
 #include "EnemyBulletManager.h"
 #include "GameObjects/Effect/EffectGenerator.h"
 #include "GameObjects/Player/Player.h"
-#include "ColorPalette.h"
 
 using namespace TinyEngine;
 
@@ -67,7 +67,8 @@ void Enemy::Initialize(EngineContext* ctx, Vector3 pos, EnemyType type, DecalMan
 	bloodDecalManager_ = bloodDecalManager;
 }
 
-void Enemy::Update(float deltaTime, Player* player, EnemyBulletManager* enemyBulletManager, WallManager* wallManager, DoorManager* doorManager, GlassManager* glassManager, EnemyBombManager* enemyBombManager) {
+void Enemy::Update(
+    float deltaTime, Player* player, EnemyBulletManager* enemyBulletManager, WallManager* wallManager, DoorManager* doorManager, GlassManager* glassManager, EnemyBombManager* enemyBombManager) {
 	if (isDead_) {
 		// 死亡後も爆発エフェクトの更新と終了したエフェクトの削除を行う
 		for (auto& particle : bombEffects_) {
@@ -98,82 +99,69 @@ void Enemy::Update(float deltaTime, Player* player, EnemyBulletManager* enemyBul
 		return;
 	}
 
-	Vector3 playerPos = player->GetPosition();
-	Vector3 enemyPos = transform_.translate;
-	float dx = playerPos.x - enemyPos.x;
-	float dy = playerPos.y - enemyPos.y;
-	float dz = playerPos.z - enemyPos.z;
-	float distSq = dx * dx + dy * dy + dz * dz;
+	// 無敵タイマー更新
+	if (invincibleTimer_ > 0.0f) {
+		invincibleTimer_ -= deltaTime;
+	}
 
-	// 画面に収まる程度の距離
-	const float kActiveDistance = 30.0f;
-	bool isWithinActiveRange = (distSq <= (kActiveDistance * kActiveDistance));
+	// AI更新前の座標を記録
+	Vector3 prevPos = transform_.translate;
 
-	if (isWithinActiveRange) {
-		// 無敵タイマー更新
-		if (invincibleTimer_ > 0.0f) {
-			invincibleTimer_ -= deltaTime;
-		}
+	// AIインスタンス更新
+	ai_->Update(deltaTime, player, enemyBulletManager, wallManager, doorManager, glassManager, enemyBombManager);
 
-		// AI更新前の座標を記録
-		Vector3 prevPos = transform_.translate;
+	// アニメーション遷移処理
+	std::string targetModel = "HumanIdle.gltf"; // 待機
 
-		// AIインスタンス更新
-		ai_->Update(deltaTime, player, enemyBulletManager, wallManager, doorManager, glassManager, enemyBombManager);
-
-		// アニメーション遷移処理
-		std::string targetModel = "HumanIdle.gltf"; // 待機
-
-		if (ai_->GetState() == EnemyAI::State::Hold) {
-			// 拘束時
-			targetModel = "HumanIdle.gltf";
-		} else if (ai_->GetState() == EnemyAI::State::Vigilance) {
-			// 警戒時
-			targetModel = "HumanVigilanceWalk.gltf";
+	if (ai_->GetState() == EnemyAI::State::Hold) {
+		// 拘束時
+		targetModel = "HumanIdle.gltf";
+	} else if (ai_->GetState() == EnemyAI::State::Vigilance) {
+		// 警戒時
+		targetModel = "HumanVigilanceWalk.gltf";
+	} else {
+		// 通常時
+		float dx = transform_.translate.x - prevPos.x;
+		float dz = transform_.translate.z - prevPos.z;
+		if ((dx * dx + dz * dz) > 0.0001f) {
+			targetModel = "HumanNormalWalk.gltf"; // 歩き
 		} else {
-			// 通常時
-			float dx = transform_.translate.x - prevPos.x;
-			float dz = transform_.translate.z - prevPos.z;
-			if ((dx * dx + dz * dz) > 0.0001f) {
-				targetModel = "HumanNormalWalk.gltf"; // 歩き
-			} else {
-				targetModel = "HumanIdle.gltf"; // 待機
-			}
+			targetModel = "HumanIdle.gltf"; // 待機
 		}
+	}
 
-		// 現在のモデルと違う場合のみ、モデルを切り替えてアニメーション再生
-		if (render_->GetFilepath() != targetModel) {
-			render_->SetModel(targetModel);
-			KeyframeAnimation keyframeAnim;
-			Animation anim = keyframeAnim.LoadAnimationFile(targetModel);
-			render_->GetObject3d()->PlayAnimation(anim);
-		}
+	// 現在のモデルと違う場合のみ、モデルを切り替えてアニメーション再生
+	if (render_->GetFilepath() != targetModel) {
+		render_->SetModel(targetModel);
+		KeyframeAnimation keyframeAnim;
+		Animation anim = keyframeAnim.LoadAnimationFile(targetModel);
+		render_->GetObject3d()->PlayAnimation(anim);
+	}
 
-		if (ai_->IsShotThisFrame()) {
-			GenerateMuzzleFlash(ai_->GetShotDirection());
-		}
+	if (ai_->IsShotThisFrame()) {
+		GenerateMuzzleFlash(ai_->GetShotDirection());
+	}
 
-		// プレイヤー発見時に「!」マークの生成
-		if (lastState != ai_->GetState() && ai_->GetState() == EnemyAI::State::Vigilance) {
-			GenerateExMark();
-		}
+	// プレイヤー発見時に「!」マークの生成
+	if (lastState != ai_->GetState() && ai_->GetState() == EnemyAI::State::Vigilance) {
+		GenerateExMark();
+	}
 
-		// AIの状態を取得して色を変える
-		if (ai_->GetState() == EnemyAI::State::Vigilance) {
-			// 警戒状態なら赤色
-			visionCone_->SetColor({1.0f, 0.0f, 0.0f, 0.3f});
-			// 射撃ゲージの進行度を渡す
-			visionCone_->SetChargeProgress(ai_->GetShotProgress());
-		} else if (ai_->GetState() == EnemyAI::State::Hold) {
-			// 拘束状態も射撃するのでプログレスを渡す
-			visionCone_->SetColor({1.0f, 0.5f, 0.0f, 0.3f});
-			visionCone_->SetChargeProgress(ai_->GetShotProgress());
-		} else {
-			// 通常状態なら緑色
-			visionCone_->SetColor({0.0f, 1.0f, 0.0f, 0.3f});
-			// プログレスはリセット
-			visionCone_->SetChargeProgress(0.0f);
-		}
+	// AIの状態を取得して色を変える
+	if (ai_->GetState() == EnemyAI::State::Vigilance) {
+		// 警戒状態なら赤色
+		visionCone_->SetColor({1.0f, 0.0f, 0.0f, 0.3f});
+		// 射撃ゲージの進行度を渡す
+		visionCone_->SetChargeProgress(ai_->GetShotProgress());
+	} else if (ai_->GetState() == EnemyAI::State::Hold) {
+		// 拘束状態も射撃するのでプログレスを渡す
+		visionCone_->SetColor({1.0f, 0.5f, 0.0f, 0.3f});
+		visionCone_->SetChargeProgress(ai_->GetShotProgress());
+	} else {
+		// 通常状態なら緑色
+		visionCone_->SetColor({0.0f, 1.0f, 0.0f, 0.3f});
+		// プログレスはリセット
+		visionCone_->SetChargeProgress(0.0f);
 	}
 
 	// 「!」マークのアニメーションが終了していれば「!」マークインスタンスを削除

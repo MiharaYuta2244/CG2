@@ -1,5 +1,6 @@
 #include "EnemyManager.h"
 #include "JsonManager.h"
+#include "GameObjects/Player/Player.h"
 
 #ifdef USE_IMGUI
 #include "ImGuiManager.h"
@@ -41,9 +42,27 @@ void EnemyManager::Update(
 		audioManager_->PlaySE("Snare", 0.2f);
 	}
 
+	// 距離判定用の設定
+	Vector3 playerPos = player->GetPosition();
+	const float kActiveDistance = 30.0f; // 画面に収まる程度の距離
+	const float kActiveDistanceSq = kActiveDistance * kActiveDistance;
+
 	// 生きている敵をすべて更新
 	for (auto& enemy : enemies_) {
-		enemy->Update(deltaTime, player, enemyBulletManager, wallManager, doorManager, glassManager, enemyBombManager);
+		Vector3 enemyPos = enemy->GetPos();
+		float dx = playerPos.x - enemyPos.x;
+		float dy = playerPos.y - enemyPos.y;
+		float dz = playerPos.z - enemyPos.z;
+		float distSq = dx * dx + dy * dy + dz * dz;
+
+		// プレイヤーとの距離が一定範囲内の場合のみ更新を行う
+		if (distSq <= kActiveDistanceSq) {
+			enemy->SetActive(true);
+			enemy->Update(deltaTime, player, enemyBulletManager, wallManager, doorManager, glassManager, enemyBombManager);
+		} else {
+			// 範囲外ならアクティブフラグをおろし、更新をスキップ
+			enemy->SetActive(false);
+		}
 	}
 
 	// 音声更新
@@ -52,13 +71,19 @@ void EnemyManager::Update(
 
 void EnemyManager::PostUpdate() {
 	for (auto& enemy : enemies_) {
-		enemy->PostUpdate();
+		// アクティブな敵のみ更新
+		if (enemy->IsActive()) {
+			enemy->PostUpdate();
+		}
 	}
 }
 
 void EnemyManager::Draw() {
 	for (auto& enemy : enemies_) {
-		enemy->Draw();
+		// アクティブな敵のみ描画
+		if (enemy->IsActive()) {
+			enemy->Draw();
+		}
 	}
 }
 
