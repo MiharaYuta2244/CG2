@@ -15,9 +15,27 @@ void TitleScene::Initialize(const SceneContext& ctx) {
 	menu_ = std::make_unique<MenuList>();
 	menu_->Initialize(ctx.engineContext);
 	menu_->AddItem("Play", "Title_Play.png", [this]() { RequestSceneChange("StageSelect"); });
+	menu_->AddItem("Option", "Title_Option.png", [this]() {
+		menuState_ = TitleMenuState::Option;
+		optionMenu_->ResetState();
+	});
 	menu_->AddItem("Quit", "Title_Quit.png", [this]() {
 		finishTimer_ = std::make_unique<GameTimer>();
 		finishTimer_->Initialize(0.5f);
+	});
+
+	// オプションメニューの生成
+	optionMenu_ = std::make_unique<MenuList>();
+	optionMenu_->Initialize(ctx.engineContext);
+	optionMenu_->SetStartPos(titleLogoPos_ + Vector2{400.0f, 200.0f});
+
+	auto& pfx = commonData_->postEffectSettings;
+	optionMenu_->AddToggleItem("Vignette", "Vignette.png", &pfx.vignetteEnabled);
+	optionMenu_->AddToggleItem("RadialBlur", "RadialBlur.png", &pfx.radialBlurEnabled);
+	optionMenu_->AddToggleItem("Glitch", "Glitch.png", &pfx.glitchEnabled);
+	optionMenu_->AddItem("Back", "Back.png", [this]() {
+		menuState_ = TitleMenuState::Main;
+		menu_->ResetState();
 	});
 
 	// タイトルロゴの生成&初期化
@@ -61,7 +79,11 @@ void TitleScene::Update() {
 	audioManager_->Update();
 
 	// メニューの更新
-	menu_->Update(ctx_.keyboard, ctx_.gamePad, ctx_.timeManager->GetDeltaTime());
+	if (menuState_ == TitleMenuState::Main) {
+		menu_->Update(ctx_.keyboard, ctx_.gamePad, deltaTime);
+	} else {
+		optionMenu_->Update(ctx_.keyboard, ctx_.gamePad, deltaTime);
+	}
 
 	// タイトルロゴ更新
 	titleLogo_->SetPosition(titleLogoPos_);
@@ -140,7 +162,11 @@ void TitleScene::Draw() {
 	background_->Draw();
 
 	// メニュー描画
-	menu_->Draw();
+	if (menuState_ == TitleMenuState::Main) {
+		menu_->Draw();
+	} else {
+		optionMenu_->Draw();
+	}
 
 	// タイトルロゴ描画
 	titleLogo_->Draw();

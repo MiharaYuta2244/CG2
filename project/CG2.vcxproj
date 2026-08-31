@@ -404,6 +404,7 @@ xcopy /Y "$(windowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDi
     <ClInclude Include="engine\base\CopyImage.h" />
     <ClInclude Include="engine\base\ParticleMaterial.h" />
     <ClInclude Include="engine\base\PostEffectPass.h" />
+    <ClInclude Include="engine\base\PostEffectSetting.h" />
     <ClInclude Include="engine\base\PostEffectTypes.h" />
     <ClInclude Include="engine\base\SceneContext.h" />
     <ClInclude Include="engine\base\utility\ColorPalette.h" />

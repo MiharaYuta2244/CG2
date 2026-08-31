@@ -15,8 +15,13 @@ public:
 	void Finalize() override;
 
 private:
+	// メイン/オプションのメニュー状態
+	enum class TitleMenuState { Main, Option };
+	TitleMenuState menuState_ = TitleMenuState::Main;
+
 	// メニュー
 	std::unique_ptr<MenuList> menu_;
+	std::unique_ptr<MenuList> optionMenu_;
 
 	// タイトルロゴ
 	std::unique_ptr<TinyEngine::Sprite> titleLogo_;

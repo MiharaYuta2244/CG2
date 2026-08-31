@@ -22,11 +22,6 @@ void MenuList::Initialize(EngineContext* ctx) {
 	selectorBg_->SetColor({1.0f, 1.0f, 1.0f, 0.2f});
 	selectorBg_->SetSize(selectorBgSize_);
 	selectorBg_->SetAnchorPoint({0.5f, 0.0f});
-
-	// スケールアニメーションの初期パラメータ設定
-	decideScaleAnim_.start = {1.0f, 1.0f};
-	decideScaleAnim_.end = {1.0f, 0.0f};
-	decideScaleAnim_.temp = decideScaleAnim_.start;
 }
 
 void MenuList::AddItem(const std::string& label, const std::string& texturePath, std::function<void()> onSelect) {
@@ -36,6 +31,22 @@ void MenuList::AddItem(const std::string& label, const std::string& texturePath,
 	item.sprite = std::make_unique<Sprite>();
 	item.sprite->Initialize(ctx_, texturePath);
 	item.originalSize = item.sprite->GetSize();
+	items_.push_back(std::move(item));
+}
+
+void MenuList::AddToggleItem(const std::string& label, const std::string& texturePath, bool* target) {
+	MenuItem item;
+	item.label = label;
+	item.toggleValue = target;
+	item.onSelect = [target]() { *target = !(*target); };
+
+	item.sprite = std::make_unique<Sprite>();
+	item.sprite->Initialize(ctx_, texturePath);
+	item.originalSize = item.sprite->GetSize();
+
+	item.checkIcon = std::make_unique<Sprite>();
+	item.checkIcon->Initialize(ctx_, "Check.png");
+
 	items_.push_back(std::move(item));
 }
 
@@ -95,21 +106,17 @@ void MenuList::Update(DirectInput* input, GamePad* gamePad, float deltaTime) {
 		audioManager_->PlaySE("Select", 0.5f);
 	}
 
-	// 決定処理にアニメーションの開始処理を追加
+	// 決定処理
 	if (decide && !isDecided_) {
 		items_[currentIndex_].onSelect();
-		decideEffect_->StartAnimation();
 		audioManager_->PlaySE("Decide", 0.5f);
-		decideScaleAnim_.anim.Start(decideScaleAnim_.start, decideScaleAnim_.end, 0.2f, EaseType::EASEOUTEXPO);
-		isDecided_ = true;
-	}
 
-	// アニメーションの更新
-	if (decideScaleAnim_.anim.GetIsActive()) {
-		decideScaleAnim_.anim.Update(deltaTime, decideScaleAnim_.temp);
-	} else if (!isDecided_) {
-		// アニメーション非再生時はデフォルトの倍率に戻しておく
-		decideScaleAnim_.temp = decideScaleAnim_.start;
+		if (items_[currentIndex_].toggleValue) {
+			// トグル項目はロックせず即座に再入力可能にする
+		} else {
+			decideEffect_->StartAnimation();
+			isDecided_ = true;
+		}
 	}
 
 	// 背景スプライトの座標を選択中アイテムに合わせる
@@ -135,20 +142,27 @@ void MenuList::Draw() {
 	decideEffect_->Draw();
 
 	for (int i = 0; i < items_.size(); i++) {
-		auto& sprite = items_[i].sprite;
+		auto& item = items_[i];
+		auto& sprite = item.sprite;
 
 		// 選択中は色を変える
 		if (i == currentIndex_) {
 			sprite->SetColor(selectColor_);
-			Vector2 currentScale = {items_[i].originalSize.x * decideScaleAnim_.temp.x, items_[i].originalSize.y * decideScaleAnim_.temp.y};
-			sprite->SetSize(currentScale);
 		} else {
 			sprite->SetColor(normalColor_);
-			sprite->SetSize(items_[i].originalSize);
 		}
 
 		sprite->SetPosition({startPos_.x, startPos_.y + offsetY_ * i});
 		sprite->Update();
 		sprite->Draw();
+
+		// トグル項目ならON/OFF状態のアイコンも描画
+		if (item.toggleValue && item.checkIcon) {
+			bool isOn = *item.toggleValue;
+			item.checkIcon->SetColor(isOn ? Vector4{0.3f, 1.0f, 0.3f, 1.0f} : Vector4{0.4f, 0.4f, 0.4f, 0.5f});
+			item.checkIcon->SetPosition({startPos_.x + checkIconOffsetX_, startPos_.y + offsetY_ * i});
+			item.checkIcon->Update();
+			item.checkIcon->Draw();
+		}
 	}
 }

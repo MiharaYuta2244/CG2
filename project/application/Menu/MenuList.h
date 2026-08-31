@@ -12,6 +12,8 @@ struct MenuItem {
 	std::function<void()> onSelect;
 	std::unique_ptr<TinyEngine::Sprite> sprite;
 	Vector2 originalSize;
+	bool* toggleValue = nullptr;
+	std::unique_ptr<TinyEngine::Sprite> checkIcon;
 };
 
 /// <summary>
@@ -25,6 +27,9 @@ public:
 	// メニューの追加
 	void AddItem(const std::string& label, const std::string& texturePath, std::function<void()> onSelect);
 
+	// ON/OFFを切り替えるトグル項目
+	void AddToggleItem(const std::string& label, const std::string& texturePath, bool* target);
+
 	// 更新処理
 	void Update(DirectInput* input, GamePad* gamePad, float deltaTime);
 
@@ -36,6 +41,9 @@ public:
 
 	// メニュー項目間の縦の間隔を変更する
 	void SetOffsetY(float offset) { offsetY_ = offset; }
+
+	// 決定ロック状態をリセットする
+	void ResetState() { isDecided_ = false; }
 
 private:
 	EngineContext* ctx_ = nullptr;
@@ -65,12 +73,12 @@ private:
 	// 選択中の背後に表示する矩形スプライト
 	std::unique_ptr<TinyEngine::Sprite> selectorBg_;
 
-	// 決定時のスケールアニメーションバンドル
-	AnimationBundle<Vector2> decideScaleAnim_;
-
 	// 決定アニメーション再生中かどうかのフラグ
 	bool isDecided_ = false;
 
 	// 背景サイズ
 	Vector2 selectorBgSize_ = {2000, 60};
+
+	// チェックアイコンのXオフセット
+	float checkIconOffsetX_ = 400.0f;
 };

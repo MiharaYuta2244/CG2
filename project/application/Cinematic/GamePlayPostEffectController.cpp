@@ -5,6 +5,7 @@ using namespace TinyEngine;
 
 void GamePlayPostEffectController::Initialize(const SceneContext& ctx) {
 	ctx_ = &ctx;
+	commonData_ = ctx_->sceneManager->GetCommonData();
 
 	// シーンで使うエフェクトの宣言
 	ctx_->engineContext->postEffectPipeline->SetEffects({
@@ -50,6 +51,8 @@ void GamePlayPostEffectController::Update(float deltaTime, float playerHP, bool 
 	auto* gaussian = ctx_->engineContext->postEffectPipeline->GetPass(PostEffectType::Gaussian);
 	auto* radialBlur = ctx_->engineContext->postEffectPipeline->GetPass(PostEffectType::RadialBlur);
 	auto* deathEffect = ctx_->engineContext->postEffectPipeline->GetPass(PostEffectType::DeathEffect);
+
+	const auto& pfx = commonData_->postEffectSettings;
 
 	if (!isPlayerDead) {
 		// 生存時のエフェクト更新
@@ -104,7 +107,8 @@ void GamePlayPostEffectController::UpdateGlitch(float deltaTime) {
 		}
 	}
 
-	float intensity = (glitchTimer_ > 0.0f) ? 1.0f : 0.0f;
+	bool shouldGlitch = commonData_->postEffectSettings.glitchEnabled && glitchTimer_ > 0.0f;
+	float intensity = shouldGlitch ? 1.0f : 0.0f;
 	auto* glitch = ctx_->engineContext->postEffectPipeline->GetPass(PostEffectType::Glitch);
 	if (glitch) {
 		glitch->SetGlitchTime(elapsedTime_);

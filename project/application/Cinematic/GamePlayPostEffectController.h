@@ -4,6 +4,7 @@
 
 // シーンコンテキスト等の前方宣言
 struct SceneContext;
+struct CommonData;
 
 /// <summary>
 /// ゲームプレイ中のポストエフェクト演出を管理するクラス
@@ -32,6 +33,7 @@ private:
 
 private:
 	const SceneContext* ctx_ = nullptr;
+	CommonData* commonData_ = nullptr;
 
 	// グリッチノイズ用変数
 	float glitchTimer_ = 0.0f;

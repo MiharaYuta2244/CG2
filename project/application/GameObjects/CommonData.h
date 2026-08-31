@@ -1,4 +1,5 @@
 #pragma once
+#include "PostEffectSetting.h"
 
 /// <summary>
 /// シーンをまたいで保持するデータ
@@ -9,4 +10,5 @@ struct CommonData {
 	bool isClear = false;                   // クリアしたかどうか
 	std::string currentStageKey = "Stage1"; // 現在プレイ中のステージ
 	int currentStageNo = 1;                 // 現在のステージ番号
+	PostEffectSettings postEffectSettings;  // ポストエフェクトのON/OFF設定
 };

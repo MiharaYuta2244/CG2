@@ -82,8 +82,9 @@ void ResultScene::Update() {
 
 	auto* glitch = ctx_.engineContext->postEffectPipeline->GetPass(PostEffectType::Glitch);
 	if (glitch) {
+		bool shouldGlitch = commonData_->postEffectSettings.glitchEnabled;
 		glitch->SetGlitchTime(glitchParam_.time);
-		glitch->SetGlitchIntensity(glitchParam_.intensity);
+		glitch->SetGlitchIntensity(shouldGlitch ? glitchParam_.intensity : 0.0f);
 	}
 
 	// リザルトテキスト更新
